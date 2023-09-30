@@ -42,11 +42,10 @@ public class UserService : IUserService
 
         var result = new ResultModel();
 
-        var userByEmail = _dbContext.User.Where(s => s.Email == model.Email).FirstOrDefault();
+        var user = _dbContext.User.Where(s => s.Email == model.Email).FirstOrDefault();
 
-        if (userByEmail != null)
+        if (user != null)
         {
-            var user = await _userManager.FindByNameAsync(userByEmail.UserName);
             var check = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
             if (check.Succeeded)
             {

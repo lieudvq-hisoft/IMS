@@ -1,4 +1,5 @@
 ﻿using Data.Entities;
+using Data.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -20,6 +21,7 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Seed();
         base.OnModelCreating(modelBuilder);
         modelBuilder.Entity<User>(b =>
         {

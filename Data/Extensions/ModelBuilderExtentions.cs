@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace IMS.Extensions;
+namespace Data.Extensions;
 
 public static class ModelBuilderExtentions
 {
