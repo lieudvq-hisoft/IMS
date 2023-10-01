@@ -18,6 +18,44 @@ public static class ModelBuilderExtentions
 
             return new Guid(guid);
         }
+
+        #region Roles
+        modelBuilder.Entity<Role>().HasData(new Role {
+            Id = GenerateSeededGuid(1),
+            Name = "Customer",
+            Description = "Customer",
+            isDeactive = false,
+        });
+        modelBuilder.Entity<Role>().HasData(new Role
+        {
+            Id = GenerateSeededGuid(2),
+            Name = "IT",
+            Description = "IT Staff",
+            isDeactive = false,
+        });
+        modelBuilder.Entity<Role>().HasData(new Role
+        {
+            Id = GenerateSeededGuid(3),
+            Name = "Staff",
+            Description = "Staff",
+            isDeactive = false,
+        });
+        modelBuilder.Entity<Role>().HasData(new Role
+        {
+            Id = GenerateSeededGuid(4),
+            Name = "Manager",
+            Description = "Manager",
+            isDeactive = false,
+        });
+        modelBuilder.Entity<Role>().HasData(new Role
+        {
+            Id = GenerateSeededGuid(5),
+            Name = "Admin",
+            Description = "Admin",
+            isDeactive = false,
+        });
+        #endregion
+
         for (var i = 1; i<=5; i++) {
             modelBuilder.Entity<User>().HasData(new User
             {
@@ -43,6 +81,14 @@ public static class ModelBuilderExtentions
                 FcmToken = "token"+i,
                 UserAva = "Avatar" + i,
             }); ;
+
+            #region UserRole
+            modelBuilder.Entity<UserRole>().HasData(new UserRole
+            {
+                RoleId = GenerateSeededGuid(i),
+                UserId = GenerateSeededGuid(i),
+            });
+            #endregion
         }
         #endregion
     }
