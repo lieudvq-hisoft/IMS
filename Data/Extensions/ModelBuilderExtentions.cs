@@ -78,9 +78,9 @@ public static class ModelBuilderExtentions
                 isBlock = true,
                 isDelete = false,
                 CurrenNoticeCount = 0,
-                FcmToken = "token"+i,
+                FcmToken = "token" + i,
                 UserAva = "Avatar" + i,
-            }); ;
+            });
 
             #region UserRole
             modelBuilder.Entity<UserRole>().HasData(new UserRole
