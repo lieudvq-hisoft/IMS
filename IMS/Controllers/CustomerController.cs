@@ -27,4 +27,12 @@ public class CustomerController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPost]
+    public async Task<ActionResult> Create([FromForm] CustomerCreateModel model)
+    {
+        var result = await _customerService.Create(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }
