@@ -17,6 +17,14 @@ public class CustomerModel
     public string Email { get; set; }
 }
 
+public class CustomerCreateModel
+{
+    public string CompanyName { get; set; }
+    public string CompanyRepresentative { get; set; }
+    public string TaxNumber { get; set; }
+    public Guid UserId { get; set; }
+}
+
 public class CustomerSearchModel
 {
     public string? SearchValue { get; set; } = "";

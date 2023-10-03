@@ -11,23 +11,16 @@ public static class ModelBuilderExtentions
     {
         #region User
         var hasher = new PasswordHasher<User>();
-        Guid GenerateSeededGuid(int seed)
-        {
-            var r = new Random(seed);
-            var guid = new byte[16];
-            r.NextBytes(guid);
-
-            return new Guid(guid);
-        }
 
         List<Guid> seedGuids = new List<Guid>();
-        for(int i = 1; i <= 5; i++ )
+        for (int i = 1; i <= 5; i++)
         {
             seedGuids.Add(GenerateSeededGuid(i));
         }
 
         #region Roles
-        modelBuilder.Entity<Role>().HasData(new Role {
+        modelBuilder.Entity<Role>().HasData(new Role
+        {
             Id = GenerateSeededGuid(1),
             Name = "Customer",
             Description = "Customer",
@@ -63,10 +56,11 @@ public static class ModelBuilderExtentions
         });
         #endregion
 
-        for (var i = 1; i<=5; i++) {
+        for (var i = 1; i <= 5; i++)
+        {
             modelBuilder.Entity<User>().HasData(new User
             {
-                Id = seedGuids[i-1],
+                Id = seedGuids[i - 1],
                 UserName = "user" + i.ToString(),
                 NormalizedUserName = "member" + i.ToString() + "@gmail.com",
                 Email = "member" + i.ToString() + "@gmail.com",
@@ -77,7 +71,7 @@ public static class ModelBuilderExtentions
                 FirstName = "FirstName" + i,
                 LastName = "LastName" + i,
                 Address = "Address" + i,
-                PhoneNumber = "000000000"+i,
+                PhoneNumber = "000000000" + i,
                 isDelete = false,
                 CurrenNoticeCount = 0,
                 FcmToken = "token" + i,
@@ -111,5 +105,14 @@ public static class ModelBuilderExtentions
             UserId = seedGuids[1]
         });
         #endregion
+    }
+
+    private static Guid GenerateSeededGuid(int seed)
+    {
+        var r = new Random(seed);
+        var guid = new byte[16];
+        r.NextBytes(guid);
+
+        return new Guid(guid);
     }
 }
