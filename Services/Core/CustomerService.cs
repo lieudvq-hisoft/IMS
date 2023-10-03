@@ -42,7 +42,10 @@ public class CustomerService : ICustomerService
             var customers = _dbContext.Customer
                 .Include(x => x.User)
                 .Where(x => !x.IsDeleted)
-                .Where(x => MatchString(searchModel, x.User.Email))
+                .Where(delegate (Customer x)
+                {
+                    return MatchString(searchModel, x.User.Email);
+                })
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, customers.Count());
