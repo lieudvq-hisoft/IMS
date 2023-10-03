@@ -42,7 +42,7 @@ public class UserService : IUserService
 
         var result = new ResultModel();
 
-        var user = _dbContext.User.Where(s => s.Email == model.Email).FirstOrDefault();
+        var user = _dbContext.User.Where(s => s.UserName == model.Username).FirstOrDefault();
 
         if (user != null)
         {
@@ -93,13 +93,7 @@ public class UserService : IUserService
                 LastName = model.LastName,
                 Address = model.Address,
                 PhoneNumber = model.PhoneNumber,
-                Age = model.Age,
-                IdenficationNumber = model.IdenficationNumber,
-                IdenficationConfirm = false,
-                isBlock = false,
-                IsGoogle = false,
                 isDelete = false,
-                UserAva = "",
                 NormalizedEmail = model.Email,
             };
             var userByPhone = _dbContext.User.Where(s => s.PhoneNumber == user.PhoneNumber).FirstOrDefault();
@@ -122,11 +116,6 @@ public class UserService : IUserService
                     {
                         result.Succeed = false;
                         result.ErrorMessage = "PHONE_NUMBER " + ErrorMessage.INVALID;
-                    }
-                    if (user.IdenficationNumber.Length != 12)
-                    {
-                        result.Succeed = false;
-                        result.ErrorMessage = "Idenfication_Number" + ErrorMessage.INVALID;
                     }
                     else
                     {
@@ -184,7 +173,6 @@ public class UserService : IUserService
             UserID = user.Id.ToString(),
             UserName = user.UserName,
             PhoneNumber = user.PhoneNumber,
-            UserAva = user.UserAva,
             CurrenNoticeCount = user.CurrenNoticeCount,
             //Role = user.Role
         };

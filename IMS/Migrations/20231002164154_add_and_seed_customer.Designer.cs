@@ -3,6 +3,7 @@ using System;
 using Data.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IMS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231002164154_add_and_seed_customer")]
+    partial class add_and_seed_customer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -66,8 +69,8 @@ namespace IMS.Migrations
                             Id = 1,
                             CompanyName = "Company 1",
                             CompanyRepresentative = "Representative 1",
-                            DateCreated = new DateTime(2023, 10, 3, 13, 25, 22, 726, DateTimeKind.Local).AddTicks(389),
-                            DateUpdated = new DateTime(2023, 10, 3, 13, 25, 22, 726, DateTimeKind.Local).AddTicks(420),
+                            DateCreated = new DateTime(2023, 10, 2, 23, 41, 54, 74, DateTimeKind.Local).AddTicks(5761),
+                            DateUpdated = new DateTime(2023, 10, 2, 23, 41, 54, 74, DateTimeKind.Local).AddTicks(5772),
                             IsDeleted = false,
                             TaxNumber = "taxnumber1",
                             UserId = new Guid("8286d046-9740-a3e4-95cf-ff46699c73c4")
@@ -77,8 +80,8 @@ namespace IMS.Migrations
                             Id = 2,
                             CompanyName = "Company 2",
                             CompanyRepresentative = "Representative 2",
-                            DateCreated = new DateTime(2023, 10, 3, 13, 25, 22, 726, DateTimeKind.Local).AddTicks(464),
-                            DateUpdated = new DateTime(2023, 10, 3, 13, 25, 22, 726, DateTimeKind.Local).AddTicks(465),
+                            DateCreated = new DateTime(2023, 10, 2, 23, 41, 54, 74, DateTimeKind.Local).AddTicks(5821),
+                            DateUpdated = new DateTime(2023, 10, 2, 23, 41, 54, 74, DateTimeKind.Local).AddTicks(5821),
                             IsDeleted = false,
                             TaxNumber = "taxnumber2",
                             UserId = new Guid("95c69371-b924-6fe3-7c38-98b7dd200bc1")
@@ -190,6 +193,16 @@ namespace IMS.Migrations
                         .IsRequired()
                         .HasColumnType("varchar(1000)");
 
+                    b.Property<bool>("IdenficationConfirm")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("IdenficationNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsGoogle")
+                        .HasColumnType("boolean");
+
                     b.Property<string>("LastName")
                         .HasColumnType("varchar(1000)");
 
@@ -226,6 +239,9 @@ namespace IMS.Migrations
                         .HasMaxLength(256)
                         .HasColumnType("character varying(256)");
 
+                    b.Property<bool>("isBlock")
+                        .HasColumnType("boolean");
+
                     b.Property<bool>("isDelete")
                         .HasColumnType("boolean");
 
@@ -246,22 +262,26 @@ namespace IMS.Migrations
                             Id = new Guid("8286d046-9740-a3e4-95cf-ff46699c73c4"),
                             AccessFailedCount = 0,
                             Address = "Address1",
-                            ConcurrencyStamp = "31f384dd-65c3-4bf4-b9c4-c132c66073fb",
+                            ConcurrencyStamp = "b5837b6f-1666-49a1-8786-edb8371605e8",
                             CurrenNoticeCount = 0,
                             Email = "member1@gmail.com",
                             EmailConfirmed = true,
                             FcmToken = "token1",
                             FirstName = "FirstName1",
+                            IdenficationConfirm = true,
+                            IdenficationNumber = "001183000001",
+                            IsGoogle = true,
                             LastName = "LastName1",
                             LockoutEnabled = false,
                             NormalizedEmail = "member1@gmail.com",
                             NormalizedUserName = "member1@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEMpcYGyosp3r+G2TuClqfic+iG+661RlhWQSoe2bqqREIG6KsRKvbbu/rT+rTsTD0Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEErRI5CK7VIzGmcB716uttKgp6yEFY7a2ndbO+Syzl8Yob+tRLSIEB7aLBS6m+3Uxw==",
                             PhoneNumber = "0000000001",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
                             UserName = "user1",
+                            isBlock = true,
                             isDelete = false
                         },
                         new
@@ -269,22 +289,26 @@ namespace IMS.Migrations
                             Id = new Guid("95c69371-b924-6fe3-7c38-98b7dd200bc1"),
                             AccessFailedCount = 0,
                             Address = "Address2",
-                            ConcurrencyStamp = "4d70424d-73cb-4cf2-b62d-a2182dd67bec",
+                            ConcurrencyStamp = "288ec5da-4893-491b-a510-7d18d8b1f880",
                             CurrenNoticeCount = 0,
                             Email = "member2@gmail.com",
                             EmailConfirmed = true,
                             FcmToken = "token2",
                             FirstName = "FirstName2",
+                            IdenficationConfirm = true,
+                            IdenficationNumber = "001183000001",
+                            IsGoogle = true,
                             LastName = "LastName2",
                             LockoutEnabled = false,
                             NormalizedEmail = "member2@gmail.com",
                             NormalizedUserName = "member2@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJBWtFFK7JqnuwcQlOdbLSvUIQgGhheN2XRgC6Sq0L8zqgw3rV5K8WT5uMP2/5PEMg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGqe9EWHHhvKfDv7HReFyW1gPNnWvLyFBf9tZgqvuWhH4EDeRQlrchTyptyUZIxB6A==",
                             PhoneNumber = "0000000002",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
                             UserName = "user2",
+                            isBlock = true,
                             isDelete = false
                         },
                         new
@@ -292,22 +316,26 @@ namespace IMS.Migrations
                             Id = new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd"),
                             AccessFailedCount = 0,
                             Address = "Address3",
-                            ConcurrencyStamp = "d24a4f7e-7544-48ba-a0da-c191e574b820",
+                            ConcurrencyStamp = "1b45bf0d-e553-4b53-a0c9-f16926ba5e4d",
                             CurrenNoticeCount = 0,
                             Email = "member3@gmail.com",
                             EmailConfirmed = true,
                             FcmToken = "token3",
                             FirstName = "FirstName3",
+                            IdenficationConfirm = true,
+                            IdenficationNumber = "001183000001",
+                            IsGoogle = true,
                             LastName = "LastName3",
                             LockoutEnabled = false,
                             NormalizedEmail = "member3@gmail.com",
                             NormalizedUserName = "member3@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFAJ38spWreI4RAoR2e5vjAorz/WnzhXAbNyMQVYLH/TTNdybhZwmmK+/uUn1J7E7g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEPDh/SJATdIpFYKdcJ862CIlUgMrdTNZzMo6Vh3bK/XKxnM+Sun/7jYG96NBvJmiiw==",
                             PhoneNumber = "0000000003",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
                             UserName = "user3",
+                            isBlock = true,
                             isDelete = false
                         },
                         new
@@ -315,22 +343,26 @@ namespace IMS.Migrations
                             Id = new Guid("bc4519c8-fdeb-06e2-4a08-cc98c4273aba"),
                             AccessFailedCount = 0,
                             Address = "Address4",
-                            ConcurrencyStamp = "859742a4-c66c-4e97-bb07-80c3ca69fad8",
+                            ConcurrencyStamp = "0bf22c75-ce4a-431a-8802-624b183c9590",
                             CurrenNoticeCount = 0,
                             Email = "member4@gmail.com",
                             EmailConfirmed = true,
                             FcmToken = "token4",
                             FirstName = "FirstName4",
+                            IdenficationConfirm = true,
+                            IdenficationNumber = "001183000001",
+                            IsGoogle = true,
                             LastName = "LastName4",
                             LockoutEnabled = false,
                             NormalizedEmail = "member4@gmail.com",
                             NormalizedUserName = "member4@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAECdlzvAi68nNVHjV8yzGDyqkKAKjsl8OtHR8ozYmt8l/OXD84DaTVOpLToAqddrGCg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDdoSBTeS3aogN8JNwbNtl/FPx5yr3LB987Xc9ZA53rJVBlVok/qGDdyzAN/xBoBRw==",
                             PhoneNumber = "0000000004",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
                             UserName = "user4",
+                            isBlock = true,
                             isDelete = false
                         },
                         new
@@ -338,22 +370,26 @@ namespace IMS.Migrations
                             Id = new Guid("cf85ddf4-1ece-d1e2-3171-650938abd2b7"),
                             AccessFailedCount = 0,
                             Address = "Address5",
-                            ConcurrencyStamp = "d6674f92-e3d8-45e3-b995-9c7315734499",
+                            ConcurrencyStamp = "b362f201-ac02-4e2c-9218-a55ebdf624d9",
                             CurrenNoticeCount = 0,
                             Email = "member5@gmail.com",
                             EmailConfirmed = true,
                             FcmToken = "token5",
                             FirstName = "FirstName5",
+                            IdenficationConfirm = true,
+                            IdenficationNumber = "001183000001",
+                            IsGoogle = true,
                             LastName = "LastName5",
                             LockoutEnabled = false,
                             NormalizedEmail = "member5@gmail.com",
                             NormalizedUserName = "member5@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEPdou0YA5yyKRLhIyHC2WVzSVlh/+dAlLeFX77JqkwxrsedBP/EDBYLpY9yeoYOv8Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEM92jm9HOXdwQ7PUucL5a9renYmpSimMYf0Vs02Mv0fCCCtGcDMldU5db0jw+fZdhg==",
                             PhoneNumber = "0000000005",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
                             UserName = "user5",
+                            isBlock = true,
                             isDelete = false
                         });
                 });

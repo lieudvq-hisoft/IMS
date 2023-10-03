@@ -1,6 +1,7 @@
 ﻿using Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Collections;
 
 namespace Data.Extensions;
 
@@ -17,6 +18,12 @@ public static class ModelBuilderExtentions
             r.NextBytes(guid);
 
             return new Guid(guid);
+        }
+
+        List<Guid> seedGuids = new List<Guid>();
+        for(int i = 1; i <= 5; i++ )
+        {
+            seedGuids.Add(GenerateSeededGuid(i));
         }
 
         #region Roles
@@ -59,7 +66,7 @@ public static class ModelBuilderExtentions
         for (var i = 1; i<=5; i++) {
             modelBuilder.Entity<User>().HasData(new User
             {
-                Id = GenerateSeededGuid(i),
+                Id = seedGuids[i-1],
                 UserName = "user" + i.ToString(),
                 NormalizedUserName = "member" + i.ToString() + "@gmail.com",
                 Email = "member" + i.ToString() + "@gmail.com",
@@ -70,16 +77,10 @@ public static class ModelBuilderExtentions
                 FirstName = "FirstName" + i,
                 LastName = "LastName" + i,
                 Address = "Address" + i,
-                Gender = (i % 2 == 0) ? true : false,
-                Age = "2" + i,
-                IdenficationNumber = "001183000001",
-                IdenficationConfirm = true,
-                IsGoogle = true,
-                isBlock = true,
+                PhoneNumber = "000000000"+i,
                 isDelete = false,
                 CurrenNoticeCount = 0,
                 FcmToken = "token" + i,
-                UserAva = "Avatar" + i,
             });
 
             #region UserRole
@@ -90,6 +91,25 @@ public static class ModelBuilderExtentions
             });
             #endregion
         }
+        #endregion
+
+        #region Customer
+        modelBuilder.Entity<Customer>().HasData(new Customer
+        {
+            Id = 1,
+            CompanyName = "Company 1",
+            CompanyRepresentative = "Representative 1",
+            TaxNumber = "taxnumber1",
+            UserId = seedGuids[0]
+        });
+        modelBuilder.Entity<Customer>().HasData(new Customer
+        {
+            Id = 2,
+            CompanyName = "Company 2",
+            CompanyRepresentative = "Representative 2",
+            TaxNumber = "taxnumber2",
+            UserId = seedGuids[1]
+        });
         #endregion
     }
 }
