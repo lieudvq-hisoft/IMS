@@ -4,7 +4,10 @@ using Data.DataAccess;
 using Data.Entities;
 using Data.Enums;
 using Data.Model;
+using Data.Models;
+using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
+using Services.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,7 +18,7 @@ namespace Services.Core;
 
 public interface ICustomerService
 {
-
+    Task<ResultModel> Get(PagingParam<CustomerSortCriteria> paginationModel, CustomerSearchModel searchModel);
 }
 
 public class CustomerService : ICustomerService
@@ -29,31 +32,37 @@ public class CustomerService : ICustomerService
         _mapper = mapper;
     }
 
-    //public ResultModel Get(PagingParam<NotificationSortCriteria> paginationModel)
-    //{
-    //    var result = new ResultModel();
-    //    try
-    //    {
-    //        var customers = _dbContext.Customer
-    //            .Include(_ => _.User)
-    //            .Where(_ => !_.IsDeleted);
+    public async Task<ResultModel> Get(PagingParam<CustomerSortCriteria> paginationModel, CustomerSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        try
+        {
+            var customers = _dbContext.Customer
+                .Include(_ => _.User)
+                .Where(_ => !_.IsDeleted)
+                .Where(delegate (Customer c)
+                {
+                    if ((MyFunction.ConvertToUnSign(c.User.Email ?? "").IndexOf(MyFunction.ConvertToUnSign(searchModel.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0))
+                        return true;
+                    else
+                        return false;
+                })
+                .AsQueryable();
 
-    //        var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, customers.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, customers.Count());
 
-    //        customers = customers.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-    //        customers = customers.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            customers = customers.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            customers = customers.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-    //        var viewModels = _mapper.ProjectTo<NotificationModel>(customers).ToList();
+            paging.Data = _mapper.ProjectTo<CustomerModel>(customers).ToList();
 
-    //        paging.Data = viewModels;
-
-    //        result.Data = paging;
-    //        result.Succeed = true;
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
-    //    }
-    //    return result;
-    //}
+            result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
+        }
+        return result;
+    }
 }
