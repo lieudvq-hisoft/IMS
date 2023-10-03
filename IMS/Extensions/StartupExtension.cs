@@ -55,6 +55,7 @@ public static class StartupExtension
     public static void AddBussinessService(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ICustomerService, CustomerService>();
     }
 
     public static void ConfigIdentityService(this IServiceCollection services)

@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Data.Entities;
+using Data.Models;
 
 namespace Services.Mapping
 {
@@ -6,6 +8,10 @@ namespace Services.Mapping
     {
         public MapperProfile()
         {
+            CreateMap<Customer, CustomerModel>()
+                .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.User.Address))
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
+                .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber));
             //CreateMap<UserCreateModel, User>();
             //CreateMap<User, UserPostModel>();
             //CreateMap<User, UserModel>();
