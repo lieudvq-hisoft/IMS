@@ -27,11 +27,11 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPost("Register")]
-    public async Task<ActionResult> Register([FromBody] UserCreateModel model)
-    {
-        var result = await _userService.Register(model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPost("Register")]
+    //public async Task<ActionResult> Register([FromBody] UserCreateModel model)
+    //{
+    //    var result = await _userService.Register(model);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 }

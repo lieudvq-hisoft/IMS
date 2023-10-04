@@ -12,6 +12,5 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.User.Address))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
             .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber));
-        CreateMap<CustomerCreateModel, Customer>();
     }
 }

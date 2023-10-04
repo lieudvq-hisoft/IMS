@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,9 +21,21 @@ public class CustomerModel
 public class CustomerCreateModel
 {
     public string CompanyName { get; set; }
+    public string TaxNumber { get; set; }
+    public string UserName { get; set; }
+    public string Fullname { get; set; }
+    public string Address { get; set; }
+    public string Email { get; set; }
+    [Phone]
+    public string PhoneNumber { get; set; }
+}
+
+public class CustomerUpdateModel
+{
+    public int Id { get; set; }
+    public string CompanyName { get; set; }
     public string CompanyRepresentative { get; set; }
     public string TaxNumber { get; set; }
-    public Guid UserId { get; set; }
 }
 
 public class CustomerSearchModel
