@@ -11,8 +11,6 @@ public class UserModel
     public string Fullname { get; set; }
     public string Email { get; set; }
     public string Address { get; set; }
-    public int CurrenNoticeCount { get; set; }
-    public List<UserRoleModel>? userRoles { get; set; }
 }
 
 public class UserViewModel
