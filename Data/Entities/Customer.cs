@@ -11,7 +11,6 @@ namespace Data.Entities;
 public class Customer : BaseEntity
 {
     public string CompanyName { get; set; }
-    public string CompanyRepresentative { get; set; }
     public string TaxNumber { get; set; }
     public Guid UserId { get; set; }
     public virtual User User { get; set; }

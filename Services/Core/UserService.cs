@@ -3,6 +3,7 @@ using Data.DataAccess;
 using Data.DataAccess.Constant;
 using Data.Entities;
 using Data.Model;
+using Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,8 +16,8 @@ namespace Services.Core;
 
 public interface IUserService
 {
-    Task<ResultModel> Register(UserCreateModel model);
     Task<ResultModel> Login(LoginModel model);
+    Task<ResultModel> Register(UserCreateModel model);
 }
 public class UserService : IUserService
 {
@@ -80,68 +81,53 @@ public class UserService : IUserService
         result.Succeed = false;
         try
         {
-            if (!await _roleManager.RoleExistsAsync("Member"))
+            // Check for duplicate user by email or phonenumber
+            var existingUser = _dbContext.User.Where(x => (x.Email == model.Email || x.PhoneNumber == model.PhoneNumber) && !x.IsDeleted).FirstOrDefault();
+            if (existingUser != null)
             {
-                await _roleManager.CreateAsync(new Role { Description = "Role for Member", Name = "Member" });
-            }
-            var role = await _dbContext.Roles.FirstOrDefaultAsync(r => r.Name == "Member");
-            var user = new User
-            {
-                UserName = model.UserName,
-                Email = model.Email,
-                FirstName = model.FirstName,
-                LastName = model.LastName,
-                Address = model.Address,
-                PhoneNumber = model.PhoneNumber,
-                isDelete = false,
-                NormalizedEmail = model.Email,
-            };
-            var userByPhone = _dbContext.User.Where(s => s.PhoneNumber == user.PhoneNumber).FirstOrDefault();
-            var userByMail = _dbContext.User.Where(s => s.Email == user.Email).FirstOrDefault();
-            if (userByPhone != null)
-            {
-                result.Succeed = false;
-                result.ErrorMessage = "PHONE_NUMBER " + ErrorMessage.EXISTED;
+                result.ErrorMessage = "User " + ErrorMessage.EXISTED;
             }
             else
             {
-                if (userByMail != null)
+                var roles = new List<Role>();
+                foreach (string role in model.Roles)
                 {
-                    result.Succeed = false;
-                    result.ErrorMessage = "EMAIL " + ErrorMessage.EXISTED; ;
+                    roles.Add(await _dbContext.Roles.FirstOrDefaultAsync(r => r.Name == role));
+                }
+
+                var user = new User
+                {
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    Fullname = model.Fullname,
+                    Address = model.Address,
+                    PhoneNumber = model.PhoneNumber,
+                    IsDeleted = false,
+                    NormalizedEmail = model.Email.ToLower(),
+                };
+                var createUserResult = await _userManager.CreateAsync(user, model.Password);
+
+                if (createUserResult.Succeeded)
+                {
+                    foreach(Role role in roles)
+                    {
+                        var userRole = new UserRole
+                        {
+                            RoleId = role.Id,
+                            UserId = user.Id
+                        };
+                        _dbContext.UserRoles.Add(userRole);
+                        await _dbContext.SaveChangesAsync();
+                    }
+                    
+                    result.Succeed = true;
+                    result.Data = _mapper.Map<UserModel>(user);
                 }
                 else
                 {
-                    if (user.PhoneNumber.Length < 9 || user.PhoneNumber.Length > 10)
-                    {
-                        result.Succeed = false;
-                        result.ErrorMessage = "PHONE_NUMBER " + ErrorMessage.INVALID;
-                    }
-                    else
-                    {
-                        var check = await _userManager.CreateAsync(user, model.Password);
-
-                        if (check.Succeeded == true)
-                        {
-                            var userRole = new UserRole
-                            {
-                                RoleId = role.Id,
-                                UserId = user.Id
-                            };
-                            _dbContext.UserRoles.Add(userRole);
-                            await _dbContext.SaveChangesAsync();
-                            result.Succeed = true;
-                            result.Data = user.Id;
-                        }
-                        else
-                        {
-                            result.Succeed = false;
-                            result.ErrorMessage = "REGISTER_USER_ERROR";
-                        }
-                    }
-
+                    result.Succeed = false;
+                    result.ErrorMessage = "REGISTER_USER_ERROR";
                 }
-
             }
         }
         catch (Exception ex)
@@ -184,7 +170,7 @@ public class UserService : IUserService
         var claims = new List<Claim> {
                 new Claim("UserId", user.Id.ToString()),
                 new Claim("Email", user.Email),
-                new Claim("FullName", user.FirstName + user.LastName),
+                new Claim("FullName", user.Fullname),
 
                 new Claim("UserName", user.UserName)
             };

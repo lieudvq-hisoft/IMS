@@ -3,6 +3,7 @@ using System;
 using Data.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IMS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231004142833_change_user_and_customer")]
+    partial class change_user_and_customer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -55,6 +58,28 @@ namespace IMS.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("Customer");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CompanyName = "Company 1",
+                            DateCreated = new DateTime(2023, 10, 4, 21, 28, 33, 143, DateTimeKind.Local).AddTicks(4408),
+                            DateUpdated = new DateTime(2023, 10, 4, 21, 28, 33, 143, DateTimeKind.Local).AddTicks(4421),
+                            IsDeleted = false,
+                            TaxNumber = "taxnumber1",
+                            UserId = new Guid("8286d046-9740-a3e4-95cf-ff46699c73c4")
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CompanyName = "Company 2",
+                            DateCreated = new DateTime(2023, 10, 4, 21, 28, 33, 143, DateTimeKind.Local).AddTicks(4493),
+                            DateUpdated = new DateTime(2023, 10, 4, 21, 28, 33, 143, DateTimeKind.Local).AddTicks(4493),
+                            IsDeleted = false,
+                            TaxNumber = "taxnumber2",
+                            UserId = new Guid("95c69371-b924-6fe3-7c38-98b7dd200bc1")
+                        });
                 });
 
             modelBuilder.Entity("Data.Entities.Role", b =>
@@ -212,7 +237,7 @@ namespace IMS.Migrations
                             Id = new Guid("8286d046-9740-a3e4-95cf-ff46699c73c4"),
                             AccessFailedCount = 0,
                             Address = "Address1",
-                            ConcurrencyStamp = "7d855491-c92f-44a0-895f-846e9dbc1b06",
+                            ConcurrencyStamp = "2cdf8928-7d8c-485c-bb7b-bd16688753b2",
                             CurrenNoticeCount = 0,
                             Email = "member1@gmail.com",
                             EmailConfirmed = true,
@@ -221,7 +246,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "member1@gmail.com",
                             NormalizedUserName = "member1@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEP6Mu58sqfRDKpsC8z2zHezvrA2Dru+Xg806/JtFEQn4KzGL5T0dBvqHRpmQg2tVcw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOLr4jWsWPKBzxOifNDHbvQYPijWnmRGR0Zi2nnXa7ZkojfLTqkvKGJOeINX/XAybA==",
                             PhoneNumber = "0000000001",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -233,7 +258,7 @@ namespace IMS.Migrations
                             Id = new Guid("95c69371-b924-6fe3-7c38-98b7dd200bc1"),
                             AccessFailedCount = 0,
                             Address = "Address2",
-                            ConcurrencyStamp = "440cd3e6-a9fc-4f48-b13a-c4b2350cbb17",
+                            ConcurrencyStamp = "afd904dd-8799-401c-aa32-561039f3e59f",
                             CurrenNoticeCount = 0,
                             Email = "member2@gmail.com",
                             EmailConfirmed = true,
@@ -242,7 +267,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "member2@gmail.com",
                             NormalizedUserName = "member2@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAENGyAyulfcG6ZnnFZ11WVlajj1sY+v3dhXrfjHQaQ9x3lEcIcZRFreSFmL5/8O5T5Q==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAZSz+nGVsLk5/OzI5lUyNx5ZX0TpteUwE4IDJOw0ewXU5SfKKW4OgwGXcvokX7q9w==",
                             PhoneNumber = "0000000002",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -254,7 +279,7 @@ namespace IMS.Migrations
                             Id = new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd"),
                             AccessFailedCount = 0,
                             Address = "Address3",
-                            ConcurrencyStamp = "4bd769a6-f71d-48cb-99da-ba7c5ad830ad",
+                            ConcurrencyStamp = "cd4af860-7705-4134-ac5f-f05a2c1bc39d",
                             CurrenNoticeCount = 0,
                             Email = "member3@gmail.com",
                             EmailConfirmed = true,
@@ -263,7 +288,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "member3@gmail.com",
                             NormalizedUserName = "member3@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEFjm+ZZQsHEEkLQgKIRunlX5eCbXHYNrxcoCtCM+fpZ8UxJ/eSz8Ilk++mbv0EUk6g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEKlLowcqYENSICm/SD7a4XUr1+KadQV9KW8/aGfyOqhAruTCYPQD3ce6f10rx5qmnw==",
                             PhoneNumber = "0000000003",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -275,7 +300,7 @@ namespace IMS.Migrations
                             Id = new Guid("bc4519c8-fdeb-06e2-4a08-cc98c4273aba"),
                             AccessFailedCount = 0,
                             Address = "Address4",
-                            ConcurrencyStamp = "b7be5590-f73d-4c07-a4e0-fc29ecdd0885",
+                            ConcurrencyStamp = "1f7af214-be59-4705-bb8f-182ededd4cd8",
                             CurrenNoticeCount = 0,
                             Email = "member4@gmail.com",
                             EmailConfirmed = true,
@@ -284,7 +309,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "member4@gmail.com",
                             NormalizedUserName = "member4@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEF+x6VFdjY4eE/lE+cl2KUUCBEhbjdM9Jql4ONfhgCVvd/8LxKEGEfLKuy0QntG/Pg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBV6OJnI6ydosHn+KLKG4sfPzAyETqT0klZ+p5zJSfza3wCeECVuImhVV6x+lHx4gw==",
                             PhoneNumber = "0000000004",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -296,7 +321,7 @@ namespace IMS.Migrations
                             Id = new Guid("cf85ddf4-1ece-d1e2-3171-650938abd2b7"),
                             AccessFailedCount = 0,
                             Address = "Address5",
-                            ConcurrencyStamp = "53909117-3d34-45c2-80bd-33249a4874e0",
+                            ConcurrencyStamp = "bdf362f5-8366-4529-98c2-44ac2a81e674",
                             CurrenNoticeCount = 0,
                             Email = "member5@gmail.com",
                             EmailConfirmed = true,
@@ -305,7 +330,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "member5@gmail.com",
                             NormalizedUserName = "member5@gmail.com",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGryF3YReBj4BkPB20bUrgUDwXEEum8gqrHrKRU7ndH4wH3CSsW8gVvNXJ9FZWobeQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIkgEobSJxfO30NbfykBu8MljbZGuMMvdauPuBMbAaTZQTyMf4aSlqXdeUUP2gCowQ==",
                             PhoneNumber = "0000000005",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",

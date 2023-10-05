@@ -11,6 +11,7 @@ namespace UserController.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(AuthenticationSchemes = "Bearer")]
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -19,6 +20,7 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
+    [AllowAnonymous]
     [HttpPost("Login")]
     public async Task<ActionResult> Login([FromBody] LoginModel model)
     {
@@ -27,6 +29,7 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [Authorize(Roles = "Admin")]
     [HttpPost("Register")]
     public async Task<ActionResult> Register([FromBody] UserCreateModel model)
     {

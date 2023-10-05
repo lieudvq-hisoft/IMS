@@ -68,13 +68,11 @@ public static class ModelBuilderExtentions
                 EmailConfirmed = true,
                 PasswordHash = hasher.HashPassword(null, "12345678"),
                 SecurityStamp = string.Empty,
-                FirstName = "FirstName" + i,
-                LastName = "LastName" + i,
+                Fullname = "Fullname" + i,
                 Address = "Address" + i,
                 PhoneNumber = "000000000" + i,
-                isDelete = false,
                 CurrenNoticeCount = 0,
-                FcmToken = "token" + i,
+                IsDeleted = false,
             });
 
             #region UserRole
@@ -85,25 +83,6 @@ public static class ModelBuilderExtentions
             });
             #endregion
         }
-        #endregion
-
-        #region Customer
-        modelBuilder.Entity<Customer>().HasData(new Customer
-        {
-            Id = 1,
-            CompanyName = "Company 1",
-            CompanyRepresentative = "Representative 1",
-            TaxNumber = "taxnumber1",
-            UserId = seedGuids[0]
-        });
-        modelBuilder.Entity<Customer>().HasData(new Customer
-        {
-            Id = 2,
-            CompanyName = "Company 2",
-            CompanyRepresentative = "Representative 2",
-            TaxNumber = "taxnumber2",
-            UserId = seedGuids[1]
-        });
         #endregion
     }
 
