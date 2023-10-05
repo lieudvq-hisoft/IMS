@@ -3,6 +3,7 @@ using Data.DataAccess;
 using Data.DataAccess.Constant;
 using Data.Entities;
 using Data.Model;
+using Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -16,7 +17,7 @@ namespace Services.Core;
 public interface IUserService
 {
     Task<ResultModel> Login(LoginModel model);
-    //Task<ResultModel> Register(UserCreateModel model);
+    Task<ResultModel> Register(UserCreateModel model);
 }
 public class UserService : IUserService
 {
@@ -74,82 +75,67 @@ public class UserService : IUserService
         return result;
     }
 
-    //public async Task<ResultModel> Register(UserCreateModel model)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
-    //    try
-    //    {
-    //        if (!await _roleManager.RoleExistsAsync("Member"))
-    //        {
-    //            await _roleManager.CreateAsync(new Role { Description = "Role for Member", Name = "Member" });
-    //        }
-    //        var role = await _dbContext.Roles.FirstOrDefaultAsync(r => r.Name == "Member");
-    //        var user = new User
-    //        {
-    //            UserName = model.UserName,
-    //            Email = model.Email,
-    //            FirstName = model.FirstName,
-    //            LastName = model.LastName,
-    //            Address = model.Address,
-    //            PhoneNumber = model.PhoneNumber,
-    //            isDelete = false,
-    //            NormalizedEmail = model.Email,
-    //        };
-    //        var userByPhone = _dbContext.User.Where(s => s.PhoneNumber == user.PhoneNumber).FirstOrDefault();
-    //        var userByMail = _dbContext.User.Where(s => s.Email == user.Email).FirstOrDefault();
-    //        if (userByPhone != null)
-    //        {
-    //            result.Succeed = false;
-    //            result.ErrorMessage = "PHONE_NUMBER " + ErrorMessage.EXISTED;
-    //        }
-    //        else
-    //        {
-    //            if (userByMail != null)
-    //            {
-    //                result.Succeed = false;
-    //                result.ErrorMessage = "EMAIL " + ErrorMessage.EXISTED; ;
-    //            }
-    //            else
-    //            {
-    //                if (user.PhoneNumber.Length < 9 || user.PhoneNumber.Length > 10)
-    //                {
-    //                    result.Succeed = false;
-    //                    result.ErrorMessage = "PHONE_NUMBER " + ErrorMessage.INVALID;
-    //                }
-    //                else
-    //                {
-    //                    var check = await _userManager.CreateAsync(user, model.Password);
+    public async Task<ResultModel> Register(UserCreateModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        try
+        {
+            // Check for duplicate user by email or phonenumber
+            var existingUser = _dbContext.User.Where(x => (x.Email == model.Email || x.PhoneNumber == model.PhoneNumber) && !x.IsDeleted).FirstOrDefault();
+            if (existingUser != null)
+            {
+                result.ErrorMessage = "User " + ErrorMessage.EXISTED;
+            }
+            else
+            {
+                var roles = new List<Role>();
+                foreach (string role in model.Roles)
+                {
+                    roles.Add(await _dbContext.Roles.FirstOrDefaultAsync(r => r.Name == role));
+                }
 
-    //                    if (check.Succeeded == true)
-    //                    {
-    //                        var userRole = new UserRole
-    //                        {
-    //                            RoleId = role.Id,
-    //                            UserId = user.Id
-    //                        };
-    //                        _dbContext.UserRoles.Add(userRole);
-    //                        await _dbContext.SaveChangesAsync();
-    //                        result.Succeed = true;
-    //                        result.Data = user.Id;
-    //                    }
-    //                    else
-    //                    {
-    //                        result.Succeed = false;
-    //                        result.ErrorMessage = "REGISTER_USER_ERROR";
-    //                    }
-    //                }
+                var user = new User
+                {
+                    UserName = model.UserName,
+                    Email = model.Email,
+                    Fullname = model.Fullname,
+                    Address = model.Address,
+                    PhoneNumber = model.PhoneNumber,
+                    IsDeleted = false,
+                    NormalizedEmail = model.Email.ToLower(),
+                };
+                var createUserResult = await _userManager.CreateAsync(user, model.Password);
 
-    //            }
-
-    //        }
-    //    }
-    //    catch (Exception ex)
-    //    {
-    //        result.ErrorMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
-    //    }
-    //    return result;
-    //}
+                if (createUserResult.Succeeded)
+                {
+                    foreach(Role role in roles)
+                    {
+                        var userRole = new UserRole
+                        {
+                            RoleId = role.Id,
+                            UserId = user.Id
+                        };
+                        _dbContext.UserRoles.Add(userRole);
+                        await _dbContext.SaveChangesAsync();
+                    }
+                    
+                    result.Succeed = true;
+                    result.Data = _mapper.Map<UserModel>(user);
+                }
+                else
+                {
+                    result.Succeed = false;
+                    result.ErrorMessage = "REGISTER_USER_ERROR";
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            result.ErrorMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+        }
+        return result;
+    }
 
     private async Task<Token> GetAccessToken(User user, List<string> role)
     {

@@ -84,25 +84,6 @@ public static class ModelBuilderExtentions
             #endregion
         }
         #endregion
-
-        #region Customer
-        modelBuilder.Entity<Customer>().HasData(new Customer
-        {
-            Id = 1,
-            CompanyName = "Company 1",
-            TaxNumber = "taxnumber1",
-            UserId = seedGuids[0],
-            IsDeleted = false
-        });
-        modelBuilder.Entity<Customer>().HasData(new Customer
-        {
-            Id = 2,
-            CompanyName = "Company 2",
-            TaxNumber = "taxnumber2",
-            UserId = seedGuids[1],
-            IsDeleted = false
-        });
-        #endregion
     }
 
     private static Guid GenerateSeededGuid(int seed)

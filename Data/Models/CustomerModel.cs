@@ -20,13 +20,27 @@ public class CustomerModel
 
 public class CustomerCreateModel
 {
+    [Required]
     public string CompanyName { get; set; }
+
+    [Required]
     public string TaxNumber { get; set; }
+
+    [Required]
     public string UserName { get; set; }
+
+    [Required]
     public string Fullname { get; set; }
+
+    [Required]
     public string Address { get; set; }
+
+    [Required]
+    [EmailAddress]
     public string Email { get; set; }
+
     [Phone]
+    [Required]
     public string PhoneNumber { get; set; }
 }
 

@@ -3,17 +3,14 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Data.Model;
 
-public class UserModel 
+public class UserModel
 {
     public Guid Id { get; set; }
     public string PhoneNumber { get; set; }
     public string UserName { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
+    public string Fullname { get; set; }
     public string Email { get; set; }
     public string Address { get; set; }
-    public string? UserAva { get; set; }
-    public string FcmToken { get; set; }
     public int CurrenNoticeCount { get; set; }
     public List<UserRoleModel>? userRoles { get; set; }
 }
@@ -51,23 +48,26 @@ public class UserRoleModel
 }
 public class UserCreateModel
 {
+    [Required]
     public string UserName { get; set; }
+
     [Required]
     public string Password { get; set; }
+
     [Required]
     public string Email { get; set; }
-    [Required]
-    public string FirstName { get; set; }
 
-    public string? LastName { get; set; }
+    [Required]
+    public string Fullname { get; set; }
+
     [Required]
     public string Address { get; set; }
-    
+
+    [Required]
     public string PhoneNumber { get; set; }
 
-    public string Age { get; set; }
-    public string IdenficationNumber { get; set; }
-
+    [Required] 
+    public List<string> Roles { get; set; }
 }
 public class UserUpdateModel
 {
