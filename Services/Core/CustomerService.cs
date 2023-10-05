@@ -22,6 +22,7 @@ public interface ICustomerService
 {
     Task<ResultModel> Get(PagingParam<CustomerSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> Create(CustomerCreateModel model);
+    Task<ResultModel> Delete(int id);
 }
 
 public class CustomerService : ICustomerService
@@ -157,6 +158,35 @@ public class CustomerService : ICustomerService
             result.ErrorMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
         }
 
+        return result;
+    }
+
+    public async Task<ResultModel> Delete(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var customer = _dbContext.Customer.Include(x => x.User).Where(x => x.Id == id && !x.IsDeleted).FirstOrDefault();
+            if (customer == null)
+            {
+                result.ErrorMessage = "Delete customer fail";
+            }
+            else
+            {
+                customer.IsDeleted = true;
+                customer.User.IsDeleted = true;
+                customer.DateUpdated = DateTime.Now;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = customer.Id;
+            }
+        }
+        catch (Exception ex)
+        {
+            result.ErrorMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+        }
         return result;
     }
 
