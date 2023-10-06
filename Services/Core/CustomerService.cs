@@ -7,11 +7,15 @@ using Data.Enums;
 using Data.Model;
 using Data.Models;
 using Data.Utils.Paging;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using Services.Utilities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +27,7 @@ public interface ICustomerService
     Task<ResultModel> Get(PagingParam<CustomerSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> Create(CustomerCreateModel model);
     Task<ResultModel> Delete(int id);
+    Task<ResultModel> Import(string filename);
 }
 
 public class CustomerService : ICustomerService
@@ -30,16 +35,14 @@ public class CustomerService : ICustomerService
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
-    private readonly SignInManager<User> _signInManager;
-    private readonly RoleManager<Role> _roleManager;
+    private readonly IHostingEnvironment _environment;
 
-    public CustomerService(AppDbContext dbContext, IMapper mapper, UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<Role> roleManager)
+    public CustomerService(AppDbContext dbContext, IMapper mapper, UserManager<User> userManager, IHostingEnvironment environment)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _userManager = userManager;
-        _signInManager = signInManager;
-        _roleManager = roleManager;
+        _environment = environment;
     }
 
     public async Task<ResultModel> Get(PagingParam<CustomerSortCriteria> paginationModel, CustomerSearchModel searchModel)
@@ -73,14 +76,74 @@ public class CustomerService : ICustomerService
             result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
         }
         return result;
-
-
     }
+
     private bool MatchString(CustomerSearchModel searchModel, string? value)
     {
         return MyFunction
             .ConvertToUnSign(value ?? "")
             .IndexOf(MyFunction.ConvertToUnSign(searchModel.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
+    }
+
+    public async Task<ResultModel> Import(string filename)
+    {
+        string filePath = Path.Combine(_environment.WebRootPath, "import/customer/" + filename);
+        ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
+        using var package = new ExcelPackage(filePath);
+        var worksheet = package.Workbook.Worksheets["Sheet1"];
+        int rowCount = worksheet.Dimension.End.Row;     //get row count
+        int successRow = 0;
+
+        for (int row = 2; row <= rowCount; row++)
+        {
+            var model = new CustomerCreateModel()
+            {
+                Fullname = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                Email = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                UserName = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                Address = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                CompanyName = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                PhoneNumber = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                TaxNumber = worksheet.Cells[row, 7].Value?.ToString().Trim(),
+            };
+
+            var context = new ValidationContext(model, serviceProvider: null, items: null);
+            var validationResults = new List<ValidationResult>();
+            var resultCell = worksheet.Cells[row, 8];
+            resultCell.Style.WrapText = true;
+            resultCell.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+
+            bool isValid = Validator.TryValidateObject(model, context, validationResults, true);
+
+            if (!isValid)
+            {
+                foreach (ValidationResult validationError in validationResults)
+                {
+                    resultCell.RichText.Add(validationError.ErrorMessage+"\r\n");
+                }
+            }
+            else
+            {
+                var result = await Create(model);
+                if (!result.Succeed)
+                {
+                    resultCell.Value = result.ErrorMessage;
+                }
+                else
+                {
+                    resultCell.Value = "Ok";
+                    successRow++;
+                }
+            }
+        }
+
+        package.Save();
+
+        return new ResultModel
+        {
+            Succeed = true,
+            Data = successRow
+        };
     }
 
     /// <summary>

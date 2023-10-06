@@ -4,6 +4,7 @@ using Data.Model;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
 using Services.Core;
 
 namespace IMS.Controllers;
@@ -24,6 +25,15 @@ public class CustomerController : ControllerBase
     public async Task<ActionResult> Get([FromQuery] PagingParam<CustomerSortCriteria> pagingParam, [FromQuery] CustomerSearchModel searchModel)
     {
         var result = await _customerService.Get(pagingParam, searchModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [AllowAnonymous]
+    [HttpPost("bulk")]
+    public async Task<ActionResult> Import()
+    {
+        var result = await _customerService.Import("Test_Excel.xlsx");
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
