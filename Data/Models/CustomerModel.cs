@@ -10,7 +10,7 @@ public class CustomerModel
 {
     public int Id { get; set; }
     public string CompanyName { get; set; }
-    public string CompanyRepresentative { get; set; }
+    public string Fullname { get; set; }
     public string TaxNumber { get; set; }
     public Guid UserId { get; set; }
     public string Address { get; set; }
@@ -35,8 +35,8 @@ public class CustomerCreateModel
     [Required]
     public string Address { get; set; }
 
-    [Required]
     [EmailAddress]
+    [Required]
     public string Email { get; set; }
 
     [Phone]
@@ -46,10 +46,22 @@ public class CustomerCreateModel
 
 public class CustomerUpdateModel
 {
+    [Required]
     public int Id { get; set; }
-    public string CompanyName { get; set; }
-    public string CompanyRepresentative { get; set; }
-    public string TaxNumber { get; set; }
+
+    public string? CompanyName { get; set; }
+
+    public string? TaxNumber { get; set; }
+
+    public string? Fullname { get; set; }
+
+    public string? Address { get; set; }
+
+    [EmailAddress]
+    public string? Email { get; set; }
+
+    [Phone]
+    public string? PhoneNumber { get; set; }
 }
 
 public class CustomerSearchModel

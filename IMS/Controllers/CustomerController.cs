@@ -29,7 +29,7 @@ public class CustomerController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [AllowAnonymous]
+    [Authorize(Roles = "Admin")]
     [HttpPost("bulk")]
     public async Task<ActionResult> Import()
     {
@@ -50,6 +50,15 @@ public class CustomerController : ControllerBase
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _customerService.Delete(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [AllowAnonymous]
+    [HttpPatch]
+    public async Task<ActionResult> Update([FromForm] CustomerUpdateModel model)
+    {
+        var result = await _customerService.Update(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
