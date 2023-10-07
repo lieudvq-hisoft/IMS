@@ -26,6 +26,7 @@ namespace Services.Core;
 public interface ICustomerService
 {
     Task<ResultModel> Get(PagingParam<CustomerSortCriteria> paginationModel, CustomerSearchModel searchModel);
+    Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Import(string filename);
     Task<ResultModel> Create(CustomerCreateModel model);
     Task<ResultModel> Delete(int id);
@@ -72,6 +73,33 @@ public class CustomerService : ICustomerService
 
             result.Data = paging;
             result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetDetail(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var customer = _dbContext.Customer.Include(x => x.User).Where(x => x.Id == id && !x.IsDeleted).FirstOrDefault();
+
+            if (customer != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<CustomerModel>(customer);
+            }
+            else
+            {
+                result.ErrorMessage = "Customer with id " + ErrorMessage.ID_NOT_EXISTED;
+                result.Succeed = false;
+            }
         }
         catch (Exception e)
         {
