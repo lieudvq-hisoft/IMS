@@ -4,6 +4,7 @@ using Data.Model;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using OfficeOpenXml;
 using Services.Core;
 
 namespace IMS.Controllers;
@@ -28,6 +29,15 @@ public class CustomerController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [Authorize(Roles = "Admin")]
+    [HttpPost("bulk")]
+    public async Task<ActionResult> Import()
+    {
+        var result = await _customerService.Import("Test_Excel.xlsx");
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost]
     public async Task<ActionResult> Create([FromForm] CustomerCreateModel model)
     {
@@ -40,6 +50,15 @@ public class CustomerController : ControllerBase
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _customerService.Delete(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [AllowAnonymous]
+    [HttpPatch]
+    public async Task<ActionResult> Update([FromForm] CustomerUpdateModel model)
+    {
+        var result = await _customerService.Update(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
