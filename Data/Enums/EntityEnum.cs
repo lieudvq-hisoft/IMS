@@ -3,8 +3,11 @@ namespace Data.Enums;
 
 public enum RoleType
 {
-    Admin = 1,
-    Member = 2,
+    Customer = 1,
+    It = 2,
+    Staff = 3,
+    Manager = 4,
+    Admin = 5
 }
 
 public enum UserSortCriteria

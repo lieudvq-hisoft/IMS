@@ -12,7 +12,7 @@ namespace IMS.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = "Bearer")]
-[AllowAnonymous]
+[Authorize(Roles = nameof(RoleType.Staff))]
 public class CustomerController : ControllerBase
 {
     private readonly ICustomerService _customerService;
@@ -38,7 +38,6 @@ public class CustomerController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [Authorize(Roles = "Admin")]
     [HttpPost("bulk")]
     public async Task<ActionResult> Import()
     {
