@@ -29,7 +29,7 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = nameof(RoleType.Admin))]
     [HttpPost("Register")]
     public async Task<ActionResult> Register([FromBody] UserCreateModel model)
     {
