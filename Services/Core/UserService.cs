@@ -137,9 +137,9 @@ public class UserService : IUserService
         return result;
     }
 
-    private async Task<Token> GetAccessToken(User user, List<string> role)
+    private async Task<Token> GetAccessToken(User user, List<string> roles)
     {
-        List<Claim> claims = GetClaims(user, role);
+        List<Claim> claims = GetClaims(user, roles);
         var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
         var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
