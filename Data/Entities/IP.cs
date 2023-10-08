@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Data.Entities;
 
-public class IP_Management : BaseEntity
+public class IP : BaseEntity
 {
     public string Octet1 { get; set; }
     public string Octet2 { get; set; }

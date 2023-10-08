@@ -56,15 +56,32 @@ public static class ModelBuilderExtentions
         });
         #endregion
 
-        for (var i = 1; i <= 5; i++)
+        for (var i = 2; i <= 5; i++)
         {
+            var username = "";
+            switch (i)
+            {
+                case 2:
+                    username = "it";
+                    break;
+                case 3:
+                    username = "staff";
+                    break;
+                case 4:
+                    username = "manager";
+                    break;
+                case 5:
+                    username = "admin";
+                    break;
+            }
+
             modelBuilder.Entity<User>().HasData(new User
             {
                 Id = seedGuids[i - 1],
-                UserName = "user" + i.ToString(),
-                NormalizedUserName = "member" + i.ToString() + "@gmail.com",
-                Email = "member" + i.ToString() + "@gmail.com",
-                NormalizedEmail = "member" + i.ToString() + "@gmail.com",
+                UserName = username,
+                NormalizedUserName = username,
+                Email = username + "@gmail.com",
+                NormalizedEmail = username + "@gmail.com",
                 EmailConfirmed = true,
                 PasswordHash = hasher.HashPassword(null, "12345678"),
                 SecurityStamp = string.Empty,

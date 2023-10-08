@@ -50,7 +50,7 @@ public class UserService : IUserService
             var check = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);
             if (check.Succeeded)
             {
-                var userRoles = _dbContext.UserRoles.Where(ur => ur.UserId == user.Id).ToList();
+                var userRoles = _dbContext.UserRole.Where(ur => ur.UserId == user.Id).ToList();
                 var roles = new List<string>();
                 foreach (var userRole in userRoles)
                 {
@@ -92,7 +92,7 @@ public class UserService : IUserService
                 var roles = new List<Role>();
                 foreach (string role in model.Roles)
                 {
-                    roles.Add(await _dbContext.Roles.FirstOrDefaultAsync(r => r.Name == role));
+                    roles.Add(await _dbContext.Role.FirstOrDefaultAsync(r => r.Name == role));
                 }
 
                 var user = new User
@@ -116,7 +116,7 @@ public class UserService : IUserService
                             RoleId = role.Id,
                             UserId = user.Id
                         };
-                        _dbContext.UserRoles.Add(userRole);
+                        _dbContext.UserRole.Add(userRole);
                         await _dbContext.SaveChangesAsync();
                     }
                     

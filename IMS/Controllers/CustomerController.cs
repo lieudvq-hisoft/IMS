@@ -1,10 +1,8 @@
 ﻿using Data.Common.PaginationModel;
 using Data.Enums;
-using Data.Model;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using OfficeOpenXml;
 using Services.Core;
 
 namespace IMS.Controllers;
@@ -16,10 +14,12 @@ namespace IMS.Controllers;
 public class CustomerController : ControllerBase
 {
     private readonly ICustomerService _customerService;
+    private readonly IWebHostEnvironment _environment;
 
-    public CustomerController(ICustomerService customerService)
+    public CustomerController(ICustomerService customerService, IWebHostEnvironment environment)
     {
         _customerService = customerService;
+        _environment = environment;
     }
 
     [HttpGet]
@@ -41,8 +41,13 @@ public class CustomerController : ControllerBase
     [HttpPost("bulk")]
     public async Task<ActionResult> Import()
     {
+        string filePath = Path.Combine(_environment.WebRootPath, "import\\customer\\" + "Test_Excel.xlsx");
         var result = await _customerService.Import("Test_Excel.xlsx");
-        if (result.Succeed) return Ok(result.Data);
+
+
+        if (result.Succeed)
+            return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Result.xlsx");
+            //return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 

@@ -3,6 +3,7 @@ using System;
 using Data.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IMS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231007154505_change_default_user")]
+    partial class change_default_user
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,44 +24,6 @@ namespace IMS.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Data.Entities.Collocation", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CustomerId")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<bool>("IsApproved")
-                        .HasColumnType("boolean");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("text");
-
-                    b.Property<int>("ServerId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CustomerId");
-
-                    b.HasIndex("ServerId");
-
-                    b.ToTable("Collocations");
-                });
 
             modelBuilder.Entity("Data.Entities.Customer", b =>
                 {
@@ -92,46 +57,7 @@ namespace IMS.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Customers");
-                });
-
-            modelBuilder.Entity("Data.Entities.Device", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("BasePower")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("NumberOfPort")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("Size")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Devices");
+                    b.ToTable("Customer");
                 });
 
             modelBuilder.Entity("Data.Entities.Role", b =>
@@ -203,44 +129,6 @@ namespace IMS.Migrations
                             Name = "Admin",
                             isDeactive = false
                         });
-                });
-
-            modelBuilder.Entity("Data.Entities.Server", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("DNS")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int>("DeviceId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Model")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("SerialNumber")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("DeviceId");
-
-                    b.ToTable("Servers");
                 });
 
             modelBuilder.Entity("Data.Entities.User", b =>
@@ -327,7 +215,7 @@ namespace IMS.Migrations
                             Id = new Guid("95c69371-b924-6fe3-7c38-98b7dd200bc1"),
                             AccessFailedCount = 0,
                             Address = "Address2",
-                            ConcurrencyStamp = "63fedae9-f6d9-4493-8b30-9edb431eecf3",
+                            ConcurrencyStamp = "349205f1-69f6-4661-a945-bf5b6242eebe",
                             CurrenNoticeCount = 0,
                             Email = "it@gmail.com",
                             EmailConfirmed = true,
@@ -336,7 +224,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "it@gmail.com",
                             NormalizedUserName = "it",
-                            PasswordHash = "AQAAAAIAAYagAAAAECgdmGbshm8UOiUl+00lfYO1mau6qW1YMuVBKdjMAoxXu9V+bzV9wfyDZrjZaTtPCw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAz0XcxPx9RjviSiWO7Up3djkCShwTd3wxDjddJ46Ca1M6apk4IsF+6ZvntbxwPg7w==",
                             PhoneNumber = "0000000002",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -348,7 +236,7 @@ namespace IMS.Migrations
                             Id = new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd"),
                             AccessFailedCount = 0,
                             Address = "Address3",
-                            ConcurrencyStamp = "5098293a-3c1c-46f0-ace1-395936aeada7",
+                            ConcurrencyStamp = "609b5546-3d32-4c17-8126-ebdfd8aa196d",
                             CurrenNoticeCount = 0,
                             Email = "staff@gmail.com",
                             EmailConfirmed = true,
@@ -357,7 +245,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "staff@gmail.com",
                             NormalizedUserName = "staff",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGefrsWmBhpr278J5s8hgImXf/uKuEHeD9sTQoJsrzv3Gqt92XxYB6w5XbkpO1vnRQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAELPA/VneXTqkO28QpApw3GrlOgM2TYnVmmlRqsEUxqh5Twdp0caQXXvt1F9DucpZvw==",
                             PhoneNumber = "0000000003",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -369,7 +257,7 @@ namespace IMS.Migrations
                             Id = new Guid("bc4519c8-fdeb-06e2-4a08-cc98c4273aba"),
                             AccessFailedCount = 0,
                             Address = "Address4",
-                            ConcurrencyStamp = "af01b317-034d-45f3-b32f-f7d817be2777",
+                            ConcurrencyStamp = "bbc65bce-47b0-40a9-ba06-fe2e5ae4b0f1",
                             CurrenNoticeCount = 0,
                             Email = "manager@gmail.com",
                             EmailConfirmed = true,
@@ -378,7 +266,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "manager@gmail.com",
                             NormalizedUserName = "manager",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBZDxyq78ZNWlaK5FUlcqM1GgdjYDNoK2eoTKbkondC5TW1hGf142c3OKFszm72AxA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBMTuQhgx9fR71UnODX0b1fHPCzO3OVpnqKts6SdqbxYdzc0IcJLcsthcNPc4Dy1oQ==",
                             PhoneNumber = "0000000004",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -390,7 +278,7 @@ namespace IMS.Migrations
                             Id = new Guid("cf85ddf4-1ece-d1e2-3171-650938abd2b7"),
                             AccessFailedCount = 0,
                             Address = "Address5",
-                            ConcurrencyStamp = "d0e26c08-91e1-4d79-8cb6-ccc32de751ea",
+                            ConcurrencyStamp = "f938ab94-9cd2-4351-92b2-61f20239504e",
                             CurrenNoticeCount = 0,
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -399,7 +287,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "admin@gmail.com",
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKi7BZjeWOWAlbf8fIPqsf/lX/RjXwyASGasY/sJYRih6kRLsyEbvxp7Ak1UwsgUqA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDPP5lHza3HxQvmdTj5EkGrWLydgImuTV2uJxDldbZqPXVTDgQ1/ZSDgNl2FV3g6Vg==",
                             PhoneNumber = "0000000005",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -533,25 +421,6 @@ namespace IMS.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Data.Entities.Collocation", b =>
-                {
-                    b.HasOne("Data.Entities.Customer", "Customer")
-                        .WithMany()
-                        .HasForeignKey("CustomerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entities.Server", "Server")
-                        .WithMany()
-                        .HasForeignKey("ServerId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Customer");
-
-                    b.Navigation("Server");
-                });
-
             modelBuilder.Entity("Data.Entities.Customer", b =>
                 {
                     b.HasOne("Data.Entities.User", "User")
@@ -561,17 +430,6 @@ namespace IMS.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Data.Entities.Server", b =>
-                {
-                    b.HasOne("Data.Entities.Device", "Device")
-                        .WithMany()
-                        .HasForeignKey("DeviceId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Device");
                 });
 
             modelBuilder.Entity("Data.Entities.UserRole", b =>

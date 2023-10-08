@@ -55,7 +55,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customers = _dbContext.Customer
+            var customers = _dbContext.Customers
                 .Include(x => x.User)
                 .Where(x => !x.IsDeleted)
                 .Where(delegate (Customer x)
@@ -88,7 +88,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customer.Include(x => x.User).Where(x => x.Id == id && !x.IsDeleted).FirstOrDefault();
+            var customer = _dbContext.Customers.Include(x => x.User).Where(x => x.Id == id && !x.IsDeleted).FirstOrDefault();
 
             if (customer != null)
             {
@@ -117,7 +117,7 @@ public class CustomerService : ICustomerService
 
     public async Task<ResultModel> Import(string filename)
     {
-        string filePath = Path.Combine(_environment.WebRootPath, "import/customer/" + filename);
+        string filePath = Path.Combine(_environment.WebRootPath, "import\\customer\\" + filename);
         //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         using var package = new ExcelPackage(new FileInfo(filePath));
         var worksheet = package.Workbook.Worksheets["Sheet1"];
@@ -197,7 +197,7 @@ public class CustomerService : ICustomerService
             else
             {
                 // Check for duplicate customer by tax number
-                var existingCustomer = _dbContext.Customer.Where(x => x.TaxNumber == model.TaxNumber && !x.IsDeleted).FirstOrDefault();
+                var existingCustomer = _dbContext.Customers.Where(x => x.TaxNumber == model.TaxNumber && !x.IsDeleted).FirstOrDefault();
                 if (existingCustomer != null)
                 {
                     result.ErrorMessage = "Customer with tax number " + ErrorMessage.EXISTED;
@@ -205,7 +205,7 @@ public class CustomerService : ICustomerService
                 else
                 {
                     // Create new user
-                    var role = await _dbContext.Roles.FirstOrDefaultAsync(r => r.Name == "Customer");
+                    var role = await _dbContext.Role.FirstOrDefaultAsync(r => r.Name == "Customer");
                     var user = new User
                     {
                         UserName = model.UserName,
@@ -225,7 +225,7 @@ public class CustomerService : ICustomerService
                             RoleId = role.Id,
                             UserId = user.Id
                         };
-                        _dbContext.UserRoles.Add(userRole);
+                        _dbContext.UserRole.Add(userRole);
                         await _dbContext.SaveChangesAsync();
 
                         // Create associate customer
@@ -235,7 +235,7 @@ public class CustomerService : ICustomerService
                             TaxNumber = model.TaxNumber,
                             UserId = user.Id
                         };
-                        _dbContext.Customer.Add(customer);
+                        _dbContext.Customers.Add(customer);
                         _dbContext.SaveChanges();
 
                         result.Succeed = true;
@@ -264,7 +264,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customer.Include(x => x.User).Where(x => x.Id == id && !x.IsDeleted).FirstOrDefault();
+            var customer = _dbContext.Customers.Include(x => x.User).Where(x => x.Id == id && !x.IsDeleted).FirstOrDefault();
             if (customer == null)
             {
                 result.ErrorMessage = "Delete customer fail";
@@ -293,7 +293,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customer.Include(x => x.User).Where(x => x.Id == model.Id && !x.IsDeleted).FirstOrDefault();
+            var customer = _dbContext.Customers.Include(x => x.User).Where(x => x.Id == model.Id && !x.IsDeleted).FirstOrDefault();
 
             if (customer == null)
             {

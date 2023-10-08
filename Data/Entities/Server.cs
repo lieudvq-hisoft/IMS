@@ -8,7 +8,10 @@ namespace Data.Entities;
 
 public class Server : BaseEntity
 {
-    public string ServerDetail { get; set; }
-    public int Device_Id { get; set; }
-    public virtual required Device Device { get; set; }
+    public string SerialNumber { get; set; }
+    public int DNS { get; set; }
+    public string Model { get; set; }
+
+    public int DeviceId { get; set; }
+    public virtual Device Device { get; set; }
 }

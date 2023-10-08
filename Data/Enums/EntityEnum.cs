@@ -10,6 +10,12 @@ public enum RoleType
     Admin = 5
 }
 
+public enum DeviceStatus
+{
+    Running,
+    Shutdown
+}
+
 public enum UserSortCriteria
 {
     Email
