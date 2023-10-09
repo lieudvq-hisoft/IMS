@@ -26,24 +26,21 @@ public class UserService : IUserService
     private readonly IConfiguration _configuration;
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
-    private readonly RoleManager<Role> _roleManager;
 
-    public UserService(AppDbContext dbContext, IMapper mapper, IConfiguration configuration, UserManager<User> userManager, SignInManager<User> signInManager, RoleManager<Role> roleManager)
+    public UserService(AppDbContext dbContext, IMapper mapper, IConfiguration configuration, UserManager<User> userManager, SignInManager<User> signInManager)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _configuration = configuration;
         _userManager = userManager;
         _signInManager = signInManager;
-        _roleManager = roleManager;
     }
 
     public async Task<ResultModel> Login(LoginModel model)
     {
-
         var result = new ResultModel();
 
-        var user = _dbContext.User.Where(s => s.UserName == model.Username).FirstOrDefault();
+        var user = _dbContext.User.FirstOrDefault(s => s.UserName == model.Username);
 
         if (user != null)
         {
@@ -79,15 +76,29 @@ public class UserService : IUserService
     {
         var result = new ResultModel();
         result.Succeed = false;
+        bool validPrecondition = true;
+
         try
         {
             // Check for duplicate user by email or phonenumber
-            var existingUser = _dbContext.User.Where(x => (x.Email == model.Email || x.PhoneNumber == model.PhoneNumber) && !x.IsDeleted).FirstOrDefault();
+            var existingUser = _dbContext.User.FirstOrDefault(x => (x.Email == model.Email || x.PhoneNumber == model.PhoneNumber) && !x.IsDeleted);
             if (existingUser != null)
             {
                 result.ErrorMessage = "User " + ErrorMessage.EXISTED;
+                validPrecondition = false;
             }
-            else
+
+            if (validPrecondition)
+            {
+                // Not able to create a customer
+                if (model.Roles.Exists(x => x == "Customer"))
+                {
+                    result.ErrorMessage = "Cannot create a customer";
+                    validPrecondition = false;
+                }
+            }
+
+            if (validPrecondition)
             {
                 var roles = new List<Role>();
                 foreach (string role in model.Roles)

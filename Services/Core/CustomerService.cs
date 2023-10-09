@@ -86,7 +86,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customers.Include(x => x.User).Where(x => x.Id == id && !x.IsDeleted).FirstOrDefault();
+            var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.Id == id && !x.IsDeleted);
 
             if (customer != null)
             {
@@ -280,7 +280,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customers.Include(x => x.User).Where(x => x.Id == id && !x.IsDeleted).FirstOrDefault();
+            var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.Id == id && !x.IsDeleted);
             if (customer == null)
             {
                 result.ErrorMessage = "Delete customer fail";
@@ -309,7 +309,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customers.Include(x => x.User).Where(x => x.Id == model.Id && !x.IsDeleted).FirstOrDefault();
+            var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.Id == model.Id && !x.IsDeleted);
 
             if (customer == null)
             {
