@@ -36,9 +36,7 @@ public class CollocationController : ControllerBase
     {
         var createCustomerResult = await _customerService.Create(model.CustomerCreateModel);
         if (createCustomerResult.Succeed)
-        {
             return Ok(createCustomerResult.Data);
-        }
 
         return BadRequest(createCustomerResult.ErrorMessage);
     }
