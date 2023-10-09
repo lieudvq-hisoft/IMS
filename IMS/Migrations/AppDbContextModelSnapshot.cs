@@ -60,6 +60,83 @@ namespace IMS.Migrations
                     b.ToTable("Collocations");
                 });
 
+            modelBuilder.Entity("Data.Entities.CompanyType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CompanyTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DateCreated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5654),
+                            DateUpdated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5671),
+                            Description = "Doanh nghiệp tư nhân",
+                            IsDeleted = false,
+                            Name = "Doanh nghiệp tư nhân"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DateCreated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5717),
+                            DateUpdated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5718),
+                            Description = "Công ty trách nhiệm hữu hạn một thành viên",
+                            IsDeleted = false,
+                            Name = "Công ty trách nhiệm hữu hạn một thành viên"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DateCreated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5733),
+                            DateUpdated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5733),
+                            Description = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên",
+                            IsDeleted = false,
+                            Name = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            DateCreated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5747),
+                            DateUpdated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5747),
+                            Description = "Công ty cổ phần",
+                            IsDeleted = false,
+                            Name = "Công ty cổ phần"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            DateCreated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5760),
+                            DateUpdated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5760),
+                            Description = "Công ty hợp danh",
+                            IsDeleted = false,
+                            Name = "Công ty hợp danh"
+                        });
+                });
+
             modelBuilder.Entity("Data.Entities.Customer", b =>
                 {
                     b.Property<int>("Id")
@@ -71,6 +148,9 @@ namespace IMS.Migrations
                     b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("CompanyTypeId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("timestamp without time zone");
@@ -89,6 +169,8 @@ namespace IMS.Migrations
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CompanyTypeId");
 
                     b.HasIndex("UserId");
 
@@ -185,8 +267,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd"),
-                            Description = "Staff",
-                            Name = "Staff",
+                            Description = "Sale",
+                            Name = "Sale",
                             isDeactive = false
                         },
                         new
@@ -327,7 +409,7 @@ namespace IMS.Migrations
                             Id = new Guid("95c69371-b924-6fe3-7c38-98b7dd200bc1"),
                             AccessFailedCount = 0,
                             Address = "Address2",
-                            ConcurrencyStamp = "63fedae9-f6d9-4493-8b30-9edb431eecf3",
+                            ConcurrencyStamp = "1a722328-bfca-4162-91fd-6ab6a0cc4f77",
                             CurrenNoticeCount = 0,
                             Email = "it@gmail.com",
                             EmailConfirmed = true,
@@ -336,7 +418,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "it@gmail.com",
                             NormalizedUserName = "it",
-                            PasswordHash = "AQAAAAIAAYagAAAAECgdmGbshm8UOiUl+00lfYO1mau6qW1YMuVBKdjMAoxXu9V+bzV9wfyDZrjZaTtPCw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJcaGUNf0iUKfOei69GQYHm9aHDeN08u05+73jkOFO2nJPf4uVgC8sZKHHbJhKPFug==",
                             PhoneNumber = "0000000002",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -348,28 +430,28 @@ namespace IMS.Migrations
                             Id = new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd"),
                             AccessFailedCount = 0,
                             Address = "Address3",
-                            ConcurrencyStamp = "5098293a-3c1c-46f0-ace1-395936aeada7",
+                            ConcurrencyStamp = "d5610279-ee00-4b7d-9d88-1c8622573280",
                             CurrenNoticeCount = 0,
-                            Email = "staff@gmail.com",
+                            Email = "sale@gmail.com",
                             EmailConfirmed = true,
                             Fullname = "Fullname3",
                             IsDeleted = false,
                             LockoutEnabled = false,
-                            NormalizedEmail = "staff@gmail.com",
-                            NormalizedUserName = "staff",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGefrsWmBhpr278J5s8hgImXf/uKuEHeD9sTQoJsrzv3Gqt92XxYB6w5XbkpO1vnRQ==",
+                            NormalizedEmail = "sale@gmail.com",
+                            NormalizedUserName = "sale",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFaO3qa4/NRwsT183gsowwV8mJgbaDp2g7TKLtYWCmwfF+rn0VJK2Pi4B4DthoxZjw==",
                             PhoneNumber = "0000000003",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
-                            UserName = "staff"
+                            UserName = "sale"
                         },
                         new
                         {
                             Id = new Guid("bc4519c8-fdeb-06e2-4a08-cc98c4273aba"),
                             AccessFailedCount = 0,
                             Address = "Address4",
-                            ConcurrencyStamp = "af01b317-034d-45f3-b32f-f7d817be2777",
+                            ConcurrencyStamp = "5f0ff865-4047-4053-9797-da1d2e6f719f",
                             CurrenNoticeCount = 0,
                             Email = "manager@gmail.com",
                             EmailConfirmed = true,
@@ -378,7 +460,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "manager@gmail.com",
                             NormalizedUserName = "manager",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBZDxyq78ZNWlaK5FUlcqM1GgdjYDNoK2eoTKbkondC5TW1hGf142c3OKFszm72AxA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBxB/X2Dho8yxgAQ5zNxaN06kWKJfcUlPxcdg/i7feCAXrejwc7Bb39LNgRMLC+V+w==",
                             PhoneNumber = "0000000004",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -390,7 +472,7 @@ namespace IMS.Migrations
                             Id = new Guid("cf85ddf4-1ece-d1e2-3171-650938abd2b7"),
                             AccessFailedCount = 0,
                             Address = "Address5",
-                            ConcurrencyStamp = "d0e26c08-91e1-4d79-8cb6-ccc32de751ea",
+                            ConcurrencyStamp = "468b2f1e-2a7f-4480-90cb-84f1cd207edc",
                             CurrenNoticeCount = 0,
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -399,7 +481,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "admin@gmail.com",
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKi7BZjeWOWAlbf8fIPqsf/lX/RjXwyASGasY/sJYRih6kRLsyEbvxp7Ak1UwsgUqA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOhoOWXDjK2roPufBcfg+5z6iiIFxGbtWvgYGHPR456CN6UR7HBvQPF/G0T2aHYUrQ==",
                             PhoneNumber = "0000000005",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -554,11 +636,19 @@ namespace IMS.Migrations
 
             modelBuilder.Entity("Data.Entities.Customer", b =>
                 {
+                    b.HasOne("Data.Entities.CompanyType", "CompanyType")
+                        .WithMany("Customer")
+                        .HasForeignKey("CompanyTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Data.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("CompanyType");
 
                     b.Navigation("User");
                 });
@@ -627,6 +717,11 @@ namespace IMS.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Data.Entities.CompanyType", b =>
+                {
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Data.Entities.Role", b =>

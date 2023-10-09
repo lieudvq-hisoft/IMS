@@ -27,10 +27,10 @@ public class CustomerCreateModel
     public string TaxNumber { get; set; }
 
     [Required]
-    public string UserName { get; set; }
+    public string Fullname { get; set; }
 
     [Required]
-    public string Fullname { get; set; }
+    public string CompanyType { get; set; }
 
     [Required]
     public string Address { get; set; }

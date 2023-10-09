@@ -27,7 +27,7 @@ public interface ICustomerService
 {
     Task<ResultModel> Get(PagingParam<CustomerSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> Import(string filename);
+    Task<ResultModel> Import(string filePath);
     Task<ResultModel> Create(CustomerCreateModel model);
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Update(CustomerUpdateModel model);
@@ -38,14 +38,12 @@ public class CustomerService : ICustomerService
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
-    private readonly IHostingEnvironment _environment;
 
-    public CustomerService(AppDbContext dbContext, IMapper mapper, UserManager<User> userManager, IHostingEnvironment environment)
+    public CustomerService(AppDbContext dbContext, IMapper mapper, UserManager<User> userManager)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _userManager = userManager;
-        _environment = environment;
     }
 
     public async Task<ResultModel> Get(PagingParam<CustomerSortCriteria> paginationModel, CustomerSearchModel searchModel)
@@ -115,9 +113,8 @@ public class CustomerService : ICustomerService
             .IndexOf(MyFunction.ConvertToUnSign(searchModel.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
     }
 
-    public async Task<ResultModel> Import(string filename)
+    public async Task<ResultModel> Import(string filePath)
     {
-        string filePath = Path.Combine(_environment.WebRootPath, "import\\customer\\" + filename);
         //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         using var package = new ExcelPackage(new FileInfo(filePath));
         var worksheet = package.Workbook.Worksheets["Sheet1"];
@@ -128,13 +125,13 @@ public class CustomerService : ICustomerService
         {
             var model = new CustomerCreateModel()
             {
-                Fullname = worksheet.Cells[row, 1].Value?.ToString().Trim(),
-                Email = worksheet.Cells[row, 2].Value?.ToString().Trim(),
-                UserName = worksheet.Cells[row, 3].Value?.ToString().Trim(),
-                Address = worksheet.Cells[row, 4].Value?.ToString().Trim(),
-                CompanyName = worksheet.Cells[row, 5].Value?.ToString().Trim(),
-                PhoneNumber = worksheet.Cells[row, 6].Value?.ToString().Trim(),
-                TaxNumber = worksheet.Cells[row, 7].Value?.ToString().Trim(),
+                CompanyName = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                CompanyType = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                Fullname = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                TaxNumber = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                Address = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                Email = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                PhoneNumber = worksheet.Cells[row, 7].Value?.ToString().Trim(),
             };
 
             var context = new ValidationContext(model, serviceProvider: null, items: null);
@@ -185,67 +182,86 @@ public class CustomerService : ICustomerService
     {
         var result = new ResultModel();
         result.Succeed = false;
+        bool validPrecondition = true;
+        CompanyType companyType = null;
 
         try
         {
             // Check for duplicate user by email or phonenumber
-            var existingUser = _dbContext.User.Where(x => (x.Email == model.Email || x.PhoneNumber == model.PhoneNumber) && !x.IsDeleted).FirstOrDefault();
+            var existingUser = _dbContext.User.FirstOrDefault(x => (x.Email == model.Email || x.PhoneNumber == model.PhoneNumber) && !x.IsDeleted);
             if (existingUser != null)
             {
                 result.ErrorMessage = "User " + ErrorMessage.EXISTED;
+                validPrecondition = false;
             }
-            else
+
+            if (validPrecondition)
             {
                 // Check for duplicate customer by tax number
-                var existingCustomer = _dbContext.Customers.Where(x => x.TaxNumber == model.TaxNumber && !x.IsDeleted).FirstOrDefault();
+                var existingCustomer = _dbContext.Customers.FirstOrDefault(x => x.TaxNumber == model.TaxNumber && !x.IsDeleted);
                 if (existingCustomer != null)
                 {
                     result.ErrorMessage = "Customer with tax number " + ErrorMessage.EXISTED;
+                    validPrecondition = false;
+                }
+            }
+
+            if (validPrecondition)
+            {
+                // Find company type
+                companyType = _dbContext.CompanyTypes.FirstOrDefault(r => r.Name == model.CompanyType);
+
+                if (companyType == null)
+                {
+                    result.ErrorMessage = "Company type " + ErrorMessage.NOT_EXISTED;
+                    validPrecondition = false;
+                }
+            }
+
+            if (validPrecondition)
+            {
+                // Create new user
+                var role = _dbContext.Role.FirstOrDefault(r => r.Name == "Customer");
+                var user = new User
+                {
+                    UserName = model.CompanyName.Trim().Replace(" ", ""),
+                    Email = model.Email,
+                    Fullname = model.Fullname,
+                    Address = model.Address,
+                    PhoneNumber = model.PhoneNumber,
+                    IsDeleted = false,
+                    NormalizedEmail = model.Email.ToLower(),
+                };
+
+                var createUserResult = await _userManager.CreateAsync(user, model.CompanyName + "@123");
+                if (createUserResult.Succeeded)
+                {
+                    var userRole = new UserRole
+                    {
+                        RoleId = role.Id,
+                        UserId = user.Id
+                    };
+                    _dbContext.UserRole.Add(userRole);
+                    await _dbContext.SaveChangesAsync();
+
+                    // Create associate customer
+                    var customer = new Customer
+                    {
+                        CompanyName = model.CompanyName,
+                        TaxNumber = model.TaxNumber,
+                        UserId = user.Id,
+                        CompanyTypeId = companyType.Id
+                    };
+                    _dbContext.Customers.Add(customer);
+                    _dbContext.SaveChanges();
+
+                    result.Succeed = true;
+                    result.Data = _mapper.Map<CustomerModel>(customer);
                 }
                 else
                 {
-                    // Create new user
-                    var role = await _dbContext.Role.FirstOrDefaultAsync(r => r.Name == "Customer");
-                    var user = new User
-                    {
-                        UserName = model.UserName,
-                        Email = model.Email,
-                        Fullname = model.Fullname,
-                        Address = model.Address,
-                        PhoneNumber = model.PhoneNumber,
-                        IsDeleted = false,
-                        NormalizedEmail = model.Email.ToLower(),
-                    };
-
-                    var createUserResult = await _userManager.CreateAsync(user, model.UserName + "@123");
-                    if (createUserResult.Succeeded)
-                    {
-                        var userRole = new UserRole
-                        {
-                            RoleId = role.Id,
-                            UserId = user.Id
-                        };
-                        _dbContext.UserRole.Add(userRole);
-                        await _dbContext.SaveChangesAsync();
-
-                        // Create associate customer
-                        var customer = new Customer
-                        {
-                            CompanyName = model.CompanyName,
-                            TaxNumber = model.TaxNumber,
-                            UserId = user.Id
-                        };
-                        _dbContext.Customers.Add(customer);
-                        _dbContext.SaveChanges();
-
-                        result.Succeed = true;
-                        result.Data = _mapper.Map<CustomerModel>(customer);
-                    }
-                    else
-                    {
-                        result.Succeed = false;
-                        result.ErrorMessage = "REGISTER_USER_ERROR";
-                    }
+                    result.Succeed = false;
+                    result.ErrorMessage = "REGISTER_USER_ERROR";
                 }
             }
         }

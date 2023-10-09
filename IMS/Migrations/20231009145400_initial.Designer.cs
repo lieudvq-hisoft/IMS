@@ -12,8 +12,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IMS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231007154505_change_default_user")]
-    partial class change_default_user
+    [Migration("20231009145400_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,121 @@ namespace IMS.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+
+            modelBuilder.Entity("Data.Entities.Collocation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsApproved")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
+
+                    b.Property<int>("ServerId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ServerId");
+
+                    b.ToTable("Collocations");
+                });
+
+            modelBuilder.Entity("Data.Entities.CompanyType", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CompanyTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            DateCreated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5654),
+                            DateUpdated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5671),
+                            Description = "Doanh nghiệp tư nhân",
+                            IsDeleted = false,
+                            Name = "Doanh nghiệp tư nhân"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            DateCreated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5717),
+                            DateUpdated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5718),
+                            Description = "Công ty trách nhiệm hữu hạn một thành viên",
+                            IsDeleted = false,
+                            Name = "Công ty trách nhiệm hữu hạn một thành viên"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            DateCreated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5733),
+                            DateUpdated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5733),
+                            Description = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên",
+                            IsDeleted = false,
+                            Name = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            DateCreated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5747),
+                            DateUpdated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5747),
+                            Description = "Công ty cổ phần",
+                            IsDeleted = false,
+                            Name = "Công ty cổ phần"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            DateCreated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5760),
+                            DateUpdated = new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5760),
+                            Description = "Công ty hợp danh",
+                            IsDeleted = false,
+                            Name = "Công ty hợp danh"
+                        });
+                });
 
             modelBuilder.Entity("Data.Entities.Customer", b =>
                 {
@@ -36,6 +151,9 @@ namespace IMS.Migrations
                     b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasColumnType("text");
+
+                    b.Property<int>("CompanyTypeId")
+                        .HasColumnType("integer");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("timestamp without time zone");
@@ -55,9 +173,50 @@ namespace IMS.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("CompanyTypeId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("Customer");
+                    b.ToTable("Customers");
+                });
+
+            modelBuilder.Entity("Data.Entities.Device", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BasePower")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("NumberOfPort")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<int>("Size")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Devices");
                 });
 
             modelBuilder.Entity("Data.Entities.Role", b =>
@@ -111,8 +270,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd"),
-                            Description = "Staff",
-                            Name = "Staff",
+                            Description = "Sale",
+                            Name = "Sale",
                             isDeactive = false
                         },
                         new
@@ -129,6 +288,44 @@ namespace IMS.Migrations
                             Name = "Admin",
                             isDeactive = false
                         });
+                });
+
+            modelBuilder.Entity("Data.Entities.Server", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DNS")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("DeviceId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Model")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("SerialNumber")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DeviceId");
+
+                    b.ToTable("Servers");
                 });
 
             modelBuilder.Entity("Data.Entities.User", b =>
@@ -215,7 +412,7 @@ namespace IMS.Migrations
                             Id = new Guid("95c69371-b924-6fe3-7c38-98b7dd200bc1"),
                             AccessFailedCount = 0,
                             Address = "Address2",
-                            ConcurrencyStamp = "349205f1-69f6-4661-a945-bf5b6242eebe",
+                            ConcurrencyStamp = "1a722328-bfca-4162-91fd-6ab6a0cc4f77",
                             CurrenNoticeCount = 0,
                             Email = "it@gmail.com",
                             EmailConfirmed = true,
@@ -224,7 +421,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "it@gmail.com",
                             NormalizedUserName = "it",
-                            PasswordHash = "AQAAAAIAAYagAAAAEAz0XcxPx9RjviSiWO7Up3djkCShwTd3wxDjddJ46Ca1M6apk4IsF+6ZvntbxwPg7w==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEJcaGUNf0iUKfOei69GQYHm9aHDeN08u05+73jkOFO2nJPf4uVgC8sZKHHbJhKPFug==",
                             PhoneNumber = "0000000002",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -236,28 +433,28 @@ namespace IMS.Migrations
                             Id = new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd"),
                             AccessFailedCount = 0,
                             Address = "Address3",
-                            ConcurrencyStamp = "609b5546-3d32-4c17-8126-ebdfd8aa196d",
+                            ConcurrencyStamp = "d5610279-ee00-4b7d-9d88-1c8622573280",
                             CurrenNoticeCount = 0,
-                            Email = "staff@gmail.com",
+                            Email = "sale@gmail.com",
                             EmailConfirmed = true,
                             Fullname = "Fullname3",
                             IsDeleted = false,
                             LockoutEnabled = false,
-                            NormalizedEmail = "staff@gmail.com",
-                            NormalizedUserName = "staff",
-                            PasswordHash = "AQAAAAIAAYagAAAAELPA/VneXTqkO28QpApw3GrlOgM2TYnVmmlRqsEUxqh5Twdp0caQXXvt1F9DucpZvw==",
+                            NormalizedEmail = "sale@gmail.com",
+                            NormalizedUserName = "sale",
+                            PasswordHash = "AQAAAAIAAYagAAAAEFaO3qa4/NRwsT183gsowwV8mJgbaDp2g7TKLtYWCmwfF+rn0VJK2Pi4B4DthoxZjw==",
                             PhoneNumber = "0000000003",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
                             TwoFactorEnabled = false,
-                            UserName = "staff"
+                            UserName = "sale"
                         },
                         new
                         {
                             Id = new Guid("bc4519c8-fdeb-06e2-4a08-cc98c4273aba"),
                             AccessFailedCount = 0,
                             Address = "Address4",
-                            ConcurrencyStamp = "bbc65bce-47b0-40a9-ba06-fe2e5ae4b0f1",
+                            ConcurrencyStamp = "5f0ff865-4047-4053-9797-da1d2e6f719f",
                             CurrenNoticeCount = 0,
                             Email = "manager@gmail.com",
                             EmailConfirmed = true,
@@ -266,7 +463,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "manager@gmail.com",
                             NormalizedUserName = "manager",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBMTuQhgx9fR71UnODX0b1fHPCzO3OVpnqKts6SdqbxYdzc0IcJLcsthcNPc4Dy1oQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEBxB/X2Dho8yxgAQ5zNxaN06kWKJfcUlPxcdg/i7feCAXrejwc7Bb39LNgRMLC+V+w==",
                             PhoneNumber = "0000000004",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -278,7 +475,7 @@ namespace IMS.Migrations
                             Id = new Guid("cf85ddf4-1ece-d1e2-3171-650938abd2b7"),
                             AccessFailedCount = 0,
                             Address = "Address5",
-                            ConcurrencyStamp = "f938ab94-9cd2-4351-92b2-61f20239504e",
+                            ConcurrencyStamp = "468b2f1e-2a7f-4480-90cb-84f1cd207edc",
                             CurrenNoticeCount = 0,
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -287,7 +484,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "admin@gmail.com",
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEDPP5lHza3HxQvmdTj5EkGrWLydgImuTV2uJxDldbZqPXVTDgQ1/ZSDgNl2FV3g6Vg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOhoOWXDjK2roPufBcfg+5z6iiIFxGbtWvgYGHPR456CN6UR7HBvQPF/G0T2aHYUrQ==",
                             PhoneNumber = "0000000005",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -421,15 +618,53 @@ namespace IMS.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("Data.Entities.Collocation", b =>
+                {
+                    b.HasOne("Data.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Data.Entities.Server", "Server")
+                        .WithMany()
+                        .HasForeignKey("ServerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("Server");
+                });
+
             modelBuilder.Entity("Data.Entities.Customer", b =>
                 {
+                    b.HasOne("Data.Entities.CompanyType", "CompanyType")
+                        .WithMany("Customer")
+                        .HasForeignKey("CompanyTypeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.HasOne("Data.Entities.User", "User")
                         .WithMany()
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("CompanyType");
+
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Data.Entities.Server", b =>
+                {
+                    b.HasOne("Data.Entities.Device", "Device")
+                        .WithMany()
+                        .HasForeignKey("DeviceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Device");
                 });
 
             modelBuilder.Entity("Data.Entities.UserRole", b =>
@@ -485,6 +720,11 @@ namespace IMS.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("Data.Entities.CompanyType", b =>
+                {
+                    b.Navigation("Customer");
                 });
 
             modelBuilder.Entity("Data.Entities.Role", b =>

@@ -9,6 +9,39 @@ public static class ModelBuilderExtentions
 {
     public static void Seed(this ModelBuilder modelBuilder)
     {
+        #region CompanyType
+        modelBuilder.Entity<CompanyType>().HasData(new CompanyType
+        {
+            Id = 1,
+            Name = "Doanh nghiệp tư nhân",
+            Description = "Doanh nghiệp tư nhân",
+        });
+        modelBuilder.Entity<CompanyType>().HasData(new CompanyType
+        {
+            Id = 2,
+            Name = "Công ty trách nhiệm hữu hạn một thành viên",
+            Description = "Công ty trách nhiệm hữu hạn một thành viên",
+        });
+        modelBuilder.Entity<CompanyType>().HasData(new CompanyType
+        {
+            Id = 3,
+            Name = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên",
+            Description = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên",
+        });
+        modelBuilder.Entity<CompanyType>().HasData(new CompanyType
+        {
+            Id = 4,
+            Name = "Công ty cổ phần",
+            Description = "Công ty cổ phần",
+        });
+        modelBuilder.Entity<CompanyType>().HasData(new CompanyType
+        {
+            Id = 5,
+            Name = "Công ty hợp danh",
+            Description = "Công ty hợp danh",
+        });
+        #endregion
+
         #region User
         var hasher = new PasswordHasher<User>();
 
@@ -36,8 +69,8 @@ public static class ModelBuilderExtentions
         modelBuilder.Entity<Role>().HasData(new Role
         {
             Id = GenerateSeededGuid(3),
-            Name = "Staff",
-            Description = "Staff",
+            Name = "Sale",
+            Description = "Sale",
             isDeactive = false,
         });
         modelBuilder.Entity<Role>().HasData(new Role
@@ -65,7 +98,7 @@ public static class ModelBuilderExtentions
                     username = "it";
                     break;
                 case 3:
-                    username = "staff";
+                    username = "sale";
                     break;
                 case 4:
                     username = "manager";

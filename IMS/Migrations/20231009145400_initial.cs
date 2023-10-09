@@ -60,6 +60,43 @@ namespace IMS.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CompanyTypes",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CompanyTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Devices",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Type = table.Column<string>(type: "text", nullable: false),
+                    NumberOfPort = table.Column<string>(type: "text", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    Size = table.Column<int>(type: "integer", nullable: false),
+                    BasePower = table.Column<int>(type: "integer", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Devices", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -166,7 +203,7 @@ namespace IMS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Customer",
+                name: "Customers",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
@@ -174,17 +211,80 @@ namespace IMS.Migrations
                     CompanyName = table.Column<string>(type: "text", nullable: false),
                     TaxNumber = table.Column<string>(type: "text", nullable: false),
                     UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    CompanyTypeId = table.Column<int>(type: "integer", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Customer", x => x.Id);
+                    table.PrimaryKey("PK_Customers", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Customer_AspNetUsers_UserId",
+                        name: "FK_Customers_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Customers_CompanyTypes_CompanyTypeId",
+                        column: x => x.CompanyTypeId,
+                        principalTable: "CompanyTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Servers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    SerialNumber = table.Column<string>(type: "text", nullable: false),
+                    DNS = table.Column<int>(type: "integer", nullable: false),
+                    Model = table.Column<string>(type: "text", nullable: false),
+                    DeviceId = table.Column<int>(type: "integer", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Servers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Servers_Devices_DeviceId",
+                        column: x => x.DeviceId,
+                        principalTable: "Devices",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Collocations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    IsApproved = table.Column<bool>(type: "boolean", nullable: false),
+                    Note = table.Column<string>(type: "text", nullable: true),
+                    CustomerId = table.Column<int>(type: "integer", nullable: false),
+                    ServerId = table.Column<int>(type: "integer", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Collocations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Collocations_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Collocations_Servers_ServerId",
+                        column: x => x.ServerId,
+                        principalTable: "Servers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -196,7 +296,7 @@ namespace IMS.Migrations
                 {
                     { new Guid("8286d046-9740-a3e4-95cf-ff46699c73c4"), null, "Customer", "Customer", null, false },
                     { new Guid("95c69371-b924-6fe3-7c38-98b7dd200bc1"), null, "IT Staff", "IT", null, false },
-                    { new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd"), null, "Staff", "Staff", null, false },
+                    { new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd"), null, "Sale", "Sale", null, false },
                     { new Guid("bc4519c8-fdeb-06e2-4a08-cc98c4273aba"), null, "Manager", "Manager", null, false },
                     { new Guid("cf85ddf4-1ece-d1e2-3171-650938abd2b7"), null, "Admin", "Admin", null, false }
                 });
@@ -206,11 +306,22 @@ namespace IMS.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "Address", "ConcurrencyStamp", "CurrenNoticeCount", "Email", "EmailConfirmed", "Fullname", "IsDeleted", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { new Guid("8286d046-9740-a3e4-95cf-ff46699c73c4"), 0, "Address1", "44b686e1-6084-4d5e-ab41-a5df630f98db", 0, "member1@gmail.com", true, "Fullname1", false, false, null, "member1@gmail.com", "member1@gmail.com", "AQAAAAIAAYagAAAAEDYwxMpcSDVjyzOkWi4HJ+64KVBW4lhKAN17Z8udJYgOSVd8gbP/Y3aPFMFGuTGMhg==", "0000000001", false, "", false, "user1" },
-                    { new Guid("95c69371-b924-6fe3-7c38-98b7dd200bc1"), 0, "Address2", "8591b203-c691-4ea9-a4aa-33ee70465006", 0, "member2@gmail.com", true, "Fullname2", false, false, null, "member2@gmail.com", "member2@gmail.com", "AQAAAAIAAYagAAAAEAi+062tzBnHbuAEj9QXGdJvvxTAbvcVsEexJsdapk6GsFhTACGRXfglH23AVUCoqg==", "0000000002", false, "", false, "user2" },
-                    { new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd"), 0, "Address3", "96c7d585-bcd1-4426-a548-27ea96a688b8", 0, "member3@gmail.com", true, "Fullname3", false, false, null, "member3@gmail.com", "member3@gmail.com", "AQAAAAIAAYagAAAAECA2q2LpdElLdB5wnlQbobl3b/vgq9qKAdREn9AqDknYG7JKR7tfzTSjDg74obLpxQ==", "0000000003", false, "", false, "user3" },
-                    { new Guid("bc4519c8-fdeb-06e2-4a08-cc98c4273aba"), 0, "Address4", "4a826301-73fd-4656-9960-780d4cddb812", 0, "member4@gmail.com", true, "Fullname4", false, false, null, "member4@gmail.com", "member4@gmail.com", "AQAAAAIAAYagAAAAELhoUYxurQjMRKpjfHYsc8Cw2fnkUQjn+gzCSWMj+k+ScRLe9YMRE558tC55T/epRg==", "0000000004", false, "", false, "user4" },
-                    { new Guid("cf85ddf4-1ece-d1e2-3171-650938abd2b7"), 0, "Address5", "ff0bbeb1-4dae-4104-bf0a-5710876a2c2c", 0, "member5@gmail.com", true, "Fullname5", false, false, null, "member5@gmail.com", "member5@gmail.com", "AQAAAAIAAYagAAAAEFnDJJLbw+/XSEFejVTp+NLEv+H/ITLVOCkILU5lgD4W9DJeXbCQdr8oL4x2/LplIg==", "0000000005", false, "", false, "user5" }
+                    { new Guid("95c69371-b924-6fe3-7c38-98b7dd200bc1"), 0, "Address2", "1a722328-bfca-4162-91fd-6ab6a0cc4f77", 0, "it@gmail.com", true, "Fullname2", false, false, null, "it@gmail.com", "it", "AQAAAAIAAYagAAAAEJcaGUNf0iUKfOei69GQYHm9aHDeN08u05+73jkOFO2nJPf4uVgC8sZKHHbJhKPFug==", "0000000002", false, "", false, "it" },
+                    { new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd"), 0, "Address3", "d5610279-ee00-4b7d-9d88-1c8622573280", 0, "sale@gmail.com", true, "Fullname3", false, false, null, "sale@gmail.com", "sale", "AQAAAAIAAYagAAAAEFaO3qa4/NRwsT183gsowwV8mJgbaDp2g7TKLtYWCmwfF+rn0VJK2Pi4B4DthoxZjw==", "0000000003", false, "", false, "sale" },
+                    { new Guid("bc4519c8-fdeb-06e2-4a08-cc98c4273aba"), 0, "Address4", "5f0ff865-4047-4053-9797-da1d2e6f719f", 0, "manager@gmail.com", true, "Fullname4", false, false, null, "manager@gmail.com", "manager", "AQAAAAIAAYagAAAAEBxB/X2Dho8yxgAQ5zNxaN06kWKJfcUlPxcdg/i7feCAXrejwc7Bb39LNgRMLC+V+w==", "0000000004", false, "", false, "manager" },
+                    { new Guid("cf85ddf4-1ece-d1e2-3171-650938abd2b7"), 0, "Address5", "468b2f1e-2a7f-4480-90cb-84f1cd207edc", 0, "admin@gmail.com", true, "Fullname5", false, false, null, "admin@gmail.com", "admin", "AQAAAAIAAYagAAAAEOhoOWXDjK2roPufBcfg+5z6iiIFxGbtWvgYGHPR456CN6UR7HBvQPF/G0T2aHYUrQ==", "0000000005", false, "", false, "admin" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "CompanyTypes",
+                columns: new[] { "Id", "DateCreated", "DateUpdated", "Description", "IsDeleted", "Name" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5654), new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5671), "Doanh nghiệp tư nhân", false, "Doanh nghiệp tư nhân" },
+                    { 2, new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5717), new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5718), "Công ty trách nhiệm hữu hạn một thành viên", false, "Công ty trách nhiệm hữu hạn một thành viên" },
+                    { 3, new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5733), new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5733), "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên", false, "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên" },
+                    { 4, new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5747), new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5747), "Công ty cổ phần", false, "Công ty cổ phần" },
+                    { 5, new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5760), new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5760), "Công ty hợp danh", false, "Công ty hợp danh" }
                 });
 
             migrationBuilder.InsertData(
@@ -218,7 +329,6 @@ namespace IMS.Migrations
                 columns: new[] { "RoleId", "UserId" },
                 values: new object[,]
                 {
-                    { new Guid("8286d046-9740-a3e4-95cf-ff46699c73c4"), new Guid("8286d046-9740-a3e4-95cf-ff46699c73c4") },
                     { new Guid("95c69371-b924-6fe3-7c38-98b7dd200bc1"), new Guid("95c69371-b924-6fe3-7c38-98b7dd200bc1") },
                     { new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd"), new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd") },
                     { new Guid("bc4519c8-fdeb-06e2-4a08-cc98c4273aba"), new Guid("bc4519c8-fdeb-06e2-4a08-cc98c4273aba") },
@@ -263,9 +373,29 @@ namespace IMS.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Customer_UserId",
-                table: "Customer",
+                name: "IX_Collocations_CustomerId",
+                table: "Collocations",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Collocations_ServerId",
+                table: "Collocations",
+                column: "ServerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customers_CompanyTypeId",
+                table: "Customers",
+                column: "CompanyTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customers_UserId",
+                table: "Customers",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Servers_DeviceId",
+                table: "Servers",
+                column: "DeviceId");
         }
 
         /// <inheritdoc />
@@ -287,13 +417,25 @@ namespace IMS.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Customer");
+                name: "Collocations");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");
 
             migrationBuilder.DropTable(
+                name: "Customers");
+
+            migrationBuilder.DropTable(
+                name: "Servers");
+
+            migrationBuilder.DropTable(
                 name: "AspNetUsers");
+
+            migrationBuilder.DropTable(
+                name: "CompanyTypes");
+
+            migrationBuilder.DropTable(
+                name: "Devices");
         }
     }
 }

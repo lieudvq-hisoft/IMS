@@ -14,4 +14,16 @@ public class Customer : BaseEntity
     public string TaxNumber { get; set; }
     public Guid UserId { get; set; }
     public virtual User User { get; set; }
+
+    public int CompanyTypeId { get; set; }
+    public virtual CompanyType CompanyType { get; set; }
 }
+
+public class CompanyType : BaseEntity
+{
+    public string Name { get; set; }
+    public string Description { get; set; }
+
+    public virtual List<Customer> Customer { get; set; }
+}
+

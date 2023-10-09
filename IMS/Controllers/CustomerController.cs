@@ -14,12 +14,10 @@ namespace IMS.Controllers;
 public class CustomerController : ControllerBase
 {
     private readonly ICustomerService _customerService;
-    private readonly IWebHostEnvironment _environment;
 
-    public CustomerController(ICustomerService customerService, IWebHostEnvironment environment)
+    public CustomerController(ICustomerService customerService)
     {
         _customerService = customerService;
-        _environment = environment;
     }
 
     [HttpGet]
@@ -34,27 +32,6 @@ public class CustomerController : ControllerBase
     public async Task<ActionResult> GetDetail(int id)
     {
         var result = await _customerService.GetDetail(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
-    [HttpPost("bulk")]
-    public async Task<ActionResult> Import()
-    {
-        string filePath = Path.Combine(_environment.WebRootPath, "import\\customer\\" + "Test_Excel.xlsx");
-        var result = await _customerService.Import("Test_Excel.xlsx");
-
-
-        if (result.Succeed)
-            return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Result.xlsx");
-            //return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
-    [HttpPost]
-    public async Task<ActionResult> Create([FromForm] CustomerCreateModel model)
-    {
-        var result = await _customerService.Create(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
