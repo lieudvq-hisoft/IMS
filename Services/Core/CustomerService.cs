@@ -119,6 +119,7 @@ public class CustomerService : ICustomerService
         using var package = new ExcelPackage(new FileInfo(filePath));
         var worksheet = package.Workbook.Worksheets["Sheet1"];
         int rowCount = worksheet.Dimension.End.Row;     //get row count
+        int colCount = worksheet.Dimension.End.Column;     //get col count
         int successRow = 0;
 
         for (int row = 2; row <= rowCount; row++)
@@ -136,7 +137,7 @@ public class CustomerService : ICustomerService
 
             var context = new ValidationContext(model, serviceProvider: null, items: null);
             var validationResults = new List<ValidationResult>();
-            var resultCell = worksheet.Cells[row, 8];
+            var resultCell = worksheet.Cells[row, colCount];
             resultCell.Style.WrapText = true;
             resultCell.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
 

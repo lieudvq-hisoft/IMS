@@ -5,6 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Services.Core;
-internal class ServerDeviceService
+public interface IServerDeviceService
 {
+
+}
+
+public class ServerDeviceService
+{
+
 }
