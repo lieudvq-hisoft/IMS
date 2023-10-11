@@ -156,7 +156,7 @@ public class UserService : IUserService
         var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
           _configuration["Jwt:Issuer"],
           claims,
-          expires: DateTime.Now.AddHours(int.Parse(_configuration["Jwt:ExpireTimes"])),
+          expires: DateTime.Now.AddMinutes(int.Parse(_configuration["Jwt:ExpireTimes"])),
           //int.Parse(_configuration["Jwt:ExpireTimes"]) * 3600
           signingCredentials: creds);
 

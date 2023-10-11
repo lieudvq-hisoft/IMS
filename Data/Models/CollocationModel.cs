@@ -27,3 +27,34 @@ public class CollocationCreateModel
     public List<AdditionalServiceModel> AdditionalServices { get; set; }
 }
 
+public class CollocationUpdateModel
+{
+    [Required]
+    public int CollocationId { get; set; }
+
+    [Required]
+    public string Model { get; set; }
+
+    [Required]
+    public int Size { get; set; }
+
+    [Required]
+    public int NumberOfPort { get; set; }
+
+    public int SerialNumber { get; set; }
+
+    public int BasePower { get; set; }
+
+    public int LocationId { get; set; }
+
+    public string IpServer { get; set; }
+
+    public string SubnetMask { get; set; }
+
+    public string Gateway { get; set; }
+
+    public string DNS { get; set; }
+
+    public int PortIP { get; set; }
+}
+
