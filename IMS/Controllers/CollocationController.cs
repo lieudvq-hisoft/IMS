@@ -16,19 +16,22 @@ public class CollocationController : ControllerBase
     private readonly ICustomerService _customerService;
     private readonly IWebHostEnvironment _environment;
     private readonly ICollocationService _collocationService;
+    private readonly IFileService _fileService;
 
-    public CollocationController(ICustomerService customerService, IWebHostEnvironment environment, ICollocationService collocationService)
+    public CollocationController(ICustomerService customerService, IWebHostEnvironment environment, ICollocationService collocationService, IFileService fileService)
     {
         _customerService = customerService;
         _environment = environment;
         _collocationService = collocationService;
+        _fileService = fileService;
     }
 
     [HttpPost("bulk")]
-    public async Task<ActionResult> Import()
+    public async Task<ActionResult> Import(IFormFile importFile)
     {
-        string filePath = Path.Combine(_environment.WebRootPath, "import\\customer\\" + "Test_Excel.xlsx");
-        await _customerService.Import(filePath);
+        string folderPath = Path.Combine(_environment.WebRootPath, "import\\customer");
+        string filePath = await _fileService.SaveFile(importFile, folderPath);
+        //await _customerService.Import(filePath);
 
         return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Result.xlsx");
     }
