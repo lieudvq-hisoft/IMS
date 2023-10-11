@@ -119,7 +119,7 @@ public class CustomerService : ICustomerService
         using var package = new ExcelPackage(new FileInfo(filePath));
         var worksheet = package.Workbook.Worksheets["Sheet1"];
         int rowCount = worksheet.Dimension.End.Row;     //get row count
-        int colCount = worksheet.Dimension.End.Column;     //get col count
+        int colCount = worksheet.Dimension.Start.Column;     //get col count
         int successRow = 0;
 
         for (int row = 2; row <= rowCount; row++)

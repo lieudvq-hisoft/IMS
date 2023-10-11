@@ -15,11 +15,13 @@ public class CollocationController : ControllerBase
 {
     private readonly ICustomerService _customerService;
     private readonly IWebHostEnvironment _environment;
+    private readonly ICollocationService _collocationService;
 
-    public CollocationController(ICustomerService customerService, IWebHostEnvironment environment)
+    public CollocationController(ICustomerService customerService, IWebHostEnvironment environment, ICollocationService collocationService)
     {
         _customerService = customerService;
         _environment = environment;
+        _collocationService = collocationService;
     }
 
     [HttpPost("bulk")]
@@ -32,11 +34,21 @@ public class CollocationController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create([FromForm] CollocationCreateModel model)
+    public async Task<ActionResult> Create([FromBody] CollocationCreateModel model)
     {
         var createCustomerResult = await _customerService.Create(model.CustomerCreateModel);
         if (createCustomerResult.Succeed)
-            return Ok(createCustomerResult.Data);
+        {
+            CustomerModel customerModel = createCustomerResult.Data as CustomerModel;
+            var createCollocationResult = await _collocationService.AttempCreate(model, customerModel);
+
+            if (createCollocationResult.Succeed)
+            {
+                return Ok();
+            }
+        }
+
+
 
         return BadRequest(createCustomerResult.ErrorMessage);
     }

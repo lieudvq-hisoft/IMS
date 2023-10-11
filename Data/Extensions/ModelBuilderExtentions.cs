@@ -42,6 +42,27 @@ public static class ModelBuilderExtentions
         });
         #endregion
 
+        #region Service
+        modelBuilder.Entity<Service>().HasData(new Service
+        {
+            Id = 1,
+            Name = "Thuê Chỗ",
+            Description = "Thuê Chỗ",
+        });
+        modelBuilder.Entity<Service>().HasData(new Service
+        {
+            Id = 2,
+            Name = "Thêm 1U",
+            Description = "Thêm 1U",
+        });
+        modelBuilder.Entity<Service>().HasData(new Service
+        {
+            Id = 3,
+            Name = "Công suất 100",
+            Description = "Công suất 100",
+        });
+        #endregion
+
         #region User
         var hasher = new PasswordHasher<User>();
 

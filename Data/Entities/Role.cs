@@ -10,8 +10,6 @@ namespace Data.Entities;
 
 public class Role : IdentityRole<Guid>
 {
-    //public Guid roleID { get; set; }
-    // public string roleName { get; set; }
     [Column(TypeName = "varchar(350)")]
     public string Description { get; set; }
     public bool isDeactive { get; set; }

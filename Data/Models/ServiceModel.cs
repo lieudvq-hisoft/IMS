@@ -4,13 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Services.Core;
-public interface IServerDeviceService
+namespace Data.Models;
+public class ServiceModel
 {
-
-}
-
-public class ServerDeviceService
-{
-
 }
