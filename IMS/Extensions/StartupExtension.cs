@@ -25,7 +25,7 @@ public static class StartupExtension
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         services.AddDbContext<AppDbContext>(opt =>
         {
-            opt.UseNpgsql(configuration.GetConnectionString("Dev"),
+            opt.UseNpgsql(configuration.GetConnectionString("Local"),
                 b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name));
         });
     }

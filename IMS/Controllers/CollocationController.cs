@@ -31,7 +31,7 @@ public class CollocationController : ControllerBase
     {
         string folderPath = Path.Combine(_environment.WebRootPath, "import\\customer");
         string filePath = await _fileService.SaveFile(importFile, folderPath);
-        //await _customerService.Import(filePath);
+        await _customerService.Import(filePath);
 
         return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Result.xlsx");
     }
@@ -50,9 +50,6 @@ public class CollocationController : ControllerBase
                 return Ok();
             }
         }
-
-
-
         return BadRequest(createCustomerResult.ErrorMessage);
     }
 }

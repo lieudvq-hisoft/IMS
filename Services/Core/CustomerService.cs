@@ -119,48 +119,58 @@ public class CustomerService : ICustomerService
         using var package = new ExcelPackage(new FileInfo(filePath));
         var worksheet = package.Workbook.Worksheets["Sheet1"];
         int rowCount = worksheet.Dimension.End.Row;     //get row count
-        int colCount = worksheet.Dimension.Start.Column;     //get col count
+        int colCount = worksheet.Dimension.End.Column;     //get col count
         int successRow = 0;
 
         for (int row = 2; row <= rowCount; row++)
         {
-            var model = new CustomerCreateModel()
-            {
-                CompanyName = worksheet.Cells[row, 1].Value?.ToString().Trim(),
-                CompanyTypeId = int.Parse(worksheet.Cells[row, 2].Value?.ToString().Trim()),
-                Fullname = worksheet.Cells[row, 3].Value?.ToString().Trim(),
-                TaxNumber = worksheet.Cells[row, 4].Value?.ToString().Trim(),
-                Address = worksheet.Cells[row, 5].Value?.ToString().Trim(),
-                Email = worksheet.Cells[row, 6].Value?.ToString().Trim(),
-                PhoneNumber = worksheet.Cells[row, 7].Value?.ToString().Trim(),
-            };
-
-            var context = new ValidationContext(model, serviceProvider: null, items: null);
-            var validationResults = new List<ValidationResult>();
             var resultCell = worksheet.Cells[row, colCount];
             resultCell.Style.WrapText = true;
             resultCell.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
+            string companyName = worksheet.Cells[row, 2].Value?.ToString().Trim();
+            var company = _dbContext.CompanyTypes.FirstOrDefault(x => x.Name == companyName);
 
-            bool isValid = Validator.TryValidateObject(model, context, validationResults, true);
-
-            if (!isValid)
+            if (company == null)
             {
-                foreach (ValidationResult validationError in validationResults)
-                {
-                    resultCell.Value = validationError.ErrorMessage + "\r\n";
-                }
+                resultCell.Value = "Company " + ErrorMessage.NOT_EXISTED;
             }
             else
             {
-                var result = await Create(model);
-                if (!result.Succeed)
+                var model = new CustomerCreateModel()
                 {
-                    resultCell.Value = result.ErrorMessage;
+                    CompanyName = worksheet.Cells[row, 1].Value?.ToString().Trim(),
+                    CompanyTypeId = company.Id,
+                    Fullname = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                    TaxNumber = worksheet.Cells[row, 4].Value?.ToString().Trim(),
+                    Address = worksheet.Cells[row, 5].Value?.ToString().Trim(),
+                    Email = worksheet.Cells[row, 6].Value?.ToString().Trim(),
+                    PhoneNumber = worksheet.Cells[row, 7].Value?.ToString().Trim(),
+                };
+
+                var context = new ValidationContext(model, serviceProvider: null, items: null);
+                var validationResults = new List<ValidationResult>();
+
+                bool isValid = Validator.TryValidateObject(model, context, validationResults, true);
+
+                if (!isValid)
+                {
+                    foreach (ValidationResult validationError in validationResults)
+                    {
+                        resultCell.Value = validationError.ErrorMessage + "\r\n";
+                    }
                 }
                 else
                 {
-                    resultCell.Value = "Ok";
-                    successRow++;
+                    var result = await Create(model);
+                    if (!result.Succeed)
+                    {
+                        resultCell.Value = result.ErrorMessage;
+                    }
+                    else
+                    {
+                        resultCell.Value = "Ok";
+                        successRow++;
+                    }
                 }
             }
         }
