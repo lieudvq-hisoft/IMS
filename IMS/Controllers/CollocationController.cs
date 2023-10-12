@@ -1,4 +1,5 @@
-﻿using Data.Enums;
+﻿using Data.Common.PaginationModel;
+using Data.Enums;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -24,6 +25,14 @@ public class CollocationController : ControllerBase
         _environment = environment;
         _collocationService = collocationService;
         _fileService = fileService;
+    }
+
+    [HttpGet]
+    public async Task<ActionResult> Get([FromQuery] PagingParam<CollocationSortCriteria> pagingParam, [FromQuery] CollocationSearchModel searchModel)
+    {
+        var result = await _collocationService.Get(pagingParam, searchModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
     }
 
     [HttpPost("bulk")]

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Data.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 namespace Data.Entities;
 public class Collocation : BaseEntity
 {
-    public bool IsApproved { get; set; }
+    public CollocationStatus Status { get; set; }
     public string? Note { get; set; }
     public string? InspectorNote { get; set; }
     public DateTime DateAllocate { get; set; }

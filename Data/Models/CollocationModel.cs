@@ -1,4 +1,5 @@
-﻿using IMS.Data.Utils.ValidationAttributes;
+﻿using Data.Enums;
+using IMS.Data.Utils.ValidationAttributes;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -7,6 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Data.Models;
+public class CollocationModel
+{
+    public int Id { get; set; }
+    public DateTime DateCreate { get; set; }
+    public string CompanyName { get; set; }
+    public CollocationStatus Status { get; set; }
+}
+
 public class CollocationCreateModel
 {
     [Required]
@@ -61,3 +70,7 @@ public class CollocationUpdateModel
     public int PortIP { get; set; }
 }
 
+public class CollocationSearchModel
+{
+    public string? SearchValue { get; set; } = "";
+}

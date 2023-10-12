@@ -1,23 +1,71 @@
-﻿using Data.DataAccess;
+﻿using AutoMapper;
+using Data.Common.PaginationModel;
+using Data.DataAccess;
 using Data.Entities;
+using Data.Enums;
 using Data.Model;
 using Data.Models;
+using Data.Utils.Paging;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Services.Utilities;
 
 namespace Services.Core;
 public interface ICollocationService
 {
     Task<ResultModel> AttempCreate(CollocationCreateModel model, CustomerModel customer);
+    Task<ResultModel> Get(PagingParam<CollocationSortCriteria> paginationModel, CollocationSearchModel searchModel);
 }
 
 public class CollocationService : ICollocationService
 {
     private readonly AppDbContext _dbContext;
+    private readonly IMapper _mapper;
 
-    public CollocationService(AppDbContext dbContext)
+    public CollocationService(AppDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
+        _mapper = mapper;
+    }
+
+    public async Task<ResultModel> Get(PagingParam<CollocationSortCriteria> paginationModel, CollocationSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var collocations = _dbContext.Collocations
+                .Include(x => x.Customer)
+                .Where(x => !x.IsDeleted)
+                .Where(delegate (Collocation x)
+                {
+                    return MatchString(searchModel, x.Customer.CompanyName);
+                })
+                .AsQueryable();
+
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, collocations.Count());
+
+            collocations = collocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            collocations = collocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            paging.Data = _mapper.ProjectTo<CollocationModel>(collocations).ToList();
+
+            result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
+        }
+        return result;
+    }
+
+    private bool MatchString(CollocationSearchModel searchModel, string? value)
+    {
+        return MyFunction
+            .ConvertToUnSign(value ?? "")
+            .IndexOf(MyFunction.ConvertToUnSign(searchModel.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
     }
 
     /// <summary>
@@ -51,7 +99,7 @@ public class CollocationService : ICollocationService
             {
                 var collocation = new Collocation
                 {
-                    IsApproved = false,
+                    Status = CollocationStatus.Pending,
                     Note = model.Note,
                     InspectorNote = model.InspectorNote,
                     DateCreated = model.DateCreate,

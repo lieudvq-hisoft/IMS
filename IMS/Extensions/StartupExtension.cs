@@ -89,7 +89,6 @@ public static class StartupExtension
         services.AddAuthorization();
 
         //services.AddControllers().AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize);
-
     }
 
     public static void AddJWTAuthentication(this IServiceCollection services, string key, string issuer)

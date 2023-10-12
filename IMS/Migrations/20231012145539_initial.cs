@@ -97,6 +97,23 @@ namespace IMS.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "Services",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Services", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
@@ -264,10 +281,13 @@ namespace IMS.Migrations
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    IsApproved = table.Column<bool>(type: "boolean", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
                     Note = table.Column<string>(type: "text", nullable: true),
+                    InspectorNote = table.Column<string>(type: "text", nullable: true),
+                    DateAllocate = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    DateStop = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     CustomerId = table.Column<int>(type: "integer", nullable: false),
-                    ServerId = table.Column<int>(type: "integer", nullable: false),
+                    ServerId = table.Column<int>(type: "integer", nullable: true),
                     DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
@@ -285,6 +305,35 @@ namespace IMS.Migrations
                         name: "FK_Collocations_Servers_ServerId",
                         column: x => x.ServerId,
                         principalTable: "Servers",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AdditionalServices",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Quantity = table.Column<int>(type: "integer", nullable: false),
+                    CollocationId = table.Column<int>(type: "integer", nullable: false),
+                    ServiceId = table.Column<int>(type: "integer", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AdditionalServices", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AdditionalServices_Collocations_CollocationId",
+                        column: x => x.CollocationId,
+                        principalTable: "Collocations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AdditionalServices_Services_ServiceId",
+                        column: x => x.ServiceId,
+                        principalTable: "Services",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -306,10 +355,10 @@ namespace IMS.Migrations
                 columns: new[] { "Id", "AccessFailedCount", "Address", "ConcurrencyStamp", "CurrenNoticeCount", "Email", "EmailConfirmed", "Fullname", "IsDeleted", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
                 values: new object[,]
                 {
-                    { new Guid("95c69371-b924-6fe3-7c38-98b7dd200bc1"), 0, "Address2", "1a722328-bfca-4162-91fd-6ab6a0cc4f77", 0, "it@gmail.com", true, "Fullname2", false, false, null, "it@gmail.com", "it", "AQAAAAIAAYagAAAAEJcaGUNf0iUKfOei69GQYHm9aHDeN08u05+73jkOFO2nJPf4uVgC8sZKHHbJhKPFug==", "0000000002", false, "", false, "it" },
-                    { new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd"), 0, "Address3", "d5610279-ee00-4b7d-9d88-1c8622573280", 0, "sale@gmail.com", true, "Fullname3", false, false, null, "sale@gmail.com", "sale", "AQAAAAIAAYagAAAAEFaO3qa4/NRwsT183gsowwV8mJgbaDp2g7TKLtYWCmwfF+rn0VJK2Pi4B4DthoxZjw==", "0000000003", false, "", false, "sale" },
-                    { new Guid("bc4519c8-fdeb-06e2-4a08-cc98c4273aba"), 0, "Address4", "5f0ff865-4047-4053-9797-da1d2e6f719f", 0, "manager@gmail.com", true, "Fullname4", false, false, null, "manager@gmail.com", "manager", "AQAAAAIAAYagAAAAEBxB/X2Dho8yxgAQ5zNxaN06kWKJfcUlPxcdg/i7feCAXrejwc7Bb39LNgRMLC+V+w==", "0000000004", false, "", false, "manager" },
-                    { new Guid("cf85ddf4-1ece-d1e2-3171-650938abd2b7"), 0, "Address5", "468b2f1e-2a7f-4480-90cb-84f1cd207edc", 0, "admin@gmail.com", true, "Fullname5", false, false, null, "admin@gmail.com", "admin", "AQAAAAIAAYagAAAAEOhoOWXDjK2roPufBcfg+5z6iiIFxGbtWvgYGHPR456CN6UR7HBvQPF/G0T2aHYUrQ==", "0000000005", false, "", false, "admin" }
+                    { new Guid("95c69371-b924-6fe3-7c38-98b7dd200bc1"), 0, "Address2", "73c24578-5c42-42d7-ae1b-422b70498519", 0, "it@gmail.com", true, "Fullname2", false, false, null, "it@gmail.com", "it", "AQAAAAIAAYagAAAAEFAnpx5QcN7HUzYGFjRYvK2kPaVdayG47OHLbWJ/zIz519vF3BKyZuQ+tK58JuVydQ==", "0000000002", false, "", false, "it" },
+                    { new Guid("a905569d-db07-3ae3-63a0-322750a4a3bd"), 0, "Address3", "f1cde6a3-b1b6-4188-bd9a-9252c72402b4", 0, "sale@gmail.com", true, "Fullname3", false, false, null, "sale@gmail.com", "sale", "AQAAAAIAAYagAAAAEORgVmX3+vWmltxfELtm0tLUb1X1IwrtEGtwjgzwSslZRVH4KKOg1x1N3wg6rJ19ng==", "0000000003", false, "", false, "sale" },
+                    { new Guid("bc4519c8-fdeb-06e2-4a08-cc98c4273aba"), 0, "Address4", "eb3281db-b525-4669-9a38-44ac82bf4a14", 0, "manager@gmail.com", true, "Fullname4", false, false, null, "manager@gmail.com", "manager", "AQAAAAIAAYagAAAAEH1zX+xExkHk0snDI9PSMqXoswR1ADUc+cICx39VUUcLFCuPv7+3K4iAechhobBT4Q==", "0000000004", false, "", false, "manager" },
+                    { new Guid("cf85ddf4-1ece-d1e2-3171-650938abd2b7"), 0, "Address5", "7cadd2f7-44c4-4d1f-898b-cef6a6e0ff17", 0, "admin@gmail.com", true, "Fullname5", false, false, null, "admin@gmail.com", "admin", "AQAAAAIAAYagAAAAEKm3fOWBBDAhs02/t4qGIy8+1zFleMz3qvtN7pv0WuADcvL0HkOiZBvdOKvkQhrgew==", "0000000005", false, "", false, "admin" }
                 });
 
             migrationBuilder.InsertData(
@@ -317,11 +366,21 @@ namespace IMS.Migrations
                 columns: new[] { "Id", "DateCreated", "DateUpdated", "Description", "IsDeleted", "Name" },
                 values: new object[,]
                 {
-                    { 1, new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5654), new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5671), "Doanh nghiệp tư nhân", false, "Doanh nghiệp tư nhân" },
-                    { 2, new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5717), new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5718), "Công ty trách nhiệm hữu hạn một thành viên", false, "Công ty trách nhiệm hữu hạn một thành viên" },
-                    { 3, new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5733), new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5733), "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên", false, "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên" },
-                    { 4, new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5747), new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5747), "Công ty cổ phần", false, "Công ty cổ phần" },
-                    { 5, new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5760), new DateTime(2023, 10, 9, 21, 54, 0, 161, DateTimeKind.Local).AddTicks(5760), "Công ty hợp danh", false, "Công ty hợp danh" }
+                    { 1, new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6544), new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6562), "Doanh nghiệp tư nhân", false, "Doanh nghiệp tư nhân" },
+                    { 2, new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6671), new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6672), "Công ty trách nhiệm hữu hạn một thành viên", false, "Công ty trách nhiệm hữu hạn một thành viên" },
+                    { 3, new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6709), new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6709), "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên", false, "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên" },
+                    { 4, new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6740), new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6741), "Công ty cổ phần", false, "Công ty cổ phần" },
+                    { 5, new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6846), new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6847), "Công ty hợp danh", false, "Công ty hợp danh" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Services",
+                columns: new[] { "Id", "DateCreated", "DateUpdated", "Description", "IsDeleted", "Name" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6901), new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6901), "Thuê Chỗ", false, "Thuê Chỗ" },
+                    { 2, new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6942), new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6943), "Thêm 1U", false, "Thêm 1U" },
+                    { 3, new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6988), new DateTime(2023, 10, 12, 21, 55, 38, 506, DateTimeKind.Local).AddTicks(6989), "Công suất 100", false, "Công suất 100" }
                 });
 
             migrationBuilder.InsertData(
@@ -334,6 +393,16 @@ namespace IMS.Migrations
                     { new Guid("bc4519c8-fdeb-06e2-4a08-cc98c4273aba"), new Guid("bc4519c8-fdeb-06e2-4a08-cc98c4273aba") },
                     { new Guid("cf85ddf4-1ece-d1e2-3171-650938abd2b7"), new Guid("cf85ddf4-1ece-d1e2-3171-650938abd2b7") }
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AdditionalServices_CollocationId",
+                table: "AdditionalServices",
+                column: "CollocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AdditionalServices_ServiceId",
+                table: "AdditionalServices",
+                column: "ServiceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetRoleClaims_RoleId",
@@ -402,6 +471,9 @@ namespace IMS.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "AdditionalServices");
+
+            migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
@@ -418,6 +490,9 @@ namespace IMS.Migrations
 
             migrationBuilder.DropTable(
                 name: "Collocations");
+
+            migrationBuilder.DropTable(
+                name: "Services");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

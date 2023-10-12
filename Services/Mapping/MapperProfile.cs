@@ -20,5 +20,8 @@ public class MapperProfile : Profile
         CreateMap<CompanyType, CompanyTypeModel>();
 
         CreateMap<Service, ServiceModel>();
+
+        CreateMap<Collocation, CollocationModel>()
+            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName));
     }
 }

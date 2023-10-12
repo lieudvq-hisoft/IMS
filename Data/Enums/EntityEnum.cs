@@ -16,6 +16,20 @@ public enum DeviceStatus
     Shutdown
 }
 
+public enum CollocationStatus
+{
+    Pending,
+    Success,
+    Unsuccess
+}
+
+public enum AdditionalServiceStatus
+{
+    Pending,
+    Success,
+    Unsuccess
+}
+
 public enum UserSortCriteria
 {
     Email
@@ -26,3 +40,7 @@ public enum CustomerSortCriteria
     Id
 }
 
+public enum CollocationSortCriteria
+{
+    Id
+}
