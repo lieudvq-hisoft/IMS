@@ -1,4 +1,5 @@
-﻿using System;
+﻿using IMS.Data.Utils.ValidationAttributes;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -15,9 +16,11 @@ public class CollocationCreateModel
     public DateTime DateCreate { get; set; }
 
     [Required]
+    [DateMoreThan(comparisonProperty: "DateCreate", ErrorMessage = "Allocate dat must be later than create date")]
     public DateTime DateAllocate { get; set; }
 
     [Required]
+    [DateMoreThan(comparisonProperty: "DateAllocate", ErrorMessage = "Stop dat must be later than allocate date")]
     public DateTime DateStop { get; set; }
 
     public string? Note { get; set; }

@@ -36,7 +36,7 @@ public class CollocationService : ICollocationService
             var services = new List<Service>();
             foreach (var additionalService in model.AdditionalServices)
             {
-                var service = _dbContext.Services.FirstOrDefault(x => x.Name == additionalService.Name);
+                var service = _dbContext.Services.FirstOrDefault(x => x.Id == additionalService.Id);
                 if (service == null)
                 {
                     validPrecondition = false;
@@ -65,7 +65,7 @@ public class CollocationService : ICollocationService
 
                 foreach (var service in services)
                 {
-                    var additionalService = model.AdditionalServices.FirstOrDefault(x => x.Name == service.Name);
+                    var additionalService = model.AdditionalServices.FirstOrDefault(x => x.Id == service.Id);
                     _dbContext.AdditionalServices.Add(new AdditionalService
                     {
                         ServiceId = service.Id,

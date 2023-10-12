@@ -17,6 +17,8 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
             .ForMember(dest => dest.Fullname, opt => opt.MapFrom(src => src.User.Fullname));
 
+        CreateMap<CompanyType, CompanyTypeModel>();
+
         CreateMap<Service, ServiceModel>();
     }
 }

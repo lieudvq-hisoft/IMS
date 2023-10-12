@@ -59,6 +59,7 @@ public static class StartupExtension
         services.AddScoped<ICollocationService, CollocationService>();
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<IServiceService, ServiceService>();
+        services.AddScoped<ICompanyTypeService, CompanyTypeService>();
     }
 
     public static void ConfigIdentityService(this IServiceCollection services)

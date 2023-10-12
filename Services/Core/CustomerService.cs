@@ -127,7 +127,7 @@ public class CustomerService : ICustomerService
             var model = new CustomerCreateModel()
             {
                 CompanyName = worksheet.Cells[row, 1].Value?.ToString().Trim(),
-                CompanyType = worksheet.Cells[row, 2].Value?.ToString().Trim(),
+                CompanyTypeId = int.Parse(worksheet.Cells[row, 2].Value?.ToString().Trim()),
                 Fullname = worksheet.Cells[row, 3].Value?.ToString().Trim(),
                 TaxNumber = worksheet.Cells[row, 4].Value?.ToString().Trim(),
                 Address = worksheet.Cells[row, 5].Value?.ToString().Trim(),
@@ -210,7 +210,7 @@ public class CustomerService : ICustomerService
             if (validPrecondition)
             {
                 // Find company type
-                companyType = _dbContext.CompanyTypes.FirstOrDefault(r => r.Name == model.CompanyType);
+                companyType = _dbContext.CompanyTypes.FirstOrDefault(r => r.Id == model.CompanyTypeId);
 
                 if (companyType == null)
                 {
@@ -225,7 +225,7 @@ public class CustomerService : ICustomerService
                 var role = _dbContext.Role.FirstOrDefault(r => r.Name == "Customer");
                 var user = new User
                 {
-                    UserName = model.CompanyName.Trim().Replace(" ", ""),
+                    UserName = MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")),
                     Email = model.Email,
                     Fullname = model.Fullname,
                     Address = model.Address,

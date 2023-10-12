@@ -30,7 +30,7 @@ public class CustomerCreateModel
     public string Fullname { get; set; }
 
     [Required]
-    public string CompanyType { get; set; }
+    public int CompanyTypeId { get; set; }
 
     [Required]
     public string Address { get; set; }
