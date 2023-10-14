@@ -22,7 +22,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> Get([FromQuery] PagingParam<CustomerSortCriteria> pagingParam, [FromQuery] CustomerSearchModel searchModel)
+    public async Task<ActionResult> Get([FromBody] PagingParam<CustomerSortCriteria> pagingParam, [FromQuery] CustomerSearchModel searchModel)
     {
         var result = await _customerService.Get(pagingParam, searchModel);
         if (result.Succeed) return Ok(result.Data);
@@ -38,7 +38,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create([FromForm] CustomerCreateModel model)
+    public async Task<ActionResult> Create([FromBody] CustomerCreateModel model)
     {
         var result = await _customerService.Create(model);
         if (result.Succeed) return Ok(result.Data);
