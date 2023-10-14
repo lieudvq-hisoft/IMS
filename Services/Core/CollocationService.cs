@@ -18,8 +18,10 @@ namespace Services.Core;
 public interface ICollocationService
 {
     Task<ResultModel> Get(PagingParam<CollocationSortCriteria> paginationModel, CollocationSearchModel searchModel);
+    Task<ResultModel> GetRequest(PagingParam<CollocationSortCriteria> paginationModel, CollocationSearchModel searchModel);
     Task<ResultModel> Import(string filePath);
     Task<ResultModel> Create(CollocationRequestCreateModel model);
+
 }
 
 public class CollocationService : ICollocationService
@@ -42,7 +44,10 @@ public class CollocationService : ICollocationService
         {
             var collocations = _dbContext.Collocations
                 .Include(x => x.Customer)
-                .Where(x => !x.IsDeleted)
+                .Include(x => x.AdditionalServices)
+                .Where(x => !x.IsDeleted
+                    && x.Status != CollocationStatus.Pending
+                    && !x.AdditionalServices.Any(_ => _.Status == AdditionalServiceStatus.Pending))
                 .Where(delegate (Collocation x)
                 {
                     return MatchString(searchModel, x.Customer.CompanyName);
@@ -54,7 +59,42 @@ public class CollocationService : ICollocationService
             collocations = collocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             collocations = collocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<CollocationModel>(collocations).ToList();
+            paging.Data = _mapper.ProjectTo<CollocationRequestModel>(collocations).ToList();
+
+            result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetRequest(PagingParam<CollocationSortCriteria> paginationModel, CollocationSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var collocations = _dbContext.Collocations
+                .Include(x => x.Customer)
+                .Include(x => x.AdditionalServices)
+                .Where(x => !x.IsDeleted 
+                    && (x.Status == CollocationStatus.Pending || x.AdditionalServices.Any(_ => _.Status == AdditionalServiceStatus.Pending)))
+                .Where(delegate (Collocation x)
+                {
+                    return MatchString(searchModel, x.Customer.CompanyName);
+                })
+                .AsQueryable();
+
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, collocations.Count());
+
+            collocations = collocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            collocations = collocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            paging.Data = _mapper.ProjectTo<CollocationRequestModel>(collocations).ToList();
 
             result.Data = paging;
             result.Succeed = true;

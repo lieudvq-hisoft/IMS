@@ -12,6 +12,16 @@ public class CollocationModel
 {
     public int Id { get; set; }
     public DateTime DateCreate { get; set; }
+    public string Type { get; set; }
+    public string CompanyName { get; set; }
+    public CollocationStatus Status { get; set; }
+}
+
+public class CollocationRequestModel
+{
+    public int Id { get; set; }
+    public DateTime DateCreate { get; set; }
+    public string Type { get; set; }
     public string CompanyName { get; set; }
     public CollocationStatus Status { get; set; }
 }

@@ -22,7 +22,31 @@ public class MapperProfile : Profile
 
         CreateMap<Service, ServiceModel>();
 
-        CreateMap<Collocation, CollocationModel>()
-            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName));
+        CreateMap<Collocation, CollocationModel>();
+        CreateMap<Collocation, CollocationRequestModel>()
+            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName))
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => GetCollocationRequestType(src)));
+    }
+
+    private string GetCollocationRequestType(Collocation collocation)
+    {
+        string type = "";
+        if (collocation.Status == Data.Enums.CollocationStatus.Pending)
+        {
+            if (collocation.AdditionalServices.Any(x => x.Status == Data.Enums.AdditionalServiceStatus.Pending))
+            {
+                type = "Mix";
+            }
+            else
+            {
+                type = "New Collocation";
+            }
+        }   
+        else
+        {
+            type = "Addtional Service";
+        }
+
+        return type;
     }
 }

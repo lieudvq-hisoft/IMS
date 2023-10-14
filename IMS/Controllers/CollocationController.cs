@@ -35,7 +35,15 @@ public class CollocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPost("bulk")]
+    [HttpGet("Request")]
+    public async Task<ActionResult> GetRequest([FromQuery] PagingParam<CollocationSortCriteria> pagingParam, [FromQuery] CollocationSearchModel searchModel)
+    {
+        var result = await _collocationService.GetRequest(pagingParam, searchModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPost("Bulk")]
     public async Task<ActionResult> Import(IFormFile importFile)
     {
         string folderPath = Path.Combine(_environment.WebRootPath, "import\\customer");
