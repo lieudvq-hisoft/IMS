@@ -155,6 +155,83 @@ public static class ModelBuilderExtentions
             #endregion
         }
         #endregion
+
+        #region Device
+        modelBuilder.Entity<Device>().HasData(new Device
+        {
+            Id = 1,
+            Type = "Mock",
+            NumberOfPort = 3,
+            Status = Enums.DeviceStatus.Running,
+            Size = 2,
+            BasePower = 200,
+        });
+        #endregion
+
+        #region Location
+        modelBuilder.Entity<Area>().HasData(new Area
+        {
+            Id = 1,
+            Name = "A",
+            RowCount = 8,
+            ColumnCount = 8,
+        });
+        modelBuilder.Entity<Area>().HasData(new Area
+        {
+            Id = 2,
+            Name = "B",
+            RowCount = 5,
+            ColumnCount = 8,
+        });
+
+        for (int i = 1; i <= 8; i++)
+        {
+            for (int j = 1; j <= 8; j++)
+            {
+                modelBuilder.Entity<Rack>().HasData(new Rack
+                {
+                    Id = (j - 1) * 8 + i,
+                    MaxPower = 3000,
+                    CurrentPower = (j - 1) * 8 + i == 1 ? 200 : 0,
+                    Column = i,
+                    Row = j,
+                    Size = 42,
+                    AreaId = 1
+                });
+            }
+        }
+
+        for (int i = 1; i <= 8; i++)
+        {
+            for (int j = 1; j <= 5; j++)
+            {
+                modelBuilder.Entity<Rack>().HasData(new Rack
+                {
+                    Id = 8 * 8 + (j - 1) * 8 + i,
+                    MaxPower = 3500,
+                    CurrentPower = 0,
+                    Column = i,
+                    Row = j,
+                    Size = 42,
+                    AreaId = 2
+                });
+            }
+        }
+
+        modelBuilder.Entity<Location>().HasData(new Location
+        {
+            Id = 1,
+            StartPosition = 2,
+            RackId = 1,
+        });
+
+        modelBuilder.Entity<DeviceLocation>().HasData(new DeviceLocation
+        {
+            Id = 1,
+            LocationId = 1,
+            DeviceId = 1
+        });
+        #endregion
     }
 
     private static Guid GenerateSeededGuid(int seed)

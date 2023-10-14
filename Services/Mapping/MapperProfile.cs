@@ -26,6 +26,8 @@ public class MapperProfile : Profile
         CreateMap<Collocation, CollocationRequestModel>()
             .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName))
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => GetCollocationRequestType(src)));
+
+        CreateMap<Area, AreaModel>();
     }
 
     private string GetCollocationRequestType(Collocation collocation)
@@ -41,7 +43,7 @@ public class MapperProfile : Profile
             {
                 type = "New Collocation";
             }
-        }   
+        }
         else
         {
             type = "Addtional Service";
