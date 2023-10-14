@@ -15,7 +15,8 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.User.Address))
             .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.User.Email))
             .ForMember(dest => dest.PhoneNumber, opt => opt.MapFrom(src => src.User.PhoneNumber))
-            .ForMember(dest => dest.Fullname, opt => opt.MapFrom(src => src.User.Fullname));
+            .ForMember(dest => dest.Fullname, opt => opt.MapFrom(src => src.User.Fullname))
+            .ForMember(dest => dest.CompanyType, opt => opt.MapFrom(src => src.CompanyType.Name));
 
         CreateMap<CompanyType, CompanyTypeModel>();
 

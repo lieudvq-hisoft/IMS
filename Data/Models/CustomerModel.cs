@@ -10,6 +10,7 @@ public class CustomerModel
 {
     public int Id { get; set; }
     public string CompanyName { get; set; }
+    public string CompanyType { get; set; }
     public string Fullname { get; set; }
     public string TaxNumber { get; set; }
     public Guid UserId { get; set; }

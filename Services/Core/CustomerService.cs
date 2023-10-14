@@ -55,6 +55,7 @@ public class CustomerService : ICustomerService
         {
             var customers = _dbContext.Customers
                 .Include(x => x.User)
+                .Include(x => x.CompanyType)
                 .Where(x => !x.IsDeleted)
                 .Where(delegate (Customer x)
                 {

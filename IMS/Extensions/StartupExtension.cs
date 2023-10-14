@@ -104,7 +104,7 @@ public static class StartupExtension
                     ValidateAudience = false,
                     ValidIssuer = issuer,
                     ValidateIssuer = true,
-                    ValidateLifetime = false,
+                    ValidateLifetime = true,
                     RequireAudience = false,
                 };
                 jwtconfig.Events = new JwtBearerEvents()

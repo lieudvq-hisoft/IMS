@@ -41,24 +41,25 @@ public class CollocationController : ControllerBase
         string folderPath = Path.Combine(_environment.WebRootPath, "import\\customer");
         string filePath = await _fileService.SaveFile(importFile, folderPath);
         await _customerService.Import(filePath);
+        await _collocationService.Import(filePath);
 
         return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Result.xlsx");
     }
 
-    [HttpPost]
-    public async Task<ActionResult> Create([FromBody] CollocationCreateModel model)
-    {
-        var createCustomerResult = await _customerService.Create(model.CustomerCreateModel);
-        if (createCustomerResult.Succeed)
-        {
-            CustomerModel customerModel = createCustomerResult.Data as CustomerModel;
-            var createCollocationResult = await _collocationService.AttempCreate(model, customerModel);
+    //[HttpPost]
+    //public async Task<ActionResult> Create([FromBody] CollocationImportRequestModel model)
+    //{
+    //    var createCustomerResult = await _customerService.Create(model.CustomerCreateModel);
+    //    if (createCustomerResult.Succeed)
+    //    {
+    //        CustomerModel customerModel = createCustomerResult.Data as CustomerModel;
+    //        var createCollocationResult = await _collocationService.AttempCreateFromExcel(model.CollocationCreateModel, customerModel);
 
-            if (createCollocationResult.Succeed)
-            {
-                return Ok();
-            }
-        }
-        return BadRequest(createCustomerResult.ErrorMessage);
-    }
+    //        if (createCollocationResult.Succeed)
+    //        {
+    //            return Ok();
+    //        }
+    //    }
+    //    return BadRequest(createCustomerResult.ErrorMessage);
+    //}
 }
