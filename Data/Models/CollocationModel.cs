@@ -16,10 +16,19 @@ public class CollocationModel
     public CollocationStatus Status { get; set; }
 }
 
-public class CollocationImportRequestModel
+public class CollocationRequestImportModel
 {
     [Required]
     public CustomerCreateModel CustomerCreateModel { get; set; }
+
+    [Required]
+    public CollocationCreateModel CollocationCreateModel { get; set; }
+}
+
+public class CollocationRequestCreateModel
+{
+    [Required]
+    public int CustomerId { get; set; }
 
     [Required]
     public CollocationCreateModel CollocationCreateModel { get; set; }

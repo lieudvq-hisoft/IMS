@@ -46,20 +46,11 @@ public class CollocationController : ControllerBase
         return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Result.xlsx");
     }
 
-    //[HttpPost]
-    //public async Task<ActionResult> Create([FromBody] CollocationImportRequestModel model)
-    //{
-    //    var createCustomerResult = await _customerService.Create(model.CustomerCreateModel);
-    //    if (createCustomerResult.Succeed)
-    //    {
-    //        CustomerModel customerModel = createCustomerResult.Data as CustomerModel;
-    //        var createCollocationResult = await _collocationService.AttempCreateFromExcel(model.CollocationCreateModel, customerModel);
-
-    //        if (createCollocationResult.Succeed)
-    //        {
-    //            return Ok();
-    //        }
-    //    }
-    //    return BadRequest(createCustomerResult.ErrorMessage);
-    //}
+    [HttpPost]
+    public async Task<ActionResult> Create([FromBody] CollocationRequestCreateModel model)
+    {
+        var result = await _collocationService.Create(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }

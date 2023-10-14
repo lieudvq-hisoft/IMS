@@ -17,9 +17,9 @@ using System.ComponentModel.DataAnnotations;
 namespace Services.Core;
 public interface ICollocationService
 {
-    Task<ResultModel> AttempCreateFromExcel(CollocationCreateModel model, Customer customer);
     Task<ResultModel> Get(PagingParam<CollocationSortCriteria> paginationModel, CollocationSearchModel searchModel);
     Task<ResultModel> Import(string filePath);
+    Task<ResultModel> Create(CollocationRequestCreateModel model);
 }
 
 public class CollocationService : ICollocationService
@@ -157,27 +157,61 @@ public class CollocationService : ICollocationService
     /// </summary>
     /// <param name="model"></param>
     /// <returns>The result model contain the new collocation</returns>
-    public async Task<ResultModel> AttempCreateFromExcel(CollocationCreateModel model, Customer customer)
+    private async Task<ResultModel> AttempCreateFromExcel(CollocationCreateModel model, Customer customer)
+    {
+        var result = await Create(new CollocationRequestCreateModel
+        {
+            CollocationCreateModel = model,
+            CustomerId = customer.Id
+        });
+
+        if (!result.Succeed)
+        {
+            // Delete customer and user on fail to create collocation
+            _dbContext.Attach(customer);
+            _dbContext.Entry(customer).Reference(x => x.User).Load();
+            var user = customer.User;
+            _dbContext.Remove(customer);
+            _dbContext.Remove(user);
+            _dbContext.SaveChanges();
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Create(CollocationRequestCreateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
         bool validPrecondition = true;
+        var createModel = model.CollocationCreateModel;
+        var customerId = model.CustomerId;
 
         try
         {
-            var services = new List<Service>();
-            foreach (var additionalService in model.AdditionalServices)
+            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == customerId);
+            if (customer == null)
             {
-                if (additionalService.Quantity > 0)
+                validPrecondition = false;
+                result.ErrorMessage = "Customer " + ErrorMessage.NOT_EXISTED;
+            }
+
+            var services = new List<Service>();
+            if (validPrecondition)
+            {
+                foreach (var additionalService in createModel.AdditionalServices)
                 {
-                    var service = _dbContext.Services.FirstOrDefault(x => x.Id == additionalService.Id);
-                    if (service == null)
+                    if (additionalService.Quantity > 0)
                     {
-                        validPrecondition = false;
-                    }
-                    else
-                    {
-                        services.Add(service);
+                        var service = _dbContext.Services.FirstOrDefault(x => x.Id == additionalService.Id);
+                        if (service == null)
+                        {
+                            validPrecondition = false;
+                        }
+                        else
+                        {
+                            services.Add(service);
+                        }
                     }
                 }
             }
@@ -187,13 +221,13 @@ public class CollocationService : ICollocationService
                 var collocation = new Collocation
                 {
                     Status = CollocationStatus.Pending,
-                    ExpectedSize = model.ExpectedSize,
-                    Note = model.Note,
-                    InspectorNote = model.InspectorNote,
-                    DateCreated = model.DateCreate,
-                    DateAllocate = model.DateAllocate,
-                    DateStop = model.DateStop,
-                    CustomerId = customer.Id,
+                    ExpectedSize = createModel.ExpectedSize,
+                    Note = createModel.Note,
+                    InspectorNote = createModel.InspectorNote,
+                    DateCreated = createModel.DateCreate,
+                    DateAllocate = createModel.DateAllocate,
+                    DateStop = createModel.DateStop,
+                    CustomerId = customerId,
                 };
 
                 _dbContext.Collocations.Add(collocation);
@@ -201,7 +235,7 @@ public class CollocationService : ICollocationService
 
                 foreach (var service in services)
                 {
-                    var additionalService = model.AdditionalServices.FirstOrDefault(x => x.Id == service.Id);
+                    var additionalService = createModel.AdditionalServices.FirstOrDefault(x => x.Id == service.Id);
                     _dbContext.AdditionalServices.Add(new AdditionalService
                     {
                         ServiceId = service.Id,
@@ -217,17 +251,6 @@ public class CollocationService : ICollocationService
         catch (Exception ex)
         {
             result.ErrorMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
-        }
-
-        if (!result.Succeed)
-        {
-            // Delete customer and user on fail to create collocation
-            _dbContext.Attach(customer);
-            _dbContext.Entry(customer).Reference(x => x.User).Load();
-            var user = customer.User;
-            _dbContext.Remove(customer);
-            _dbContext.Remove(user);
-            _dbContext.SaveChanges();
         }
 
         return result;
