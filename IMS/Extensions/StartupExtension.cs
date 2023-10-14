@@ -25,7 +25,7 @@ public static class StartupExtension
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         services.AddDbContext<AppDbContext>(opt =>
         {
-            opt.UseNpgsql(configuration.GetConnectionString("Local"),
+            opt.UseNpgsql(configuration.GetConnectionString("Dev"),
                 b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name));
         });
     }
@@ -60,6 +60,8 @@ public static class StartupExtension
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<IServiceService, ServiceService>();
         services.AddScoped<ICompanyTypeService, CompanyTypeService>();
+        services.AddScoped<IServerService, ServerService>();
+        services.AddScoped<IDeviceService, DeviceService>();
     }
 
     public static void ConfigIdentityService(this IServiceCollection services)

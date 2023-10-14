@@ -18,13 +18,15 @@ public class CollocationController : ControllerBase
     private readonly IWebHostEnvironment _environment;
     private readonly ICollocationService _collocationService;
     private readonly IFileService _fileService;
+    private readonly IServerService _serverService;
 
-    public CollocationController(ICustomerService customerService, IWebHostEnvironment environment, ICollocationService collocationService, IFileService fileService)
+    public CollocationController(ICustomerService customerService, IWebHostEnvironment environment, ICollocationService collocationService, IFileService fileService, IServerService serverService)
     {
         _customerService = customerService;
         _environment = environment;
         _collocationService = collocationService;
         _fileService = fileService;
+        _serverService = serverService;
     }
 
     [HttpGet]
@@ -43,7 +45,7 @@ public class CollocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPost("Bulk")]
+    [HttpPost("Request/Bulk")]
     public async Task<ActionResult> Import(IFormFile importFile)
     {
         string folderPath = Path.Combine(_environment.WebRootPath, "import\\customer");
@@ -54,7 +56,7 @@ public class CollocationController : ControllerBase
         return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Result.xlsx");
     }
 
-    [HttpPost]
+    [HttpPost("Request")]
     public async Task<ActionResult> Create([FromBody] CollocationRequestCreateModel model)
     {
         var result = await _collocationService.Create(model);

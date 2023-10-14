@@ -14,4 +14,6 @@ public class Device : BaseEntity
     public DeviceStatus Status { get; set; }
     public int Size { get; set; }
     public int BasePower { get; set; }
+
+    public virtual ICollection<DeviceLocation> DeviceLocations { get; set; }
 }
