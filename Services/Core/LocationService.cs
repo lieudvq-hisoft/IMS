@@ -14,9 +14,10 @@ namespace Services.Core;
 public interface ILocationService
 {
     Task<ResultModel> GetAreas();
+    //Task<ResultModel> GetRackDetail(int id);
 }
 
-public class LocationService: ILocationService
+public class LocationService : ILocationService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
@@ -46,4 +47,25 @@ public class LocationService: ILocationService
 
         return result;
     }
+
+    //public async Task<ResultModel> GetRackDetail(int id)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+
+    //    try
+    //    {
+    //        var rack = _dbContext.Racks.FirstOrDefault(x => x.Id == id && !x.IsDeleted);
+    //        var location = _dbContext.DeviceLocations.Include(x => x.Device).Include(x => x.Location).Where(x => x.Location.RackId == id && !x.IsDeleted);
+
+    //        result.Data = _mapper.Map<RackModel>(rack);
+    //        result.Succeed = true;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+
+    //    return result;
+    //}
 }

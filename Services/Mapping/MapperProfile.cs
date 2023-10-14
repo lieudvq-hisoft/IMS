@@ -28,6 +28,8 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => GetCollocationRequestType(src)));
 
         CreateMap<Area, AreaModel>();
+        CreateMap<Rack, RackModel>();
+        CreateMap<Location, DeviceLocationModel>();
     }
 
     private string GetCollocationRequestType(Collocation collocation)

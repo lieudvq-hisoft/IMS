@@ -22,10 +22,18 @@ public class LocationController : ControllerBase
     }
 
     [HttpGet("Areas")]
-    public async Task<ActionResult> Get()
+    public async Task<ActionResult> GetAreas()
     {
         var result = await _locationService.GetAreas();
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    //[HttpGet("Rack/{id}")]
+    //public async Task<ActionResult> GetRack(int id)
+    //{
+    //    var result = await _locationService.GetRackDetail(id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 }
