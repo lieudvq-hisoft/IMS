@@ -22,7 +22,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> Get([FromBody] PagingParam<CustomerSortCriteria> pagingParam, [FromQuery] CustomerSearchModel searchModel)
+    public async Task<ActionResult> Get([FromQuery] PagingParam<CustomerSortCriteria> pagingParam, [FromQuery] CustomerSearchModel searchModel)
     {
         var result = await _customerService.Get(pagingParam, searchModel);
         if (result.Succeed) return Ok(result.Data);
@@ -46,7 +46,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPatch]
-    public async Task<ActionResult> Update([FromForm] CustomerUpdateModel model)
+    public async Task<ActionResult> Update([FromBody] CustomerUpdateModel model)
     {
         var result = await _customerService.Update(model);
         if (result.Succeed) return Ok(result.Data);
