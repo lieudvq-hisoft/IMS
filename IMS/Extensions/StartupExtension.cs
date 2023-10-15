@@ -20,6 +20,16 @@ namespace IMS.Extensions;
 
 public static class StartupExtension
 {
+    public static void AddDbContext(this IServiceCollection services, IConfiguration configuration)
+    {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        services.AddDbContext<AppDbContext>(opt =>
+        {
+            opt.UseNpgsql(configuration.GetConnectionString("Dev"),
+                b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name));
+        });
+    }
+
     public static void ApplyPendingMigrations(this IServiceProvider provider)
     {
         using var scope = provider.CreateScope();
