@@ -29,7 +29,11 @@ public class MapperProfile : Profile
 
         CreateMap<Area, AreaModel>();
         CreateMap<Rack, RackModel>();
-        CreateMap<Location, DeviceLocationModel>();
+        CreateMap<Rack, RackDetailModel>();
+        CreateMap<Location, LocationModel>()
+            .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Device.Server != null? src.Device.Server.Model: src.Device.Type ))
+            .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.Device.Size))
+            .ForMember(dest => dest.StartPosition, opt => opt.MapFrom(src => src.StartPosition));
     }
 
     private string GetCollocationRequestType(Collocation collocation)

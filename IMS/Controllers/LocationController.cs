@@ -29,11 +29,19 @@ public class LocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpGet("Rack/{id}")]
-    //public async Task<ActionResult> GetRack(int id)
-    //{
-    //    var result = await _locationService.GetRackDetail(id);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
+    [HttpGet("Rack/{id}")]
+    public async Task<ActionResult> GetRack(int id)
+    {
+        var result = await _locationService.GetRackDetail(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("Rack/{id}/Available")]
+    public async Task<ActionResult> GetAvailableLocationChoice(int id)
+    {
+        var result = await _locationService.GetRackAvailableLocationChoice(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }

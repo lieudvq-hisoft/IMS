@@ -15,7 +15,7 @@ public interface ICompanyTypeService
     Task<ResultModel> Get();
 }
 
-public class CompanyTypeService: ICompanyTypeService
+public class CompanyTypeService : ICompanyTypeService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
@@ -33,7 +33,7 @@ public class CompanyTypeService: ICompanyTypeService
 
         try
         {
-            var companyTypes = _dbContext.CompanyTypes.ToList();
+            var companyTypes = _dbContext.CompanyTypes.Where(x => !x.IsDeleted).ToList();
 
             result.Data = _mapper.Map<List<CompanyTypeModel>>(companyTypes);
             result.Succeed = true;

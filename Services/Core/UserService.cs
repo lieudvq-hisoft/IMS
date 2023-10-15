@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Services.Utilities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -141,9 +142,9 @@ public class UserService : IUserService
                 }
             }
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            result.ErrorMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
         return result;
     }

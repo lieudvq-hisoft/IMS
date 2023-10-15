@@ -49,7 +49,6 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<CompanyType> CompanyTypes { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Device> Devices { get; set; }
-    public DbSet<DeviceLocation> DeviceLocations { get; set; }
     public DbSet<Location> Locations { get; set; }
     public DbSet<Rack> Racks { get; set; }
     public DbSet<Role> Role { get; set; }

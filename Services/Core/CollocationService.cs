@@ -66,7 +66,7 @@ public class CollocationService : ICollocationService
         }
         catch (Exception e)
         {
-            result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
         return result;
     }
@@ -81,7 +81,7 @@ public class CollocationService : ICollocationService
             var collocations = _dbContext.Collocations
                 .Include(x => x.Customer)
                 .Include(x => x.AdditionalServices)
-                .Where(x => !x.IsDeleted 
+                .Where(x => !x.IsDeleted
                     && (x.Status == CollocationStatus.Pending || x.AdditionalServices.Any(_ => _.Status == AdditionalServiceStatus.Pending)))
                 .Where(delegate (Collocation x)
                 {
@@ -101,7 +101,7 @@ public class CollocationService : ICollocationService
         }
         catch (Exception e)
         {
-            result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
         return result;
     }
@@ -144,7 +144,7 @@ public class CollocationService : ICollocationService
                 for (int i = 13; i < colCount; i++)
                 {
                     var serviceName = worksheet.Cells[1, i].Value?.ToString().Trim();
-                    var service = _dbContext.Services.FirstOrDefault(x => x.Name == serviceName);
+                    var service = _dbContext.Services.FirstOrDefault(x => !x.IsDeleted && x.Name == serviceName);
                     model.AdditionalServices.Add(new AdditionalServiceModel
                     {
                         Id = service.Id,
@@ -168,7 +168,7 @@ public class CollocationService : ICollocationService
                 {
                     var companyName = worksheet.Cells[row, 1].Value?.ToString().Trim();
                     var username = MyFunction.ConvertToUnSign(companyName.Trim().Replace(" ", ""));
-                    var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.User.UserName == username);
+                    var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => !x.IsDeleted && x.User.UserName == username);
                     var result = await AttempCreateFromExcel(model, customer);
                     if (!result.Succeed)
                     {
@@ -229,7 +229,7 @@ public class CollocationService : ICollocationService
 
         try
         {
-            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == customerId);
+            var customer = _dbContext.Customers.FirstOrDefault(x => !x.IsDeleted && x.Id == customerId);
             if (customer == null)
             {
                 validPrecondition = false;
@@ -243,7 +243,7 @@ public class CollocationService : ICollocationService
                 {
                     if (additionalService.Quantity > 0)
                     {
-                        var service = _dbContext.Services.FirstOrDefault(x => x.Id == additionalService.Id);
+                        var service = _dbContext.Services.FirstOrDefault(x => !x.IsDeleted && x.Id == additionalService.Id);
                         if (service == null)
                         {
                             validPrecondition = false;
@@ -288,9 +288,9 @@ public class CollocationService : ICollocationService
                 result.Succeed = true;
             }
         }
-        catch (Exception ex)
+        catch (Exception e)
         {
-            result.ErrorMessage = ex.InnerException != null ? ex.InnerException.Message : ex.Message;
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 
         return result;

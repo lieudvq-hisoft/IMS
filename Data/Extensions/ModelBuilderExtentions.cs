@@ -223,14 +223,9 @@ public static class ModelBuilderExtentions
             Id = 1,
             StartPosition = 2,
             RackId = 1,
+            DeviceId = 1,
         });
 
-        modelBuilder.Entity<DeviceLocation>().HasData(new DeviceLocation
-        {
-            Id = 1,
-            LocationId = 1,
-            DeviceId = 1
-        });
         #endregion
     }
 

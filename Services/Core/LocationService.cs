@@ -1,5 +1,7 @@
 ﻿using AutoMapper;
 using Data.DataAccess;
+using Data.DataAccess.Constant;
+using Data.Entities;
 using Data.Model;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +16,8 @@ namespace Services.Core;
 public interface ILocationService
 {
     Task<ResultModel> GetAreas();
-    //Task<ResultModel> GetRackDetail(int id);
+    Task<ResultModel> GetRackDetail(int id);
+    Task<ResultModel> GetRackAvailableLocationChoice(int rackId);
 }
 
 public class LocationService : ILocationService
@@ -35,9 +38,17 @@ public class LocationService : ILocationService
 
         try
         {
-            var areas = _dbContext.Areas.ToList();
+            var areas = _dbContext.Areas.Where(x => !x.IsDeleted).ToList();
+            var mappedAreas = new List<AreaModel>();
+            foreach (var area in areas)
+            {
+                var racks = _dbContext.Racks.Where(x => !x.IsDeleted && x.AreaId == area.Id).ToList();
+                var mappedArea = _mapper.Map<AreaModel>(area);
+                mappedArea.Racks = _mapper.Map<List<RackModel>>(racks);
+                mappedAreas.Add(mappedArea);
+            }
 
-            result.Data = _mapper.Map<List<AreaModel>>(areas);
+            result.Data = mappedAreas;
             result.Succeed = true;
         }
         catch (Exception e)
@@ -48,24 +59,76 @@ public class LocationService : ILocationService
         return result;
     }
 
-    //public async Task<ResultModel> GetRackDetail(int id)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
+    public async Task<ResultModel> GetRackDetail(int rackId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
 
-    //    try
-    //    {
-    //        var rack = _dbContext.Racks.FirstOrDefault(x => x.Id == id && !x.IsDeleted);
-    //        var location = _dbContext.DeviceLocations.Include(x => x.Device).Include(x => x.Location).Where(x => x.Location.RackId == id && !x.IsDeleted);
+        try
+        {
+            var rack = _dbContext.Racks.FirstOrDefault(x => !x.IsDeleted && x.Id == rackId);
+            var rackLocations = _dbContext.Locations
+                .Include(x => x.Device).ThenInclude(x => x.Server)
+                .Where(x => !x.IsDeleted && x.RackId == rackId);
+            var mappedRack = _mapper.Map<RackDetailModel>(rack);
+            mappedRack.DeviceLocations = _mapper.Map<List<LocationModel>>(rackLocations);
 
-    //        result.Data = _mapper.Map<RackModel>(rack);
-    //        result.Succeed = true;
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
+            result.Data = mappedRack;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
 
-    //    return result;
-    //}
+        return result;
+    }
+
+    public async Task<ResultModel> GetRackAvailableLocationChoice(int rackId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var rack = _dbContext.Racks.FirstOrDefault(x => !x.IsDeleted && x.Id == rackId);
+            if (rack == null)
+            {
+                result.ErrorMessage = "Rack " + ErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var locationChoices = new List<LocationChoiceModel>();
+                for (int i = 1; i <= rack.Size; i++)
+                {
+                    locationChoices.Add(new LocationChoiceModel
+                    {
+                        RackId = rack.Id,
+                        AreaId = rack.AreaId,
+                        Position = i
+                    });
+                }
+
+                var unavailableLocations = _dbContext.Locations.Include(x => x.Device).Where(x => !x.IsDeleted && !x.IsMoveout && x.RackId == rackId).ToList();
+                foreach (Location location in unavailableLocations)
+                {
+                    var startPosition = location.StartPosition;
+                    var endPosition = startPosition + location.Device.Size - 1;
+                    for (int i = startPosition; i <= endPosition; i++)
+                    {
+                        locationChoices.RemoveAll(x => x.Position == i);
+                    }
+                }
+
+                result.Data = locationChoices;
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
 }
