@@ -21,10 +21,18 @@ public class LocationController : ControllerBase
         _locationService = locationService;
     }
 
-    [HttpGet("Areas")]
+    [HttpGet("Area")]
     public async Task<ActionResult> GetAreas()
     {
         var result = await _locationService.GetAreas();
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("Area/{id}/Suggestion")]
+    public async Task<ActionResult> GetAreaSuggestionRack(int id, [FromQuery] int size)
+    {
+        var result = await _locationService.GetRackChoiceSuggestionBySize(id, size);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -38,7 +46,7 @@ public class LocationController : ControllerBase
     }
 
     [HttpGet("Rack/{id}/Available")]
-    public async Task<ActionResult> GetAvailableLocationChoice(int id)
+    public async Task<ActionResult> GetRackAvailableLocationChoice(int id)
     {
         var result = await _locationService.GetRackAvailableLocationChoice(id);
         if (result.Succeed) return Ok(result.Data);

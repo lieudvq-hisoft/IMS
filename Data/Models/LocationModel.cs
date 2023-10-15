@@ -24,6 +24,7 @@ public class RackModel
     public int AreaId { get; set; }
 }
 
+
 public class RackDetailModel
 {
     public int Id { get; set; }
