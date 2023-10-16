@@ -56,6 +56,19 @@ public class CollocationController : ControllerBase
         return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Result.xlsx");
     }
 
+    [HttpGet("Request/Bulk/Template")]
+    public async Task<ActionResult> GetImportTemplate()
+    {
+        string filePath = Path.Combine(_environment.WebRootPath, "import\\customer\\Template.xlsx");
+        var result = await _collocationService.GenerateImportExcelTemplate(filePath);
+        if (result.Succeed)
+        {
+            return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Import.xlsx");
+        }
+
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost("Request")]
     public async Task<ActionResult> Create([FromBody] CollocationRequestCreateModel model)
     {

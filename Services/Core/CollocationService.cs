@@ -21,6 +21,7 @@ public interface ICollocationService
     Task<ResultModel> GetRequest(PagingParam<CollocationSortCriteria> paginationModel, CollocationSearchModel searchModel);
     Task<ResultModel> Import(string filePath);
     Task<ResultModel> Create(CollocationRequestCreateModel model);
+    Task<ResultModel> GenerateImportExcelTemplate(string filePath);
 
 }
 
@@ -115,7 +116,6 @@ public class CollocationService : ICollocationService
 
     public async Task<ResultModel> Import(string filePath)
     {
-        //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         using var package = new ExcelPackage(new FileInfo(filePath));
         var worksheet = package.Workbook.Worksheets["Sheet1"];
         int rowCount = worksheet.Dimension.End.Row;     //get row count
@@ -287,6 +287,43 @@ public class CollocationService : ICollocationService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
             }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> GenerateImportExcelTemplate(string filePath)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            using var package = new ExcelPackage(new FileInfo(filePath));
+            var worksheet = package.Workbook.Worksheets["Sheet1"];
+            int rowCount = worksheet.Dimension.End.Row;     //get row count
+            int colCount = worksheet.Dimension.End.Column;     //get col count
+            var services = _dbContext.Services.Where(x => !x.IsDeleted).ToList();
+
+            // Reset header
+            for (int i = 13; i < colCount; i++)
+            {
+                worksheet.DeleteColumn(i);
+                colCount--;
+            }
+
+            foreach (var service in services)
+            {
+                worksheet.Cells[1, colCount++].Value = service.Name;
+            }
+
+            package.Save();
+
+            result.Succeed = true;
         }
         catch (Exception e)
         {
