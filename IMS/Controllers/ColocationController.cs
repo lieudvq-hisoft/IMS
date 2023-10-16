@@ -12,7 +12,6 @@ namespace IMS.Controllers;
 [Authorize(AuthenticationSchemes = "Bearer")]
 //[Authorize(Roles = nameof(RoleType.Staff))]
 [AllowAnonymous]
-[Tags("entity")]
 public class ColocationController : ControllerBase
 {
     private readonly ICustomerService _customerService;
@@ -57,18 +56,18 @@ public class ColocationController : ControllerBase
         return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Result.xlsx");
     }
 
-    [HttpGet("Request/Bulk/Template")]
-    public async Task<ActionResult> GetImportTemplate()
-    {
-        string filePath = Path.Combine(_environment.WebRootPath, "import\\customer\\Template.xlsx");
-        var result = await _colocationService.GenerateImportExcelTemplate(filePath);
-        if (result.Succeed)
-        {
-            return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Import.xlsx");
-        }
+    //[HttpGet("Request/Bulk/Template")]
+    //public async Task<ActionResult> GetImportTemplate()
+    //{
+    //    string filePath = Path.Combine(_environment.WebRootPath, "import\\customer\\Template.xlsx");
+    //    var result = await _colocationService.GenerateImportExcelTemplate(filePath);
+    //    if (result.Succeed)
+    //    {
+    //        return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Import.xlsx");
+    //    }
 
-        return BadRequest(result.ErrorMessage);
-    }
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPost("Request")]
     public async Task<ActionResult> CreateRequest([FromBody] ColocationRequestCreateModel model)
