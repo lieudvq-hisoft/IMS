@@ -12,6 +12,7 @@ namespace IMS.Controllers;
 [Authorize(AuthenticationSchemes = "Bearer")]
 //[Authorize(Roles = nameof(RoleType.Staff))]
 [AllowAnonymous]
+[Tags("entity")]
 public class ColocationController : ControllerBase
 {
     private readonly ICustomerService _customerService;
