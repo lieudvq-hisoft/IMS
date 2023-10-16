@@ -51,7 +51,7 @@ public class CollocationController : ControllerBase
         string folderPath = Path.Combine(_environment.WebRootPath, "import\\customer");
         string filePath = await _fileService.SaveFile(importFile, folderPath);
         await _customerService.Import(filePath);
-        await _collocationService.Import(filePath);
+        await _collocationService.ImportRequest(filePath);
 
         return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Result.xlsx");
     }
@@ -70,9 +70,17 @@ public class CollocationController : ControllerBase
     }
 
     [HttpPost("Request")]
-    public async Task<ActionResult> Create([FromBody] CollocationRequestCreateModel model)
+    public async Task<ActionResult> CreateRequest([FromBody] CollocationRequestCreateModel model)
     {
-        var result = await _collocationService.Create(model);
+        var result = await _collocationService.CreateRequest(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPatch("Request")]
+    public async Task<ActionResult> UpdateRequest([FromBody] CollocationRequestUpdateModel model)
+    {
+        var result = await _collocationService.UpdateRequest(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

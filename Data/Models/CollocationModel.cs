@@ -67,35 +67,30 @@ public class CollocationCreateModel
     public List<AdditionalServiceModel> AdditionalServices { get; set; }
 }
 
-public class CollocationUpdateModel
+public class CollocationRequestUpdateModel
 {
     [Required]
-    public int CollocationId { get; set; }
+    public int Id { get; set; }
 
     [Required]
-    public string Model { get; set; }
+    public int ExpectedSize { get; set; }
 
     [Required]
-    public int Size { get; set; }
+    public DateTime DateCreate { get; set; }
 
     [Required]
-    public int NumberOfPort { get; set; }
+    [DateMoreThan(comparisonProperty: "DateCreate", ErrorMessage = "Allocate dat must be later than create date")]
+    public DateTime DateAllocate { get; set; }
 
-    public int SerialNumber { get; set; }
+    [Required]
+    [DateMoreThan(comparisonProperty: "DateAllocate", ErrorMessage = "Stop dat must be later than allocate date")]
+    public DateTime DateStop { get; set; }
 
-    public int BasePower { get; set; }
+    public string? Note { get; set; }
 
-    public int LocationId { get; set; }
+    public string? InspectorNote { get; set; }
 
-    public string IpServer { get; set; }
-
-    public string SubnetMask { get; set; }
-
-    public string Gateway { get; set; }
-
-    public string DNS { get; set; }
-
-    public int PortIP { get; set; }
+    public List<AdditionalServiceModel> AdditionalServices { get; set; }
 }
 
 public class CollocationSearchModel

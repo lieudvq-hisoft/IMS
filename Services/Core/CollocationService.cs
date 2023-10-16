@@ -19,8 +19,9 @@ public interface ICollocationService
 {
     Task<ResultModel> Get(PagingParam<CollocationSortCriteria> paginationModel, CollocationSearchModel searchModel);
     Task<ResultModel> GetRequest(PagingParam<CollocationSortCriteria> paginationModel, CollocationSearchModel searchModel);
-    Task<ResultModel> Import(string filePath);
-    Task<ResultModel> Create(CollocationRequestCreateModel model);
+    Task<ResultModel> ImportRequest(string filePath);
+    Task<ResultModel> CreateRequest(CollocationRequestCreateModel model);
+    Task<ResultModel> UpdateRequest(CollocationRequestUpdateModel model);
     Task<ResultModel> GenerateImportExcelTemplate(string filePath);
 
 }
@@ -114,7 +115,7 @@ public class CollocationService : ICollocationService
             .IndexOf(MyFunction.ConvertToUnSign(searchModel.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
     }
 
-    public async Task<ResultModel> Import(string filePath)
+    public async Task<ResultModel> ImportRequest(string filePath)
     {
         using var package = new ExcelPackage(new FileInfo(filePath));
         var worksheet = package.Workbook.Worksheets["Sheet1"];
@@ -169,7 +170,7 @@ public class CollocationService : ICollocationService
                     var companyName = worksheet.Cells[row, 1].Value?.ToString().Trim();
                     var username = MyFunction.ConvertToUnSign(companyName.Trim().Replace(" ", ""));
                     var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => !x.IsDeleted && x.User.UserName == username);
-                    var result = await AttempCreateFromExcel(model, customer);
+                    var result = await AttempCreateRequestFromExcel(model, customer);
                     if (!result.Succeed)
                     {
                         resultCell.Value = result.ErrorMessage;
@@ -197,9 +198,9 @@ public class CollocationService : ICollocationService
     /// </summary>
     /// <param name="model"></param>
     /// <returns>The result model contain the new collocation</returns>
-    private async Task<ResultModel> AttempCreateFromExcel(CollocationCreateModel model, Customer customer)
+    private async Task<ResultModel> AttempCreateRequestFromExcel(CollocationCreateModel model, Customer customer)
     {
-        var result = await Create(new CollocationRequestCreateModel
+        var result = await CreateRequest(new CollocationRequestCreateModel
         {
             CollocationCreateModel = model,
             CustomerId = customer.Id
@@ -219,7 +220,7 @@ public class CollocationService : ICollocationService
         return result;
     }
 
-    public async Task<ResultModel> Create(CollocationRequestCreateModel model)
+    public async Task<ResultModel> CreateRequest(CollocationRequestCreateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -276,6 +277,85 @@ public class CollocationService : ICollocationService
                 foreach (var service in services)
                 {
                     var additionalService = createModel.AdditionalServices.FirstOrDefault(x => x.Id == service.Id);
+                    _dbContext.AdditionalServices.Add(new AdditionalService
+                    {
+                        ServiceId = service.Id,
+                        CollocationId = collocation.Id,
+                        Quantity = additionalService.Quantity
+                    });
+                }
+
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> UpdateRequest(CollocationRequestUpdateModel model)
+    {
+
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var collocation = _dbContext.Collocations.FirstOrDefault(x => !x.IsDeleted && x.Id == model.Id);
+            if (collocation == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Collocation " + ErrorMessage.NOT_EXISTED;
+            }
+
+            if (collocation.Status != CollocationStatus.Pending)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Can only update collocation request";
+            }
+
+            var services = new List<Service>();
+            if (validPrecondition)
+            {
+                foreach (var additionalService in model.AdditionalServices)
+                {
+                    if (additionalService.Quantity > 0)
+                    {
+                        var service = _dbContext.Services.FirstOrDefault(x => !x.IsDeleted && x.Id == additionalService.Id);
+                        if (service == null)
+                        {
+                            validPrecondition = false;
+                        }
+                        else
+                        {
+                            services.Add(service);
+                        }
+                    }
+                }
+            }
+
+            if (validPrecondition)
+            {
+                collocation.ExpectedSize = model.ExpectedSize;
+                collocation.Note = model.Note;
+                collocation.InspectorNote = model.InspectorNote;
+                collocation.DateCreated = model.DateCreate;
+                collocation.DateAllocate = model.DateAllocate;
+                collocation.DateStop = model.DateStop;
+
+                // Delete current additional services
+                var currentServices = _dbContext.AdditionalServices.Where(x => !x.IsDeleted && x.CollocationId == model.Id).ToList();
+                _dbContext.AdditionalServices.RemoveRange(currentServices);
+
+                // Update additional services
+                foreach (var service in services)
+                {
+                    var additionalService = model.AdditionalServices.FirstOrDefault(x => x.Id == service.Id);
                     _dbContext.AdditionalServices.Add(new AdditionalService
                     {
                         ServiceId = service.Id,
