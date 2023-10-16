@@ -7,7 +7,7 @@ using Services.Core;
 
 namespace IMS.Controllers;
 
-[Route("api/[controller]")]
+[Route("api/Colocation")]
 [ApiController]
 [Authorize(AuthenticationSchemes = "Bearer")]
 //[Authorize(Roles = nameof(RoleType.Staff))]
