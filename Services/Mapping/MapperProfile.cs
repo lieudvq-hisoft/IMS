@@ -22,10 +22,10 @@ public class MapperProfile : Profile
 
         CreateMap<Service, ServiceModel>();
 
-        CreateMap<Collocation, CollocationModel>();
-        CreateMap<Collocation, CollocationRequestModel>()
+        CreateMap<Colocation, ColocationModel>();
+        CreateMap<Colocation, ColocationRequestModel>()
             .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName))
-            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => GetCollocationRequestType(src)));
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => GetColocationRequestType(src)));
 
         CreateMap<Area, AreaModel>();
         CreateMap<Rack, RackModel>();
@@ -36,18 +36,18 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.StartPosition, opt => opt.MapFrom(src => src.StartPosition));
     }
 
-    private string GetCollocationRequestType(Collocation collocation)
+    private string GetColocationRequestType(Colocation colocation)
     {
         string type = "";
-        if (collocation.Status == Data.Enums.CollocationStatus.Pending)
+        if (colocation.Status == Data.Enums.ColocationStatus.Pending)
         {
-            if (collocation.AdditionalServices.Any(x => x.Status == Data.Enums.AdditionalServiceStatus.Pending))
+            if (colocation.AdditionalServices.Any(x => x.Status == Data.Enums.AdditionalServiceStatus.Pending))
             {
                 type = "Mix";
             }
             else
             {
-                type = "New Collocation";
+                type = "New Colocation";
             }
         }
         else

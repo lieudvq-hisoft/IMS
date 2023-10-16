@@ -15,53 +15,53 @@ using Services.Utilities;
 using System.ComponentModel.DataAnnotations;
 
 namespace Services.Core;
-public interface ICollocationService
+public interface IColocationService
 {
-    Task<ResultModel> Get(PagingParam<CollocationSortCriteria> paginationModel, CollocationSearchModel searchModel);
-    Task<ResultModel> GetRequest(PagingParam<CollocationSortCriteria> paginationModel, CollocationSearchModel searchModel);
+    Task<ResultModel> Get(PagingParam<ColocationSortCriteria> paginationModel, ColocationSearchModel searchModel);
+    Task<ResultModel> GetRequest(PagingParam<ColocationSortCriteria> paginationModel, ColocationSearchModel searchModel);
     Task<ResultModel> ImportRequest(string filePath);
-    Task<ResultModel> CreateRequest(CollocationRequestCreateModel model);
-    Task<ResultModel> UpdateRequest(CollocationRequestUpdateModel model);
+    Task<ResultModel> CreateRequest(ColocationRequestCreateModel model);
+    Task<ResultModel> UpdateRequest(ColocationRequestUpdateModel model);
     Task<ResultModel> GenerateImportExcelTemplate(string filePath);
 
 }
 
-public class CollocationService : ICollocationService
+public class ColocationService : IColocationService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public CollocationService(AppDbContext dbContext, IMapper mapper)
+    public ColocationService(AppDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
     }
 
-    public async Task<ResultModel> Get(PagingParam<CollocationSortCriteria> paginationModel, CollocationSearchModel searchModel)
+    public async Task<ResultModel> Get(PagingParam<ColocationSortCriteria> paginationModel, ColocationSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var collocations = _dbContext.Collocations
+            var colocations = _dbContext.Colocations
                 .Include(x => x.Customer)
                 .Include(x => x.AdditionalServices)
                 .Where(x => !x.IsDeleted
-                    && x.Status != CollocationStatus.Pending
+                    && x.Status != ColocationStatus.Pending
                     && !x.AdditionalServices.Any(_ => _.Status == AdditionalServiceStatus.Pending))
-                .Where(delegate (Collocation x)
+                .Where(delegate (Colocation x)
                 {
                     return MatchString(searchModel, x.Customer.CompanyName);
                 })
                 .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, collocations.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, colocations.Count());
 
-            collocations = collocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            collocations = collocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            colocations = colocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            colocations = colocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<CollocationRequestModel>(collocations).ToList();
+            paging.Data = _mapper.ProjectTo<ColocationRequestModel>(colocations).ToList();
 
             result.Data = paging;
             result.Succeed = true;
@@ -73,30 +73,30 @@ public class CollocationService : ICollocationService
         return result;
     }
 
-    public async Task<ResultModel> GetRequest(PagingParam<CollocationSortCriteria> paginationModel, CollocationSearchModel searchModel)
+    public async Task<ResultModel> GetRequest(PagingParam<ColocationSortCriteria> paginationModel, ColocationSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var collocations = _dbContext.Collocations
+            var colocations = _dbContext.Colocations
                 .Include(x => x.Customer)
                 .Include(x => x.AdditionalServices)
                 .Where(x => !x.IsDeleted
-                    && (x.Status == CollocationStatus.Pending || x.AdditionalServices.Any(_ => _.Status == AdditionalServiceStatus.Pending)))
-                .Where(delegate (Collocation x)
+                    && (x.Status == ColocationStatus.Pending || x.AdditionalServices.Any(_ => _.Status == AdditionalServiceStatus.Pending)))
+                .Where(delegate (Colocation x)
                 {
                     return MatchString(searchModel, x.Customer.CompanyName);
                 })
                 .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, collocations.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, colocations.Count());
 
-            collocations = collocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            collocations = collocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            colocations = colocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            colocations = colocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<CollocationRequestModel>(collocations).ToList();
+            paging.Data = _mapper.ProjectTo<ColocationRequestModel>(colocations).ToList();
 
             result.Data = paging;
             result.Succeed = true;
@@ -108,7 +108,7 @@ public class CollocationService : ICollocationService
         return result;
     }
 
-    private bool MatchString(CollocationSearchModel searchModel, string? value)
+    private bool MatchString(ColocationSearchModel searchModel, string? value)
     {
         return MyFunction
             .ConvertToUnSign(value ?? "")
@@ -131,7 +131,7 @@ public class CollocationService : ICollocationService
             string createCustomerResult = resultCell.Value as string;
             if (createCustomerResult == "Ok")
             {
-                var model = new CollocationCreateModel()
+                var model = new ColocationCreateModel()
                 {
                     ExpectedSize = int.Parse(worksheet.Cells[row, 8].Value?.ToString().Trim()),
                     DateCreate = DateTime.Parse(worksheet.Cells[row, 9].Value?.ToString().Trim()),
@@ -194,21 +194,21 @@ public class CollocationService : ICollocationService
     }
 
     /// <summary>
-    /// Create a new collocation for the customer created previous. Will hard delete the customer on fail
+    /// Create a new colocation for the customer created previous. Will hard delete the customer on fail
     /// </summary>
     /// <param name="model"></param>
-    /// <returns>The result model contain the new collocation</returns>
-    private async Task<ResultModel> AttempCreateRequestFromExcel(CollocationCreateModel model, Customer customer)
+    /// <returns>The result model contain the new colocation</returns>
+    private async Task<ResultModel> AttempCreateRequestFromExcel(ColocationCreateModel model, Customer customer)
     {
-        var result = await CreateRequest(new CollocationRequestCreateModel
+        var result = await CreateRequest(new ColocationRequestCreateModel
         {
-            CollocationCreateModel = model,
+            ColocationCreateModel = model,
             CustomerId = customer.Id
         });
 
         if (!result.Succeed)
         {
-            // Delete customer and user on fail to create collocation
+            // Delete customer and user on fail to create colocation
             _dbContext.Attach(customer);
             _dbContext.Entry(customer).Reference(x => x.User).Load();
             var user = customer.User;
@@ -220,12 +220,12 @@ public class CollocationService : ICollocationService
         return result;
     }
 
-    public async Task<ResultModel> CreateRequest(CollocationRequestCreateModel model)
+    public async Task<ResultModel> CreateRequest(ColocationRequestCreateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
         bool validPrecondition = true;
-        var createModel = model.CollocationCreateModel;
+        var createModel = model.ColocationCreateModel;
         var customerId = model.CustomerId;
 
         try
@@ -259,9 +259,9 @@ public class CollocationService : ICollocationService
 
             if (validPrecondition)
             {
-                var collocation = new Collocation
+                var colocation = new Colocation
                 {
-                    Status = CollocationStatus.Pending,
+                    Status = ColocationStatus.Pending,
                     ExpectedSize = createModel.ExpectedSize,
                     Note = createModel.Note,
                     InspectorNote = createModel.InspectorNote,
@@ -271,7 +271,7 @@ public class CollocationService : ICollocationService
                     CustomerId = customerId,
                 };
 
-                _dbContext.Collocations.Add(collocation);
+                _dbContext.Colocations.Add(colocation);
                 _dbContext.SaveChanges();
 
                 foreach (var service in services)
@@ -280,7 +280,7 @@ public class CollocationService : ICollocationService
                     _dbContext.AdditionalServices.Add(new AdditionalService
                     {
                         ServiceId = service.Id,
-                        CollocationId = collocation.Id,
+                        ColocationId = colocation.Id,
                         Quantity = additionalService.Quantity
                     });
                 }
@@ -297,7 +297,7 @@ public class CollocationService : ICollocationService
         return result;
     }
 
-    public async Task<ResultModel> UpdateRequest(CollocationRequestUpdateModel model)
+    public async Task<ResultModel> UpdateRequest(ColocationRequestUpdateModel model)
     {
 
         var result = new ResultModel();
@@ -306,17 +306,17 @@ public class CollocationService : ICollocationService
 
         try
         {
-            var collocation = _dbContext.Collocations.FirstOrDefault(x => !x.IsDeleted && x.Id == model.Id);
-            if (collocation == null)
+            var colocation = _dbContext.Colocations.FirstOrDefault(x => !x.IsDeleted && x.Id == model.Id);
+            if (colocation == null)
             {
                 validPrecondition = false;
-                result.ErrorMessage = "Collocation " + ErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = "Colocation " + ErrorMessage.NOT_EXISTED;
             }
 
-            if (collocation.Status != CollocationStatus.Pending)
+            if (colocation.Status != ColocationStatus.Pending)
             {
                 validPrecondition = false;
-                result.ErrorMessage = "Can only update collocation request";
+                result.ErrorMessage = "Can only update colocation request";
             }
 
             var services = new List<Service>();
@@ -341,15 +341,15 @@ public class CollocationService : ICollocationService
 
             if (validPrecondition)
             {
-                collocation.ExpectedSize = model.ExpectedSize;
-                collocation.Note = model.Note;
-                collocation.InspectorNote = model.InspectorNote;
-                collocation.DateCreated = model.DateCreate;
-                collocation.DateAllocate = model.DateAllocate;
-                collocation.DateStop = model.DateStop;
+                colocation.ExpectedSize = model.ExpectedSize;
+                colocation.Note = model.Note;
+                colocation.InspectorNote = model.InspectorNote;
+                colocation.DateCreated = model.DateCreate;
+                colocation.DateAllocate = model.DateAllocate;
+                colocation.DateStop = model.DateStop;
 
                 // Delete current additional services
-                var currentServices = _dbContext.AdditionalServices.Where(x => !x.IsDeleted && x.CollocationId == model.Id).ToList();
+                var currentServices = _dbContext.AdditionalServices.Where(x => !x.IsDeleted && x.ColocationId == model.Id).ToList();
                 _dbContext.AdditionalServices.RemoveRange(currentServices);
 
                 // Update additional services
@@ -359,7 +359,7 @@ public class CollocationService : ICollocationService
                     _dbContext.AdditionalServices.Add(new AdditionalService
                     {
                         ServiceId = service.Id,
-                        CollocationId = collocation.Id,
+                        ColocationId = colocation.Id,
                         Quantity = additionalService.Quantity
                     });
                 }

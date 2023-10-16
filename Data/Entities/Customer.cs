@@ -17,4 +17,6 @@ public class Customer : BaseEntity
 
     public int CompanyTypeId { get; set; }
     public virtual CompanyType CompanyType { get; set; }
+
+    public virtual ICollection<Colocation> Colocations { get; set; }
 }

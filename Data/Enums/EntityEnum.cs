@@ -16,7 +16,7 @@ public enum DeviceStatus
     Shutdown
 }
 
-public enum CollocationStatus
+public enum ColocationStatus
 {
     Pending,
     Success,
@@ -40,7 +40,7 @@ public enum CustomerSortCriteria
     Id
 }
 
-public enum CollocationSortCriteria
+public enum ColocationSortCriteria
 {
     Id
 }

@@ -8,43 +8,43 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Data.Models;
-public class CollocationModel
+public class ColocationModel
 {
     public int Id { get; set; }
     public DateTime DateCreate { get; set; }
     public string Type { get; set; }
     public string CompanyName { get; set; }
-    public CollocationStatus Status { get; set; }
+    public ColocationStatus Status { get; set; }
 }
 
-public class CollocationRequestModel
+public class ColocationRequestModel
 {
     public int Id { get; set; }
     public DateTime DateCreate { get; set; }
     public string Type { get; set; }
     public string CompanyName { get; set; }
-    public CollocationStatus Status { get; set; }
+    public ColocationStatus Status { get; set; }
 }
 
-public class CollocationRequestImportModel
+public class ColocationRequestImportModel
 {
     [Required]
     public CustomerCreateModel CustomerCreateModel { get; set; }
 
     [Required]
-    public CollocationCreateModel CollocationCreateModel { get; set; }
+    public ColocationCreateModel ColocationCreateModel { get; set; }
 }
 
-public class CollocationRequestCreateModel
+public class ColocationRequestCreateModel
 {
     [Required]
     public int CustomerId { get; set; }
 
     [Required]
-    public CollocationCreateModel CollocationCreateModel { get; set; }
+    public ColocationCreateModel ColocationCreateModel { get; set; }
 }
 
-public class CollocationCreateModel
+public class ColocationCreateModel
 {
     [Required]
     public int ExpectedSize { get; set; }
@@ -67,7 +67,7 @@ public class CollocationCreateModel
     public List<AdditionalServiceModel> AdditionalServices { get; set; }
 }
 
-public class CollocationRequestUpdateModel
+public class ColocationRequestUpdateModel
 {
     [Required]
     public int Id { get; set; }
@@ -93,7 +93,7 @@ public class CollocationRequestUpdateModel
     public List<AdditionalServiceModel> AdditionalServices { get; set; }
 }
 
-public class CollocationSearchModel
+public class ColocationSearchModel
 {
     public string? SearchValue { get; set; } = "";
 }

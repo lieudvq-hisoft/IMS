@@ -6,9 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Data.Entities;
-public class Collocation : BaseEntity
+public class Colocation : BaseEntity
 {
-    public CollocationStatus Status { get; set; }
+    public ColocationStatus Status { get; set; }
     public int ExpectedSize { get; set; }
     public string? Note { get; set; }
     public string? InspectorNote { get; set; }
