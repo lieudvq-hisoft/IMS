@@ -10,9 +10,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace IMS.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(AuthenticationSchemes = "Bearer")]
-//[Authorize(Roles = nameof(RoleType.Staff))]
-[AllowAnonymous]
+[Authorize]
 public class LocationController : ControllerBase
 {
     private readonly ILocationService _locationService;
@@ -32,6 +30,7 @@ public class LocationController : ControllerBase
     }
 
     [HttpGet("Area/{id}/Suggestion")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     [SwaggerOperation(Summary = "Get all area have enough space for device with specified size")]
     public async Task<ActionResult> GetAreaSuggestionRack(int id, [FromQuery] int size)
     {
@@ -41,6 +40,7 @@ public class LocationController : ControllerBase
     }
 
     [HttpGet("Rack/{id}")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     [SwaggerOperation(Summary = "Get a detail information of rack and it's device map")]
     public async Task<ActionResult> GetRackDetail(int id)
     {
@@ -50,6 +50,7 @@ public class LocationController : ControllerBase
     }
 
     [HttpGet("Rack/{id}/Available")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     [SwaggerOperation(Summary = "Get all empty space of a rack")]
     public async Task<ActionResult> GetRackAvailableLocationChoice(int id)
     {

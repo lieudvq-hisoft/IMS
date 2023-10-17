@@ -6,8 +6,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace IMS.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(AuthenticationSchemes = "Bearer")]
-[AllowAnonymous]
+[Authorize]
 public class CompanyTypeController: ControllerBase
 {
     private readonly ICompanyTypeService _companyTypeService;

@@ -83,7 +83,7 @@ public static class ModelBuilderExtentions
         modelBuilder.Entity<Role>().HasData(new Role
         {
             Id = GenerateSeededGuid(2),
-            Name = "IT",
+            Name = "Tech",
             Description = "IT Staff",
             isDeactive = false,
         });
@@ -116,7 +116,7 @@ public static class ModelBuilderExtentions
             switch (i)
             {
                 case 2:
-                    username = "it";
+                    username = "tech";
                     break;
                 case 3:
                     username = "sale";

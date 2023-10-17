@@ -4,8 +4,8 @@ namespace Data.Enums;
 public enum RoleType
 {
     Customer = 1,
-    It = 2,
-    Staff = 3,
+    Tech = 2,
+    Sale = 3,
     Manager = 4,
     Admin = 5
 }

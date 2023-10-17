@@ -10,9 +10,7 @@ namespace IMS.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(AuthenticationSchemes = "Bearer")]
-//[Authorize(Roles = nameof(RoleType.Staff))]
-[AllowAnonymous]
+[Authorize]
 public class ColocationController : ControllerBase
 {
     private readonly ICustomerService _customerService;
@@ -32,6 +30,7 @@ public class ColocationController : ControllerBase
 
 
     [HttpGet]
+    [Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Get ongoing or stopped colocations")]
     public async Task<ActionResult> Get([FromQuery] PagingParam<ColocationSortCriteria> pagingParam, [FromQuery] ColocationSearchModel searchModel)
     {
@@ -41,6 +40,7 @@ public class ColocationController : ControllerBase
     }
 
     [HttpGet("Request")]
+    [Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Get colocation requests, excluding ongoing or stopped colocations, and those with unsuccessful additional services")]
     public async Task<ActionResult> GetRequest([FromQuery] PagingParam<ColocationSortCriteria> pagingParam, [FromQuery] ColocationSearchModel searchModel)
     {
@@ -50,6 +50,7 @@ public class ColocationController : ControllerBase
     }
 
     [HttpPost("Request/Bulk")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Create user, customer and colocation request base on import excel. Create all 3 entity if success or nothing if any fail validation or have error when inserting. Return the result excel file with result on the right most column")]
     public async Task<ActionResult> Import(IFormFile importFile)
     {
@@ -62,6 +63,7 @@ public class ColocationController : ControllerBase
     }
 
     [HttpGet("Request/Bulk/Template")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Generate the excel file for importing. The services will be base on the database")]
     public async Task<ActionResult> GetImportTemplate()
     {
@@ -76,6 +78,7 @@ public class ColocationController : ControllerBase
     }
 
     [HttpPost("Request")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Create colocation request for an existing customer")]
     public async Task<ActionResult> CreateRequest([FromBody] ColocationRequestCreateModel model)
     {
@@ -85,6 +88,7 @@ public class ColocationController : ControllerBase
     }
 
     [HttpPatch("Request")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Update information of a colocation request")]
     public async Task<ActionResult> UpdateRequest([FromBody] ColocationRequestUpdateModel model)
     {

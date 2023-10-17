@@ -10,9 +10,7 @@ namespace IMS.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize(AuthenticationSchemes = "Bearer")]
-//[Authorize(Roles = nameof(RoleType.Staff))]
-[AllowAnonymous]
+[Authorize]
 public class CustomerController : ControllerBase
 {
     private readonly ICustomerService _customerService;
@@ -41,6 +39,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Create a customer and associate user")]
     public async Task<ActionResult> Create([FromBody] CustomerCreateModel model)
     {
@@ -50,6 +49,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPatch]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Update a customer")]
     public async Task<ActionResult> Update([FromBody] CustomerUpdateModel model)
     {
@@ -59,6 +59,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Delete a customer")]
     public async Task<ActionResult> Delete(int id)
     {
