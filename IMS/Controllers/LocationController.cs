@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace IMS.Controllers;
 [Route("api/[controller]")]
@@ -22,6 +23,7 @@ public class LocationController : ControllerBase
     }
 
     [HttpGet("Area")]
+    [SwaggerOperation(Summary = "Get all area")]
     public async Task<ActionResult> GetAreas()
     {
         var result = await _locationService.GetAreas();
@@ -30,6 +32,7 @@ public class LocationController : ControllerBase
     }
 
     [HttpGet("Area/{id}/Suggestion")]
+    [SwaggerOperation(Summary = "Get all area have enough space for device with specified size")]
     public async Task<ActionResult> GetAreaSuggestionRack(int id, [FromQuery] int size)
     {
         var result = await _locationService.GetRackChoiceSuggestionBySize(id, size);
@@ -38,7 +41,8 @@ public class LocationController : ControllerBase
     }
 
     [HttpGet("Rack/{id}")]
-    public async Task<ActionResult> GetRack(int id)
+    [SwaggerOperation(Summary = "Get a detail information of rack and it's device map")]
+    public async Task<ActionResult> GetRackDetail(int id)
     {
         var result = await _locationService.GetRackDetail(id);
         if (result.Succeed) return Ok(result.Data);
@@ -46,6 +50,7 @@ public class LocationController : ControllerBase
     }
 
     [HttpGet("Rack/{id}/Available")]
+    [SwaggerOperation(Summary = "Get all empty space of a rack")]
     public async Task<ActionResult> GetRackAvailableLocationChoice(int id)
     {
         var result = await _locationService.GetRackAvailableLocationChoice(id);

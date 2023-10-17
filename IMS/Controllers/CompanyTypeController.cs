@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace IMS.Controllers;
 [Route("api/[controller]")]
@@ -16,6 +17,7 @@ public class CompanyTypeController: ControllerBase
         _companyTypeService = companyTypeService;
     }
 
+    [SwaggerOperation(Summary = "Get all company type")]
     [HttpGet]
     public async Task<ActionResult> Get()
     {

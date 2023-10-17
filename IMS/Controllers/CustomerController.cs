@@ -4,6 +4,7 @@ using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace IMS.Controllers;
 
@@ -22,6 +23,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpGet]
+    [SwaggerOperation(Summary = "Get all customer")]
     public async Task<ActionResult> Get([FromQuery] PagingParam<CustomerSortCriteria> pagingParam, [FromQuery] CustomerSearchModel searchModel)
     {
         var result = await _customerService.Get(pagingParam, searchModel);
@@ -30,6 +32,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [SwaggerOperation(Summary = "Get detail information of a customer")]
     public async Task<ActionResult> GetDetail(int id)
     {
         var result = await _customerService.GetDetail(id);
@@ -38,6 +41,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPost]
+    [SwaggerOperation(Summary = "Create a customer and associate user")]
     public async Task<ActionResult> Create([FromBody] CustomerCreateModel model)
     {
         var result = await _customerService.Create(model);
@@ -46,6 +50,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPatch]
+    [SwaggerOperation(Summary = "Update a customer")]
     public async Task<ActionResult> Update([FromBody] CustomerUpdateModel model)
     {
         var result = await _customerService.Update(model);
@@ -54,6 +59,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [SwaggerOperation(Summary = "Delete a customer")]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _customerService.Delete(id);

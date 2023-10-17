@@ -4,6 +4,7 @@ using Data.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
+using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.Design;
 
@@ -20,8 +21,9 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
-    [AllowAnonymous]
     [HttpPost("Login")]
+    [AllowAnonymous]
+    [SwaggerOperation(Summary = "Login")]
     public async Task<ActionResult> Login([FromBody] LoginModel model)
     {
         var result = await _userService.Login(model);
@@ -29,8 +31,9 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [Authorize(Roles = nameof(RoleType.Admin))]
     [HttpPost("Register")]
+    [Authorize(Roles = nameof(RoleType.Admin))]
+    [SwaggerOperation(Summary = "Register a new user, cannot register a customer")]
     public async Task<ActionResult> Register([FromBody] UserCreateModel model)
     {
         var result = await _userService.Register(model);

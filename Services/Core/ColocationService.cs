@@ -79,6 +79,13 @@ public class ColocationService : IColocationService
         return result;
     }
 
+    /// <summary>
+    /// Retrieves a paginated list of colocation request with is colocation that are not ongoing or stopped with optional search and sorting and colocation with service not success.
+    /// </summary>
+    /// <param name="paginationModel">Pagination and sorting parameters.</param>
+    /// <param name="searchModel">Criteria for filtering colocations.</param>
+    /// <returns>The paginated colocation data or an error message.</returns>
+    /// <exception cref="Exception">Thrown when an error occurs during data retrieval.</exception>
     public async Task<ResultModel> GetRequest(PagingParam<ColocationSortCriteria> paginationModel, ColocationSearchModel searchModel)
     {
         var result = new ResultModel();

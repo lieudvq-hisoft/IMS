@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace IMS.Controllers;
 [Route("api/[controller]")]
@@ -21,6 +22,7 @@ public class ServiceController : ControllerBase
     }
 
     [HttpGet]
+    [SwaggerOperation(Summary = "Get services")]
     public async Task<ActionResult> Get()
     {
         var result = await _serviceService.Get();

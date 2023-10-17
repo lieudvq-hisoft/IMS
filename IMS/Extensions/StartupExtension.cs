@@ -189,6 +189,7 @@ public static class StartupExtension
                     new List<string>()
                 }
             });
+            c.EnableAnnotations();
         });
 
         services.AddControllersWithViews().AddNewtonsoftJson(options =>
