@@ -24,15 +24,15 @@ public class UserService : IUserService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly IConfiguration _configuration;
+    private readonly IConfiguration _config;
     private readonly UserManager<User> _userManager;
     private readonly SignInManager<User> _signInManager;
 
-    public UserService(AppDbContext dbContext, IMapper mapper, IConfiguration configuration, UserManager<User> userManager, SignInManager<User> signInManager)
+    public UserService(AppDbContext dbContext, IMapper mapper, IConfiguration config, UserManager<User> userManager, SignInManager<User> signInManager)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _configuration = configuration;
+        _config = config;
         _userManager = userManager;
         _signInManager = signInManager;
     }
@@ -41,7 +41,7 @@ public class UserService : IUserService
     {
         var result = new ResultModel();
 
-        var user = _dbContext.User.FirstOrDefault(s => s.UserName == model.Username);
+        var user = _dbContext.User.FirstOrDefault(x => x.UserName == model.Username && x.EmailConfirmed);
 
         if (user != null)
         {
@@ -152,12 +152,12 @@ public class UserService : IUserService
     private async Task<Token> GetAccessToken(User user, List<string> roles)
     {
         List<Claim> claims = GetClaims(user, roles);
-        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]));
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
         var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-        var token = new JwtSecurityToken(_configuration["Jwt:Issuer"],
-          _configuration["Jwt:Issuer"],
+        var token = new JwtSecurityToken(_config["Jwt:Issuer"],
+          _config["Jwt:Issuer"],
           claims,
-          expires: DateTime.Now.AddDays(int.Parse(_configuration["Jwt:ExpireTimes"])),
+          expires: DateTime.Now.AddDays(int.Parse(_config["Jwt:ExpireTimes"])),
           //int.Parse(_configuration["Jwt:ExpireTimes"]) * 3600
           signingCredentials: creds);
 
@@ -167,7 +167,7 @@ public class UserService : IUserService
         {
             Access_token = serializedToken,
             Token_type = "Bearer",
-            Expires_in = int.Parse(_configuration["Jwt:ExpireTimes"]) * 60,
+            Expires_in = int.Parse(_config["Jwt:ExpireTimes"]) * 60,
             UserID = user.Id.ToString(),
             UserName = user.UserName,
             PhoneNumber = user.PhoneNumber,

@@ -10,7 +10,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace IMS.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = "Bearer")]
 public class ServiceController : ControllerBase
 {
     private readonly IServiceService _serviceService;

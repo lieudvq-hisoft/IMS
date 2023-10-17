@@ -10,7 +10,7 @@ namespace IMS.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = "Bearer")]
 public class CustomerController : ControllerBase
 {
     private readonly ICustomerService _customerService;

@@ -10,7 +10,7 @@ namespace IMS.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = "Bearer")]
 public class ColocationController : ControllerBase
 {
     private readonly ICustomerService _customerService;
@@ -54,6 +54,7 @@ public class ColocationController : ControllerBase
     [SwaggerOperation(Summary = "Create user, customer and colocation request base on import excel. Create all 3 entity if success or nothing if any fail validation or have error when inserting. Return the result excel file with result on the right most column")]
     public async Task<ActionResult> Import(IFormFile importFile)
     {
+        string domainName = HttpContext.Request.Host.Value;
         string folderPath = Path.Combine(_environment.WebRootPath, "import\\customer");
         string filePath = await _fileService.SaveFile(importFile, folderPath);
         await _customerService.Import(filePath);

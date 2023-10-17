@@ -10,7 +10,7 @@ using Swashbuckle.AspNetCore.Annotations;
 namespace IMS.Controllers;
 [Route("api/[controller]")]
 [ApiController]
-[Authorize]
+[Authorize(AuthenticationSchemes = "Bearer")]
 public class LocationController : ControllerBase
 {
     private readonly ILocationService _locationService;

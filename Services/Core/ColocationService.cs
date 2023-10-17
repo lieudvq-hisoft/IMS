@@ -13,6 +13,9 @@ using OfficeOpenXml.Style;
 using OfficeOpenXml;
 using Services.Utilities;
 using System.ComponentModel.DataAnnotations;
+using Microsoft.Extensions.Configuration;
+using System.Net.Mail;
+using System.Net;
 
 namespace Services.Core;
 public interface IColocationService
@@ -30,11 +33,13 @@ public class ColocationService : IColocationService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly IConfiguration _config;
 
-    public ColocationService(AppDbContext dbContext, IMapper mapper)
+    public ColocationService(AppDbContext dbContext, IMapper mapper, IConfiguration config)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _config = config;
     }
 
     /// <summary>
@@ -232,6 +237,24 @@ public class ColocationService : IColocationService
         }
 
         return result;
+    }
+
+    private async Task SendNotifyEmail(Customer customer)
+    {
+        var smtpClient = new SmtpClient(_config["Email:Client"])
+        {
+            Port = 587,
+            Credentials = new NetworkCredential(_config["Email:Account"], _config["Email:Key"]),
+            EnableSsl = true,
+        };
+
+        var mailMessage = new MailMessage
+        {
+            From = new MailAddress(_config["Email:Account"]),
+            Subject = "Wished book on sale",
+            Body = $"<h1> is on sale</h1>",
+            IsBodyHtml = true,
+        };
     }
 
     public async Task<ResultModel> CreateRequest(ColocationRequestCreateModel model)
