@@ -82,7 +82,7 @@ public class UserService : IUserService
         try
         {
             // Check for duplicate user by email or phonenumber
-            var existingUser = _dbContext.User.FirstOrDefault(x => (x.Email == model.Email || x.PhoneNumber == model.PhoneNumber) && !x.IsDeleted);
+            var existingUser = _dbContext.User.FirstOrDefault(x => x.Email == model.Email || x.PhoneNumber == model.PhoneNumber);
             if (existingUser != null)
             {
                 result.ErrorMessage = "User " + ErrorMessage.EXISTED;
@@ -121,7 +121,7 @@ public class UserService : IUserService
 
                 if (createUserResult.Succeeded)
                 {
-                    foreach(Role role in roles)
+                    foreach (Role role in roles)
                     {
                         var userRole = new UserRole
                         {
@@ -131,7 +131,7 @@ public class UserService : IUserService
                         _dbContext.UserRole.Add(userRole);
                         await _dbContext.SaveChangesAsync();
                     }
-                    
+
                     result.Succeed = true;
                     result.Data = _mapper.Map<UserModel>(user);
                 }

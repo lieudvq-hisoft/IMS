@@ -37,6 +37,13 @@ public class ColocationService : IColocationService
         _mapper = mapper;
     }
 
+    /// <summary>
+    /// Retrieves a paginated list of ongoing and stopped colocations with optional search and sorting.
+    /// </summary>
+    /// <param name="paginationModel">Pagination and sorting parameters.</param>
+    /// <param name="searchModel">Criteria for filtering colocations.</param>
+    /// <returns>The paginated colocation data or an error message.</returns>
+    /// <exception cref="Exception">Thrown when an error occurs during data retrieval.</exception>
     public async Task<ResultModel> Get(PagingParam<ColocationSortCriteria> paginationModel, ColocationSearchModel searchModel)
     {
         var result = new ResultModel();
@@ -47,9 +54,8 @@ public class ColocationService : IColocationService
             var colocations = _dbContext.Colocations
                 .Include(x => x.Customer)
                 .Include(x => x.AdditionalServices)
-                .Where(x => !x.IsDeleted
-                    && x.Status != ColocationStatus.Pending
-                    && !x.AdditionalServices.Any(_ => _.Status == AdditionalServiceStatus.Pending))
+                .Where(x => x.Status == ColocationStatus.Ongoing
+                    || x.Status == ColocationStatus.Stopped)
                 .Where(delegate (Colocation x)
                 {
                     return MatchString(searchModel, x.Customer.CompanyName);
@@ -61,7 +67,7 @@ public class ColocationService : IColocationService
             colocations = colocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             colocations = colocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<ColocationRequestModel>(colocations).ToList();
+            paging.Data = _mapper.ProjectTo<ColocationModel>(colocations).ToList();
 
             result.Data = paging;
             result.Succeed = true;
@@ -83,8 +89,9 @@ public class ColocationService : IColocationService
             var colocations = _dbContext.Colocations
                 .Include(x => x.Customer)
                 .Include(x => x.AdditionalServices)
-                .Where(x => !x.IsDeleted
-                    && (x.Status == ColocationStatus.Pending || x.AdditionalServices.Any(_ => _.Status == AdditionalServiceStatus.Pending)))
+                .Where(x => x.Status != ColocationStatus.Ongoing ||
+                    x.Status != ColocationStatus.Stopped ||
+                    x.AdditionalServices.Any(_ => _.Status != AdditionalServiceStatus.Success))
                 .Where(delegate (Colocation x)
                 {
                     return MatchString(searchModel, x.Customer.CompanyName);
@@ -145,7 +152,7 @@ public class ColocationService : IColocationService
                 for (int i = 13; i < colCount; i++)
                 {
                     var serviceName = worksheet.Cells[1, i].Value?.ToString().Trim();
-                    var service = _dbContext.Services.FirstOrDefault(x => !x.IsDeleted && x.Name == serviceName);
+                    var service = _dbContext.Services.FirstOrDefault(x => x.Name == serviceName);
                     model.AdditionalServices.Add(new AdditionalServiceModel
                     {
                         Id = service.Id,
@@ -169,7 +176,7 @@ public class ColocationService : IColocationService
                 {
                     var companyName = worksheet.Cells[row, 1].Value?.ToString().Trim();
                     var username = MyFunction.ConvertToUnSign(companyName.Trim().Replace(" ", ""));
-                    var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => !x.IsDeleted && x.User.UserName == username);
+                    var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.User.UserName == username);
                     var result = await AttempCreateRequestFromExcel(model, customer);
                     if (!result.Succeed)
                     {
@@ -230,7 +237,7 @@ public class ColocationService : IColocationService
 
         try
         {
-            var customer = _dbContext.Customers.FirstOrDefault(x => !x.IsDeleted && x.Id == customerId);
+            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == customerId);
             if (customer == null)
             {
                 validPrecondition = false;
@@ -244,7 +251,7 @@ public class ColocationService : IColocationService
                 {
                     if (additionalService.Quantity > 0)
                     {
-                        var service = _dbContext.Services.FirstOrDefault(x => !x.IsDeleted && x.Id == additionalService.Id);
+                        var service = _dbContext.Services.FirstOrDefault(x => x.Id == additionalService.Id);
                         if (service == null)
                         {
                             validPrecondition = false;
@@ -261,7 +268,7 @@ public class ColocationService : IColocationService
             {
                 var colocation = new Colocation
                 {
-                    Status = ColocationStatus.Pending,
+                    Status = ColocationStatus.Incomplete,
                     ExpectedSize = createModel.ExpectedSize,
                     Note = createModel.Note,
                     InspectorNote = createModel.InspectorNote,
@@ -306,7 +313,7 @@ public class ColocationService : IColocationService
 
         try
         {
-            var colocation = _dbContext.Colocations.FirstOrDefault(x => !x.IsDeleted && x.Id == model.Id);
+            var colocation = _dbContext.Colocations.FirstOrDefault(x => x.Id == model.Id);
             if (colocation == null)
             {
                 validPrecondition = false;
@@ -326,7 +333,7 @@ public class ColocationService : IColocationService
                 {
                     if (additionalService.Quantity > 0)
                     {
-                        var service = _dbContext.Services.FirstOrDefault(x => !x.IsDeleted && x.Id == additionalService.Id);
+                        var service = _dbContext.Services.FirstOrDefault(x => x.Id == additionalService.Id);
                         if (service == null)
                         {
                             validPrecondition = false;
@@ -349,7 +356,7 @@ public class ColocationService : IColocationService
                 colocation.DateStop = model.DateStop;
 
                 // Delete current additional services
-                var currentServices = _dbContext.AdditionalServices.Where(x => !x.IsDeleted && x.ColocationId == model.Id).ToList();
+                var currentServices = _dbContext.AdditionalServices.Where(x => x.ColocationId == model.Id).ToList();
                 _dbContext.AdditionalServices.RemoveRange(currentServices);
 
                 // Update additional services
@@ -387,7 +394,7 @@ public class ColocationService : IColocationService
             var worksheet = package.Workbook.Worksheets["Sheet1"];
             int rowCount = worksheet.Dimension.End.Row;     //get row count
             int colCount = worksheet.Dimension.End.Column;     //get col count
-            var services = _dbContext.Services.Where(x => !x.IsDeleted).ToList();
+            var services = _dbContext.Services.ToList();
 
             // Reset header
             for (int i = 13; i < colCount; i++)

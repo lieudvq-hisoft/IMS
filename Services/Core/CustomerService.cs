@@ -56,7 +56,6 @@ public class CustomerService : ICustomerService
             var customers = _dbContext.Customers
                 .Include(x => x.User)
                 .Include(x => x.CompanyType)
-                .Where(x => !x.IsDeleted)
                 .Where(delegate (Customer x)
                 {
                     return MatchString(searchModel, x.User.Email);
@@ -87,7 +86,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => !x.IsDeleted && x.Id == id);
+            var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.Id == id);
 
             if (customer != null)
             {
@@ -129,7 +128,7 @@ public class CustomerService : ICustomerService
             resultCell.Style.WrapText = true;
             resultCell.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
             string companyName = worksheet.Cells[row, 2].Value?.ToString().Trim();
-            var company = _dbContext.CompanyTypes.FirstOrDefault(x => !x.IsDeleted && x.Name == companyName);
+            var company = _dbContext.CompanyTypes.FirstOrDefault(x => x.Name == companyName);
 
             if (company == null)
             {
@@ -200,7 +199,7 @@ public class CustomerService : ICustomerService
         try
         {
             // Check for duplicate user by email or phonenumber
-            var existingUser = _dbContext.User.FirstOrDefault(x => !x.IsDeleted && (x.Email == model.Email || x.PhoneNumber == model.PhoneNumber));
+            var existingUser = _dbContext.User.FirstOrDefault(x => x.Email == model.Email || x.PhoneNumber == model.PhoneNumber);
             if (existingUser != null)
             {
                 result.ErrorMessage = "User " + ErrorMessage.EXISTED;
@@ -210,7 +209,7 @@ public class CustomerService : ICustomerService
             if (validPrecondition)
             {
                 // Check for duplicate customer by tax number
-                var existingCustomer = _dbContext.Customers.FirstOrDefault(x => !x.IsDeleted && x.TaxNumber == model.TaxNumber);
+                var existingCustomer = _dbContext.Customers.FirstOrDefault(x => x.TaxNumber == model.TaxNumber);
                 if (existingCustomer != null)
                 {
                     result.ErrorMessage = "Customer with tax number " + ErrorMessage.EXISTED;
@@ -221,7 +220,7 @@ public class CustomerService : ICustomerService
             if (validPrecondition)
             {
                 // Find company type
-                companyType = _dbContext.CompanyTypes.FirstOrDefault(x => !x.IsDeleted && x.Id == model.CompanyTypeId);
+                companyType = _dbContext.CompanyTypes.FirstOrDefault(x => x.Id == model.CompanyTypeId);
 
                 if (companyType == null)
                 {
@@ -292,7 +291,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => !x.IsDeleted && x.Id == id);
+            var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.Id == id);
             if (customer == null)
             {
                 result.ErrorMessage = "Delete customer fail";
@@ -322,7 +321,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => !x.IsDeleted && x.Id == model.Id);
+            var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.Id == model.Id);
 
             if (customer == null)
             {

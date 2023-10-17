@@ -33,7 +33,7 @@ public class CompanyTypeService : ICompanyTypeService
 
         try
         {
-            var companyTypes = _dbContext.CompanyTypes.Where(x => !x.IsDeleted).ToList();
+            var companyTypes = _dbContext.CompanyTypes.ToList();
 
             result.Data = _mapper.Map<List<CompanyTypeModel>>(companyTypes);
             result.Succeed = true;

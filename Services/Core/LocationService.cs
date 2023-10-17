@@ -39,11 +39,11 @@ public class LocationService : ILocationService
 
         try
         {
-            var areas = _dbContext.Areas.Where(x => !x.IsDeleted).ToList();
+            var areas = _dbContext.Areas.ToList();
             var mappedAreas = new List<AreaModel>();
             foreach (var area in areas)
             {
-                var racks = _dbContext.Racks.Where(x => !x.IsDeleted && x.AreaId == area.Id).ToList();
+                var racks = _dbContext.Racks.Where(x => x.AreaId == area.Id).ToList();
                 var mappedArea = _mapper.Map<AreaModel>(area);
                 mappedArea.Racks = _mapper.Map<List<RackModel>>(racks);
                 mappedAreas.Add(mappedArea);
@@ -67,10 +67,10 @@ public class LocationService : ILocationService
 
         try
         {
-            var rack = _dbContext.Racks.FirstOrDefault(x => !x.IsDeleted && x.Id == rackId);
+            var rack = _dbContext.Racks.FirstOrDefault(x => x.Id == rackId);
             var rackLocations = _dbContext.Locations
                 .Include(x => x.Device).ThenInclude(x => x.Server)
-                .Where(x => !x.IsDeleted && x.RackId == rackId);
+                .Where(x => x.RackId == rackId);
             var mappedRack = _mapper.Map<RackDetailModel>(rack);
             mappedRack.DeviceLocations = _mapper.Map<List<LocationModel>>(rackLocations);
 
@@ -92,7 +92,7 @@ public class LocationService : ILocationService
 
         try
         {
-            var racks = _dbContext.Racks.Where(x => !x.IsDeleted && x.AreaId == areaId).ToList();
+            var racks = _dbContext.Racks.Where(x => x.AreaId == areaId).ToList();
             var suggestedRack = new List<Rack>();
 
             foreach (var rack in racks)
@@ -147,7 +147,7 @@ public class LocationService : ILocationService
 
         try
         {
-            var rack = _dbContext.Racks.FirstOrDefault(x => !x.IsDeleted && x.Id == rackId);
+            var rack = _dbContext.Racks.FirstOrDefault(x => x.Id == rackId);
             if (rack == null)
             {
                 result.ErrorMessage = "Rack " + ErrorMessage.NOT_EXISTED;
@@ -179,7 +179,7 @@ public class LocationService : ILocationService
             });
         }
 
-        var unavailableLocations = _dbContext.Locations.Include(x => x.Device).Where(x => !x.IsDeleted && !x.IsMoveout && x.RackId == rack.Id).ToList();
+        var unavailableLocations = _dbContext.Locations.Include(x => x.Device).Where(x => !x.IsMoveout && x.RackId == rack.Id).ToList();
         foreach (Location location in unavailableLocations)
         {
             var startPosition = location.StartPosition;

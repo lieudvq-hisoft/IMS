@@ -20,10 +20,10 @@ public class ColocationModel
 public class ColocationRequestModel
 {
     public int Id { get; set; }
-    public DateTime DateCreate { get; set; }
+    public DateTime DateCreated { get; set; }
     public string Type { get; set; }
     public string CompanyName { get; set; }
-    public ColocationStatus Status { get; set; }
+    public string Status { get; set; }
 }
 
 public class ColocationRequestImportModel

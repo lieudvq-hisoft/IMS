@@ -15,7 +15,7 @@ namespace Data.DataAccess;
 
 public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClaim<Guid>, UserRole, IdentityUserLogin<Guid>, IdentityRoleClaim<Guid>, IdentityUserToken<Guid>>
 {
-    public AppDbContext(DbContextOptions options) : base(options) 
+    public AppDbContext(DbContextOptions options) : base(options)
     {
 
     }
@@ -40,8 +40,34 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
                 .HasForeignKey(ur => ur.RoleId)
                 .IsRequired();
         });
+
+        modelBuilder.Entity<AdditionalService>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Area>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Colocation>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<CompanyType>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Customer>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Device>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Location>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Rack>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Role>()
+            .HasQueryFilter(x => !x.isDeactive);
+        modelBuilder.Entity<Server>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<Service>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        modelBuilder.Entity<User>()
+            .HasQueryFilter(x => !x.IsDeleted);
+
         modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-  
+
     }
     public DbSet<AdditionalService> AdditionalServices { get; set; }
     public DbSet<Area> Areas { get; set; }

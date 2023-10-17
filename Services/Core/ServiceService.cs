@@ -33,7 +33,7 @@ public class ServiceService: IServiceService
 
         try
         {
-            var services = _dbContext.Services.Where(x => !x.IsDeleted).ToList();
+            var services = _dbContext.Services.ToList();
 
             result.Data = _mapper.Map<List<ServiceModel>>(services);
             result.Succeed = true;

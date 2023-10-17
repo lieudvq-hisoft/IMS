@@ -18,16 +18,27 @@ public enum DeviceStatus
 
 public enum ColocationStatus
 {
+    Incomplete,
     Pending,
-    Success,
-    Unsuccess
+    Accepted,
+    Denied,
+    Ongoing,
+    Stopped
+}
+
+public enum ColocationRequestType
+{
+    New,
+    Additional,
+    Mixed
 }
 
 public enum AdditionalServiceStatus
 {
     Pending,
+    Accepted,
+    Denied,
     Success,
-    Unsuccess
 }
 
 public enum UserSortCriteria
