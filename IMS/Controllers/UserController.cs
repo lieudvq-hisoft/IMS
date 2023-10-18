@@ -33,7 +33,7 @@ public class UserController : ControllerBase
 
     [HttpPost("Register")]
     [Authorize(Roles = nameof(RoleType.Admin))]
-    [SwaggerOperation(Summary = "Register a new user, cannot register a customer")]
+    [SwaggerOperation(Summary = "[Admin]: Register a new user, cannot register a customer")]
     public async Task<ActionResult> Register([FromBody] UserCreateModel model)
     {
         var result = await _userService.Register(model);
@@ -41,13 +41,14 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPost("Activate/{email}")]
+    [HttpGet("Activate/{email}")]
     [AllowAnonymous]
     [SwaggerOperation(Summary = "Activate a user")]
     public async Task<ActionResult> Activate(string email)
     {
         var result = await _userService.ActivateUser(email);
-        if (result.Succeed) return Ok(result.Data);
+        if (result.Succeed)
+            return Redirect("https://ims.hisoft.vn/signin");
         return BadRequest(result.ErrorMessage);
     }
 }

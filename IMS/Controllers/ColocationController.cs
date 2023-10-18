@@ -31,7 +31,7 @@ public class ColocationController : ControllerBase
 
     [HttpGet]
     [Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
-    [SwaggerOperation(Summary = "Get ongoing or stopped colocations")]
+    [SwaggerOperation(Summary = "[Tech, Sale]: Get ongoing or stopped colocations")]
     public async Task<ActionResult> Get([FromQuery] PagingParam<ColocationSortCriteria> pagingParam, [FromQuery] ColocationSearchModel searchModel)
     {
         var result = await _colocationService.Get(pagingParam, searchModel);
@@ -41,7 +41,7 @@ public class ColocationController : ControllerBase
 
     [HttpGet("Request")]
     [Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
-    [SwaggerOperation(Summary = "Get colocation requests, excluding ongoing or stopped colocations, and those with unsuccessful additional services")]
+    [SwaggerOperation(Summary = "[Tech, Sale]: Get colocation requests, excluding ongoing or stopped colocations, and those with unsuccessful additional services")]
     public async Task<ActionResult> GetRequest([FromQuery] PagingParam<ColocationSortCriteria> pagingParam, [FromQuery] ColocationSearchModel searchModel)
     {
         var result = await _colocationService.GetRequest(pagingParam, searchModel);
@@ -50,9 +50,8 @@ public class ColocationController : ControllerBase
     }
 
     [HttpPost("Request/Bulk")]
-    //[Authorize(Roles = nameof(RoleType.Sale))]
-    [AllowAnonymous]
-    [SwaggerOperation(Summary = "Create user, customer and colocation request base on import excel. Create all 3 entity if success or nothing if any fail validation or have error when inserting. Return the result excel file with result on the right most column")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Sale]: Create user, customer and colocation request base on import excel. Create all 3 entity if success or nothing if any fail validation or have error when inserting. Return the result excel file with result on the right most column")]
     public async Task<ActionResult> Import(IFormFile importFile)
     {
         string folderPath = Path.Combine(_environment.WebRootPath, "import\\customer");
@@ -68,7 +67,7 @@ public class ColocationController : ControllerBase
 
     [HttpGet("Request/Bulk/Template")]
     [Authorize(Roles = nameof(RoleType.Sale))]
-    [SwaggerOperation(Summary = "Generate the excel file for importing. The services will be base on the database")]
+    [SwaggerOperation(Summary = "[Sale]: Generate the excel file for importing. The services will be base on the database")]
     public async Task<ActionResult> GetImportTemplate()
     {
         string filePath = Path.Combine(_environment.WebRootPath, "import\\customer\\Template.xlsx");
@@ -83,7 +82,7 @@ public class ColocationController : ControllerBase
 
     [HttpPost("Request")]
     [Authorize(Roles = nameof(RoleType.Sale))]
-    [SwaggerOperation(Summary = "Create colocation request for an existing customer")]
+    [SwaggerOperation(Summary = "[Sale]: Create colocation request for an existing customer")]
     public async Task<ActionResult> CreateRequest([FromBody] ColocationRequestCreateModel model)
     {
         var result = await _colocationService.CreateRequest(model);
@@ -93,7 +92,7 @@ public class ColocationController : ControllerBase
 
     [HttpPatch("Request")]
     [Authorize(Roles = nameof(RoleType.Sale))]
-    [SwaggerOperation(Summary = "Update information of a colocation request")]
+    [SwaggerOperation(Summary = "[Sale]: Update information of a colocation request")]
     public async Task<ActionResult> UpdateRequest([FromBody] ColocationRequestUpdateModel model)
     {
         var result = await _colocationService.UpdateRequest(model);

@@ -31,7 +31,7 @@ public class LocationController : ControllerBase
 
     [HttpGet("Area/{id}/Suggestion")]
     [Authorize(Roles = nameof(RoleType.Tech))]
-    [SwaggerOperation(Summary = "Get all area have enough space for device with specified size")]
+    [SwaggerOperation(Summary = "[Tech]: Get all area have enough space for device with specified size")]
     public async Task<ActionResult> GetAreaSuggestionRack(int id, [FromQuery] int size)
     {
         var result = await _locationService.GetRackChoiceSuggestionBySize(id, size);
@@ -41,7 +41,7 @@ public class LocationController : ControllerBase
 
     [HttpGet("Rack/{id}")]
     [Authorize(Roles = nameof(RoleType.Tech))]
-    [SwaggerOperation(Summary = "Get a detail information of rack and it's device map")]
+    [SwaggerOperation(Summary = "[Tech]: Get a detail information of rack and it's device map")]
     public async Task<ActionResult> GetRackDetail(int id)
     {
         var result = await _locationService.GetRackDetail(id);
@@ -51,7 +51,7 @@ public class LocationController : ControllerBase
 
     [HttpGet("Rack/{id}/Available")]
     [Authorize(Roles = nameof(RoleType.Tech))]
-    [SwaggerOperation(Summary = "Get all empty space of a rack")]
+    [SwaggerOperation(Summary = "[Tech]: Get all empty space of a rack")]
     public async Task<ActionResult> GetRackAvailableLocationChoice(int id)
     {
         var result = await _locationService.GetRackAvailableLocationChoice(id);

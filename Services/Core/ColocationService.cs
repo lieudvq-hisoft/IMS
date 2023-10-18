@@ -186,9 +186,9 @@ public class ColocationService : IColocationService
                 }
                 else
                 {
-                    var companyName = worksheet.Cells[row, 1].Value?.ToString().Trim();
-                    var username = MyFunction.ConvertToUnSign(companyName.Trim().Replace(" ", ""));
-                    var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.User.UserName == username);
+                    var email = worksheet.Cells[row, 6].Value?.ToString().Trim();
+                    var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.User.Email == email);
+
                     var result = await AttempCreateRequestFromExcel(model, customer);
                     if (!result.Succeed)
                     {

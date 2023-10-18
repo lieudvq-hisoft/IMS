@@ -391,20 +391,18 @@ public class CustomerService : ICustomerService
     public async Task<ResultModel> SendActivationEmail(List<int> customerIds)
     {
         var smtpClient = _emailHelper.GetClient();
-        var subject = "Activate your new account";
 
-        //foreach (int customerId in customerIds)
-        //{
-        //    var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == customerId);
-        //    if (customer != null)
-        //    {
-        //        var mailMessage = _emailHelper.GetMessage(subject, "Haha");
-        //    }
-        //}
-
-        var mailMessage = _emailHelper.GetMessage(subject, "Haha");
-        mailMessage.To.Add("vendetta9z147@gmail.com");
-        smtpClient.Send(mailMessage);
+        foreach (int customerId in customerIds)
+        {
+            var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.Id == customerId);
+            if (customer != null)
+            {
+                var email = customer.User.Email;
+                var mailMessage = _emailHelper.GetActivationMessage(email);
+                mailMessage.To.Add(email);
+                smtpClient.Send(mailMessage);
+            }
+        }
 
         return new ResultModel
         {

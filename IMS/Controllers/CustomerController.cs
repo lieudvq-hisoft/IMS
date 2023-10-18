@@ -40,7 +40,7 @@ public class CustomerController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = nameof(RoleType.Sale))]
-    [SwaggerOperation(Summary = "Create a customer and associate user")]
+    [SwaggerOperation(Summary = "[Sale]: Create a customer and associate user")]
     public async Task<ActionResult> Create([FromBody] CustomerCreateModel model)
     {
         var result = await _customerService.Create(model);
@@ -50,7 +50,7 @@ public class CustomerController : ControllerBase
 
     [HttpPatch]
     [Authorize(Roles = nameof(RoleType.Sale))]
-    [SwaggerOperation(Summary = "Update a customer")]
+    [SwaggerOperation(Summary = "[Sale]: Update a customer")]
     public async Task<ActionResult> Update([FromBody] CustomerUpdateModel model)
     {
         var result = await _customerService.Update(model);
@@ -60,19 +60,11 @@ public class CustomerController : ControllerBase
 
     [HttpDelete("{id}")]
     [Authorize(Roles = nameof(RoleType.Sale))]
-    [SwaggerOperation(Summary = "Delete a customer")]
+    [SwaggerOperation(Summary = "[Sale]: Delete a customer")]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _customerService.Delete(id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
-    }
-
-    [HttpPost("Email")]
-    [AllowAnonymous]
-    public async Task<ActionResult> Email()
-    {
-        await _customerService.SendActivationEmail(new List<int>());
-        return Ok();
     }
 }
