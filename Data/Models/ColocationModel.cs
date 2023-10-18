@@ -23,6 +23,7 @@ public class ColocationRequestModel
     public DateTime DateCreated { get; set; }
     public string Type { get; set; }
     public string CompanyName { get; set; }
+    public int CustomerId { get; set; }
     public string Status { get; set; }
 }
 

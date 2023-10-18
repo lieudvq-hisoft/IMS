@@ -18,8 +18,13 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Net.Mail;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Http.Extensions;
+using Microsoft.AspNetCore.Mvc;
 
 namespace Services.Core;
 
@@ -31,6 +36,8 @@ public interface ICustomerService
     Task<ResultModel> Create(CustomerCreateModel model);
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Update(CustomerUpdateModel model);
+    Task<ResultModel> SendActivationEmail(List<int> customerIds);
+
 }
 
 public class CustomerService : ICustomerService
@@ -38,12 +45,14 @@ public class CustomerService : ICustomerService
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
+    private readonly EmailHelper _emailHelper;
 
-    public CustomerService(AppDbContext dbContext, IMapper mapper, UserManager<User> userManager)
+    public CustomerService(AppDbContext dbContext, IMapper mapper, UserManager<User> userManager, EmailHelper emailHelper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _userManager = userManager;
+        _emailHelper = emailHelper;
     }
 
     public async Task<ResultModel> Get(PagingParam<CustomerSortCriteria> paginationModel, CustomerSearchModel searchModel)
@@ -235,7 +244,7 @@ public class CustomerService : ICustomerService
                 var role = _dbContext.Role.FirstOrDefault(x => !x.isDeactive && x.Name == "Customer");
                 var user = new User
                 {
-                    UserName = MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")),
+                    UserName = GenerateUsername(model.CompanyName),
                     Email = model.Email,
                     Fullname = model.Fullname,
                     Address = model.Address,
@@ -244,7 +253,7 @@ public class CustomerService : ICustomerService
                     NormalizedEmail = model.Email.ToLower(),
                 };
 
-                var createUserResult = await _userManager.CreateAsync(user, model.CompanyName + "@123");
+                var createUserResult = await _userManager.CreateAsync(user, MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")) + "@123");
                 if (createUserResult.Succeeded)
                 {
                     var userRole = new UserRole
@@ -282,6 +291,17 @@ public class CustomerService : ICustomerService
         }
 
         return result;
+    }
+
+    private string GenerateUsername(string companyName)
+    {
+        string username = "";
+        var normalizedCompanyName = MyFunction.ConvertToUnSign(companyName.Trim().Replace(" ", ""));
+        var customerOfCompanyCount = _dbContext.Customers.IgnoreQueryFilters().Include(x => x.User).Where(x => x.User.UserName.Contains(normalizedCompanyName)).ToList().Count();
+
+        username = normalizedCompanyName + (customerOfCompanyCount + 1).ToString();
+
+        return username;
     }
 
     public async Task<ResultModel> Delete(int id)
@@ -366,5 +386,29 @@ public class CustomerService : ICustomerService
         }
 
         return result;
+    }
+
+    public async Task<ResultModel> SendActivationEmail(List<int> customerIds)
+    {
+        var smtpClient = _emailHelper.GetClient();
+        var subject = "Activate your new account";
+
+        //foreach (int customerId in customerIds)
+        //{
+        //    var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == customerId);
+        //    if (customer != null)
+        //    {
+        //        var mailMessage = _emailHelper.GetMessage(subject, "Haha");
+        //    }
+        //}
+
+        var mailMessage = _emailHelper.GetMessage(subject, "Haha");
+        mailMessage.To.Add("vendetta9z147@gmail.com");
+        smtpClient.Send(mailMessage);
+
+        return new ResultModel
+        {
+            Succeed = true
+        };
     }
 }

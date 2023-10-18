@@ -40,4 +40,14 @@ public class UserController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPost("Activate/{email}")]
+    [AllowAnonymous]
+    [SwaggerOperation(Summary = "Activate a user")]
+    public async Task<ActionResult> Activate(string email)
+    {
+        var result = await _userService.ActivateUser(email);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }

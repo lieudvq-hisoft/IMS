@@ -16,6 +16,7 @@ using System.ComponentModel.DataAnnotations;
 using Microsoft.Extensions.Configuration;
 using System.Net.Mail;
 using System.Net;
+using System.ComponentModel;
 
 namespace Services.Core;
 public interface IColocationService
@@ -33,13 +34,11 @@ public class ColocationService : IColocationService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly IConfiguration _config;
 
-    public ColocationService(AppDbContext dbContext, IMapper mapper, IConfiguration config)
+    public ColocationService(AppDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _config = config;
     }
 
     /// <summary>
@@ -100,6 +99,7 @@ public class ColocationService : IColocationService
         {
             var colocations = _dbContext.Colocations
                 .Include(x => x.Customer)
+                .ThenInclude(x => x.User)
                 .Include(x => x.AdditionalServices)
                 .Where(x => x.Status != ColocationStatus.Ongoing ||
                     x.Status != ColocationStatus.Stopped ||
@@ -136,11 +136,11 @@ public class ColocationService : IColocationService
 
     public async Task<ResultModel> ImportRequest(string filePath)
     {
+        var importedColocation = new List<ColocationRequestModel>();
         using var package = new ExcelPackage(new FileInfo(filePath));
         var worksheet = package.Workbook.Worksheets["Sheet1"];
         int rowCount = worksheet.Dimension.End.Row;     //get row count
         int colCount = worksheet.Dimension.End.Column;     //get col count
-        int successRow = 0;
 
         for (int row = 2; row <= rowCount; row++)
         {
@@ -196,8 +196,8 @@ public class ColocationService : IColocationService
                     }
                     else
                     {
+                        importedColocation.Add(result.Data as ColocationRequestModel);
                         resultCell.Value = "Ok";
-                        successRow++;
                     }
                 }
             }
@@ -208,7 +208,7 @@ public class ColocationService : IColocationService
         return new ResultModel
         {
             Succeed = true,
-            Data = successRow
+            Data = importedColocation
         };
     }
 
@@ -237,24 +237,6 @@ public class ColocationService : IColocationService
         }
 
         return result;
-    }
-
-    private async Task SendNotifyEmail(Customer customer)
-    {
-        var smtpClient = new SmtpClient(_config["Email:Client"])
-        {
-            Port = 587,
-            Credentials = new NetworkCredential(_config["Email:Account"], _config["Email:Key"]),
-            EnableSsl = true,
-        };
-
-        var mailMessage = new MailMessage
-        {
-            From = new MailAddress(_config["Email:Account"]),
-            Subject = "Wished book on sale",
-            Body = $"<h1> is on sale</h1>",
-            IsBodyHtml = true,
-        };
     }
 
     public async Task<ResultModel> CreateRequest(ColocationRequestCreateModel model)
@@ -324,6 +306,7 @@ public class ColocationService : IColocationService
 
                 _dbContext.SaveChanges();
                 result.Succeed = true;
+                result.Data = _mapper.Map<ColocationRequestModel>(colocation);
             }
         }
         catch (Exception e)

@@ -15,6 +15,7 @@ using System.Text;
 using System.Text.Json;
 using Services.Mapping;
 using Services.Core;
+using Services.Utilities;
 
 namespace IMS.Extensions;
 
@@ -53,6 +54,8 @@ public static class StartupExtension
         services.AddScoped<IServerService, ServerService>();
         services.AddScoped<IServiceService, ServiceService>();
         services.AddScoped<IUserService, UserService>();
+
+        services.AddScoped<EmailHelper>();
     }
 
     public static void ConfigIdentityService(this IServiceCollection services)

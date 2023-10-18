@@ -10,6 +10,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Services.Utilities;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net.Mail;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
 
@@ -19,6 +21,7 @@ public interface IUserService
 {
     Task<ResultModel> Login(LoginModel model);
     Task<ResultModel> Register(UserCreateModel model);
+    Task<ResultModel> ActivateUser(string email);
 }
 public class UserService : IUserService
 {
@@ -116,6 +119,7 @@ public class UserService : IUserService
                     PhoneNumber = model.PhoneNumber,
                     IsDeleted = false,
                     NormalizedEmail = model.Email.ToLower(),
+                    EmailConfirmed = true
                 };
                 var createUserResult = await _userManager.CreateAsync(user, model.Password);
 
@@ -192,5 +196,33 @@ public class UserService : IUserService
         }
         if (!string.IsNullOrEmpty(user.PhoneNumber)) claims.Add(new Claim("PhoneNumber", user.PhoneNumber));
         return claims;
+    }
+
+    public async Task<ResultModel> ActivateUser(string email)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var user = _dbContext.User.FirstOrDefault(x => x.Email == email && !x.EmailConfirmed);
+
+            if (user == null)
+            {
+                result.ErrorMessage = "User with email " + ErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                user.EmailConfirmed = true;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
     }
 }

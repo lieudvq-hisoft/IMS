@@ -67,4 +67,12 @@ public class CustomerController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPost("Email")]
+    [AllowAnonymous]
+    public async Task<ActionResult> Email()
+    {
+        await _customerService.SendActivationEmail(new List<int>());
+        return Ok();
+    }
 }
