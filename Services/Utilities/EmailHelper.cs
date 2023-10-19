@@ -30,14 +30,16 @@ public class EmailHelper
         };
     }
 
-    public MailMessage GetActivationMessage(string email)
+    public MailMessage GetActivationMessage(string username, string password, string email)
     {
         var subject = "Activate your new account";
         return new MailMessage
         {
             From = new MailAddress(_config[$"Email:{_env}:Account"]),
             Subject = subject,
-            Body = $"<h1>Click the following link to confirm your email address</h1> <a href='{_config[$"Email:{_env}:Link"] + email}'>Activation Link</a>",
+            Body = $"<h1>Click the following link to confirm your email address " +
+            $"<a href='{_config[$"Email:{_env}:Link"] + email}'>Activation Link</a></h1>" +
+            $"<h1>Your username: [{username}] and password: [{password}]</h1>",
             IsBodyHtml = true,
         };
     }
