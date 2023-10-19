@@ -304,7 +304,6 @@ public class ColocationService : IColocationService
                     {
                         ServiceId = service.Id,
                         ColocationId = colocation.Id,
-                        Quantity = additionalService.Quantity
                     });
                 }
 
@@ -384,7 +383,6 @@ public class ColocationService : IColocationService
                     {
                         ServiceId = service.Id,
                         ColocationId = colocation.Id,
-                        Quantity = additionalService.Quantity
                     });
                 }
 

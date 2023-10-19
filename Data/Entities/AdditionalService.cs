@@ -9,7 +9,6 @@ namespace Data.Entities;
 public class AdditionalService : BaseEntity
 {
     public AdditionalServiceStatus Status { get; set; }
-    public int Quantity { get; set; }
 
     public int ColocationId { get; set; }
     public virtual Colocation Colocation { get; set; }

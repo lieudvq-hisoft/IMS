@@ -17,7 +17,7 @@ public class EmailHelper
     public EmailHelper(IConfiguration config)
     {
         _config = config;
-        _env = "Dev";
+        _env = SettingHelper.GetEnvironment();
     }
 
     public SmtpClient GetClient()

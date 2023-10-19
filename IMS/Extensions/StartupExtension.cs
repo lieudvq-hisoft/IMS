@@ -16,11 +16,22 @@ using System.Text.Json;
 using Services.Mapping;
 using Services.Core;
 using Services.Utilities;
+using Microsoft.Extensions.Configuration;
 
 namespace IMS.Extensions;
 
 public static class StartupExtension
 {
+    public static void AddDbContext(this IServiceCollection services, IConfiguration config)
+    {
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        services.AddDbContext<AppDbContext>(opt =>
+        {
+            opt.UseNpgsql(config.GetConnectionString(SettingHelper.GetEnvironment()),
+                b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name));
+        });
+    }
+
     public static void ApplyPendingMigrations(this IServiceProvider provider)
     {
         using var scope = provider.CreateScope();

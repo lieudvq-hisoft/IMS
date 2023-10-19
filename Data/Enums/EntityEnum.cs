@@ -12,6 +12,7 @@ public enum RoleType
 
 public enum DeviceStatus
 {
+    Pending,
     Running,
     Shutdown
 }
