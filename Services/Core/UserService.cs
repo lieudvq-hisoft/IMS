@@ -2,20 +2,17 @@
 using Data.DataAccess;
 using Data.DataAccess.Constant;
 using Data.Entities;
+using Data.Enums;
 using Data.Model;
-using Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Services.Utilities;
+using System.Data;
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Mail;
-using System.Net;
 using System.Security.Claims;
 using System.Text;
-using Data.Enums;
-using System.Data;
 
 namespace Services.Core;
 

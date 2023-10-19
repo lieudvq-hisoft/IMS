@@ -1,8 +1,7 @@
-﻿using System;
-namespace Data.Model;
+﻿namespace Data.Model;
 
-	public class PagingModel
-	{
+public class PagingModel
+{
     public int PageIndex { get; set; }
     public int PageSize { get; set; }
     public int TotalPage { get; set; }

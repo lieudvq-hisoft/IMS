@@ -1,5 +1,4 @@
-﻿using System;
-using static Data.Utils.Paging.PagingConstant;
+﻿using static Data.Utils.Paging.PagingConstant;
 
 namespace Data.Utils.Paging;
 

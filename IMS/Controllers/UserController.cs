@@ -1,12 +1,9 @@
-﻿using Data.Common.PaginationModel;
-using Data.Enums;
+﻿using Data.Enums;
 using Data.Model;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
 using Swashbuckle.AspNetCore.Annotations;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.Design;
 
 namespace UserController.Controllers;
 

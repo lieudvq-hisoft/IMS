@@ -1,6 +1,5 @@
 using IMS.Extensions;
 using IMS.Filters;
-using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 

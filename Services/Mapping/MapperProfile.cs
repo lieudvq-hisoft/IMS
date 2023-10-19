@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Data.Entities;
-using Data.Enums;
 using Data.Model;
 using Data.Models;
 

@@ -7,16 +7,11 @@ using Data.Enums;
 using Data.Model;
 using Data.Models;
 using Data.Utils.Paging;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml.Style;
 using OfficeOpenXml;
+using OfficeOpenXml.Style;
 using Services.Utilities;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Extensions.Configuration;
-using System.Net.Mail;
-using System.Net;
-using System.ComponentModel;
 
 namespace Services.Core;
 public interface IColocationService

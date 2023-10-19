@@ -1,9 +1,4 @@
 ﻿using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.Core;
 public interface IFileService
@@ -11,7 +6,7 @@ public interface IFileService
     Task<string> SaveFile(IFormFile importFile, string folderPath);
 }
 
-public class FileService: IFileService
+public class FileService : IFileService
 {
     public async Task<string> SaveFile(IFormFile importFile, string folderPath)
     {

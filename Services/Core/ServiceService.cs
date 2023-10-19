@@ -3,11 +3,6 @@ using Data.DataAccess;
 using Data.Model;
 using Data.Models;
 using Services.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.Core;
 public interface IServiceService
@@ -15,7 +10,7 @@ public interface IServiceService
     Task<ResultModel> Get();
 }
 
-public class ServiceService: IServiceService
+public class ServiceService : IServiceService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;

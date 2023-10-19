@@ -7,7 +7,7 @@ namespace IMS.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = "Bearer")]
-public class CompanyTypeController: ControllerBase
+public class CompanyTypeController : ControllerBase
 {
     private readonly ICompanyTypeService _companyTypeService;
 

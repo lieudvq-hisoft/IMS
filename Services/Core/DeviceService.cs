@@ -1,15 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Services.Core;
+﻿namespace Services.Core;
 public interface IDeviceService
 {
 
 }
 
-public class DeviceService: IDeviceService
+public class DeviceService : IDeviceService
 {
 }
