@@ -97,4 +97,6 @@ public class ColocationRequestUpdateModel
 public class ColocationSearchModel
 {
     public string? SearchValue { get; set; } = "";
+    public ColocationStatus? Status { get; set; }
 }
+

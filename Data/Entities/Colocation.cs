@@ -22,4 +22,57 @@ public class Colocation : BaseEntity
     public virtual Server? Server { get; set; }
 
     public virtual ICollection<AdditionalService> AdditionalServices { get; set; }
+
+    public string GetColocationRequestType()
+    {
+        ColocationRequestType type;
+        if (Status != ColocationStatus.Ongoing && Status != ColocationStatus.Stopped)
+        {
+            if (AdditionalServices.Any(x => x.Status != AdditionalServiceStatus.Success))
+            {
+                type = ColocationRequestType.Mixed;
+            }
+            else
+            {
+                type = ColocationRequestType.New;
+            }
+        }
+        else
+        {
+            type = ColocationRequestType.Additional;
+        }
+
+        return type.ToString();
+    }
+
+    public string GetColocationRequestStatus()
+    {
+        string status;
+        if (Status != ColocationStatus.Ongoing && Status != ColocationStatus.Stopped)
+        {
+            status = Status.ToString();
+        }
+        else
+        {
+            var services = AdditionalServices;
+            if (services.All(x => x.Status == AdditionalServiceStatus.Success))
+            {
+                status = "Accepted";
+            }
+            else if (services.All(x => x.Status == AdditionalServiceStatus.Denied))
+            {
+                status = "Denied";
+            }
+            else if (services.All(x => x.Status == AdditionalServiceStatus.Pending))
+            {
+                status = "Pending";
+            }
+            else
+            {
+                status = "Mixed";
+            }
+        }
+
+        return status;
+    }
 }

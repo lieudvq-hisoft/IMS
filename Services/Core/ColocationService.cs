@@ -62,7 +62,9 @@ public class ColocationService : IColocationService
                     || x.Status == ColocationStatus.Stopped)
                 .Where(delegate (Colocation x)
                 {
-                    return MatchString(searchModel, x.Customer.CompanyName);
+                    var matchCompanyName = MatchString(searchModel, x.Customer.CompanyName);
+                    var matchStatus = searchModel.Status != null ? x.Status.ToString() == searchModel.Status.ToString() : true;
+                    return matchCompanyName && matchStatus;
                 })
                 .AsQueryable();
 
@@ -106,7 +108,9 @@ public class ColocationService : IColocationService
                     x.AdditionalServices.Any(_ => _.Status != AdditionalServiceStatus.Success))
                 .Where(delegate (Colocation x)
                 {
-                    return MatchString(searchModel, x.Customer.CompanyName);
+                    var matchCompanyName = MatchString(searchModel, x.Customer.CompanyName);
+                    var matchStatus = searchModel.Status != null ? x.GetColocationRequestStatus() == searchModel.Status.ToString() : true;
+                    return matchCompanyName && matchStatus;
                 })
                 .AsQueryable();
 

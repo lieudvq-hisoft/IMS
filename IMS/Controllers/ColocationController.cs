@@ -30,7 +30,8 @@ public class ColocationController : ControllerBase
 
 
     [HttpGet]
-    [Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    //[Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    [AllowAnonymous]
     [SwaggerOperation(Summary = "[Tech, Sale]: Get ongoing or stopped colocations")]
     public async Task<ActionResult> Get([FromQuery] PagingParam<ColocationSortCriteria> pagingParam, [FromQuery] ColocationSearchModel searchModel)
     {
@@ -40,7 +41,8 @@ public class ColocationController : ControllerBase
     }
 
     [HttpGet("Request")]
-    [Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    //[Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    [AllowAnonymous]
     [SwaggerOperation(Summary = "[Tech, Sale]: Get colocation requests, excluding ongoing or stopped colocations, and those with unsuccessful additional services")]
     public async Task<ActionResult> GetRequest([FromQuery] PagingParam<ColocationSortCriteria> pagingParam, [FromQuery] ColocationSearchModel searchModel)
     {

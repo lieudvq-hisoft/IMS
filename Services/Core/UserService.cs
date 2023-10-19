@@ -14,6 +14,8 @@ using System.Net.Mail;
 using System.Net;
 using System.Security.Claims;
 using System.Text;
+using Data.Enums;
+using System.Data;
 
 namespace Services.Core;
 
@@ -70,7 +72,6 @@ public class UserService : IUserService
         }
         else
         {
-
             result.ErrorMessage = "Email or Password not correct!";
         }
         return result;
@@ -184,15 +185,21 @@ public class UserService : IUserService
     {
         IdentityOptions _options = new IdentityOptions();
         var claims = new List<Claim> {
-                new Claim("UserId", user.Id.ToString()),
-                new Claim("Email", user.Email),
-                new Claim("FullName", user.Fullname),
+            new Claim("UserId", user.Id.ToString()),
+            new Claim("Email", user.Email),
+            new Claim("FullName", user.Fullname),
+            new Claim("UserName", user.UserName)
+        };
 
-                new Claim("UserName", user.UserName)
-            };
         foreach (var role in roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
+        if (roles.Any(x => x == nameof(RoleType.Customer)))
+        {
+            var customer = _dbContext.Customers.FirstOrDefault(x => x.UserId == user.Id);
+            claims.Add(new Claim("CustomerId", customer.Id.ToString()));
         }
         if (!string.IsNullOrEmpty(user.PhoneNumber)) claims.Add(new Claim("PhoneNumber", user.PhoneNumber));
         return claims;
