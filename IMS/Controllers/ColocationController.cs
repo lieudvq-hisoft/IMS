@@ -66,8 +66,8 @@ public class ColocationController : ControllerBase
     }
 
     [HttpGet("Request/Bulk/Template")]
-    [Authorize(Roles = nameof(RoleType.Sale) + "," + nameof(RoleType.Customer))]
-    [SwaggerOperation(Summary = "[Sale, Customer]: Generate the excel file for importing. The services will be base on the database")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Sale]: Generate the excel file for importing. The services will be base on the database")]
     public async Task<ActionResult> GetImportTemplate()
     {
         string filePath = Path.Combine(_environment.WebRootPath, "import\\customer\\Template.xlsx");
@@ -81,8 +81,8 @@ public class ColocationController : ControllerBase
     }
 
     [HttpPost("Request")]
-    [Authorize(Roles = nameof(RoleType.Sale))]
-    [SwaggerOperation(Summary = "[Sale]: Create colocation request for an existing customer")]
+    [Authorize(Roles = nameof(RoleType.Sale) + "," + nameof(RoleType.Customer))]
+    [SwaggerOperation(Summary = "[Sale, Customer]: Create colocation request for an existing customer")]
     public async Task<ActionResult> CreateRequest([FromBody] ColocationRequestCreateModel model)
     {
         var result = await _colocationService.CreateRequest(model);
