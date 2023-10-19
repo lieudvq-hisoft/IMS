@@ -30,8 +30,7 @@ public class ColocationController : ControllerBase
 
 
     [HttpGet]
-    //[Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
-    [AllowAnonymous]
+    [Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "[Tech, Sale]: Get ongoing or stopped colocations")]
     public async Task<ActionResult> Get([FromQuery] PagingParam<ColocationSortCriteria> pagingParam, [FromQuery] ColocationSearchModel searchModel)
     {
@@ -41,8 +40,7 @@ public class ColocationController : ControllerBase
     }
 
     [HttpGet("Request")]
-    //[Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
-    [AllowAnonymous]
+    [Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "[Tech, Sale]: Get colocation requests, excluding ongoing or stopped colocations, and those with unsuccessful additional services")]
     public async Task<ActionResult> GetRequest([FromQuery] PagingParam<ColocationSortCriteria> pagingParam, [FromQuery] ColocationSearchModel searchModel)
     {
@@ -68,8 +66,8 @@ public class ColocationController : ControllerBase
     }
 
     [HttpGet("Request/Bulk/Template")]
-    [Authorize(Roles = nameof(RoleType.Sale))]
-    [SwaggerOperation(Summary = "[Sale]: Generate the excel file for importing. The services will be base on the database")]
+    [Authorize(Roles = nameof(RoleType.Sale) + "," + nameof(RoleType.Customer))]
+    [SwaggerOperation(Summary = "[Sale, Customer]: Generate the excel file for importing. The services will be base on the database")]
     public async Task<ActionResult> GetImportTemplate()
     {
         string filePath = Path.Combine(_environment.WebRootPath, "import\\customer\\Template.xlsx");

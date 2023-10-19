@@ -398,7 +398,9 @@ public class CustomerService : ICustomerService
             if (customer != null)
             {
                 var email = customer.User.Email;
-                var mailMessage = _emailHelper.GetActivationMessage(email);
+                var username = customer.User.UserName;
+                var password = username.Remove(username.Length - 1) + "@123";
+                var mailMessage = _emailHelper.GetActivationMessage(username, password, email);
                 mailMessage.To.Add(email);
                 smtpClient.Send(mailMessage);
             }
