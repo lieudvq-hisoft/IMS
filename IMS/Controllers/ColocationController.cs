@@ -39,7 +39,7 @@ public class ColocationController : ControllerBase
     }
 
     [HttpGet("Request")]
-    [SwaggerOperation(Summary = "[Tech, Sale]: Get colocation requests, excluding ongoing or stopped colocations, and those with unsuccessful additional services")]
+    [SwaggerOperation(Summary = "Get colocation requests, excluding ongoing or stopped colocations, and those with unsuccessful additional services")]
     public async Task<ActionResult> GetRequest([FromQuery] PagingParam<ColocationSortCriteria> pagingParam, [FromQuery] ColocationSearchModel searchModel)
     {
         var result = await _colocationService.GetRequest(pagingParam, searchModel);
