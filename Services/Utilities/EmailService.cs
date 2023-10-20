@@ -1,20 +1,20 @@
 ﻿using Microsoft.Extensions.Configuration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Net.Http;
 using System.Net.Mail;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.Utilities;
-public class EmailHelper
+public interface IEmailService
+{
+    SmtpClient GetClient();
+    MailMessage GetActivationMessage(string username, string password, string email);
+}
+
+public class EmailService : IEmailService
 {
     private readonly IConfiguration _config;
     private readonly string _env;
 
-    public EmailHelper(IConfiguration config)
+    public EmailService(IConfiguration config)
     {
         _config = config;
         _env = SettingHelper.GetEnvironment();

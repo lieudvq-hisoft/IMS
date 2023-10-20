@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
+﻿using Data.Utils.Paging;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using Data.Utils.Paging;
 
 namespace Data.Common.PaginationModel;
 public class PagingParam<TKey> where TKey : System.Enum

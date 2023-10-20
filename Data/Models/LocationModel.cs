@@ -1,4 +1,6 @@
-﻿namespace Data.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Data.Models;
 public class AreaModel
 {
     public int Id { get; set; }
@@ -43,6 +45,10 @@ public class LocationModel
 public class LocationChoiceModel
 {
     public int AreaId { get; set; }
+
+    [Required]
     public int RackId { get; set; }
+
+    [Required]
     public int Position { get; set; }
 }

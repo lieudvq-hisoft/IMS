@@ -64,7 +64,7 @@ public class UserCreateModel
     [Required]
     public string PhoneNumber { get; set; }
 
-    [Required] 
+    [Required]
     public List<string> Roles { get; set; }
 }
 public class UserUpdateModel

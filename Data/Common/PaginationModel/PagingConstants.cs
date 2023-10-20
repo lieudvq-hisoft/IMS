@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Data.Common.PaginationModel;
+﻿namespace Data.Common.PaginationModel;
 public static class PagingConstants
 {
     public const int DefaultPage = 1;

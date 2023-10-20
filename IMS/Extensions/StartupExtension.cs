@@ -1,24 +1,20 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.OpenApi.Models;
-using System.ComponentModel.Design;
-using System.Data;
-using System;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection;
-using AutoMapper;
-using Newtonsoft.Json.Converters;
+﻿using AutoMapper;
 using Data.DataAccess;
 using Data.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
+using Services.Core;
+using Services.Mapping;
+using Services.Utilities;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using Services.Mapping;
-using Services.Core;
-using Services.Utilities;
-using Microsoft.Extensions.Configuration;
 
-namespace IMS.Extensions;
+namespace IMS.Utilities;
 
 public static class StartupExtension
 {
@@ -65,8 +61,11 @@ public static class StartupExtension
         services.AddScoped<IServerService, ServerService>();
         services.AddScoped<IServiceService, ServiceService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IIpService, IpService>();
 
-        services.AddScoped<EmailHelper>();
+        services.AddScoped<IEmailService, EmailService>();
+
+        services.AddScoped<TransactionHelper>();
     }
 
     public static void ConfigIdentityService(this IServiceCollection services)

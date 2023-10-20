@@ -1,7 +1,6 @@
 ﻿using Data.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using System.Collections;
 
 namespace Data.Extensions;
 
@@ -110,11 +109,14 @@ public static class ModelBuilderExtentions
         });
         #endregion
 
-        for (var i = 2; i <= 5; i++)
+        for (var i = 1; i <= 5; i++)
         {
             var username = "";
             switch (i)
             {
+                case 1:
+                    username = "super";
+                    break;
                 case 2:
                     username = "tech";
                     break;
@@ -147,11 +149,26 @@ public static class ModelBuilderExtentions
             });
 
             #region UserRole
-            modelBuilder.Entity<UserRole>().HasData(new UserRole
+            if (i == 1)
             {
-                RoleId = GenerateSeededGuid(i),
-                UserId = GenerateSeededGuid(i),
-            });
+                for (int j = 1; j <= 5; j++)
+                {
+                    modelBuilder.Entity<UserRole>().HasData(new UserRole
+                    {
+                        RoleId = GenerateSeededGuid(i),
+                        UserId = GenerateSeededGuid(j),
+                    });
+
+                }
+            }
+            else
+            {
+                modelBuilder.Entity<UserRole>().HasData(new UserRole
+                {
+                    RoleId = GenerateSeededGuid(i),
+                    UserId = GenerateSeededGuid(i),
+                });
+            }
             #endregion
         }
         #endregion
@@ -184,11 +201,12 @@ public static class ModelBuilderExtentions
             ColumnCount = 8,
         });
 
+        List<Rack> racks = new List<Rack>();
         for (int i = 1; i <= 8; i++)
         {
             for (int j = 1; j <= 8; j++)
             {
-                modelBuilder.Entity<Rack>().HasData(new Rack
+                racks.Add(new Rack
                 {
                     Id = (j - 1) * 8 + i,
                     MaxPower = 3000,
@@ -205,7 +223,7 @@ public static class ModelBuilderExtentions
         {
             for (int j = 1; j <= 5; j++)
             {
-                modelBuilder.Entity<Rack>().HasData(new Rack
+                racks.Add(new Rack
                 {
                     Id = 8 * 8 + (j - 1) * 8 + i,
                     MaxPower = 3500,
@@ -217,6 +235,7 @@ public static class ModelBuilderExtentions
                 });
             }
         }
+        modelBuilder.Entity<Rack>().HasData(racks.OrderBy(x => x.Id));
 
         modelBuilder.Entity<Location>().HasData(new Location
         {

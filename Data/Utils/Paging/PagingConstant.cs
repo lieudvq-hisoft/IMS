@@ -1,5 +1,4 @@
-﻿using System;
-namespace Data.Utils.Paging;
+﻿namespace Data.Utils.Paging;
 
 /// <summary>
 /// Contains constant classes related to Pagination.

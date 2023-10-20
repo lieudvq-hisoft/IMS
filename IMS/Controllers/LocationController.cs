@@ -26,12 +26,12 @@ public class LocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("Area/{id}/Suggestion")]
+    [HttpGet("Suggestion")]
     [Authorize(Roles = nameof(RoleType.Tech))]
     [SwaggerOperation(Summary = "[Tech]: Get all area have enough space for device with specified size")]
-    public async Task<ActionResult> GetAreaSuggestionRack(int id, [FromQuery] int size)
+    public async Task<ActionResult> GetAreaSuggestionRack([FromQuery] int size)
     {
-        var result = await _locationService.GetRackChoiceSuggestionBySize(id, size);
+        var result = await _locationService.GetRackChoiceSuggestionBySize(size);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

@@ -1,11 +1,6 @@
 ﻿using Data.Enums;
 using IMS.Data.Utils.ValidationAttributes;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data.Models;
 public class ColocationModel
@@ -92,6 +87,15 @@ public class ColocationRequestUpdateModel
     public string? InspectorNote { get; set; }
 
     public List<AdditionalServiceModel> AdditionalServices { get; set; }
+}
+
+public class ColocationRequestDetailCompleteModel
+{
+    [Required]
+    public ServerCreateModel ServerCreateModel { get; set; }
+
+    [Required]
+    public LocationChoiceModel LocationChoiceModel { get; set; }
 }
 
 public class ColocationSearchModel

@@ -34,14 +34,14 @@ public class CustomerService : ICustomerService
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
-    private readonly EmailHelper _emailHelper;
+    private readonly IEmailService _emailService;
 
-    public CustomerService(AppDbContext dbContext, IMapper mapper, UserManager<User> userManager, EmailHelper emailHelper)
+    public CustomerService(AppDbContext dbContext, IMapper mapper, UserManager<User> userManager, IEmailService emailService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _userManager = userManager;
-        _emailHelper = emailHelper;
+        _emailService = emailService;
     }
 
     public async Task<ResultModel> Get(PagingParam<CustomerSortCriteria> paginationModel, CustomerSearchModel searchModel)
@@ -379,7 +379,7 @@ public class CustomerService : ICustomerService
 
     public async Task<ResultModel> SendActivationEmail(List<int> customerIds)
     {
-        var smtpClient = _emailHelper.GetClient();
+        var smtpClient = _emailService.GetClient();
 
         foreach (int customerId in customerIds)
         {
@@ -389,7 +389,7 @@ public class CustomerService : ICustomerService
                 var email = customer.User.Email;
                 var username = customer.User.UserName;
                 var password = username.Remove(username.Length - 1) + "@123";
-                var mailMessage = _emailHelper.GetActivationMessage(username, password, email);
+                var mailMessage = _emailService.GetActivationMessage(username, password, email);
                 mailMessage.To.Add(email);
                 smtpClient.Send(mailMessage);
             }
