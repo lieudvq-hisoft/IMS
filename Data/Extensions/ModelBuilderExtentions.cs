@@ -65,44 +65,47 @@ public static class ModelBuilderExtentions
         #region User
         var hasher = new PasswordHasher<User>();
 
-        List<Guid> seedGuids = new List<Guid>();
-        for (int i = 1; i <= 5; i++)
+        List<Guid> seedGuids = new List<Guid>
         {
-            seedGuids.Add(GenerateSeededGuid(i));
-        }
+            new Guid("57ffb575-7c79-4133-8433-aebbcd71f824"),
+            new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab"),
+            new Guid("1abb6e28-793d-460f-8a24-745998356da8"),
+            new Guid("2e3566a9-02b1-4ec4-a2d4-b3bb3c4f2b45"),
+            new Guid("285135ab-c67d-4285-b689-7e88e7f610f9")
+        };
 
         #region Roles
         modelBuilder.Entity<Role>().HasData(new Role
         {
-            Id = GenerateSeededGuid(1),
+            Id = seedGuids[0],
             Name = "Customer",
             Description = "Customer",
             isDeactive = false,
         });
         modelBuilder.Entity<Role>().HasData(new Role
         {
-            Id = GenerateSeededGuid(2),
+            Id = seedGuids[1],
             Name = "Tech",
             Description = "IT Staff",
             isDeactive = false,
         });
         modelBuilder.Entity<Role>().HasData(new Role
         {
-            Id = GenerateSeededGuid(3),
+            Id = seedGuids[2],
             Name = "Sale",
             Description = "Sale",
             isDeactive = false,
         });
         modelBuilder.Entity<Role>().HasData(new Role
         {
-            Id = GenerateSeededGuid(4),
+            Id = seedGuids[3],
             Name = "Manager",
             Description = "Manager",
             isDeactive = false,
         });
         modelBuilder.Entity<Role>().HasData(new Role
         {
-            Id = GenerateSeededGuid(5),
+            Id = seedGuids[4],
             Name = "Admin",
             Description = "Admin",
             isDeactive = false,
@@ -155,8 +158,8 @@ public static class ModelBuilderExtentions
                 {
                     modelBuilder.Entity<UserRole>().HasData(new UserRole
                     {
-                        RoleId = GenerateSeededGuid(i),
-                        UserId = GenerateSeededGuid(j),
+                        RoleId = seedGuids[j - 1],
+                        UserId = seedGuids[i - 1],
                     });
 
                 }
@@ -165,12 +168,20 @@ public static class ModelBuilderExtentions
             {
                 modelBuilder.Entity<UserRole>().HasData(new UserRole
                 {
-                    RoleId = GenerateSeededGuid(i),
-                    UserId = GenerateSeededGuid(i),
+                    RoleId = seedGuids[i - 1],
+                    UserId = seedGuids[i - 1],
                 });
             }
             #endregion
         }
+        modelBuilder.Entity<Customer>().HasData(new Customer
+        {
+            Id = 1,
+            UserId = seedGuids[0],
+            CompanyName = "super",
+            TaxNumber = "0000000000",
+            CompanyTypeId = 1,
+        });
         #endregion
 
         #region Device

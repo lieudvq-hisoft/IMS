@@ -106,6 +106,7 @@ public class LocationService : ILocationService
                         Position = suggestedPosition
                     };
                 }
+                rackCount++;
             }
 
             result.Data = suggestedLocation;
