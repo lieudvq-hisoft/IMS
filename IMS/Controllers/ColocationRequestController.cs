@@ -57,8 +57,7 @@ public class ColocationRequestController : ControllerBase
     [SwaggerOperation(Summary = "[Sale]: Create user, customer and colocation request base on import excel. Create all 3 entity if success or nothing if any fail validation or have error when inserting. Return the result excel file with result on the right most column")]
     public async Task<ActionResult> Import(IFormFile importFile)
     {
-        string folderPath = Path.Combine(_environment.WebRootPath, "import\\customer");
-        string activateUrl = Url.Link("Default", new { Controller = "UserController", Action = "Activate" });
+        string folderPath = Path.Combine(_environment.WebRootPath, "import", "customer");
         string filePath = await _fileService.SaveFile(importFile, folderPath);
         await _customerService.Import(filePath);
         var result = await _colocationService.ImportRequest(filePath);
@@ -73,7 +72,7 @@ public class ColocationRequestController : ControllerBase
     [SwaggerOperation(Summary = "[Sale]: Generate the excel file for importing. The services will be base on the database")]
     public async Task<ActionResult> GetImportTemplate()
     {
-        string filePath = Path.Combine(_environment.WebRootPath, "import\\customer\\Template.xlsx");
+        string filePath = Path.Combine(_environment.WebRootPath, "import", "customer", "Template.xlsx");
         var result = await _colocationService.GenerateImportExcelTemplate(filePath);
         if (result.Succeed)
         {
