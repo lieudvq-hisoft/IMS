@@ -109,8 +109,15 @@ public class LocationService : ILocationService
                 rackCount++;
             }
 
-            result.Data = suggestedLocation;
-            result.Succeed = true;
+            if (suggestedLocation == null)
+            {
+                result.ErrorMessage = "No location found";
+            }
+            else
+            {
+                result.Data = suggestedLocation;
+                result.Succeed = true;
+            }
         }
         catch (Exception e)
         {
