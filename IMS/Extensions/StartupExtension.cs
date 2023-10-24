@@ -73,16 +73,14 @@ public static class StartupExtension
         var build = services.AddIdentityCore<User>(option =>
         {
             option.SignIn.RequireConfirmedAccount = false;
-            option.User.RequireUniqueEmail = false;
-            option.Password.RequireDigit = false;
+            option.User.RequireUniqueEmail = true;
+            option.Password.RequireDigit = true;
             option.Password.RequiredLength = 6;
-            option.Password.RequireNonAlphanumeric = false;
-            option.Password.RequireUppercase = false;
-            option.Password.RequireLowercase = false;
+            option.Password.RequireNonAlphanumeric = true;
+            option.Password.RequireUppercase = true;
+            option.Password.RequireLowercase = true;
 
             option.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-            option.User.RequireUniqueEmail = true;
-            option.SignIn.RequireConfirmedAccount = false;
         });
 
         build.AddRoles<Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();

@@ -10,6 +10,7 @@ public class MapperProfile : Profile
     public MapperProfile()
     {
         CreateMap<User, UserModel>();
+        CreateMap<User, UserViewModel>();
 
         CreateMap<Customer, CustomerModel>()
             .ForMember(dest => dest.Address, opt => opt.MapFrom(src => src.User.Address))

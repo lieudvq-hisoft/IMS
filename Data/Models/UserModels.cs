@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using IMS.Data.Utils.ValidationAttributes;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace Data.Model;
@@ -10,6 +11,7 @@ public class UserModel
     public string UserName { get; set; }
     public string Fullname { get; set; }
     public string Email { get; set; }
+    public string Password { get; set; }    
     public string Address { get; set; }
 }
 
@@ -18,38 +20,23 @@ public class UserViewModel
     public Guid Id { get; set; }
     public string PhoneNumber { get; set; }
     public string UserName { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
+    public string Fullname { get; set; }
     public string Email { get; set; }
     public string Address { get; set; }
-    public string FcmToken { get; set; }
-
-    [JsonProperty("userAva")]
-    public string? UserAva { get; set; }
-}
-
-public class UserPostModel
-{
-    public Guid Id { get; set; }
-    public string PhoneNumber { get; set; }
-    public string UserName { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public string Email { get; set; }
-    public string Address { get; set; }
-    public string? UserAva { get; set; }
 }
 
 public class UserRoleModel
 {
     public RoleModel role { get; set; }
 }
+
 public class UserCreateModel
 {
     [Required]
     public string UserName { get; set; }
 
     [Required]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$", ErrorMessage = "Password must be atleast 8 character and have lowercase, uppercase and special character")]
     public string Password { get; set; }
 
     [Required]
@@ -67,26 +54,30 @@ public class UserCreateModel
     [Required]
     public List<string> Roles { get; set; }
 }
+
 public class UserUpdateModel
 {
-    public Guid Id { get; set; }
-    public string FirstName { get; set; }
-    public string? LastName { get; set; }
+    [Required]
+    public string UserName { get; set; }
+
+    [Required]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$")]
+    public string Password { get; set; }
+
+    [Required]
+    public string Email { get; set; }
+
+    [Required]
+    public string Fullname { get; set; }
+
+    [Required]
     public string Address { get; set; }
+
+    [Required]
     public string PhoneNumber { get; set; }
-    public string Age { get; set; }
 }
-public class UserUpdateModelAdm
-{
-    public Guid Id { get; set; }
-    public string RoleName { get; set; }
-    public string IdenficationNumber { get; set; }
-    public bool IdenficationConfirm { get; set; }
-    public bool isBlock { get; set; }
-    public bool isDelete { get; set; }
 
 
-}
 public class LoginModel
 {
     public string Username { get; set; }

@@ -46,6 +46,7 @@ public class ServerService : IServerService
                     BasePower = model.BasePower
                 };
                 _dbContext.Devices.Add(device);
+                _dbContext.SaveChanges();
 
                 _dbContext.Servers.Add(new Server
                 {

@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Security.Claims;
 
 namespace UserController.Controllers;
 
@@ -29,7 +30,8 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("Register")]
-    [Authorize(Roles = nameof(RoleType.Admin))]
+    //[Authorize(Roles = nameof(RoleType.Admin))]
+    [AllowAnonymous]
     [SwaggerOperation(Summary = "[Admin]: Register a new user, cannot register a customer")]
     public async Task<ActionResult> Register([FromBody] UserCreateModel model)
     {
@@ -46,6 +48,25 @@ public class UserController : ControllerBase
         var result = await _userService.ActivateUser(email);
         if (result.Succeed)
             return Redirect("https://ims.hisoft.vn/signin");
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("MyAccount")]
+    [SwaggerOperation(Summary = "Get your information")]
+    public async Task<ActionResult> GetAccountInfo()
+    {
+        var email = User.Claims.FirstOrDefault(x => x.Type == "Email").Value;
+        var result = await _userService.GetAccountInfo(email);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPatch("MyAccount")]
+    [SwaggerOperation(Summary = "Update your information")]
+    public async Task<ActionResult> UpdateAccountInfo([FromBody] UserUpdateModel model)
+    {
+        var result = await _userService.UpdateAccountInfo(model);
+        if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 }

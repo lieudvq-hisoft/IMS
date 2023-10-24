@@ -102,7 +102,7 @@ public class ColocationRequestController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPatch("{id}/CompleteDetail")]
+    [HttpPut("{id}/CompleteDetail")]
     //[Authorize(Roles = nameof(RoleType.Tech))]
     [AllowAnonymous]
     [SwaggerOperation(Summary = "[Tech]: Complete")]

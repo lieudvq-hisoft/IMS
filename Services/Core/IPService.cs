@@ -30,6 +30,7 @@ public class IpService: IIpService
 
         try
         {
+            result.Succeed = true;
         }
         catch (Exception e)
         {
