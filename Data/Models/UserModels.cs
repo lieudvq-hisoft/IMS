@@ -11,7 +11,6 @@ public class UserModel
     public string UserName { get; set; }
     public string Fullname { get; set; }
     public string Email { get; set; }
-    public string Password { get; set; }    
     public string Address { get; set; }
 }
 
@@ -60,9 +59,9 @@ public class UserUpdateModel
     [Required]
     public string UserName { get; set; }
 
-    [Required]
+    //[Required]
     [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$")]
-    public string Password { get; set; }
+    public string? Password { get; set; }
 
     [Required]
     public string Email { get; set; }
