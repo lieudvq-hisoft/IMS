@@ -189,8 +189,6 @@ public static class ModelBuilderExtentions
         {
             Id = 1,
             Type = "Mock",
-            NumberOfPort = 3,
-            Status = Enums.DeviceStatus.Running,
             Size = 2,
             BasePower = 200,
         });
@@ -257,14 +255,36 @@ public static class ModelBuilderExtentions
         });
 
         #endregion
-    }
 
-    private static Guid GenerateSeededGuid(int seed)
-    {
-        var r = new Random(seed);
-        var guid = new byte[16];
-        r.NextBytes(guid);
+        #region IP
+        modelBuilder.Entity<Network>().HasData(new Network
+        {
+            Id = 1,
+            FirstOctet = 192,
+            SecondOctet = 112,
+            ThirdOctet = 121,
+            SubnetMask = 24
+        });
+        modelBuilder.Entity<Network>().HasData(new Network
+        {
+            Id = 2,
+            FirstOctet = 193,
+            SecondOctet = 122,
+            ThirdOctet = 111,
+            SubnetMask = 25
+        });
 
-        return new Guid(guid);
+        for (int i = 1; i <= 200; i++)
+        {
+            modelBuilder.Entity<Ip>().HasData(new Ip
+            {
+                Id = i,
+                Address = i,
+                Type = Enums.IpType.Host,
+                IsReserved = false,
+                NetworkId = i % 2 == 0 ? 1 : 2,
+            });
+        }
+        #endregion
     }
 }

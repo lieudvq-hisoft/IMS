@@ -15,7 +15,8 @@ public class ColocationModel
 public class ColocationRequestModel
 {
     public int Id { get; set; }
-    public DateTime DateCreated { get; set; }
+    public DateTime DateStart { get; set; }
+    public DateTime DateStop { get; set; }
     public string Type { get; set; }
     public string CompanyName { get; set; }
     public int CustomerId { get; set; }
@@ -46,10 +47,10 @@ public class ColocationCreateModel
     public int ExpectedSize { get; set; }
 
     [Required]
-    public DateTime DateCreate { get; set; }
+    public DateTime DateStart { get; set; }
 
     [Required]
-    [DateMoreThan(comparisonProperty: "DateCreate", ErrorMessage = "Allocate dat must be later than create date")]
+    [DateMoreThan(comparisonProperty: "DateStart", ErrorMessage = "Allocate dat must be later than start date")]
     public DateTime DateAllocate { get; set; }
 
     [Required]
@@ -72,10 +73,10 @@ public class ColocationRequestUpdateModel
     public int ExpectedSize { get; set; }
 
     [Required]
-    public DateTime DateCreate { get; set; }
+    public DateTime DateStart { get; set; }
 
     [Required]
-    [DateMoreThan(comparisonProperty: "DateCreate", ErrorMessage = "Allocate dat must be later than create date")]
+    [DateMoreThan(comparisonProperty: "DateStart", ErrorMessage = "Allocate dat must be later than start date")]
     public DateTime DateAllocate { get; set; }
 
     [Required]

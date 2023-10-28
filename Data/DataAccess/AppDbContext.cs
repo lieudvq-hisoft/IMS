@@ -14,20 +14,27 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
 
     }
 
-    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    protected override void OnModelCreating(ModelBuilder builder)
     {
-        modelBuilder.Seed();
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.Entity<User>(b =>
+        builder.Seed();
+        base.OnModelCreating(builder);
+        builder.Entity<User>(b =>
         {
             // Each User can have many entries in the UserRole join table
             b.HasMany(e => e.UserRoles)
                 .WithOne(e => e.User)
                 .HasForeignKey(ur => ur.UserId)
                 .IsRequired();
+            b.HasIndex(e => e.Email).IsUnique();
+            b.HasIndex(e => e.PhoneNumber).IsUnique();
         });
 
-        modelBuilder.Entity<Role>(b =>
+        builder.Entity<Customer>(b =>
+        {
+            b.HasIndex(e => e.TaxNumber).IsUnique();
+        });
+
+        builder.Entity<Role>(b =>
         {
             // Each Role can have many entries in the UserRole join table
             b.HasMany(e => e.UserRoles)
@@ -36,41 +43,60 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
                 .IsRequired();
         });
 
-        modelBuilder.Entity<AdditionalService>()
+        builder.Entity<Server>(b =>
+        {
+            b.HasIndex(e => e.SerialNumber).IsUnique();
+        });
+
+        builder.Entity<Area>(b =>
+        {
+            b.HasIndex(e => e.Name).IsUnique();
+        });
+
+        builder.Entity<Ip>(b =>
+        {
+            b.HasIndex(e => new { e.Address, e.NetworkId }).IsUnique();
+        });
+
+        builder.Entity<AdditionalService>()
             .HasQueryFilter(x => !x.IsDeleted);
-        modelBuilder.Entity<Area>()
+        builder.Entity<Area>()
             .HasQueryFilter(x => !x.IsDeleted);
-        modelBuilder.Entity<Colocation>()
+        builder.Entity<Colocation>()
             .HasQueryFilter(x => !x.IsDeleted);
-        modelBuilder.Entity<CompanyType>()
+        builder.Entity<CompanyType>()
             .HasQueryFilter(x => !x.IsDeleted);
-        modelBuilder.Entity<Customer>()
+        builder.Entity<Customer>()
             .HasQueryFilter(x => !x.IsDeleted);
-        modelBuilder.Entity<Device>()
+        builder.Entity<Device>()
             .HasQueryFilter(x => !x.IsDeleted);
-        modelBuilder.Entity<Location>()
+        builder.Entity<Location>()
             .HasQueryFilter(x => !x.IsDeleted);
-        modelBuilder.Entity<Rack>()
+        builder.Entity<Rack>()
             .HasQueryFilter(x => !x.IsDeleted);
-        modelBuilder.Entity<Role>()
+        builder.Entity<Role>()
             .HasQueryFilter(x => !x.isDeactive);
-        modelBuilder.Entity<Server>()
+        builder.Entity<Server>()
             .HasQueryFilter(x => !x.IsDeleted);
-        modelBuilder.Entity<Service>()
+        builder.Entity<Service>()
             .HasQueryFilter(x => !x.IsDeleted);
-        modelBuilder.Entity<User>()
+        builder.Entity<User>()
             .HasQueryFilter(x => !x.IsDeleted);
 
-        modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+        builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
     }
     public DbSet<AdditionalService> AdditionalServices { get; set; }
     public DbSet<Area> Areas { get; set; }
     public DbSet<Colocation> Colocations { get; set; }
+    public DbSet<ColocationHistory> ColocationHistories { get; set; }
     public DbSet<CompanyType> CompanyTypes { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Device> Devices { get; set; }
+    public DbSet<Ip> Ips { get; set; }
+    public DbSet<IpAssignment> IpAssignments { get; set; }
     public DbSet<Location> Locations { get; set; }
+    public DbSet<Network> Networks { get; set; }
     public DbSet<Rack> Racks { get; set; }
     public DbSet<Role> Role { get; set; }
     public DbSet<Server> Servers { get; set; }

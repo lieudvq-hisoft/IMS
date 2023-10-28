@@ -9,13 +9,6 @@ public enum RoleType
     Admin = 5
 }
 
-public enum DeviceStatus
-{
-    Pending,
-    Running,
-    Shutdown
-}
-
 public enum ColocationStatus
 {
     Incomplete,
@@ -23,7 +16,8 @@ public enum ColocationStatus
     Accepted,
     Denied,
     Ongoing,
-    Stopped
+    Stopped,
+    Ended
 }
 
 public enum ColocationRequestType
@@ -31,6 +25,15 @@ public enum ColocationRequestType
     New,
     Additional,
     Mixed
+}
+
+public enum IpType
+{
+    Host,
+    Port,
+    Additional,
+    DNS,
+    Gateway
 }
 
 public enum AdditionalServiceStatus
@@ -52,6 +55,10 @@ public enum CustomerSortCriteria
 }
 
 public enum ColocationSortCriteria
+{
+    Id
+}
+public enum ServerSortCriteria
 {
     Id
 }
