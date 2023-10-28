@@ -8,6 +8,9 @@ public class Colocation : BaseEntity
     public string? Note { get; set; }
     public string? InspectorNote { get; set; }
     public DateTime DateAllocate { get; set; }
+    public DateTime DateStop { get; set; }
+    public string? InspectionRecordFilePath { get; set; }
+    public string? ReceiptOfRecipientFilePath { get; set; }
 
     public int CustomerId { get; set; }
     public virtual Customer Customer { get; set; }

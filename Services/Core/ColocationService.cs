@@ -154,7 +154,7 @@ public class ColocationService : IColocationService
                 var model = new ColocationCreateModel()
                 {
                     ExpectedSize = int.Parse(worksheet.Cells[row, 8].Value?.ToString().Trim()),
-                    DateStart = DateTime.Parse(worksheet.Cells[row, 9].Value?.ToString().Trim()),
+                    DateCreated = DateTime.Parse(worksheet.Cells[row, 9].Value?.ToString().Trim()),
                     DateAllocate = DateTime.Parse(worksheet.Cells[row, 10].Value?.ToString().Trim()),
                     DateStop = DateTime.Parse(worksheet.Cells[row, 11].Value?.ToString().Trim()),
                     Note = worksheet.Cells[row, 12].Value?.ToString().Trim(),
@@ -287,19 +287,12 @@ public class ColocationService : IColocationService
                     InspectorNote = createModel.InspectorNote,
                     DateAllocate = createModel.DateAllocate,
                     CustomerId = customerId,
+                    DateCreated = createModel.DateCreated,
+                    DateStop = createModel.DateStop
                 };
 
                 _dbContext.Colocations.Add(colocation);
                 _dbContext.SaveChanges();
-
-                var colocationHistory = new ColocationHistory
-                {
-                    ColocationId = colocation.Id,
-                    DateStart = createModel.DateStart,
-                    DateStop = createModel.DateStop,
-                    IsActive = true
-                };
-                _dbContext.ColocationHistories.Add(colocationHistory);
 
                 foreach (var service in services)
                 {
@@ -346,13 +339,6 @@ public class ColocationService : IColocationService
                 result.ErrorMessage = "Can only update colocation request";
             }
 
-            var colocationCurrentHistory = colocation.ColocationHistories.FirstOrDefault(x => x.IsActive && !x.OutOfDuration());
-            if (colocationCurrentHistory == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = "Colocation ended";
-            }
-
             var services = new List<Service>();
             if (validPrecondition)
             {
@@ -378,11 +364,9 @@ public class ColocationService : IColocationService
                 colocation.ExpectedSize = model.ExpectedSize;
                 colocation.Note = model.Note;
                 colocation.InspectorNote = model.InspectorNote;
-                colocation.DateCreated = model.DateStart;
+                colocation.DateCreated = model.DateCreated;
                 colocation.DateAllocate = model.DateAllocate;
-
-                colocationCurrentHistory.DateStart = model.DateStart;
-                colocationCurrentHistory.DateStop = model.DateStop;
+                colocation.DateStop = model.DateStop;
 
                 // Delete current additional services
                 var currentServices = _dbContext.AdditionalServices.Where(x => x.ColocationId == model.Id).ToList();

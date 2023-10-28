@@ -60,9 +60,13 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
 
         builder.Entity<AdditionalService>()
             .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Approver>()
+            .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Area>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Colocation>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<ColocationHistory>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<CompanyType>()
             .HasQueryFilter(x => !x.IsDeleted);
@@ -70,7 +74,15 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Device>()
             .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Executer>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Ip>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<IpAssignment>()
+            .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Location>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Network>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Rack>()
             .HasQueryFilter(x => !x.IsDeleted);

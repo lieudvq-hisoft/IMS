@@ -27,9 +27,7 @@ public class MapperProfile : Profile
         CreateMap<Colocation, ColocationRequestModel>()
             .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName))
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.GetColocationRequestType()))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.GetColocationRequestStatus()))
-            .ForMember(dest => dest.DateStart, opt => opt.MapFrom(src => src.ColocationHistories.FirstOrDefault(x => x.IsActive).DateStart))
-             .ForMember(dest => dest.DateStop, opt => opt.MapFrom(src => src.ColocationHistories.FirstOrDefault(x => x.IsActive).DateStop));
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.GetColocationRequestStatus()));
 
         CreateMap<Area, AreaModel>();
         CreateMap<Rack, RackModel>();
@@ -40,7 +38,7 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.StartPosition, opt => opt.MapFrom(src => src.StartPosition));
 
         CreateMap<Server, ServerModel>()
-            .ForMember(dest => dest.DateAllocate, opt => opt.MapFrom(src => src.Colocation.DateAllocate))
+            .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => src.Colocation.DateCreated))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Colocation.Status))
             .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.Select(x => x.Ip).FirstOrDefault(x => x.Type == Data.Enums.IpType.Host).DisplayIp()))
             .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.Device.Size + src.Device.AdditionalSize))

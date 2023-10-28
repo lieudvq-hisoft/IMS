@@ -5,7 +5,7 @@ namespace Data.Models;
 public class ServerModel
 {
     public int Id { get; set; }
-    public DateTime DateAllocate { get; set; }
+    public DateTime DateCreated { get; set; }
     public DateTime DateUpdate { get; set; }
     public ColocationStatus? Status { get; set; }
     public string IpAddress { get; set; }

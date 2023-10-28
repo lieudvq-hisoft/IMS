@@ -13,4 +13,7 @@ public class User : IdentityUser<Guid>
     public int CurrenNoticeCount { get; set; } = 0;
 
     public virtual ICollection<UserRole> UserRoles { get; set; }
+
+    public virtual ICollection<AdditionalService>? ApprovedServices { get; set; }
+    public virtual ICollection<AdditionalService>? ExecutedServices { get; set; }
 }
