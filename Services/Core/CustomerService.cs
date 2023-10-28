@@ -242,7 +242,7 @@ public class CustomerService : ICustomerService
                     NormalizedEmail = model.Email.ToLower(),
                 };
 
-                var createUserResult = await _userManager.CreateAsync(user, MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")) + "@123");
+                var createUserResult = await _userManager.CreateAsync(user, MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")) + "@a123");
                 if (createUserResult.Succeeded)
                 {
                     var userRole = new UserRole

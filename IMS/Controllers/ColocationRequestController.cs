@@ -106,11 +106,11 @@ public class ColocationRequestController : ControllerBase
     //[Authorize(Roles = nameof(RoleType.Tech))]
     [AllowAnonymous]
     [SwaggerOperation(Summary = "[Tech]: Complete")]
-    public async Task<ActionResult> CompleteRequestDetail(ColocationRequestDetailCompleteModel model)
+    public async Task<ActionResult> CompleteRequestDetail(int id, ColocationRequestDetailCompleteModel model)
     {
         string errorMessage;
         using var transaction = _transactionHelper.GetTransaction();
-        var createServerResult = await _serverService.AttempCreateServer(model.ServerCreateModel, transaction);
+        var createServerResult = await _serverService.AttempCreateServer(id, model.ServerCreateModel, transaction);
         if (createServerResult.Succeed)
         {
             var device = createServerResult.Data as Device;

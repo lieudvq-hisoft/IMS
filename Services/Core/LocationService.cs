@@ -90,7 +90,7 @@ public class LocationService : ILocationService
 
         try
         {
-            var racks = _dbContext.Racks.ToList();
+            var racks = _dbContext.Racks.OrderBy(x => x.Id).ToList();
 
             int rackCount = 0;
             while (rackCount < racks.Count && suggestedLocation == null)

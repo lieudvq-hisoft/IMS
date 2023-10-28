@@ -7,7 +7,7 @@ public class ServerModel
     public int Id { get; set; }
     public DateTime DateAllocate { get; set; }
     public DateTime DateUpdate { get; set; }
-    public ColocationStatus Status { get; set; }
+    public ColocationStatus? Status { get; set; }
     public string IpAddress { get; set; }
     public int Size { get; set; }
     public int Power { get; set; }
@@ -16,7 +16,7 @@ public class ServerModel
 
 public class ServerSearchModel
 {
-    public ColocationStatus Status { get; set; }
+    public ColocationStatus? Status { get; set; }
 }
 
 public class ServerDetailModel

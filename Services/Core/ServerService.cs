@@ -14,7 +14,8 @@ using Services.Utilities;
 namespace Services.Core;
 public interface IServerService
 {
-    Task<ResultModel> AttempCreateServer(ServerCreateModel model, IDbContextTransaction transaction);
+    Task<ResultModel> AttempCreateServer(int colocationId, ServerCreateModel model, IDbContextTransaction transaction);
+    Task<ResultModel> Get(PagingParam<ServerSortCriteria> paginationModel, ServerSearchModel searchModel);
 }
 
 public class ServerService : IServerService
@@ -42,8 +43,8 @@ public class ServerService : IServerService
                 .Include(x => x.Device)
                 .Include(x => x.IpAssignments)
                 .ThenInclude(x => x.Ip)
-                .ThenInclude(x => x.NetworkId)
-                .Where(x => x.Colocation.Status == ColocationStatus.Ongoing || x.Colocation.Status == ColocationStatus.Stopped || x.Colocation.Status == ColocationStatus.Ended)
+                .ThenInclude(x => x.Network)
+                .Where(x => x.Colocation.Status != ColocationStatus.Denied && x.Colocation.Status != ColocationStatus.Incomplete)
                 .Where(delegate (Server x)
                 {
                     return searchModel.Status != null ? x.Colocation.Status.ToString() == searchModel.Status.ToString() : true;
@@ -55,7 +56,7 @@ public class ServerService : IServerService
             servers = servers.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             servers = servers.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<ServerModel>(servers).ToList();
+            paging.Data = _mapper.Map<List<ServerModel>>(servers);
 
             result.Data = paging;
             result.Succeed = true;
@@ -67,20 +68,30 @@ public class ServerService : IServerService
         return result;
     }
 
-    public async Task<ResultModel> AttempCreateServer(ServerCreateModel model, IDbContextTransaction transaction)
+    public async Task<ResultModel> AttempCreateServer(int colocationId, ServerCreateModel model, IDbContextTransaction transaction)
     {
         var result = new ResultModel();
         result.Succeed = false;
+        bool validPrecondition = true;
 
         try
         {
             _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
+            var colocation = _dbContext.Colocations.FirstOrDefault(x => x.Id == colocationId && x.Status == ColocationStatus.Incomplete);
+            if (colocation == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Colocation " + ErrorMessage.NOT_EXISTED;
+            }
+
             var existingServer = _dbContext.Servers.FirstOrDefault(x => x.SerialNumber == model.SerialNumber);
             if (existingServer != null)
             {
+                validPrecondition = false;
                 result.ErrorMessage = "Server " + ErrorMessage.EXISTED;
             }
-            else
+
+            if (validPrecondition)
             {
                 var device = new Device
                 {
@@ -93,15 +104,19 @@ public class ServerService : IServerService
                 _dbContext.Devices.Add(device);
                 _dbContext.SaveChanges();
 
-                _dbContext.Servers.Add(new Server
+                var server = new Server
                 {
                     DeviceId = device.Id,
                     NumberOfPort = model.NumberOfPort,
                     AdditionalNumberOfPort = 0,
                     SerialNumber = model.SerialNumber,
                     Model = model.Model,
-                });
+                };
+                _dbContext.Servers.Add(server);
                 _dbContext.SaveChanges();
+
+                colocation.ServerId = server.Id;
+                colocation.Status = ColocationStatus.Pending;
 
                 result.Succeed = true;
                 result.Data = device;
