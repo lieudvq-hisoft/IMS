@@ -93,7 +93,7 @@ public class CustomerService : ICustomerService
             }
             else
             {
-                result.ErrorMessage = "Customer with id " + ErrorMessage.ID_NOT_EXISTED;
+                result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
                 result.Succeed = false;
             }
         }
@@ -200,7 +200,7 @@ public class CustomerService : ICustomerService
             var existingUser = _dbContext.User.FirstOrDefault(x => x.Email == model.Email || x.PhoneNumber == model.PhoneNumber);
             if (existingUser != null)
             {
-                result.ErrorMessage = "User " + ErrorMessage.EXISTED;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
 
@@ -210,7 +210,7 @@ public class CustomerService : ICustomerService
                 var existingCustomer = _dbContext.Customers.FirstOrDefault(x => x.TaxNumber == model.TaxNumber);
                 if (existingCustomer != null)
                 {
-                    result.ErrorMessage = "Customer with tax number " + ErrorMessage.EXISTED;
+                    result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
                     validPrecondition = false;
                 }
             }
@@ -222,7 +222,7 @@ public class CustomerService : ICustomerService
 
                 if (companyType == null)
                 {
-                    result.ErrorMessage = "Company type " + ErrorMessage.NOT_EXISTED;
+                    result.ErrorMessage = CompanyTypeErrorMessage.NOT_EXISTED;
                     validPrecondition = false;
                 }
             }
@@ -270,7 +270,7 @@ public class CustomerService : ICustomerService
                 else
                 {
                     result.Succeed = false;
-                    result.ErrorMessage = "REGISTER_USER_ERROR";
+                    result.ErrorMessage = UserErrorMessage.REGISTER_FAILED;
                 }
             }
         }
@@ -303,7 +303,7 @@ public class CustomerService : ICustomerService
             var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.Id == id);
             if (customer == null)
             {
-                result.ErrorMessage = "Delete customer fail";
+                result.ErrorMessage = CustomerErrorMessage.DELETE_FAILED;
             }
             else
             {
@@ -334,7 +334,7 @@ public class CustomerService : ICustomerService
 
             if (customer == null)
             {
-                result.ErrorMessage = "Update customer failed";
+                result.ErrorMessage = CustomerErrorMessage.UPDATE_FAILED;
             }
             else
             {

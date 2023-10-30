@@ -66,12 +66,12 @@ public class UserService : IUserService
             else
             {
                 result.Succeed = false;
-                result.ErrorMessage = "Error password";
+                result.ErrorMessage = UserErrorMessage.ERROR_PASSWORD;
             }
         }
         else
         {
-            result.ErrorMessage = "Email or Password not correct!";
+            result.ErrorMessage = UserErrorMessage.LOGIN_ERROR;
         }
         return result;
     }
@@ -138,7 +138,7 @@ public class UserService : IUserService
 
             if (user == null)
             {
-                result.ErrorMessage = "User with email " + ErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
             else
             {
@@ -166,7 +166,7 @@ public class UserService : IUserService
             var existingUser = _dbContext.User.FirstOrDefault(x => x.Email == model.Email || x.PhoneNumber == model.PhoneNumber);
             if (existingUser != null)
             {
-                result.ErrorMessage = "User " + ErrorMessage.EXISTED;
+                result.ErrorMessage = UserErrorMessage.EXISTED;
                 validPrecondition = false;
             }
 
@@ -175,7 +175,7 @@ public class UserService : IUserService
                 // Not able to create a customer
                 if (model.Roles.Exists(x => x == "Customer"))
                 {
-                    result.ErrorMessage = "Cannot create a customer";
+                    result.ErrorMessage = UserErrorMessage.CREATE_CUSTOMER;
                     validPrecondition = false;
                 }
             }
@@ -220,7 +220,7 @@ public class UserService : IUserService
                 else
                 {
                     result.Succeed = false;
-                    result.ErrorMessage = "REGISTER_USER_ERROR";
+                    result.ErrorMessage = UserErrorMessage.REGISTER_FAILED;
                 }
             }
         }
@@ -241,7 +241,7 @@ public class UserService : IUserService
             var user = _dbContext.User.FirstOrDefault(x => x.Email == model.Email || x.PhoneNumber == model.PhoneNumber);
             if (user == null)
             {
-                result.ErrorMessage = "User " + ErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
             else
             {
@@ -261,7 +261,7 @@ public class UserService : IUserService
                 else
                 {
                     result.Succeed = false;
-                    result.ErrorMessage = "UPDATE_USER_ERROR";
+                    result.ErrorMessage = UserErrorMessage.UPDATE_FAILED;
                 }
             }
         }
@@ -283,7 +283,7 @@ public class UserService : IUserService
 
             if (user == null)
             {
-                result.ErrorMessage = "User with email " + ErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
             else
             {

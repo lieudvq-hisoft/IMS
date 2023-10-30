@@ -119,7 +119,7 @@ public class ColocationRequestController : ControllerBase
             var placeServerResult = await _locationService.AttempPlaceDevice(model.LocationChoiceModel, device, transaction);
             if (placeServerResult.Succeed)
             {
-                var assignIpResult = await _ipService.AttempAssignIp(transaction);
+                var assignIpResult = await _ipService.AttempAssignIp(id, model.IpId, transaction);
                 if (assignIpResult.Succeed)
                 {
                     transaction.Commit();

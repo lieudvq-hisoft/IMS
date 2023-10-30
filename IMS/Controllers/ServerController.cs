@@ -13,7 +13,7 @@ namespace IMS.Controllers;
 [ApiController]
 //[Authorize(AuthenticationSchemes = "Bearer")]
 [AllowAnonymous]
-public class ServerController: ControllerBase
+public class ServerController : ControllerBase
 {
     private readonly IServerService _serverService;
     public ServerController(IServerService serverService)
@@ -26,6 +26,15 @@ public class ServerController: ControllerBase
     public async Task<ActionResult> Get([FromQuery] PagingParam<ServerSortCriteria> pagingParam, [FromQuery] ServerSearchModel searchModel)
     {
         var result = await _serverService.Get(pagingParam, searchModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}")]
+    [SwaggerOperation(Summary = "Get server list")]
+    public async Task<ActionResult> GetDetail(int id)
+    {
+        var result = await _serverService.GetDetail(id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

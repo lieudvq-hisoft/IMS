@@ -6,34 +6,34 @@ namespace Data.Extensions;
 
 public static class ModelBuilderExtentions
 {
-    public static void Seed(this ModelBuilder modelBuilder)
+    public static void Seed(this ModelBuilder builder)
     {
         #region CompanyType
-        modelBuilder.Entity<CompanyType>().HasData(new CompanyType
+        builder.Entity<CompanyType>().HasData(new CompanyType
         {
             Id = 1,
             Name = "Doanh nghiệp tư nhân",
             Description = "Doanh nghiệp tư nhân",
         });
-        modelBuilder.Entity<CompanyType>().HasData(new CompanyType
+        builder.Entity<CompanyType>().HasData(new CompanyType
         {
             Id = 2,
             Name = "Công ty trách nhiệm hữu hạn một thành viên",
             Description = "Công ty trách nhiệm hữu hạn một thành viên",
         });
-        modelBuilder.Entity<CompanyType>().HasData(new CompanyType
+        builder.Entity<CompanyType>().HasData(new CompanyType
         {
             Id = 3,
             Name = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên",
             Description = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên",
         });
-        modelBuilder.Entity<CompanyType>().HasData(new CompanyType
+        builder.Entity<CompanyType>().HasData(new CompanyType
         {
             Id = 4,
             Name = "Công ty cổ phần",
             Description = "Công ty cổ phần",
         });
-        modelBuilder.Entity<CompanyType>().HasData(new CompanyType
+        builder.Entity<CompanyType>().HasData(new CompanyType
         {
             Id = 5,
             Name = "Công ty hợp danh",
@@ -42,19 +42,19 @@ public static class ModelBuilderExtentions
         #endregion
 
         #region Service
-        modelBuilder.Entity<Service>().HasData(new Service
+        builder.Entity<Service>().HasData(new Service
         {
             Id = 1,
             Name = "Thuê Chỗ",
             Description = "Thuê Chỗ",
         });
-        modelBuilder.Entity<Service>().HasData(new Service
+        builder.Entity<Service>().HasData(new Service
         {
             Id = 2,
             Name = "Thêm 1U",
             Description = "Thêm 1U",
         });
-        modelBuilder.Entity<Service>().HasData(new Service
+        builder.Entity<Service>().HasData(new Service
         {
             Id = 3,
             Name = "Công suất 100",
@@ -75,35 +75,35 @@ public static class ModelBuilderExtentions
         };
 
         #region Roles
-        modelBuilder.Entity<Role>().HasData(new Role
+        builder.Entity<Role>().HasData(new Role
         {
             Id = seedGuids[0],
             Name = "Customer",
             Description = "Customer",
             isDeactive = false,
         });
-        modelBuilder.Entity<Role>().HasData(new Role
+        builder.Entity<Role>().HasData(new Role
         {
             Id = seedGuids[1],
             Name = "Tech",
             Description = "IT Staff",
             isDeactive = false,
         });
-        modelBuilder.Entity<Role>().HasData(new Role
+        builder.Entity<Role>().HasData(new Role
         {
             Id = seedGuids[2],
             Name = "Sale",
             Description = "Sale",
             isDeactive = false,
         });
-        modelBuilder.Entity<Role>().HasData(new Role
+        builder.Entity<Role>().HasData(new Role
         {
             Id = seedGuids[3],
             Name = "Manager",
             Description = "Manager",
             isDeactive = false,
         });
-        modelBuilder.Entity<Role>().HasData(new Role
+        builder.Entity<Role>().HasData(new Role
         {
             Id = seedGuids[4],
             Name = "Admin",
@@ -134,7 +134,7 @@ public static class ModelBuilderExtentions
                     break;
             }
 
-            modelBuilder.Entity<User>().HasData(new User
+            builder.Entity<User>().HasData(new User
             {
                 Id = seedGuids[i - 1],
                 UserName = username,
@@ -156,7 +156,7 @@ public static class ModelBuilderExtentions
             {
                 for (int j = 1; j <= 5; j++)
                 {
-                    modelBuilder.Entity<UserRole>().HasData(new UserRole
+                    builder.Entity<UserRole>().HasData(new UserRole
                     {
                         RoleId = seedGuids[j - 1],
                         UserId = seedGuids[i - 1],
@@ -166,7 +166,7 @@ public static class ModelBuilderExtentions
             }
             else
             {
-                modelBuilder.Entity<UserRole>().HasData(new UserRole
+                builder.Entity<UserRole>().HasData(new UserRole
                 {
                     RoleId = seedGuids[i - 1],
                     UserId = seedGuids[i - 1],
@@ -174,7 +174,7 @@ public static class ModelBuilderExtentions
             }
             #endregion
         }
-        modelBuilder.Entity<Customer>().HasData(new Customer
+        builder.Entity<Customer>().HasData(new Customer
         {
             Id = 1,
             UserId = seedGuids[0],
@@ -185,7 +185,7 @@ public static class ModelBuilderExtentions
         #endregion
 
         #region Device
-        modelBuilder.Entity<Device>().HasData(new Device
+        builder.Entity<Device>().HasData(new Device
         {
             Id = 1,
             Type = "Mock",
@@ -195,14 +195,14 @@ public static class ModelBuilderExtentions
         #endregion
 
         #region Location
-        modelBuilder.Entity<Area>().HasData(new Area
+        builder.Entity<Area>().HasData(new Area
         {
             Id = 1,
             Name = "A",
             RowCount = 8,
             ColumnCount = 8,
         });
-        modelBuilder.Entity<Area>().HasData(new Area
+        builder.Entity<Area>().HasData(new Area
         {
             Id = 2,
             Name = "B",
@@ -244,9 +244,9 @@ public static class ModelBuilderExtentions
                 });
             }
         }
-        modelBuilder.Entity<Rack>().HasData(racks.OrderBy(x => x.Id));
+        builder.Entity<Rack>().HasData(racks.OrderBy(x => x.Id));
 
-        modelBuilder.Entity<Location>().HasData(new Location
+        builder.Entity<Location>().HasData(new Location
         {
             Id = 1,
             StartPosition = 2,
@@ -257,7 +257,7 @@ public static class ModelBuilderExtentions
         #endregion
 
         #region IP
-        modelBuilder.Entity<Network>().HasData(new Network
+        builder.Entity<Network>().HasData(new Network
         {
             Id = 1,
             FirstOctet = 192,
@@ -265,7 +265,7 @@ public static class ModelBuilderExtentions
             ThirdOctet = 121,
             SubnetMask = 24
         });
-        modelBuilder.Entity<Network>().HasData(new Network
+        builder.Entity<Network>().HasData(new Network
         {
             Id = 2,
             FirstOctet = 193,
@@ -276,7 +276,7 @@ public static class ModelBuilderExtentions
 
         for (int i = 1; i <= 200; i++)
         {
-            modelBuilder.Entity<Ip>().HasData(new Ip
+            builder.Entity<Ip>().HasData(new Ip
             {
                 Id = i,
                 Address = i,
@@ -286,5 +286,45 @@ public static class ModelBuilderExtentions
             });
         }
         #endregion
+    }
+
+    public static void FilterSoftDeleted(this ModelBuilder builder)
+    {
+        builder.Entity<AdditionalService>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Approver>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Area>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Colocation>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<ColocationHistory>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<CompanyType>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Customer>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Device>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Executor>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Ip>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<IpAssignment>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Location>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Network>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Rack>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Role>()
+            .HasQueryFilter(x => !x.isDeactive);
+        builder.Entity<Server>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Service>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<User>()
+            .HasQueryFilter(x => !x.IsDeleted);
     }
 }

@@ -256,7 +256,7 @@ public class ColocationService : IColocationService
             if (customer == null)
             {
                 validPrecondition = false;
-                result.ErrorMessage = "Customer " + ErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
             }
 
             var services = new List<Service>();
@@ -290,7 +290,7 @@ public class ColocationService : IColocationService
                     DateAllocate = createModel.DateAllocate,
                     CustomerId = customerId,
                     DateCreated = createModel.DateCreated,
-                    DateStop = createModel.DateStop
+                    InitialDateStop = createModel.DateStop
                 };
 
                 _dbContext.Colocations.Add(colocation);
@@ -332,13 +332,13 @@ public class ColocationService : IColocationService
             if (colocation == null)
             {
                 validPrecondition = false;
-                result.ErrorMessage = "Colocation " + ErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = ColocationErrorMessage.NOT_EXISTED;
             }
 
             if (colocation.Status != ColocationStatus.Pending)
             {
                 validPrecondition = false;
-                result.ErrorMessage = "Can only update colocation request";
+                result.ErrorMessage = ColocationErrorMessage.UPDATE_NON_PENDING;
             }
 
             var services = new List<Service>();
@@ -441,6 +441,11 @@ public class ColocationService : IColocationService
 
         try
         {
+            var colocation = _dbContext.Colocations.FirstOrDefault(x => x.Id == colocationId && x.Status == ColocationStatus.Accepted);
+            if (colocation == null)
+            {
+                
+            }
         }
         catch (Exception e)
         {

@@ -16,6 +16,7 @@ public interface IServerService
 {
     Task<ResultModel> AttempCreateServer(int colocationId, ServerCreateModel model, IDbContextTransaction transaction);
     Task<ResultModel> Get(PagingParam<ServerSortCriteria> paginationModel, ServerSearchModel searchModel);
+    Task<ResultModel> GetDetail(int id);
 }
 
 public class ServerService : IServerService
@@ -68,6 +69,43 @@ public class ServerService : IServerService
         return result;
     }
 
+    public async Task<ResultModel> GetDetail(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var server = _dbContext.Servers
+                .Include(x => x.Colocation).ThenInclude(x => x.Customer).ThenInclude(x => x.User)
+                .Include(x => x.Colocation).ThenInclude(x => x.ColocationHistories)
+                .Include(x => x.Colocation).ThenInclude(x => x.AdditionalServices).ThenInclude(x => x.Approver).ThenInclude(x => x.User)
+                .Include(x => x.Colocation).ThenInclude(x => x.AdditionalServices).ThenInclude(x => x.Executor).ThenInclude(x => x.User)
+                .Include(x => x.IpAssignments).ThenInclude(x => x.Ip).ThenInclude(x => x.Network)
+                .Include(x => x.Device).ThenInclude(x => x.Locations).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+                .FirstOrDefault(x => x.Id == id && x.Colocation.Status != ColocationStatus.Denied && x.Colocation.Status != ColocationStatus.Incomplete);
+
+            if (server == null)
+            {
+                result.ErrorMessage = ServerErrorMessgae.NOT_EXISTED;
+            }
+            else
+            {
+                var serverModel = _mapper.Map<ServerDetailModel>(server);
+                serverModel.AdditionalServices = _mapper.Map<List<AdditionalServiceModel>>(server.Colocation.AdditionalServices);
+
+                result.Data = serverModel;
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
     public async Task<ResultModel> AttempCreateServer(int colocationId, ServerCreateModel model, IDbContextTransaction transaction)
     {
         var result = new ResultModel();
@@ -81,14 +119,14 @@ public class ServerService : IServerService
             if (colocation == null)
             {
                 validPrecondition = false;
-                result.ErrorMessage = "Colocation " + ErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = ColocationErrorMessage.NOT_EXISTED;
             }
 
             var existingServer = _dbContext.Servers.FirstOrDefault(x => x.SerialNumber == model.SerialNumber);
             if (existingServer != null)
             {
                 validPrecondition = false;
-                result.ErrorMessage = "Server " + ErrorMessage.EXISTED;
+                result.ErrorMessage = ServerErrorMessgae.EXISTED;
             }
 
             if (validPrecondition)

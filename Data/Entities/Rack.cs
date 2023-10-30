@@ -11,4 +11,9 @@ public class Rack : BaseEntity
     public virtual Area Area { get; set; }
 
     public virtual ICollection<Location> Locations { get; set; }
+
+    public string DisplayRack()
+    {
+        return $"{Area.Name}{Column}-{Row}";
+    }
 }

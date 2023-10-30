@@ -71,6 +71,8 @@ public class ColocationRequestDetailCompleteModel
 
     [Required]
     public LocationChoiceModel LocationChoiceModel { get; set; }
+
+    public int IpId { get; set; }
 }
 
 public class ColocationRequestImportFileModel

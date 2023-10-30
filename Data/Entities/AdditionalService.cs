@@ -10,8 +10,8 @@ public class AdditionalService : BaseEntity
     public int? ApproverId { get; set; }
     public virtual Approver? Approver { get; set; }
 
-    public int? ExecuterId { get; set; }
-    public virtual Executer? Executer { get; set; }
+    public int? ExecutorId { get; set; }
+    public virtual Executor? Executor { get; set; }
 
     public int ColocationId { get; set; }
     public virtual Colocation Colocation { get; set; }

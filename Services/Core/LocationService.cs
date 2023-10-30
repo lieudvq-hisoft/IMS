@@ -111,7 +111,7 @@ public class LocationService : ILocationService
 
             if (suggestedLocation == null)
             {
-                result.ErrorMessage = "No location found";
+                result.ErrorMessage = LocationErrorMessage.NO_AVAILABLE_FOUND;
             }
             else
             {
@@ -180,7 +180,7 @@ public class LocationService : ILocationService
             var rack = _dbContext.Racks.FirstOrDefault(x => x.Id == rackId);
             if (rack == null)
             {
-                result.ErrorMessage = "Rack " + ErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
             }
             else
             {
@@ -236,7 +236,7 @@ public class LocationService : ILocationService
             var existingPlacement = _dbContext.Locations.FirstOrDefault(x => x.DeviceId == device.Id);
             if (existingPlacement != null)
             {
-                result.ErrorMessage = "Device already have a location";
+                result.ErrorMessage = LocationErrorMessage.HAVE_LOCATION_ALREADY;
                 validPrecondition = false;
             }
 
@@ -246,7 +246,7 @@ public class LocationService : ILocationService
                 var correctLocationChoice = (await GetRackChoiceSuggestionBySize(device.Size)).Data as LocationChoiceModel;
                 if (correctLocationChoice.RackId != model.RackId || correctLocationChoice.Position != model.Position)
                 {
-                    result.ErrorMessage = "Location choice is not optimal";
+                    result.ErrorMessage = LocationErrorMessage.NON_OPTIMAL_CHOICE;
                     validPrecondition = false;
                 }
             }

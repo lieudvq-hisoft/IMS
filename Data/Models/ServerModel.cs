@@ -21,8 +21,22 @@ public class ServerSearchModel
 
 public class ServerDetailModel
 {
-    public string IpAddress { get; set; }
+    public int Id { get; set; }
+    public string CompanyName { get; set; }
+    public string Status { get; set; }
+    public string Model { get; set; }
     public int BasePower { get; set; }
+    public int Power { get; set; }
+    public int BaseSize { get; set; }
+    public int Size { get; set; }
+    public DateTime DateCreated { get; set; }
+    public DateTime DateAllocate { get; set; }
+    public string SerialNumber { get; set; }
+    public string Location { get; set; }
+    public string IpAddress { get; set; }
+
+    public List<ColocationHistoryModel> ColocationHistories { get; set; }
+    public List<AdditionalServiceModel> AdditionalServices { get; set; }
 
 }
 

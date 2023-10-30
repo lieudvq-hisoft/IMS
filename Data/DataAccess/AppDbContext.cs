@@ -3,6 +3,7 @@ using Data.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
 using System.Reflection;
 
 namespace Data.DataAccess;
@@ -11,12 +12,35 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
 {
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
+        this.SavingChanges += DbContextBase_SavingChanges;
+    }
 
+    private void DbContextBase_SavingChanges(object? sender, SavingChangesEventArgs e)
+    {
+        var objectContext = (DbContext)sender;
+        var modifiedEntities =
+            objectContext.ChangeTracker.Entries().Where(c => c.State is EntityState.Added or EntityState.Modified or EntityState.Deleted);
+
+        foreach (var entry in modifiedEntities)
+        {
+            if (entry.State == EntityState.Added)
+            {
+                entry.Property("DateCreated").CurrentValue = DateTime.UtcNow;
+            }
+            if (entry.State == EntityState.Modified)
+            {
+                entry.Property("DateUpdated").CurrentValue = DateTime.UtcNow;
+            }
+            if (entry.State == EntityState.Deleted)
+            {
+                entry.Property("IsDeleted").CurrentValue = true;
+                entry.State = EntityState.Modified;
+            }
+        }
     }
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.Seed();
         base.OnModelCreating(builder);
         builder.Entity<User>(b =>
         {
@@ -58,53 +82,20 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
             b.HasIndex(e => new { e.Address, e.NetworkId }).IsUnique();
         });
 
-        builder.Entity<AdditionalService>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Approver>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Area>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Colocation>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<ColocationHistory>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<CompanyType>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Customer>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Device>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Executer>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Ip>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<IpAssignment>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Location>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Network>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Rack>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Role>()
-            .HasQueryFilter(x => !x.isDeactive);
-        builder.Entity<Server>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Service>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<User>()
-            .HasQueryFilter(x => !x.IsDeleted);
-
+        builder.Seed();
+        builder.FilterSoftDeleted();
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
     }
     public DbSet<AdditionalService> AdditionalServices { get; set; }
+    public DbSet<Approver> Approvers { get; set; }
     public DbSet<Area> Areas { get; set; }
     public DbSet<Colocation> Colocations { get; set; }
     public DbSet<ColocationHistory> ColocationHistories { get; set; }
     public DbSet<CompanyType> CompanyTypes { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Device> Devices { get; set; }
+    public DbSet<Executor> Executors { get; set; }
     public DbSet<Ip> Ips { get; set; }
     public DbSet<IpAssignment> IpAssignments { get; set; }
     public DbSet<Location> Locations { get; set; }
