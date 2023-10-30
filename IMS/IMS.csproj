@@ -40,7 +40,7 @@
 
   <ItemGroup>
     <Folder Include="Migrations\" />
-    <Folder Include="wwwroot\import\customer\" />
+    <Folder Include="wwwroot\colocation_request\inspection_record\" />
   </ItemGroup>
 
 </Project>

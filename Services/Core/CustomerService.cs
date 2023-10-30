@@ -379,19 +379,18 @@ public class CustomerService : ICustomerService
 
     public async Task<ResultModel> SendActivationEmail(List<int> customerIds)
     {
-        var smtpClient = _emailService.GetClient();
-
         foreach (int customerId in customerIds)
         {
             var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.Id == customerId);
             if (customer != null)
             {
+                using var smtpClient = _emailService.GetClient();
                 var email = customer.User.Email;
                 var username = customer.User.UserName;
-                var password = username.Remove(username.Length - 1) + "@123";
+                var password = username.Remove(username.Length - 1) + "@a123";
                 var mailMessage = _emailService.GetActivationMessage(username, password, email);
                 mailMessage.To.Add(email);
-                smtpClient.Send(mailMessage);
+                smtpClient.SendMailAsync(mailMessage);
             }
         }
 

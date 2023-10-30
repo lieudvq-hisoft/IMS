@@ -22,7 +22,8 @@ public interface IColocationService
     Task<ResultModel> CreateRequest(ColocationRequestCreateModel model);
     Task<ResultModel> UpdateRequest(ColocationRequestUpdateModel model);
     Task<ResultModel> GenerateImportExcelTemplate(string filePath);
-
+    Task<ResultModel> AssignInspectionRecordFilePath(int colocationId, string filePath);
+    Task<ResultModel> AssignReceiptOfRecipientFilePath(int colocationId, string filePath);
 }
 
 public class ColocationService : IColocationService
@@ -107,6 +108,7 @@ public class ColocationService : IColocationService
                 {
                     var matchCompanyName = MatchString(searchModel, x.Customer.CompanyName);
                     var matchStatus = searchModel.Status != null ? x.GetColocationRequestStatus() == searchModel.Status.ToString() : true;
+                    var matchId = searchModel.Id != null ? x.Id == searchModel.Id : true;
                     return matchCompanyName && matchStatus;
                 })
                 .AsQueryable();
@@ -423,6 +425,38 @@ public class ColocationService : IColocationService
             package.Save();
 
             result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> AssignInspectionRecordFilePath(int colocationId, string filePath)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> AssignReceiptOfRecipientFilePath(int colocationId, string filePath)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
         }
         catch (Exception e)
         {
