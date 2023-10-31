@@ -91,7 +91,11 @@ public class ServerService : IServerService
             else
             {
                 var serverModel = _mapper.Map<ServerDetailModel>(server);
-                serverModel.AdditionalServices = _mapper.Map<List<AdditionalServiceModel>>(server.Colocation.AdditionalServices);
+                var additionalServices = server.Colocation.AdditionalServices;
+                if (additionalServices != null)
+                {
+                    serverModel.AdditionalServices = _mapper.Map<List<AdditionalServiceModel>>(additionalServices);
+                }
 
                 result.Data = serverModel;
                 result.Succeed = true;

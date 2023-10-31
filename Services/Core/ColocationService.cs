@@ -472,7 +472,7 @@ public class ColocationService : IColocationService
             {
                 result.ErrorMessage = ColocationErrorMessage.NOT_EXISTED;
             }
-            else if (colocation.Status != ColocationStatus.Accepted)
+            else if (colocation.Status == ColocationStatus.Pending || colocation.Status == ColocationStatus.Denied)
             {
                 result.ErrorMessage = ColocationErrorMessage.DOWNLOAD_FILE_FROM_NON_ACCEPTED;
             }
@@ -538,7 +538,7 @@ public class ColocationService : IColocationService
             {
                 result.ErrorMessage = ColocationErrorMessage.NOT_EXISTED;
             }
-            else if (colocation.Status != ColocationStatus.Accepted)
+            else if (colocation.Status == ColocationStatus.Pending || colocation.Status == ColocationStatus.Denied)
             {
                 result.ErrorMessage = ColocationErrorMessage.DOWNLOAD_FILE_FROM_NON_ACCEPTED;
             }
