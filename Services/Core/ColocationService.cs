@@ -4,7 +4,6 @@ using Data.DataAccess;
 using Data.DataAccess.Constant;
 using Data.Entities;
 using Data.Enums;
-using Data.Model;
 using Data.Models;
 using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
@@ -18,12 +17,15 @@ public interface IColocationService
 {
     Task<ResultModel> Get(PagingParam<ColocationSortCriteria> paginationModel, ColocationSearchModel searchModel);
     Task<ResultModel> GetRequest(PagingParam<ColocationSortCriteria> paginationModel, ColocationSearchModel searchModel);
+    Task<ResultModel> GetDetail(int id);
     Task<ResultModel> ImportRequest(string filePath);
     Task<ResultModel> CreateRequest(ColocationRequestCreateModel model);
     Task<ResultModel> UpdateRequest(ColocationRequestUpdateModel model);
     Task<ResultModel> GenerateImportExcelTemplate(string filePath);
-    Task<ResultModel> AssignInspectionRecordFilePath(int colocationId, string filePath);
-    Task<ResultModel> AssignReceiptOfRecipientFilePath(int colocationId, string filePath);
+    Task<ResultModel> GetInspectionRecordFilePath(int colocationId);
+    Task<ResultModel> AssignInspectionRecordFilePath(int colocationId, string fileName);
+    Task<ResultModel> GetReceiptOfRecipientFilePath(int colocationId);
+    Task<ResultModel> AssignReceiptOfRecipientFilePath(int colocationId, string fileName);
 }
 
 public class ColocationService : IColocationService
@@ -121,6 +123,30 @@ public class ColocationService : IColocationService
             paging.Data = _mapper.ProjectTo<ColocationRequestModel>(colocations).ToList();
 
             result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetDetail(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var colocation = _dbContext.Colocations
+                .Include(x => x.Customer)
+                .ThenInclude(x => x.User)
+                .Include(x => x.ColocationHistories)
+                .Include(x => x.AdditionalServices)
+                .FirstOrDefault(x => x.Id == id);
+
+            result.Data = _mapper.Map<ColocationRequestModel>(colocation);
             result.Succeed = true;
         }
         catch (Exception e)
@@ -434,17 +460,30 @@ public class ColocationService : IColocationService
         return result;
     }
 
-    public async Task<ResultModel> AssignInspectionRecordFilePath(int colocationId, string filePath)
+    public async Task<ResultModel> GetInspectionRecordFilePath(int colocationId)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var colocation = _dbContext.Colocations.FirstOrDefault(x => x.Id == colocationId && x.Status == ColocationStatus.Accepted);
+            var colocation = _dbContext.Colocations.FirstOrDefault(x => x.Id == colocationId);
             if (colocation == null)
             {
-                
+                result.ErrorMessage = ColocationErrorMessage.NOT_EXISTED;
+            }
+            else if (colocation.Status != ColocationStatus.Accepted)
+            {
+                result.ErrorMessage = ColocationErrorMessage.DOWNLOAD_FILE_FROM_NON_ACCEPTED;
+            }
+            else if (colocation.InspectionRecordFilePath == null)
+            {
+                result.ErrorMessage = ColocationErrorMessage.FILE_NOT_EXISTED;
+            }
+            else
+            {
+                result.Succeed = true;
+                result.Data = colocation.InspectionRecordFilePath;
             }
         }
         catch (Exception e)
@@ -455,13 +494,95 @@ public class ColocationService : IColocationService
         return result;
     }
 
-    public async Task<ResultModel> AssignReceiptOfRecipientFilePath(int colocationId, string filePath)
+    public async Task<ResultModel> AssignInspectionRecordFilePath(int colocationId, string fileName)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
+            var colocation = _dbContext.Colocations.FirstOrDefault(x => x.Id == colocationId);
+            if (colocation == null)
+            {
+                result.ErrorMessage = ColocationErrorMessage.NOT_EXISTED;
+            }
+            else if (colocation.Status != ColocationStatus.Accepted)
+            {
+                result.ErrorMessage = ColocationErrorMessage.ASSIGN_FILE_TO_NON_ACCEPTED;
+            }
+            else
+            {
+                colocation.InspectionRecordFilePath = fileName;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = fileName;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> GetReceiptOfRecipientFilePath(int colocationId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var colocation = _dbContext.Colocations.FirstOrDefault(x => x.Id == colocationId);
+            if (colocation == null)
+            {
+                result.ErrorMessage = ColocationErrorMessage.NOT_EXISTED;
+            }
+            else if (colocation.Status != ColocationStatus.Accepted)
+            {
+                result.ErrorMessage = ColocationErrorMessage.DOWNLOAD_FILE_FROM_NON_ACCEPTED;
+            }
+            else if (colocation.ReceiptOfRecipientFilePath == null)
+            {
+                result.ErrorMessage = ColocationErrorMessage.FILE_NOT_EXISTED;
+            }
+            else
+            {
+                result.Succeed = true;
+                result.Data = colocation.ReceiptOfRecipientFilePath;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> AssignReceiptOfRecipientFilePath(int colocationId, string fileName)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var colocation = _dbContext.Colocations.FirstOrDefault(x => x.Id == colocationId);
+            if (colocation == null)
+            {
+                result.ErrorMessage = ColocationErrorMessage.NOT_EXISTED;
+            }
+            else if (colocation.Status != ColocationStatus.Accepted)
+            {
+                result.ErrorMessage = ColocationErrorMessage.ASSIGN_FILE_TO_NON_ACCEPTED;
+            }
+            else
+            {
+                colocation.ReceiptOfRecipientFilePath = fileName;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = fileName;
+            }
         }
         catch (Exception e)
         {

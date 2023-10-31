@@ -2,15 +2,10 @@
 using Data.DataAccess.Constant;
 using Data.Entities;
 using Data.Enums;
-using Data.Model;
+using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Services.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Services.Core;
 public interface IIpService

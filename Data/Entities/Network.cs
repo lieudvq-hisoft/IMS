@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Data.Entities;
-public class Network: BaseEntity
+﻿namespace Data.Entities;
+public class Network : BaseEntity
 {
     public int FirstOctet { get; set; }
     public int SecondOctet { get; set; }

@@ -1,4 +1,4 @@
-﻿namespace Data.Model;
+﻿namespace Data.Models;
 
 public class PagingModel
 {

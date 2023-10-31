@@ -2,7 +2,6 @@
 using Data.DataAccess;
 using Data.DataAccess.Constant;
 using Data.Entities;
-using Data.Model;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;

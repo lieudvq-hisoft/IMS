@@ -1,10 +1,8 @@
-﻿using Data.Enums;
-using Data.Model;
+﻿using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
 using Swashbuckle.AspNetCore.Annotations;
-using System.Security.Claims;
 
 namespace UserController.Controllers;
 

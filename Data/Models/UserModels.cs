@@ -1,8 +1,7 @@
-﻿using IMS.Data.Utils.ValidationAttributes;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
-namespace Data.Model;
+namespace Data.Models;
 
 public class UserModel
 {

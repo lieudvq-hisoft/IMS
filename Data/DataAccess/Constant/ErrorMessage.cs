@@ -18,7 +18,10 @@ public class CustomerErrorMessage
 public class ColocationErrorMessage
 {
     public const string NOT_EXISTED = "Colocation " + ErrorMessage.NOT_EXISTED;
+    public const string FILE_NOT_EXISTED = "Colocation file " + ErrorMessage.NOT_EXISTED;
     public const string UPDATE_NON_PENDING = "Can only update pending request";
+    public const string ASSIGN_FILE_TO_NON_ACCEPTED = "Can only assign file to accepted request";
+    public const string DOWNLOAD_FILE_FROM_NON_ACCEPTED = "Only accepted request have file";
 }
 
 public class CompanyTypeErrorMessage

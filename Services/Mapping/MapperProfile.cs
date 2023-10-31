@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Data.Entities;
-using Data.Model;
 using Data.Models;
 
 namespace Services.Mapping;

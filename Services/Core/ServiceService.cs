@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Data.DataAccess;
-using Data.Model;
 using Data.Models;
 using Services.Utilities;
 

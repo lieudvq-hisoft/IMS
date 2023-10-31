@@ -1,12 +1,5 @@
-﻿using Data.DataAccess.Constant;
-using IMS.Data.Utils.ValidationAttributes;
-using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
+﻿using IMS.Data.Utils.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data.Models;
 public class ColocationRequestModel
@@ -18,6 +11,8 @@ public class ColocationRequestModel
     public string CompanyName { get; set; }
     public int CustomerId { get; set; }
     public string Status { get; set; }
+    public string? InspectionRecordFilePath { get; set; }
+    public string? ReceiptOfRecipientFilePath { get; set; }
 }
 
 public class ColocationRequestImportModel
@@ -75,21 +70,4 @@ public class ColocationRequestDetailCompleteModel
     public int IpId { get; set; }
 }
 
-public class ColocationRequestImportFileModel
-{
-    [Required]
-    public IFormFile File { get; set; }
 
-    [FileExtensions(Extensions = "xlsx")]
-    public string FileName => File?.FileName;
-}
-
-public class ColocationRequestInspectionRecordFileModel
-{
-    [Required]
-    public IFormFile File { get; set; }
-
-
-    [FileExtensions(Extensions = "pdf|docx")]
-    public string FileName => File?.FileName;
-}

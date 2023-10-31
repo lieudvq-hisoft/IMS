@@ -1,7 +1,4 @@
-﻿using AutoMapper.Configuration.Conventions;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-
-namespace Data.Models;
+﻿namespace Data.Models;
 public class AdditionalServiceModel
 {
     public int Id { get; set; }

@@ -23,15 +23,15 @@ public class FileService : IFileService
 
     public async Task<string> SaveFileWithGuidName(IFormFile file, string folderPath)
     {
-        Guid guid = Guid.NewGuid();
         var extension = System.IO.Path.GetExtension(file.FileName);
-        string filePath = Path.Combine(folderPath, $"{guid}{extension}");
+        string fileName = $"{Guid.NewGuid()}{extension}";
+        string filePath = Path.Combine(folderPath, fileName);
         using (Stream fileStream = new FileStream(filePath, FileMode.Create))
         {
             await file.CopyToAsync(fileStream);
         }
 
-        return filePath;
+        return fileName;
     }
 
     public async Task DeleteFile(string filePath)

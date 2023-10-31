@@ -3,7 +3,7 @@ using Data.DataAccess;
 using Data.DataAccess.Constant;
 using Data.Entities;
 using Data.Enums;
-using Data.Model;
+using Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
