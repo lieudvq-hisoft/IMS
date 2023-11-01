@@ -12,5 +12,5 @@ public class Server : BaseEntity
 
     public virtual ICollection<IpAssignment> IpAssignments { get; set; }
 
-    public virtual Colocation Colocation { get; set; }
+    public virtual Request Request { get; set; }
 }

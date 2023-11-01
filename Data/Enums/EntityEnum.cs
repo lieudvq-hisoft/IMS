@@ -9,7 +9,7 @@ public enum RoleType
     Admin = 5
 }
 
-public enum ColocationStatus
+public enum RequestStatus
 {
     Incomplete,
     Pending,
@@ -20,7 +20,7 @@ public enum ColocationStatus
     Ended
 }
 
-public enum ColocationRequestType
+public enum RequestType
 {
     New,
     Additional,
@@ -36,7 +36,7 @@ public enum IpType
     Gateway
 }
 
-public enum AdditionalServiceStatus
+public enum ServiceRequestStatus
 {
     Pending,
     Accepted,
@@ -54,7 +54,7 @@ public enum CustomerSortCriteria
     Id
 }
 
-public enum ColocationSortCriteria
+public enum RequestSortCriteria
 {
     Id
 }

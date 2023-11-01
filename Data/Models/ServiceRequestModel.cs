@@ -1,5 +1,5 @@
 ﻿namespace Data.Models;
-public class AdditionalServiceModel
+public class ServiceRequestModel
 {
     public int Id { get; set; }
     public int Name { get; set; }

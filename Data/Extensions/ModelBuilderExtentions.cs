@@ -46,19 +46,22 @@ public static class ModelBuilderExtentions
         builder.Entity<Service>().HasData(new Service
         {
             Id = 1,
-            Name = "Thuê Chỗ",
+            Name = "Cấp bổ sung U",
+            Type = "Size",
             Description = "Thuê Chỗ",
         });
         builder.Entity<Service>().HasData(new Service
         {
             Id = 2,
-            Name = "Thêm 1U",
+            Name = "Bổ sung IP",
+            Type = "Ip",
             Description = "Thêm 1U",
         });
         builder.Entity<Service>().HasData(new Service
         {
             Id = 3,
-            Name = "Công suất 100",
+            Name = "Thêm Port",
+            Type = "Port",
             Description = "Công suất 100",
         });
         #endregion
@@ -348,10 +351,10 @@ public static class ModelBuilderExtentions
 
             if (i - 5 <= 5)
             {
-                builder.Entity<Colocation>().HasData(new Colocation
+                builder.Entity<Request>().HasData(new Request
                 {
                     Id = i - 5,
-                    Status = Enums.ColocationStatus.Incomplete,
+                    Status = Enums.RequestStatus.Incomplete,
                     ExpectedSize = 5,
                     Note = Lorem.Paragraph(20, 3),
                     DateCreated = DateTime.Now.AddMonths((int)Lorem.Number(-3, 3)),
@@ -363,10 +366,10 @@ public static class ModelBuilderExtentions
             }
             else if (i - 5 <= 10)
             {
-                builder.Entity<Colocation>().HasData(new Colocation
+                builder.Entity<Request>().HasData(new Request
                 {
                     Id = i - 5,
-                    Status = Enums.ColocationStatus.Pending,
+                    Status = Enums.RequestStatus.Pending,
                     ExpectedSize = 5,
                     Note = Lorem.Paragraph(20, 3),
                     DateCreated = DateTime.Now.AddMonths((int)Lorem.Number(-3, 3)),
@@ -378,10 +381,10 @@ public static class ModelBuilderExtentions
             }
             else if (i - 5 <= 15)
             {
-                builder.Entity<Colocation>().HasData(new Colocation
+                builder.Entity<Request>().HasData(new Request
                 {
                     Id = i - 5,
-                    Status = Enums.ColocationStatus.Accepted,
+                    Status = Enums.RequestStatus.Accepted,
                     ExpectedSize = 5,
                     Note = Lorem.Paragraph(20, 3),
                     DateCreated = DateTime.Now.AddMonths((int)Lorem.Number(-3, 3)),
@@ -389,19 +392,19 @@ public static class ModelBuilderExtentions
                     InitialDateStop = DateTime.Now.AddYears((int)Lorem.Number(1, 3)),
                     DateStop = DateTime.Now.AddYears((int)Lorem.Number(1, 3)),
                     CustomerId = i - 4,
-                    ServerId = i - 5
+                    ServerId = i - 15
                 });
             }
             else if (i - 5 <= 20)
             {
                 if (i - 5 == 16)
                 {
-                    for (int j = 16; j <= 30; j++)
+                    for (int j = 16; j <= 45; j++)
                     {
-                        builder.Entity<Colocation>().HasData(new Colocation
+                        builder.Entity<Request>().HasData(new Request
                         {
                             Id = j,
-                            Status = Enums.ColocationStatus.Ongoing,
+                            Status = Enums.RequestStatus.Ongoing,
                             ExpectedSize = 5,
                             Note = Lorem.Paragraph(20, 3),
                             DateCreated = DateTime.Now.AddMonths((int)Lorem.Number(-3, 3)),
@@ -409,17 +412,17 @@ public static class ModelBuilderExtentions
                             InitialDateStop = DateTime.Now.AddYears((int)Lorem.Number(1, 3)),
                             DateStop = DateTime.Now.AddYears((int)Lorem.Number(1, 3)),
                             CustomerId = (int)Lorem.Number(16, 20),
-                            ServerId = j,
+                            ServerId = j - 10,
                         });
                     }
                 }
             }
             else if (i - 5 <= 22)
             {
-                builder.Entity<Colocation>().HasData(new Colocation
+                builder.Entity<Request>().HasData(new Request
                 {
-                    Id = i + 5,
-                    Status = Enums.ColocationStatus.Denied,
+                    Id = i + 20,
+                    Status = Enums.RequestStatus.Denied,
                     ExpectedSize = 5,
                     Note = Lorem.Paragraph(20, 3),
                     DateCreated = DateTime.Now.AddMonths((int)Lorem.Number(-3, 3)),
@@ -427,15 +430,15 @@ public static class ModelBuilderExtentions
                     InitialDateStop = DateTime.Now.AddYears((int)Lorem.Number(1, 3)),
                     DateStop = DateTime.Now.AddYears((int)Lorem.Number(1, 3)),
                     CustomerId = i - 4,
-                    ServerId = i + 5
+                    ServerId = i + 10
                 });
             }
             else if (i - 5 <= 25)
             {
-                builder.Entity<Colocation>().HasData(new Colocation
+                builder.Entity<Request>().HasData(new Request
                 {
-                    Id = i + 5,
-                    Status = Enums.ColocationStatus.Ended,
+                    Id = i + 20,
+                    Status = Enums.RequestStatus.Ended,
                     ExpectedSize = 5,
                     Note = Lorem.Paragraph(20, 3),
                     DateCreated = DateTime.Now.AddYears((int)Lorem.Number(-5, -4)),
@@ -443,7 +446,7 @@ public static class ModelBuilderExtentions
                     InitialDateStop = DateTime.Now.AddYears((int)Lorem.Number(-1, 0)),
                     DateStop = DateTime.Now.AddYears((int)Lorem.Number(-1, 0)),
                     CustomerId = i - 4,
-                    ServerId = i + 5
+                    ServerId = i + 10
                 });
             }
         }
@@ -461,15 +464,15 @@ public static class ModelBuilderExtentions
 
     public static void FilterSoftDeleted(this ModelBuilder builder)
     {
-        builder.Entity<AdditionalService>()
+        builder.Entity<ServiceRequest>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Approver>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Area>()
             .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Colocation>()
+        builder.Entity<Request>()
             .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<ColocationHistory>()
+        builder.Entity<RequestExtendHistory>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<CompanyType>()
             .HasQueryFilter(x => !x.IsDeleted);

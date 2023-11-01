@@ -13,7 +13,7 @@ using Services.Utilities;
 namespace Services.Core;
 public interface IServerService
 {
-    Task<ResultModel> AttempCreateServer(int colocationId, ServerCreateModel model, IDbContextTransaction transaction);
+    Task<ResultModel> AttempCreateServer(int requestId, ServerCreateModel model, IDbContextTransaction transaction);
     Task<ResultModel> Get(PagingParam<ServerSortCriteria> paginationModel, ServerSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
 }
@@ -37,17 +37,17 @@ public class ServerService : IServerService
         try
         {
             var servers = _dbContext.Servers
-                .Include(x => x.Colocation)
+                .Include(x => x.Request)
                 .ThenInclude(x => x.Customer)
                 .ThenInclude(x => x.User)
                 .Include(x => x.Device)
                 .Include(x => x.IpAssignments)
                 .ThenInclude(x => x.Ip)
                 .ThenInclude(x => x.Network)
-                .Where(x => x.Colocation.Status != ColocationStatus.Denied && x.Colocation.Status != ColocationStatus.Incomplete)
+                .Where(x => x.Request.Status != RequestStatus.Denied && x.Request.Status != RequestStatus.Incomplete)
                 .Where(delegate (Server x)
                 {
-                    return searchModel.Status != null ? x.Colocation.Status.ToString() == searchModel.Status.ToString() : true;
+                    return searchModel.Status != null ? x.Request.Status.ToString() == searchModel.Status.ToString() : true;
                 })
                 .AsQueryable();
 
@@ -76,13 +76,13 @@ public class ServerService : IServerService
         try
         {
             var server = _dbContext.Servers
-                .Include(x => x.Colocation).ThenInclude(x => x.Customer).ThenInclude(x => x.User)
-                .Include(x => x.Colocation).ThenInclude(x => x.ColocationHistories)
-                .Include(x => x.Colocation).ThenInclude(x => x.AdditionalServices).ThenInclude(x => x.Approver).ThenInclude(x => x.User)
-                .Include(x => x.Colocation).ThenInclude(x => x.AdditionalServices).ThenInclude(x => x.Executor).ThenInclude(x => x.User)
+                .Include(x => x.Request).ThenInclude(x => x.Customer).ThenInclude(x => x.User)
+                .Include(x => x.Request).ThenInclude(x => x.RequestExtendHistories)
+                .Include(x => x.Request).ThenInclude(x => x.ServiceRequests).ThenInclude(x => x.Approver).ThenInclude(x => x.User)
+                .Include(x => x.Request).ThenInclude(x => x.ServiceRequests).ThenInclude(x => x.Executor).ThenInclude(x => x.User)
                 .Include(x => x.IpAssignments).ThenInclude(x => x.Ip).ThenInclude(x => x.Network)
                 .Include(x => x.Device).ThenInclude(x => x.Locations).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-                .FirstOrDefault(x => x.Id == id && x.Colocation.Status != ColocationStatus.Denied && x.Colocation.Status != ColocationStatus.Incomplete);
+                .FirstOrDefault(x => x.Id == id && x.Request.Status != RequestStatus.Denied && x.Request.Status != RequestStatus.Incomplete);
 
             if (server == null)
             {
@@ -91,10 +91,10 @@ public class ServerService : IServerService
             else
             {
                 var serverModel = _mapper.Map<ServerDetailModel>(server);
-                var additionalServices = server.Colocation.AdditionalServices;
-                if (additionalServices != null)
+                var serviceRequests = server.Request.ServiceRequests;
+                if (serviceRequests != null)
                 {
-                    serverModel.AdditionalServices = _mapper.Map<List<AdditionalServiceModel>>(additionalServices);
+                    serverModel.ServiceRequests = _mapper.Map<List<ServiceRequestModel>>(serviceRequests);
                 }
 
                 result.Data = serverModel;
@@ -109,7 +109,7 @@ public class ServerService : IServerService
         return result;
     }
 
-    public async Task<ResultModel> AttempCreateServer(int colocationId, ServerCreateModel model, IDbContextTransaction transaction)
+    public async Task<ResultModel> AttempCreateServer(int requestId, ServerCreateModel model, IDbContextTransaction transaction)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -118,11 +118,11 @@ public class ServerService : IServerService
         try
         {
             _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
-            var colocation = _dbContext.Colocations.FirstOrDefault(x => x.Id == colocationId && x.Status == ColocationStatus.Incomplete);
-            if (colocation == null)
+            var request = _dbContext.Requests.FirstOrDefault(x => x.Id == requestId && x.Status == RequestStatus.Incomplete);
+            if (request == null)
             {
                 validPrecondition = false;
-                result.ErrorMessage = ColocationErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = RequestErrorMessage.NOT_EXISTED;
             }
 
             var existingServer = _dbContext.Servers.FirstOrDefault(x => x.SerialNumber == model.SerialNumber);
@@ -156,8 +156,8 @@ public class ServerService : IServerService
                 _dbContext.Servers.Add(server);
                 _dbContext.SaveChanges();
 
-                colocation.ServerId = server.Id;
-                colocation.Status = ColocationStatus.Pending;
+                request.ServerId = server.Id;
+                request.Status = RequestStatus.Pending;
 
                 result.Succeed = true;
                 result.Data = device;

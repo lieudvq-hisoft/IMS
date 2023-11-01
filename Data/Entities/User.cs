@@ -14,6 +14,6 @@ public class User : IdentityUser<Guid>
 
     public virtual ICollection<UserRole> UserRoles { get; set; }
 
-    public virtual ICollection<AdditionalService>? ApprovedServices { get; set; }
-    public virtual ICollection<AdditionalService>? ExecutedServices { get; set; }
+    public virtual ICollection<ServiceRequest>? ApprovedServices { get; set; }
+    public virtual ICollection<ServiceRequest>? ExecutedServices { get; set; }
 }

@@ -7,7 +7,7 @@ public class ServerModel
     public int Id { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdate { get; set; }
-    public ColocationStatus? Status { get; set; }
+    public RequestStatus? Status { get; set; }
     public string IpAddress { get; set; }
     public int Size { get; set; }
     public int Power { get; set; }
@@ -16,7 +16,7 @@ public class ServerModel
 
 public class ServerSearchModel
 {
-    public ColocationStatus? Status { get; set; }
+    public RequestStatus? Status { get; set; }
 }
 
 public class ServerDetailModel
@@ -35,8 +35,8 @@ public class ServerDetailModel
     public string Location { get; set; }
     public string IpAddress { get; set; }
 
-    public List<ColocationHistoryModel> ColocationHistories { get; set; }
-    public List<AdditionalServiceModel> AdditionalServices { get; set; }
+    public List<RequestExtendHistoryModel> RequestExtendHistoryModel { get; set; }
+    public List<ServiceRequestModel> ServiceRequests { get; set; }
 
 }
 

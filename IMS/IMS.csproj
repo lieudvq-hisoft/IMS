@@ -38,9 +38,4 @@
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\colocation_request\inspection_record\" />
-    <Folder Include="wwwroot\colocation_request\receipt_of_recipient\" />
-  </ItemGroup>
-
 </Project>

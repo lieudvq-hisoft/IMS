@@ -15,10 +15,10 @@ public class CustomerErrorMessage
     public const string UPDATE_FAILED = "Update customer failed";
 }
 
-public class ColocationErrorMessage
+public class RequestErrorMessage
 {
-    public const string NOT_EXISTED = "Colocation " + ErrorMessage.NOT_EXISTED;
-    public const string FILE_NOT_EXISTED = "Colocation file " + ErrorMessage.NOT_EXISTED;
+    public const string NOT_EXISTED = "Request " + ErrorMessage.NOT_EXISTED;
+    public const string FILE_NOT_EXISTED = "Request file " + ErrorMessage.NOT_EXISTED;
     public const string UPDATE_NON_PENDING = "Can only update pending request";
     public const string ASSIGN_FILE_TO_NON_ACCEPTED = "Can only assign file to accepted request";
     public const string DOWNLOAD_FILE_FROM_NON_ACCEPTED = "Only accepted request have file";
@@ -42,8 +42,8 @@ public class UserErrorMessage
 
 public class IpErrorMessage
 {
-    public const string ASSIGN_IP_TO_NON_PENDING_REQUEST = "Can only assign Ip to pending colocation";
-    public const string ASSIGN_IP_TO_REQUEST_WITHOUT_SERVER = "Colocation dont have a server";
+    public const string ASSIGN_IP_TO_NON_PENDING_REQUEST = "Can only assign Ip to pending request";
+    public const string ASSIGN_IP_TO_REQUEST_WITHOUT_SERVER = "Request dont have a server";
     public const string NOT_EXISTED = "Ip " + ErrorMessage.EXISTED;
     public const string NOT_AVAILABLE = "Ip Not available";
 }

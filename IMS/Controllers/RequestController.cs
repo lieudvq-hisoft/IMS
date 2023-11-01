@@ -11,20 +11,20 @@ namespace IMS.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = "Bearer")]
-public class ColocationRequestController : ControllerBase
+public class RequestController : ControllerBase
 {
     private readonly ICustomerService _customerService;
     private readonly IWebHostEnvironment _environment;
-    private readonly IColocationService _colocationService;
+    private readonly IRequestService _requestService;
     private readonly IFileService _fileService;
     private readonly IServerService _serverService;
     private readonly TransactionHelper _transactionHelper;
     private readonly ILocationService _locationService;
     private readonly IIpService _ipService;
 
-    public ColocationRequestController(ICustomerService customerService,
+    public RequestController(ICustomerService customerService,
         IWebHostEnvironment environment,
-        IColocationService colocationService,
+        IRequestService requestService,
         IFileService fileService,
         IServerService serverService,
         TransactionHelper transactionHelper,
@@ -33,7 +33,7 @@ public class ColocationRequestController : ControllerBase
     {
         _customerService = customerService;
         _environment = environment;
-        _colocationService = colocationService;
+        _requestService = requestService;
         _fileService = fileService;
         _serverService = serverService;
         _transactionHelper = transactionHelper;
@@ -42,24 +42,24 @@ public class ColocationRequestController : ControllerBase
     }
 
     [HttpGet]
-    [SwaggerOperation(Summary = "Get colocation requests, excluding ongoing or stopped colocations, and those with unsuccessful additional services")]
-    public async Task<ActionResult> GetRequest([FromQuery] PagingParam<ColocationSortCriteria> pagingParam, [FromQuery] ColocationSearchModel searchModel)
+    [SwaggerOperation(Summary = "Get requests, excluding ongoing or stopped requests, and those with unsuccessful additional services")]
+    public async Task<ActionResult> GetRequest([FromQuery] PagingParam<RequestSortCriteria> pagingParam, [FromQuery] RequestSearchModel searchModel)
     {
-        var result = await _colocationService.GetRequest(pagingParam, searchModel);
+        var result = await _requestService.GetRequest(pagingParam, searchModel);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpPost("Bulk")]
     [Authorize(Roles = nameof(RoleType.Sale))]
-    [SwaggerOperation(Summary = "[Sale]: Create user, customer and colocation request base on import excel. Create all 3 entity if success or nothing if any fail validation or have error when inserting. Return the result excel file with result on the right most column")]
+    [SwaggerOperation(Summary = "[Sale]: Create user, customer and request base on import excel. Create all 3 entity if success or nothing if any fail validation or have error when inserting. Return the result excel file with result on the right most column")]
     public async Task<ActionResult> Import([FromForm] ExcelFileUploadModel model)
     {
-        string folderPath = Path.Combine(_environment.WebRootPath, "colocation_request", "import");
+        string folderPath = Path.Combine(_environment.WebRootPath, "request", "import");
         string filePath = await _fileService.SaveFile(model.File, folderPath);
         await _customerService.Import(filePath);
-        var result = await _colocationService.ImportRequest(filePath);
-        var customerIds = (result.Data as List<ColocationRequestModel>).Select(x => x.CustomerId).ToList();
+        var result = await _requestService.ImportRequest(filePath);
+        var customerIds = (result.Data as List<RequestModel>).Select(x => x.CustomerId).ToList();
         await _customerService.SendActivationEmail(customerIds);
 
         return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Result.xlsx");
@@ -70,8 +70,8 @@ public class ColocationRequestController : ControllerBase
     [SwaggerOperation(Summary = "[Sale]: Generate the excel file for importing. The services will be base on the database")]
     public async Task<ActionResult> GetImportTemplate()
     {
-        string filePath = Path.Combine(_environment.WebRootPath, "colocation_request", "import", "Template.xlsx");
-        var result = await _colocationService.GenerateImportExcelTemplate(filePath);
+        string filePath = Path.Combine(_environment.WebRootPath, "request", "import", "Template.xlsx");
+        var result = await _requestService.GenerateImportExcelTemplate(filePath);
         if (result.Succeed)
         {
             return File(System.IO.File.OpenRead(filePath), "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "Import.xlsx");
@@ -82,20 +82,20 @@ public class ColocationRequestController : ControllerBase
 
     [HttpPost]
     [Authorize(Roles = nameof(RoleType.Sale) + "," + nameof(RoleType.Customer))]
-    [SwaggerOperation(Summary = "[Sale, Customer]: Create colocation request for an existing customer")]
-    public async Task<ActionResult> CreateRequest([FromBody] ColocationRequestCreateModel model)
+    [SwaggerOperation(Summary = "[Sale, Customer]: Create request for an existing customer")]
+    public async Task<ActionResult> CreateRequest([FromBody] InitialRequestCreateModel model)
     {
-        var result = await _colocationService.CreateRequest(model);
+        var result = await _requestService.CreateRequest(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpPatch]
     [Authorize(Roles = nameof(RoleType.Sale))]
-    [SwaggerOperation(Summary = "[Sale]: Update information of a colocation request")]
-    public async Task<ActionResult> UpdateRequest([FromBody] ColocationRequestUpdateModel model)
+    [SwaggerOperation(Summary = "[Sale]: Update information of a request")]
+    public async Task<ActionResult> UpdateRequest([FromBody] RequestUpdateModel model)
     {
-        var result = await _colocationService.UpdateRequest(model);
+        var result = await _requestService.UpdateRequest(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -103,7 +103,7 @@ public class ColocationRequestController : ControllerBase
     [HttpPut("{id}/CompleteDetail")]
     [Authorize(Roles = nameof(RoleType.Tech))]
     [SwaggerOperation(Summary = "[Tech]: Complete")]
-    public async Task<ActionResult> CompleteRequestDetail(int id, ColocationRequestDetailCompleteModel model)
+    public async Task<ActionResult> CompleteRequestDetail(int id, RequestDetailCompleteModel model)
     {
         string errorMessage;
         using var transaction = _transactionHelper.GetTransaction();
@@ -140,11 +140,11 @@ public class ColocationRequestController : ControllerBase
     }
 
     [HttpGet("{id}/InspectionRecord")]
-    [SwaggerOperation(Summary = "Get colocation request inspection record")]
+    [SwaggerOperation(Summary = "Get request inspection record")]
     public async Task<ActionResult> DownloadInspectionRecord(int id)
     {
-        var result = await _colocationService.GetInspectionRecordFilePath(id);
-        string folderPath = Path.Combine(_environment.WebRootPath, "colocation_request", "inspection_record");
+        var result = await _requestService.GetInspectionRecordFilePath(id);
+        string folderPath = Path.Combine(_environment.WebRootPath, "request", "inspection_record");
         if (result.Succeed)
         {
             string filePath = Path.Combine(folderPath, result.Data as string);
@@ -155,12 +155,12 @@ public class ColocationRequestController : ControllerBase
 
     [HttpPatch("{id}/InspectionRecord")]
     [Authorize(Roles = nameof(RoleType.Tech))]
-    [SwaggerOperation(Summary = "[Tech]: Update colocation request inspection record")]
+    [SwaggerOperation(Summary = "[Tech]: Update request inspection record")]
     public async Task<ActionResult> UploadInspectionRecord(int id, [FromForm] DocumentFileUploadModel model)
     {
-        string folderPath = Path.Combine(_environment.WebRootPath, "colocation_request", "inspection_record");
+        string folderPath = Path.Combine(_environment.WebRootPath, "request", "inspection_record");
         string fileName = await _fileService.SaveFileWithGuidName(model.File, folderPath);
-        var result = await _colocationService.AssignInspectionRecordFilePath(id, fileName);
+        var result = await _requestService.AssignInspectionRecordFilePath(id, fileName);
         if (!result.Succeed)
         {
             await _fileService.DeleteFile(fileName);
@@ -171,11 +171,11 @@ public class ColocationRequestController : ControllerBase
     }
 
     [HttpGet("{id}/ReceiptOfRecipient")]
-    [SwaggerOperation(Summary = "Get colocation request receipt of recipient")]
+    [SwaggerOperation(Summary = "Get request receipt of recipient")]
     public async Task<ActionResult> GetReceiptOfRecipient(int id)
     {
-        var result = await _colocationService.GetReceiptOfRecipientFilePath(id);
-        string folderPath = Path.Combine(_environment.WebRootPath, "colocation_request", "receipt_of_recipient");
+        var result = await _requestService.GetReceiptOfRecipientFilePath(id);
+        string folderPath = Path.Combine(_environment.WebRootPath, "request", "receipt_of_recipient");
         if (result.Succeed)
         {
             string filePath = Path.Combine(folderPath, result.Data as string);
@@ -186,12 +186,12 @@ public class ColocationRequestController : ControllerBase
 
     [HttpPatch("{id}/ReceiptOfRecipient")]
     [Authorize(Roles = nameof(RoleType.Tech))]
-    [SwaggerOperation(Summary = "[Tech]: Update colocation request receipt of recipient")]
+    [SwaggerOperation(Summary = "[Tech]: Update request receipt of recipient")]
     public async Task<ActionResult> UploadReceiptOfRecipient(int id, [FromForm] DocumentFileUploadModel model)
     {
-        string folderPath = Path.Combine(_environment.WebRootPath, "colocation_request", "receipt_of_recipient");
+        string folderPath = Path.Combine(_environment.WebRootPath, "request", "receipt_of_recipient");
         string fileName = await _fileService.SaveFileWithGuidName(model.File, folderPath);
-        var result = await _colocationService.AssignReceiptOfRecipientFilePath(id, fileName);
+        var result = await _requestService.AssignReceiptOfRecipientFilePath(id, fileName);
         if (!result.Succeed)
         {
             await _fileService.DeleteFile(fileName);

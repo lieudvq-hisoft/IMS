@@ -1,9 +1,9 @@
 ﻿using Data.Enums;
 
 namespace Data.Entities;
-public class Colocation : BaseEntity
+public class Request : BaseEntity
 {
-    public ColocationStatus Status { get; set; }
+    public RequestStatus Status { get; set; }
     public int ExpectedSize { get; set; }
     public string? Note { get; set; }
     public string? InspectorNote { get; set; }
@@ -19,51 +19,51 @@ public class Colocation : BaseEntity
     public int? ServerId { get; set; }
     public virtual Server? Server { get; set; }
 
-    public virtual ICollection<ColocationHistory> ColocationHistories { get; set; }
+    public virtual ICollection<RequestExtendHistory> RequestExtendHistories { get; set; }
 
-    public virtual ICollection<AdditionalService> AdditionalServices { get; set; }
+    public virtual ICollection<ServiceRequest> ServiceRequests { get; set; }
 
-    public string GetColocationRequestType()
+    public string GetRequestType()
     {
-        ColocationRequestType type;
-        if (Status != ColocationStatus.Ongoing && Status != ColocationStatus.Stopped)
+        RequestType type;
+        if (Status != RequestStatus.Ongoing && Status != RequestStatus.Stopped)
         {
-            if (AdditionalServices.Any(x => x.Status != AdditionalServiceStatus.Success))
+            if (ServiceRequests.Any(x => x.Status != ServiceRequestStatus.Success))
             {
-                type = ColocationRequestType.Mixed;
+                type = RequestType.Mixed;
             }
             else
             {
-                type = ColocationRequestType.New;
+                type = RequestType.New;
             }
         }
         else
         {
-            type = ColocationRequestType.Additional;
+            type = RequestType.Additional;
         }
 
         return type.ToString();
     }
 
-    public string GetColocationRequestStatus()
+    public string GetRequestStatus()
     {
         string status;
-        if (Status != ColocationStatus.Ongoing && Status != ColocationStatus.Stopped)
+        if (Status != RequestStatus.Ongoing && Status != RequestStatus.Stopped)
         {
             status = Status.ToString();
         }
         else
         {
-            var services = AdditionalServices;
-            if (services.All(x => x.Status == AdditionalServiceStatus.Success))
+            var services = ServiceRequests;
+            if (services.All(x => x.Status == ServiceRequestStatus.Success))
             {
                 status = "Accepted";
             }
-            else if (services.All(x => x.Status == AdditionalServiceStatus.Denied))
+            else if (services.All(x => x.Status == ServiceRequestStatus.Denied))
             {
                 status = "Denied";
             }
-            else if (services.All(x => x.Status == AdditionalServiceStatus.Pending))
+            else if (services.All(x => x.Status == ServiceRequestStatus.Pending))
             {
                 status = "Pending";
             }

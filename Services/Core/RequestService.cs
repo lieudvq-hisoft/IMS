@@ -13,53 +13,53 @@ using Services.Utilities;
 using System.ComponentModel.DataAnnotations;
 
 namespace Services.Core;
-public interface IColocationService
+public interface IRequestService
 {
-    Task<ResultModel> Get(PagingParam<ColocationSortCriteria> paginationModel, ColocationSearchModel searchModel);
-    Task<ResultModel> GetRequest(PagingParam<ColocationSortCriteria> paginationModel, ColocationSearchModel searchModel);
+    Task<ResultModel> Get(PagingParam<RequestSortCriteria> paginationModel, RequestSearchModel searchModel);
+    Task<ResultModel> GetRequest(PagingParam<RequestSortCriteria> paginationModel, RequestSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> ImportRequest(string filePath);
-    Task<ResultModel> CreateRequest(ColocationRequestCreateModel model);
-    Task<ResultModel> UpdateRequest(ColocationRequestUpdateModel model);
+    Task<ResultModel> CreateRequest(InitialRequestCreateModel model);
+    Task<ResultModel> UpdateRequest(RequestUpdateModel model);
     Task<ResultModel> GenerateImportExcelTemplate(string filePath);
-    Task<ResultModel> GetInspectionRecordFilePath(int colocationId);
-    Task<ResultModel> AssignInspectionRecordFilePath(int colocationId, string fileName);
-    Task<ResultModel> GetReceiptOfRecipientFilePath(int colocationId);
-    Task<ResultModel> AssignReceiptOfRecipientFilePath(int colocationId, string fileName);
+    Task<ResultModel> GetInspectionRecordFilePath(int requestId);
+    Task<ResultModel> AssignInspectionRecordFilePath(int requestId, string fileName);
+    Task<ResultModel> GetReceiptOfRecipientFilePath(int requestId);
+    Task<ResultModel> AssignReceiptOfRecipientFilePath(int requestId, string fileName);
 }
 
-public class ColocationService : IColocationService
+public class RequestService : IRequestService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public ColocationService(AppDbContext dbContext, IMapper mapper)
+    public RequestService(AppDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
     }
 
     /// <summary>
-    /// Retrieves a paginated list of ongoing and stopped colocations with optional search and sorting.
+    /// Retrieves a paginated list of ongoing and stopped requests with optional search and sorting.
     /// </summary>
     /// <param name="paginationModel">Pagination and sorting parameters.</param>
-    /// <param name="searchModel">Criteria for filtering colocations.</param>
-    /// <returns>The paginated colocation data or an error message.</returns>
+    /// <param name="searchModel">Criteria for filtering requests.</param>
+    /// <returns>The paginated request data or an error message.</returns>
     /// <exception cref="Exception">Thrown when an error occurs during data retrieval.</exception>
-    public async Task<ResultModel> Get(PagingParam<ColocationSortCriteria> paginationModel, ColocationSearchModel searchModel)
+    public async Task<ResultModel> Get(PagingParam<RequestSortCriteria> paginationModel, RequestSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var colocations = _dbContext.Colocations
+            var requests = _dbContext.Requests
                 .Include(x => x.Customer)
-                .Include(x => x.ColocationHistories)
-                .Include(x => x.AdditionalServices)
-                .Where(x => x.Status == ColocationStatus.Ongoing
-                    || x.Status == ColocationStatus.Stopped)
-                .Where(delegate (Colocation x)
+                .Include(x => x.RequestExtendHistories)
+                .Include(x => x.ServiceRequests)
+                .Where(x => x.Status == RequestStatus.Ongoing
+                    || x.Status == RequestStatus.Stopped)
+                .Where(delegate (Request x)
                 {
                     var matchCompanyName = MatchString(searchModel, x.Customer.CompanyName);
                     var matchStatus = searchModel.Status != null ? x.Status.ToString() == searchModel.Status.ToString() : true;
@@ -67,12 +67,12 @@ public class ColocationService : IColocationService
                 })
                 .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, colocations.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requests.Count());
 
-            colocations = colocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            colocations = colocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            requests = requests.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            requests = requests.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<ColocationModel>(colocations).ToList();
+            paging.Data = _mapper.ProjectTo<RequestModel>(requests).ToList();
 
             result.Data = paging;
             result.Succeed = true;
@@ -85,42 +85,42 @@ public class ColocationService : IColocationService
     }
 
     /// <summary>
-    /// Retrieves a paginated list of colocation request with is colocation that are not ongoing or stopped with optional search and sorting and colocation with service not success.
+    /// Retrieves a paginated list of request with is request that are not ongoing or stopped with optional search and sorting and request with service not success.
     /// </summary>
     /// <param name="paginationModel">Pagination and sorting parameters.</param>
-    /// <param name="searchModel">Criteria for filtering colocations.</param>
-    /// <returns>The paginated colocation data or an error message.</returns>
+    /// <param name="searchModel">Criteria for filtering requests.</param>
+    /// <returns>The paginated request data or an error message.</returns>
     /// <exception cref="Exception">Thrown when an error occurs during data retrieval.</exception>
-    public async Task<ResultModel> GetRequest(PagingParam<ColocationSortCriteria> paginationModel, ColocationSearchModel searchModel)
+    public async Task<ResultModel> GetRequest(PagingParam<RequestSortCriteria> paginationModel, RequestSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var colocations = _dbContext.Colocations
+            var requests = _dbContext.Requests
                 .Include(x => x.Customer)
                 .ThenInclude(x => x.User)
-                .Include(x => x.ColocationHistories)
-                .Include(x => x.AdditionalServices)
-                .Where(x => x.Status != ColocationStatus.Ongoing ||
-                    x.Status != ColocationStatus.Stopped ||
-                    x.AdditionalServices.Any(_ => _.Status != AdditionalServiceStatus.Success))
-                .Where(delegate (Colocation x)
+                .Include(x => x.RequestExtendHistories)
+                .Include(x => x.ServiceRequests)
+                .Where(x => x.Status != RequestStatus.Ongoing ||
+                    x.Status != RequestStatus.Stopped ||
+                    x.ServiceRequests.Any(_ => _.Status != ServiceRequestStatus.Success))
+                .Where(delegate (Request x)
                 {
                     var matchCompanyName = MatchString(searchModel, x.Customer.CompanyName);
-                    var matchStatus = searchModel.Status != null ? x.GetColocationRequestStatus() == searchModel.Status.ToString() : true;
+                    var matchStatus = searchModel.Status != null ? x.GetRequestStatus() == searchModel.Status.ToString() : true;
                     var matchId = searchModel.Id != null ? x.Id == searchModel.Id : true;
                     return matchCompanyName && matchStatus;
                 })
                 .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, colocations.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requests.Count());
 
-            colocations = colocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            colocations = colocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            requests = requests.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            requests = requests.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<ColocationRequestModel>(colocations).ToList();
+            paging.Data = _mapper.ProjectTo<RequestModel>(requests).ToList();
 
             result.Data = paging;
             result.Succeed = true;
@@ -139,14 +139,14 @@ public class ColocationService : IColocationService
 
         try
         {
-            var colocation = _dbContext.Colocations
+            var request = _dbContext.Requests
                 .Include(x => x.Customer)
                 .ThenInclude(x => x.User)
-                .Include(x => x.ColocationHistories)
-                .Include(x => x.AdditionalServices)
+                .Include(x => x.RequestExtendHistories)
+                .Include(x => x.ServiceRequests)
                 .FirstOrDefault(x => x.Id == id);
 
-            result.Data = _mapper.Map<ColocationRequestModel>(colocation);
+            result.Data = _mapper.Map<RequestModel>(request);
             result.Succeed = true;
         }
         catch (Exception e)
@@ -156,7 +156,7 @@ public class ColocationService : IColocationService
         return result;
     }
 
-    private bool MatchString(ColocationSearchModel searchModel, string? value)
+    private bool MatchString(RequestSearchModel searchModel, string? value)
     {
         return MyFunction
             .ConvertToUnSign(value ?? "")
@@ -165,7 +165,7 @@ public class ColocationService : IColocationService
 
     public async Task<ResultModel> ImportRequest(string filePath)
     {
-        var importedColocation = new List<ColocationRequestModel>();
+        var importedRequest = new List<RequestModel>();
         using var package = new ExcelPackage(new FileInfo(filePath));
         var worksheet = package.Workbook.Worksheets["Sheet1"];
         int rowCount = worksheet.Dimension.End.Row;     //get row count
@@ -179,14 +179,14 @@ public class ColocationService : IColocationService
             string createCustomerResult = resultCell.Value as string;
             if (createCustomerResult == "Ok")
             {
-                var model = new ColocationCreateModel()
+                var model = new RequestCreateModel()
                 {
                     ExpectedSize = int.Parse(worksheet.Cells[row, 8].Value?.ToString().Trim()),
                     DateCreated = DateTime.Parse(worksheet.Cells[row, 9].Value?.ToString().Trim()),
                     DateAllocate = DateTime.Parse(worksheet.Cells[row, 10].Value?.ToString().Trim()),
                     DateStop = DateTime.Parse(worksheet.Cells[row, 11].Value?.ToString().Trim()),
                     Note = worksheet.Cells[row, 12].Value?.ToString().Trim(),
-                    AdditionalServices = new List<AdditionalServiceModel>()
+                    ServiceRequests = new List<ServiceRequestModel>()
                 };
 
                 // Get services
@@ -194,7 +194,7 @@ public class ColocationService : IColocationService
                 {
                     var serviceName = worksheet.Cells[1, i].Value?.ToString().Trim();
                     var service = _dbContext.Services.FirstOrDefault(x => x.Name == serviceName);
-                    model.AdditionalServices.Add(new AdditionalServiceModel
+                    model.ServiceRequests.Add(new ServiceRequestModel
                     {
                         Id = service.Id,
                         Quantity = int.Parse(worksheet.Cells[row, i].Value?.ToString().Trim())
@@ -225,7 +225,7 @@ public class ColocationService : IColocationService
                     }
                     else
                     {
-                        importedColocation.Add(result.Data as ColocationRequestModel);
+                        importedRequest.Add(result.Data as RequestModel);
                         resultCell.Value = "Ok";
                     }
                 }
@@ -237,26 +237,26 @@ public class ColocationService : IColocationService
         return new ResultModel
         {
             Succeed = true,
-            Data = importedColocation
+            Data = importedRequest
         };
     }
 
     /// <summary>
-    /// Create a new colocation for the customer created previous. Will hard delete the customer on fail
+    /// Create a new request for the customer created previous. Will hard delete the customer on fail
     /// </summary>
     /// <param name="model"></param>
-    /// <returns>The result model contain the new colocation</returns>
-    private async Task<ResultModel> AttempCreateRequestFromExcel(ColocationCreateModel model, Customer customer)
+    /// <returns>The result model contain the new request</returns>
+    private async Task<ResultModel> AttempCreateRequestFromExcel(RequestCreateModel model, Customer customer)
     {
-        var result = await CreateRequest(new ColocationRequestCreateModel
+        var result = await CreateRequest(new InitialRequestCreateModel
         {
-            ColocationCreateModel = model,
+            RequestCreateModel = model,
             CustomerId = customer.Id
         });
 
         if (!result.Succeed)
         {
-            // Delete customer and user on fail to create colocation
+            // Delete customer and user on fail to create request
             _dbContext.Attach(customer);
             _dbContext.Entry(customer).Reference(x => x.User).Load();
             var user = customer.User;
@@ -268,12 +268,12 @@ public class ColocationService : IColocationService
         return result;
     }
 
-    public async Task<ResultModel> CreateRequest(ColocationRequestCreateModel model)
+    public async Task<ResultModel> CreateRequest(InitialRequestCreateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
         bool validPrecondition = true;
-        var createModel = model.ColocationCreateModel;
+        var createModel = model.RequestCreateModel;
         var customerId = model.CustomerId;
 
         try
@@ -288,11 +288,11 @@ public class ColocationService : IColocationService
             var services = new List<Service>();
             if (validPrecondition)
             {
-                foreach (var additionalService in createModel.AdditionalServices)
+                foreach (var serviceRequest in createModel.ServiceRequests)
                 {
-                    if (additionalService.Quantity > 0)
+                    if (serviceRequest.Quantity > 0)
                     {
-                        var service = _dbContext.Services.FirstOrDefault(x => x.Id == additionalService.Id);
+                        var service = _dbContext.Services.FirstOrDefault(x => x.Id == serviceRequest.Id);
                         if (service == null)
                         {
                             validPrecondition = false;
@@ -307,9 +307,9 @@ public class ColocationService : IColocationService
 
             if (validPrecondition)
             {
-                var colocation = new Colocation
+                var request = new Request
                 {
-                    Status = ColocationStatus.Incomplete,
+                    Status = RequestStatus.Incomplete,
                     ExpectedSize = createModel.ExpectedSize,
                     Note = createModel.Note,
                     InspectorNote = createModel.InspectorNote,
@@ -319,22 +319,23 @@ public class ColocationService : IColocationService
                     InitialDateStop = createModel.DateStop
                 };
 
-                _dbContext.Colocations.Add(colocation);
+                _dbContext.Requests.Add(request);
                 _dbContext.SaveChanges();
 
                 foreach (var service in services)
                 {
-                    var additionalService = createModel.AdditionalServices.FirstOrDefault(x => x.Id == service.Id);
-                    _dbContext.AdditionalServices.Add(new AdditionalService
+                    var serviceRequest = createModel.ServiceRequests.FirstOrDefault(x => x.Id == service.Id);
+                    _dbContext.ServiceRequests.Add(new Data.Entities.ServiceRequest
                     {
                         ServiceId = service.Id,
-                        ColocationId = colocation.Id,
+                        RequestId = request.Id,
+                        Quantity = serviceRequest.Quantity
                     });
                 }
 
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<ColocationRequestModel>(colocation);
+                result.Data = _mapper.Map<RequestModel>(request);
             }
         }
         catch (Exception e)
@@ -345,7 +346,7 @@ public class ColocationService : IColocationService
         return result;
     }
 
-    public async Task<ResultModel> UpdateRequest(ColocationRequestUpdateModel model)
+    public async Task<ResultModel> UpdateRequest(RequestUpdateModel model)
     {
 
         var result = new ResultModel();
@@ -354,27 +355,27 @@ public class ColocationService : IColocationService
 
         try
         {
-            var colocation = _dbContext.Colocations.Include(x => x.ColocationHistories).FirstOrDefault(x => x.Id == model.Id);
-            if (colocation == null)
+            var request = _dbContext.Requests.Include(x => x.RequestExtendHistories).FirstOrDefault(x => x.Id == model.Id);
+            if (request == null)
             {
                 validPrecondition = false;
-                result.ErrorMessage = ColocationErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = RequestErrorMessage.NOT_EXISTED;
             }
 
-            if (colocation.Status != ColocationStatus.Pending)
+            if (request.Status != RequestStatus.Pending)
             {
                 validPrecondition = false;
-                result.ErrorMessage = ColocationErrorMessage.UPDATE_NON_PENDING;
+                result.ErrorMessage = RequestErrorMessage.UPDATE_NON_PENDING;
             }
 
             var services = new List<Service>();
             if (validPrecondition)
             {
-                foreach (var additionalService in model.AdditionalServices)
+                foreach (var serviceRequest in model.ServiceRequests)
                 {
-                    if (additionalService.Quantity > 0)
+                    if (serviceRequest.Quantity > 0)
                     {
-                        var service = _dbContext.Services.FirstOrDefault(x => x.Id == additionalService.Id);
+                        var service = _dbContext.Services.FirstOrDefault(x => x.Id == serviceRequest.Id);
                         if (service == null)
                         {
                             validPrecondition = false;
@@ -389,25 +390,25 @@ public class ColocationService : IColocationService
 
             if (validPrecondition)
             {
-                colocation.ExpectedSize = model.ExpectedSize;
-                colocation.Note = model.Note;
-                colocation.InspectorNote = model.InspectorNote;
-                colocation.DateCreated = model.DateCreated;
-                colocation.DateAllocate = model.DateAllocate;
-                colocation.DateStop = model.DateStop;
+                request.ExpectedSize = model.ExpectedSize;
+                request.Note = model.Note;
+                request.InspectorNote = model.InspectorNote;
+                request.DateCreated = model.DateCreated;
+                request.DateAllocate = model.DateAllocate;
+                request.DateStop = model.DateStop;
 
                 // Delete current additional services
-                var currentServices = _dbContext.AdditionalServices.Where(x => x.ColocationId == model.Id).ToList();
-                _dbContext.AdditionalServices.RemoveRange(currentServices);
+                var currentServices = _dbContext.ServiceRequests.Where(x => x.RequestId == model.Id).ToList();
+                _dbContext.ServiceRequests.RemoveRange(currentServices);
 
                 // Update additional services
                 foreach (var service in services)
                 {
-                    var additionalService = model.AdditionalServices.FirstOrDefault(x => x.Id == service.Id);
-                    _dbContext.AdditionalServices.Add(new AdditionalService
+                    var serviceRequest = model.ServiceRequests.FirstOrDefault(x => x.Id == service.Id);
+                    _dbContext.ServiceRequests.Add(new ServiceRequest
                     {
                         ServiceId = service.Id,
-                        ColocationId = colocation.Id,
+                        RequestId = request.Id,
                     });
                 }
 
@@ -460,30 +461,30 @@ public class ColocationService : IColocationService
         return result;
     }
 
-    public async Task<ResultModel> GetInspectionRecordFilePath(int colocationId)
+    public async Task<ResultModel> GetInspectionRecordFilePath(int requestId)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var colocation = _dbContext.Colocations.FirstOrDefault(x => x.Id == colocationId);
-            if (colocation == null)
+            var request = _dbContext.Requests.FirstOrDefault(x => x.Id == requestId);
+            if (request == null)
             {
-                result.ErrorMessage = ColocationErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = RequestErrorMessage.NOT_EXISTED;
             }
-            else if (colocation.Status == ColocationStatus.Pending || colocation.Status == ColocationStatus.Denied)
+            else if (request.Status == RequestStatus.Pending || request.Status == RequestStatus.Denied)
             {
-                result.ErrorMessage = ColocationErrorMessage.DOWNLOAD_FILE_FROM_NON_ACCEPTED;
+                result.ErrorMessage = RequestErrorMessage.DOWNLOAD_FILE_FROM_NON_ACCEPTED;
             }
-            else if (colocation.InspectionRecordFilePath == null)
+            else if (request.InspectionRecordFilePath == null)
             {
-                result.ErrorMessage = ColocationErrorMessage.FILE_NOT_EXISTED;
+                result.ErrorMessage = RequestErrorMessage.FILE_NOT_EXISTED;
             }
             else
             {
                 result.Succeed = true;
-                result.Data = colocation.InspectionRecordFilePath;
+                result.Data = request.InspectionRecordFilePath;
             }
         }
         catch (Exception e)
@@ -494,25 +495,25 @@ public class ColocationService : IColocationService
         return result;
     }
 
-    public async Task<ResultModel> AssignInspectionRecordFilePath(int colocationId, string fileName)
+    public async Task<ResultModel> AssignInspectionRecordFilePath(int requestId, string fileName)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var colocation = _dbContext.Colocations.FirstOrDefault(x => x.Id == colocationId);
-            if (colocation == null)
+            var request = _dbContext.Requests.FirstOrDefault(x => x.Id == requestId);
+            if (request == null)
             {
-                result.ErrorMessage = ColocationErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = RequestErrorMessage.NOT_EXISTED;
             }
-            else if (colocation.Status != ColocationStatus.Accepted)
+            else if (request.Status != RequestStatus.Accepted)
             {
-                result.ErrorMessage = ColocationErrorMessage.ASSIGN_FILE_TO_NON_ACCEPTED;
+                result.ErrorMessage = RequestErrorMessage.ASSIGN_FILE_TO_NON_ACCEPTED;
             }
             else
             {
-                colocation.InspectionRecordFilePath = fileName;
+                request.InspectionRecordFilePath = fileName;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = fileName;
@@ -526,30 +527,30 @@ public class ColocationService : IColocationService
         return result;
     }
 
-    public async Task<ResultModel> GetReceiptOfRecipientFilePath(int colocationId)
+    public async Task<ResultModel> GetReceiptOfRecipientFilePath(int requestId)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var colocation = _dbContext.Colocations.FirstOrDefault(x => x.Id == colocationId);
-            if (colocation == null)
+            var request = _dbContext.Requests.FirstOrDefault(x => x.Id == requestId);
+            if (request == null)
             {
-                result.ErrorMessage = ColocationErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = RequestErrorMessage.NOT_EXISTED;
             }
-            else if (colocation.Status == ColocationStatus.Pending || colocation.Status == ColocationStatus.Denied)
+            else if (request.Status == RequestStatus.Pending || request.Status == RequestStatus.Denied)
             {
-                result.ErrorMessage = ColocationErrorMessage.DOWNLOAD_FILE_FROM_NON_ACCEPTED;
+                result.ErrorMessage = RequestErrorMessage.DOWNLOAD_FILE_FROM_NON_ACCEPTED;
             }
-            else if (colocation.ReceiptOfRecipientFilePath == null)
+            else if (request.ReceiptOfRecipientFilePath == null)
             {
-                result.ErrorMessage = ColocationErrorMessage.FILE_NOT_EXISTED;
+                result.ErrorMessage = RequestErrorMessage.FILE_NOT_EXISTED;
             }
             else
             {
                 result.Succeed = true;
-                result.Data = colocation.ReceiptOfRecipientFilePath;
+                result.Data = request.ReceiptOfRecipientFilePath;
             }
         }
         catch (Exception e)
@@ -560,25 +561,25 @@ public class ColocationService : IColocationService
         return result;
     }
 
-    public async Task<ResultModel> AssignReceiptOfRecipientFilePath(int colocationId, string fileName)
+    public async Task<ResultModel> AssignReceiptOfRecipientFilePath(int requestId, string fileName)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var colocation = _dbContext.Colocations.FirstOrDefault(x => x.Id == colocationId);
-            if (colocation == null)
+            var request = _dbContext.Requests.FirstOrDefault(x => x.Id == requestId);
+            if (request == null)
             {
-                result.ErrorMessage = ColocationErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = RequestErrorMessage.NOT_EXISTED;
             }
-            else if (colocation.Status != ColocationStatus.Accepted)
+            else if (request.Status != RequestStatus.Accepted)
             {
-                result.ErrorMessage = ColocationErrorMessage.ASSIGN_FILE_TO_NON_ACCEPTED;
+                result.ErrorMessage = RequestErrorMessage.ASSIGN_FILE_TO_NON_ACCEPTED;
             }
             else
             {
-                colocation.ReceiptOfRecipientFilePath = fileName;
+                request.ReceiptOfRecipientFilePath = fileName;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = fileName;

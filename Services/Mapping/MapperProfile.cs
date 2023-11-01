@@ -8,20 +8,20 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        #region AdditionalServiceModel
-        CreateMap<AdditionalService, AdditionalServiceModel>()
+        #region ServiceRequestModel
+        CreateMap<ServiceRequest, ServiceRequestModel>()
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Service.Name))
-            .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Colocation.Customer.User.Fullname))
+            .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Request.Customer.User.Fullname))
             .ForMember(dest => dest.Executor, opt => opt.MapFrom(src => src.Executor.User.Fullname))
             .ForMember(dest => dest.Approver, opt => opt.MapFrom(src => src.Approver.User.Fullname));
         #endregion
 
-        #region Colocation
-        CreateMap<Colocation, ColocationModel>();
-        CreateMap<Colocation, ColocationRequestModel>()
+        #region Request
+        CreateMap<Request, RequestModel>();
+        CreateMap<Request, RequestModel>()
             .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName))
-            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.GetColocationRequestType()))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.GetColocationRequestStatus()));
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.GetRequestType()))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.GetRequestStatus()));
         #endregion
 
         #region CompanyType
@@ -58,23 +58,23 @@ public class MapperProfile : Profile
 
         #region Server
         CreateMap<Server, ServerModel>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Colocation.Status))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Request.Status))
             .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.Select(x => x.Ip).FirstOrDefault(x => x.Type == Data.Enums.IpType.Host).DisplayIp()))
             .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.Device.Size + src.Device.AdditionalSize))
             .ForMember(dest => dest.Power, opt => opt.MapFrom(src => src.Device.BasePower + src.Device.AdditionalPower))
-            .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Colocation.Customer.User.Fullname));
+            .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Request.Customer.User.Fullname));
         CreateMap<Server, ServerDetailModel>()
-            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Colocation.Customer.CompanyName))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Colocation.Status))
-            .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => src.Colocation.DateCreated))
+            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Request.Customer.CompanyName))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Request.Status))
+            .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => src.Request.DateCreated))
             .ForMember(dest => dest.BasePower, opt => opt.MapFrom(src => src.Device.BasePower))
             .ForMember(dest => dest.Power, opt => opt.MapFrom(src => src.Device.BasePower + src.Device.AdditionalPower))
             .ForMember(dest => dest.BaseSize, opt => opt.MapFrom(src => src.Device.Size))
             .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.Device.Size + src.Device.AdditionalSize))
-            .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => src.Colocation.DateCreated))
+            .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => src.Request.DateCreated))
             .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Device.Locations.FirstOrDefault(x => !x.IsMoveout).Rack.DisplayRack()))
             .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.Select(x => x.Ip).FirstOrDefault(x => x.Type == Data.Enums.IpType.Host).DisplayIp()))
-            .ForMember(dest => dest.ColocationHistories, opt => opt.MapFrom(src => src.Colocation.ColocationHistories.Where(x => x.IsAccepted)));
+            .ForMember(dest => dest.RequestExtendHistoryModel, opt => opt.MapFrom(src => src.Request.RequestExtendHistories.Where(x => x.IsAccepted)));
         #endregion
     }
 }
