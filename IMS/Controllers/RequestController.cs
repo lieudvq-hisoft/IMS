@@ -42,6 +42,7 @@ public class RequestController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     [SwaggerOperation(Summary = "Get requests, excluding ongoing or stopped requests, and those with unsuccessful additional services")]
     public async Task<ActionResult> GetRequest([FromQuery] PagingParam<RequestSortCriteria> pagingParam, [FromQuery] RequestSearchModel searchModel)
     {

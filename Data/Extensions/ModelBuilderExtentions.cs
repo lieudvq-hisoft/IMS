@@ -1,4 +1,5 @@
 ﻿using Data.Entities;
+using Data.Enums;
 using LoremNET;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -201,7 +202,7 @@ public static class ModelBuilderExtentions
         }
         #endregion
 
-        #region User
+        #region User, Request, ServiceRequest
         var hasher = new PasswordHasher<User>();
 
         List<Guid> seedGuids = new List<Guid>
@@ -310,6 +311,23 @@ public static class ModelBuilderExtentions
                     RoleId = seedGuids[i - 1],
                     UserId = seedGuids[i - 1],
                 });
+
+                if (i == 2)
+                {
+                    builder.Entity<TechExecution>().HasData(new TechExecution
+                    {
+                        Id = 1,
+                        TechId = seedGuids[i - 1],
+                    });
+                }
+                if (i == 3)
+                {
+                    builder.Entity<SaleApproval>().HasData(new SaleApproval
+                    {
+                        Id = 1,
+                        SaleId = seedGuids[i - 1],
+                    });
+                }
             }
             #endregion
         }
@@ -392,7 +410,8 @@ public static class ModelBuilderExtentions
                     InitialDateStop = DateTime.Now.AddYears((int)Lorem.Number(1, 3)),
                     DateStop = DateTime.Now.AddYears((int)Lorem.Number(1, 3)),
                     CustomerId = i - 4,
-                    ServerId = i - 15
+                    ServerId = i - 15,
+                    SaleApprovalId = 1,
                 });
             }
             else if (i - 5 <= 20)
@@ -413,6 +432,8 @@ public static class ModelBuilderExtentions
                             DateStop = DateTime.Now.AddYears((int)Lorem.Number(1, 3)),
                             CustomerId = (int)Lorem.Number(16, 20),
                             ServerId = j - 10,
+                            SaleApprovalId = 1,
+                            TechExecutionId = 1
                         });
                     }
                 }
@@ -430,7 +451,7 @@ public static class ModelBuilderExtentions
                     InitialDateStop = DateTime.Now.AddYears((int)Lorem.Number(1, 3)),
                     DateStop = DateTime.Now.AddYears((int)Lorem.Number(1, 3)),
                     CustomerId = i - 4,
-                    ServerId = i + 10
+                    ServerId = i + 10,
                 });
             }
             else if (i - 5 <= 25)
@@ -446,7 +467,93 @@ public static class ModelBuilderExtentions
                     InitialDateStop = DateTime.Now.AddYears((int)Lorem.Number(-1, 0)),
                     DateStop = DateTime.Now.AddYears((int)Lorem.Number(-1, 0)),
                     CustomerId = i - 4,
-                    ServerId = i + 10
+                    ServerId = i + 10,
+                    SaleApprovalId = 1,
+                    TechExecutionId = 1
+                });
+            }
+        }
+
+        int serviceRequestId = 1;
+        for (int i = 6; i <= 10; i++)
+        {
+            for (int j = 0; j <= (int)Lorem.Number(0, 5); j++)
+            {
+                builder.Entity<ServiceRequest>().HasData(new ServiceRequest
+                {
+                    Id = serviceRequestId++,
+                    RequestId = i,
+                    Quantity = (int)Lorem.Number(1, 5),
+                    ServiceId = (int)Lorem.Number(1, 3),
+                    Status = Enums.ServiceRequestStatus.Pending
+                });
+            }
+        }
+
+        for (int i = 11; i <= 15; i++)
+        {
+            for (int j = 0; j <= (int)Lorem.Number(0, 5); j++)
+            {
+                int status = (int)Lorem.Number(0, 2);
+                builder.Entity<ServiceRequest>().HasData(new ServiceRequest
+                {
+                    Id = serviceRequestId++,
+                    RequestId = i,
+                    Quantity = (int)Lorem.Number(1, 5),
+                    ServiceId = (int)Lorem.Number(1, 3),
+                    Status = (ServiceRequestStatus)status,
+                    SaleApprovalId = status == 1 ? 1 : null
+                });
+            }
+        }
+
+        for (int i = 16; i <= 45; i++)
+        {
+            for (int j = 0; j <= (int)Lorem.Number(0, 5); j++)
+            {
+                int status = (int)Lorem.Number(0, 3);
+                builder.Entity<ServiceRequest>().HasData(new ServiceRequest
+                {
+                    Id = serviceRequestId++,
+                    RequestId = i,
+                    Quantity = (int)Lorem.Number(1, 5),
+                    ServiceId = (int)Lorem.Number(1, 3),
+                    Status = (ServiceRequestStatus)status,
+                    SaleApprovalId = status == 1 || status == 3 ? 1 : null,
+                    TechExecutionId = status == 3 ? 1 : null
+                });
+            }
+        }
+
+        for (int i = 46; i <= 47; i++)
+        {
+            for (int j = 0; j <= (int)Lorem.Number(0, 5); j++)
+            {
+                builder.Entity<ServiceRequest>().HasData(new ServiceRequest
+                {
+                    Id = serviceRequestId++,
+                    RequestId = i,
+                    Quantity = (int)Lorem.Number(1, 5),
+                    ServiceId = (int)Lorem.Number(1, 3),
+                    Status = ServiceRequestStatus.Denied,
+                });
+            }
+        }
+
+        for (int i = 48; i <= 50; i++)
+        {
+            for (int j = 0; j <= (int)Lorem.Number(0, 5); j++)
+            {
+                int status = (int)Lorem.Number(0, 3);
+                builder.Entity<ServiceRequest>().HasData(new ServiceRequest
+                {
+                    Id = serviceRequestId++,
+                    RequestId = i,
+                    Quantity = (int)Lorem.Number(1, 5),
+                    ServiceId = (int)Lorem.Number(1, 3),
+                    Status = (ServiceRequestStatus)status,
+                    SaleApprovalId = status == 1 || status == 3 ? 1 : null,
+                    TechExecutionId = status == 3 ? 1 : null
                 });
             }
         }
@@ -466,7 +573,7 @@ public static class ModelBuilderExtentions
     {
         builder.Entity<ServiceRequest>()
             .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Approver>()
+        builder.Entity<SaleApproval>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Area>()
             .HasQueryFilter(x => !x.IsDeleted);
@@ -480,7 +587,7 @@ public static class ModelBuilderExtentions
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Device>()
             .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Executor>()
+        builder.Entity<TechExecution>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Ip>()
             .HasQueryFilter(x => !x.IsDeleted);

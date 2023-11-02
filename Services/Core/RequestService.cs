@@ -102,10 +102,9 @@ public class RequestService : IRequestService
                 .Include(x => x.Customer)
                 .ThenInclude(x => x.User)
                 .Include(x => x.RequestExtendHistories)
-                .Include(x => x.ServiceRequests)
-                .Where(x => x.Status != RequestStatus.Ongoing ||
-                    x.Status != RequestStatus.Stopped ||
-                    x.ServiceRequests.Any(_ => _.Status != ServiceRequestStatus.Success))
+                .Include(x => x.ServiceRequests).ThenInclude(x => x.Service)
+                .Where(x => (x.Status != RequestStatus.Ongoing &&
+                    x.Status != RequestStatus.Stopped && x.Status != RequestStatus.Ended) || x.ServiceRequests.Any(_ => _.Status != ServiceRequestStatus.Success))
                 .Where(delegate (Request x)
                 {
                     var matchCompanyName = MatchString(searchModel, x.Customer.CompanyName);
@@ -120,7 +119,7 @@ public class RequestService : IRequestService
             requests = requests.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             requests = requests.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<RequestModel>(requests).ToList();
+            paging.Data = _mapper.Map<List<RequestModel>>(requests.ToList());
 
             result.Data = paging;
             result.Succeed = true;

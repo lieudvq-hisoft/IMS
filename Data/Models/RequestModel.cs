@@ -1,6 +1,8 @@
-﻿using Data.Enums;
+﻿using Data.Entities;
+using Data.Enums;
 using IMS.Data.Utils.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
 
 namespace Data.Models;
 public class RequestModel
@@ -14,6 +16,7 @@ public class RequestModel
     public string Status { get; set; }
     public string? InspectionRecordFilePath { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
+    public List<ServiceRequestModel>? ServiceRequestModels { get; set; }
 }
 
 public class InitialRequestCreateModel

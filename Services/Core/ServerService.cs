@@ -78,8 +78,8 @@ public class ServerService : IServerService
             var server = _dbContext.Servers
                 .Include(x => x.Request).ThenInclude(x => x.Customer).ThenInclude(x => x.User)
                 .Include(x => x.Request).ThenInclude(x => x.RequestExtendHistories)
-                .Include(x => x.Request).ThenInclude(x => x.ServiceRequests).ThenInclude(x => x.Approver).ThenInclude(x => x.User)
-                .Include(x => x.Request).ThenInclude(x => x.ServiceRequests).ThenInclude(x => x.Executor).ThenInclude(x => x.User)
+                .Include(x => x.Request).ThenInclude(x => x.ServiceRequests).ThenInclude(x => x.SaleApproval).ThenInclude(x => x.Sale)
+                .Include(x => x.Request).ThenInclude(x => x.ServiceRequests).ThenInclude(x => x.TechExecution).ThenInclude(x => x.Tech)
                 .Include(x => x.IpAssignments).ThenInclude(x => x.Ip).ThenInclude(x => x.Network)
                 .Include(x => x.Device).ThenInclude(x => x.Locations).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                 .FirstOrDefault(x => x.Id == id && x.Request.Status != RequestStatus.Denied && x.Request.Status != RequestStatus.Incomplete);

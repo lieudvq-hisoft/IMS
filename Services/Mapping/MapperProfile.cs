@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Data.Entities;
 using Data.Models;
+using OfficeOpenXml.Style;
 
 namespace Services.Mapping;
 
@@ -11,17 +12,17 @@ public class MapperProfile : Profile
         #region ServiceRequestModel
         CreateMap<ServiceRequest, ServiceRequestModel>()
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Service.Name))
-            .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Request.Customer.User.Fullname))
-            .ForMember(dest => dest.Executor, opt => opt.MapFrom(src => src.Executor.User.Fullname))
-            .ForMember(dest => dest.Approver, opt => opt.MapFrom(src => src.Approver.User.Fullname));
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
         #endregion
 
         #region Request
-        CreateMap<Request, RequestModel>();
+        //CreateMap<Request, RequestModel>();
         CreateMap<Request, RequestModel>()
             .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName))
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.GetRequestType()))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.GetRequestStatus()));
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.GetRequestStatus()))
+            .ForMember(dest => dest.ServiceRequestModels, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<List<ServiceRequestModel>>(src.ServiceRequests)))
+            ;
         #endregion
 
         #region CompanyType

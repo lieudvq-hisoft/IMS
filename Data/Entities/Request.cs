@@ -19,6 +19,12 @@ public class Request : BaseEntity
     public int? ServerId { get; set; }
     public virtual Server? Server { get; set; }
 
+    public int? TechExecutionId { get; set; }
+    public virtual TechExecution? TechExecution { get; set; }
+
+    public int? SaleApprovalId { get; set; }
+    public virtual SaleApproval? SaleApproval { get; set; }
+
     public virtual ICollection<RequestExtendHistory> RequestExtendHistories { get; set; }
 
     public virtual ICollection<ServiceRequest> ServiceRequests { get; set; }
