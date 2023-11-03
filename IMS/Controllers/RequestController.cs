@@ -51,6 +51,16 @@ public class RequestController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}")]
+    [AllowAnonymous]
+    [SwaggerOperation(Summary = "Get request detail")]
+    public async Task<ActionResult> GetRequest([FromRoute] int id)
+    {
+        var result = await _requestService.GetDetail(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost("Bulk")]
     [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "[Sale]: Create user, customer and request base on import excel. Create all 3 entity if success or nothing if any fail validation or have error when inserting. Return the result excel file with result on the right most column")]
