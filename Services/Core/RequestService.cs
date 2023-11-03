@@ -142,7 +142,7 @@ public class RequestService : IRequestService
                 .Include(x => x.Customer)
                 .ThenInclude(x => x.User)
                 .Include(x => x.RequestExtendHistories)
-                .Include(x => x.ServiceRequests)
+                .Include(x => x.ServiceRequests).ThenInclude(x => x.Service)
                 .FirstOrDefault(x => x.Id == id);
 
             result.Data = _mapper.Map<RequestModel>(request);
