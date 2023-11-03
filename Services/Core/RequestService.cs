@@ -144,9 +144,14 @@ public class RequestService : IRequestService
                 .Include(x => x.RequestExtendHistories)
                 .Include(x => x.ServiceRequests).ThenInclude(x => x.Service)
                 .FirstOrDefault(x => x.Id == id);
-
-            result.Data = _mapper.Map<RequestModel>(request);
-            result.Succeed = true;
+            if (request == null) { 
+                result.ErrorMessage = RequestErrorMessage.NOT_EXISTED; 
+            }
+            else
+            {
+                result.Data = _mapper.Map<RequestModel>(request);
+                result.Succeed = true;
+            }
         }
         catch (Exception e)
         {
