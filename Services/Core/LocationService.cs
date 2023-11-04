@@ -208,7 +208,7 @@ public class LocationService : ILocationService
             });
         }
 
-        var unavailableLocations = _dbContext.Locations.Include(x => x.Device).Where(x => !x.IsMoveout && x.RackId == rack.Id).ToList();
+        var unavailableLocations = _dbContext.Locations.Include(x => x.Device).Where(x => x.RackId == rack.Id).ToList();
         foreach (Location location in unavailableLocations)
         {
             var startPosition = location.StartPosition;

@@ -59,7 +59,7 @@ public class MapperProfile : Profile
 
         #region Server
         CreateMap<Server, ServerModel>()
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Request.Status))
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.DisplayStatus()))
             .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.Select(x => x.Ip).FirstOrDefault(x => x.Type == Data.Enums.IpType.Host).DisplayIp()))
             .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.Device.Size + src.Device.AdditionalSize))
             .ForMember(dest => dest.Power, opt => opt.MapFrom(src => src.Device.BasePower + src.Device.AdditionalPower))
@@ -73,7 +73,7 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.BaseSize, opt => opt.MapFrom(src => src.Device.Size))
             .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.Device.Size + src.Device.AdditionalSize))
             .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => src.Request.DateCreated))
-            .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Device.Locations.FirstOrDefault(x => !x.IsMoveout).Rack.DisplayRack()))
+            .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Device.Locations.FirstOrDefault().Rack.DisplayRack()))
             .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.Select(x => x.Ip).FirstOrDefault(x => x.Type == Data.Enums.IpType.Host).DisplayIp()))
             .ForMember(dest => dest.RequestExtendHistoryModel, opt => opt.MapFrom(src => src.Request.RequestExtendHistories.Where(x => x.IsAccepted)));
         #endregion

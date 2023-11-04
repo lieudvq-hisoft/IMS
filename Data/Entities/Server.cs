@@ -1,4 +1,7 @@
-﻿namespace Data.Entities;
+﻿using Data.Enums;
+using System.Linq.Expressions;
+
+namespace Data.Entities;
 
 public class Server : BaseEntity
 {
@@ -13,4 +16,21 @@ public class Server : BaseEntity
     public virtual ICollection<IpAssignment> IpAssignments { get; set; }
 
     public virtual Request Request { get; set; }
+
+    public string DisplayStatus()
+    {
+        switch (Request.Status)
+        {
+            case (RequestStatus.Accepted):
+                return "Được chấp nhận";
+            case (RequestStatus.Ongoing):
+                return "Đang hoạt động";
+            case (RequestStatus.Ended):
+                return "Ngừng hoạt động";
+            case (RequestStatus.Stopped):
+                return "Tạm ngừng";
+            default:
+                throw new Exception("Unaccepted Request");
+        }
+    }
 }

@@ -7,7 +7,7 @@ public class ServerModel
     public int Id { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdate { get; set; }
-    public RequestStatus? Status { get; set; }
+    public string Status { get; set; }
     public string IpAddress { get; set; }
     public int Size { get; set; }
     public int Power { get; set; }

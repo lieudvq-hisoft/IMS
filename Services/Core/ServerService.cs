@@ -44,7 +44,7 @@ public class ServerService : IServerService
                 .Include(x => x.IpAssignments)
                 .ThenInclude(x => x.Ip)
                 .ThenInclude(x => x.Network)
-                .Where(x => x.Request.Status != RequestStatus.Denied && x.Request.Status != RequestStatus.Incomplete)
+                .Where(x => x.Request.Status == RequestStatus.Ongoing || x.Request.Status == RequestStatus.Stopped || x.Request.Status == RequestStatus.Ended || x.Request.Status == RequestStatus.Accepted)
                 .Where(delegate (Server x)
                 {
                     return searchModel.Status != null ? x.Request.Status.ToString() == searchModel.Status.ToString() : true;
