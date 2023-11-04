@@ -155,7 +155,7 @@ public static class ModelBuilderExtentions
         }
         builder.Entity<Rack>().HasData(racks.OrderBy(x => x.Id));
 
-        for (int i = 1; i <= 30; i++)
+        for (int i = 1; i <= 50; i++)
         {
             builder.Entity<Location>().HasData(new Location
             {

@@ -33,6 +33,7 @@ public class DeviceService : IDeviceService
         try
         {
             var devices = _dbContext.Devices.Include(x => x.Server)
+                .Include(x => x.Locations).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                 .Where(x => x.Server == null)
                 .Where(delegate (Device x)
                 {
@@ -45,7 +46,8 @@ public class DeviceService : IDeviceService
             devices = devices.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             devices = devices.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.Map<List<DeviceModel>>(devices);
+            var deviceList = devices.ToList();
+            paging.Data = _mapper.Map<List<DeviceModel>>(deviceList);
 
             result.Data = paging;
             result.Succeed = true;

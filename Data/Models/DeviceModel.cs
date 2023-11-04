@@ -14,4 +14,5 @@ public class DeviceModel
     public string Status { get; set; }
     public int BasePower { get; set; }
     public int BaseSize { get; set; }
+    public string Rack { get; set; }
 }

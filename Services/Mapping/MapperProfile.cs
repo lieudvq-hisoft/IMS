@@ -80,7 +80,8 @@ public class MapperProfile : Profile
 
         #region Device
         CreateMap<Device, DeviceModel>()
-             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.DisplayStatus()));
+             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.DisplayStatus()))
+             .ForMember(dest => dest.Rack, opt => opt.MapFrom(src => src.Locations.FirstOrDefault().Rack.DisplayRack()));
         #endregion
     }
 }
