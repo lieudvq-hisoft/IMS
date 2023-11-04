@@ -68,14 +68,37 @@ public static class ModelBuilderExtentions
         #endregion
 
         #region Device
-        for (int i = 1; i <= 50; i++)
+        for (int i = 1; i <= 10; i++)
         {
             builder.Entity<Device>().HasData(new Device
             {
                 Id = i,
-                Type = i <= 10 ? "Hub" : "Server",
+                Type = "Hub",
                 Size = (int)Lorem.Number(2, 10),
                 BasePower = (int)Lorem.Number(200, 500),
+                DeviceStatus = (DeviceStatus)(int)Lorem.Number(0, 1)
+            });
+        }
+        for (int i = 11; i <= 47; i++)
+        {
+            builder.Entity<Device>().HasData(new Device
+            {
+                Id = i,
+                Type = "Server",
+                Size = (int)Lorem.Number(2, 10),
+                BasePower = (int)Lorem.Number(200, 500),
+                DeviceStatus = DeviceStatus.Ongoing
+            });
+        }
+        for (int i = 48; i <= 50; i++)
+        {
+            builder.Entity<Device>().HasData(new Device
+            {
+                Id = i,
+                Type = "Server",
+                Size = (int)Lorem.Number(2, 10),
+                BasePower = (int)Lorem.Number(200, 500),
+                DeviceStatus = DeviceStatus.Ended
             });
         }
         #endregion

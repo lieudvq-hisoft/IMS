@@ -20,6 +20,13 @@ public enum RequestStatus
     Ended
 }
 
+public enum DeviceStatus
+{
+    Ongoing,
+    Stopped,
+    Ended
+}
+
 public enum RequestType
 {
     New,
@@ -59,6 +66,11 @@ public enum RequestSortCriteria
     Id
 }
 public enum ServerSortCriteria
+{
+    Id
+}
+
+public enum DeviceSortCriteria
 {
     Id
 }

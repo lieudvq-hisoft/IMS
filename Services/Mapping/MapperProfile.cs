@@ -77,5 +77,10 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.Select(x => x.Ip).FirstOrDefault(x => x.Type == Data.Enums.IpType.Host).DisplayIp()))
             .ForMember(dest => dest.RequestExtendHistoryModel, opt => opt.MapFrom(src => src.Request.RequestExtendHistories.Where(x => x.IsAccepted)));
         #endregion
+
+        #region Device
+        CreateMap<Device, DeviceModel>()
+             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.DisplayStatus()));
+        #endregion
     }
 }
