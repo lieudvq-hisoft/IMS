@@ -27,6 +27,21 @@ public enum DeviceStatus
     Ended
 }
 
+public enum IpAssignmentStatus
+{
+    Pending,
+    Denied,
+    Ongoing,
+    Ended
+}
+
+public enum IpAssignmentType
+{
+    Host,
+    Additional,
+    Port
+}
+
 public enum RequestType
 {
     New,

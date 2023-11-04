@@ -54,7 +54,7 @@ public class IpService : IIpService
                 validPrecondition = false;
                 result.ErrorMessage = IpErrorMessage.NOT_EXISTED;
             }
-            if (ip.IpAssignments.Any(x => x.IsActive))
+            if (ip.IpAssignments.Any(x => x.Status == IpAssignmentStatus.Ongoing || x.Status == IpAssignmentStatus.Pending))
             {
                 validPrecondition = false;
                 result.ErrorMessage = IpErrorMessage.NOT_AVAILABLE;
@@ -67,7 +67,7 @@ public class IpService : IIpService
                     ServerId = request.ServerId.Value,
                     IpId = ip.Id,
                     DateAssign = DateTime.Now,
-                    IsActive = true
+                    Status = IpAssignmentStatus.Pending
                 };
                 _dbContext.IpAssignments.Add(ipAssignment);
                 _dbContext.SaveChanges();

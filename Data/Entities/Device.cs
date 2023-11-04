@@ -9,7 +9,7 @@ public class Device : BaseEntity
     public int AdditionalSize { get; set; }
     public int BasePower { get; set; }
     public int AdditionalPower { get; set; }
-    public DeviceStatus DeviceStatus { get; set; }
+    public DeviceStatus Status { get; set; }
 
     public virtual Server? Server { get; set; }
 
@@ -17,7 +17,7 @@ public class Device : BaseEntity
 
     public string DisplayStatus()
     {
-        switch (DeviceStatus)
+        switch (Status)
         {
             case (DeviceStatus.Ongoing):
                 return "Đang hoạt động";

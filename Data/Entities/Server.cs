@@ -15,6 +15,8 @@ public class Server : BaseEntity
 
     public virtual ICollection<IpAssignment> IpAssignments { get; set; }
 
+    public virtual ICollection<ServerAppointment> ServerAppointments { get; set; }
+
     public virtual Request Request { get; set; }
 
     public string DisplayStatus()

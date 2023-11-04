@@ -86,6 +86,8 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
     }
+
+    public DbSet<AppointmentSchedule> AppointmentSchedules { get; set; }
     public DbSet<Area> Areas { get; set; }
     public DbSet<CompanyType> CompanyTypes { get; set; }
     public DbSet<Customer> Customers { get; set; }
@@ -100,6 +102,7 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<Role> Role { get; set; }
     public DbSet<SaleApproval> SaleApprovals { get; set; }
     public DbSet<Server> Servers { get; set; }
+    public DbSet<ServerAppointment> ServerAppointments { get; set; }
     public DbSet<Service> Services { get; set; }
     public DbSet<ServiceRequest> ServiceRequests { get; set; }
     public DbSet<TechExecution> TechExecutions { get; set; }

@@ -76,7 +76,7 @@ public static class ModelBuilderExtentions
                 Type = "Hub",
                 Size = (int)Lorem.Number(2, 10),
                 BasePower = (int)Lorem.Number(200, 500),
-                DeviceStatus = (DeviceStatus)(int)Lorem.Number(0, 1)
+                Status = (DeviceStatus)(int)Lorem.Number(0, 1)
             });
         }
         for (int i = 11; i <= 47; i++)
@@ -87,7 +87,7 @@ public static class ModelBuilderExtentions
                 Type = "Server",
                 Size = (int)Lorem.Number(2, 10),
                 BasePower = (int)Lorem.Number(200, 500),
-                DeviceStatus = DeviceStatus.Ongoing
+                Status = DeviceStatus.Ongoing
             });
         }
         for (int i = 48; i <= 50; i++)
@@ -98,7 +98,7 @@ public static class ModelBuilderExtentions
                 Type = "Server",
                 Size = (int)Lorem.Number(2, 10),
                 BasePower = (int)Lorem.Number(200, 500),
-                DeviceStatus = DeviceStatus.Ended
+                Status = DeviceStatus.Ended
             });
         }
         #endregion
@@ -217,7 +217,8 @@ public static class ModelBuilderExtentions
             {
                 Id = i,
                 DateAssign = DateTime.UtcNow,
-                IsActive = (i == 31 || i == 32) ? false : true,
+                Status = (i == 31 || i == 32) ? IpAssignmentStatus.Denied : IpAssignmentStatus.Ongoing,
+                Type = IpAssignmentType.Host,
                 IsDeleted = (i == 31 || i == 32) ? true : false,
                 ServerId = i,
                 IpId = i + 3
@@ -594,23 +595,15 @@ public static class ModelBuilderExtentions
 
     public static void FilterSoftDeleted(this ModelBuilder builder)
     {
-        builder.Entity<ServiceRequest>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<SaleApproval>()
+        builder.Entity<AppointmentSchedule>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Area>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Request>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<RequestExtendHistory>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<CompanyType>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Customer>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Device>()
-            .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<TechExecution>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Ip>()
             .HasQueryFilter(x => !x.IsDeleted);
@@ -622,11 +615,23 @@ public static class ModelBuilderExtentions
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Rack>()
             .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Request>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<RequestExtendHistory>()
+            .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Role>()
             .HasQueryFilter(x => !x.isDeactive);
+        builder.Entity<SaleApproval>()
+            .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Server>()
             .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<ServerAppointment>()
+            .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Service>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<ServiceRequest>()
+            .HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<TechExecution>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<User>()
             .HasQueryFilter(x => !x.IsDeleted);

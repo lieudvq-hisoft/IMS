@@ -36,7 +36,7 @@ public class DeviceService : IDeviceService
                 .Where(x => x.Server == null)
                 .Where(delegate (Device x)
                 {
-                    return searchModel.Status != null ? x.DeviceStatus.ToString() == searchModel.Status.ToString() : true;
+                    return searchModel.Status != null ? x.Status.ToString() == searchModel.Status.ToString() : true;
                 })
                 .AsQueryable();
 
