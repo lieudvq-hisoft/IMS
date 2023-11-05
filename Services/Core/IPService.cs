@@ -1,4 +1,5 @@
-﻿using Data.DataAccess;
+﻿using AutoMapper;
+using Data.DataAccess;
 using Data.DataAccess.Constant;
 using Data.Entities;
 using Data.Enums;
@@ -11,15 +12,18 @@ namespace Services.Core;
 public interface IIpService
 {
     Task<ResultModel> AttempAssignIp(int requestId, int ipId, IDbContextTransaction transaction);
+    Task<ResultModel> Get(IpAssignmentSearchModel searchModel);
 }
 
 public class IpService : IIpService
 {
     private readonly AppDbContext _dbContext;
+    private readonly IMapper _mapper;
 
-    public IpService(AppDbContext dbContext)
+    public IpService(AppDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
+        _mapper = mapper;
     }
 
     public async Task<ResultModel> AttempAssignIp(int requestId, int ipId, IDbContextTransaction transaction)
@@ -81,6 +85,33 @@ public class IpService : IIpService
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 
+        return result;
+    }
+
+    public async Task<ResultModel> Get(IpAssignmentSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var ipAssignments = _dbContext.IpAssignments.Include(x => x.Ip).ThenInclude(x => x.Network)
+                .Where(x => x.Status != IpAssignmentStatus.Denied)
+                .Where(delegate (IpAssignment x)
+                {
+                    bool matchServer = searchModel.ServerId != null ? x.ServerId == searchModel.ServerId.Value : true;
+                    bool matchType = x.Type == searchModel.Type;
+                    return matchServer && matchType;
+                })
+                .ToList();
+
+            result.Data = _mapper.Map<List<IpAssignmentModel>>(ipAssignments);
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
         return result;
     }
 }

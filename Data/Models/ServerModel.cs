@@ -28,13 +28,15 @@ public class ServerDetailModel
 {
     public int Id { get; set; }
     public string CompanyName { get; set; }
+    public string Customer { get; set; }
+    public DateTime DateCreated { get; set; }
     public string Status { get; set; }
     public string Model { get; set; }
     public int BasePower { get; set; }
     public int Power { get; set; }
     public int BaseSize { get; set; }
     public int Size { get; set; }
-    public DateTime DateCreated { get; set; }
+    public string ReceiptOfRecipientFilePath { get; set; }
     public DateTime DateAllocate { get; set; }
     public string SerialNumber { get; set; }
     public string Location { get; set; }
@@ -42,7 +44,6 @@ public class ServerDetailModel
 
     public List<RequestExtendHistoryModel> RequestExtendHistoryModel { get; set; }
     public List<ServiceRequestModel> ServiceRequests { get; set; }
-
 }
 
 public class ServerCreateModel

@@ -192,7 +192,6 @@ public static class ModelBuilderExtentions
             {
                 Id = i,
                 Address = i,
-                Type = Enums.IpType.Host,
                 IsReserved = false,
                 NetworkId = i % 2 == 0 ? 1 : 2,
             });

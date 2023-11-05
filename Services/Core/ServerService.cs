@@ -80,6 +80,7 @@ public class ServerService : IServerService
                 .Include(x => x.Request).ThenInclude(x => x.RequestExtendHistories)
                 .Include(x => x.Request).ThenInclude(x => x.ServiceRequests).ThenInclude(x => x.SaleApproval).ThenInclude(x => x.Sale)
                 .Include(x => x.Request).ThenInclude(x => x.ServiceRequests).ThenInclude(x => x.TechExecution).ThenInclude(x => x.Tech)
+                .Include(x => x.Request).ThenInclude(x => x.ServiceRequests).ThenInclude(x => x.Service)
                 .Include(x => x.IpAssignments).ThenInclude(x => x.Ip).ThenInclude(x => x.Network)
                 .Include(x => x.Device).ThenInclude(x => x.Locations).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                 .FirstOrDefault(x => x.Id == id && x.Request.Status != RequestStatus.Denied && x.Request.Status != RequestStatus.Incomplete);
@@ -90,14 +91,7 @@ public class ServerService : IServerService
             }
             else
             {
-                var serverModel = _mapper.Map<ServerDetailModel>(server);
-                var serviceRequests = server.Request.ServiceRequests;
-                if (serviceRequests != null)
-                {
-                    serverModel.ServiceRequests = _mapper.Map<List<ServiceRequestModel>>(serviceRequests);
-                }
-
-                result.Data = serverModel;
+                result.Data = _mapper.Map<ServerDetailModel>(server);
                 result.Succeed = true;
             }
         }

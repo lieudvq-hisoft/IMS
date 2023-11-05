@@ -21,8 +21,7 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName))
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.GetRequestType()))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.GetRequestStatus()))
-            .ForMember(dest => dest.ServiceRequestModels, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<List<ServiceRequestModel>>(src.ServiceRequests)))
-            ;
+            .ForMember(dest => dest.ServiceRequestModels, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<List<ServiceRequestModel>>(src.ServiceRequests)));
         #endregion
 
         #region CompanyType
@@ -60,12 +59,14 @@ public class MapperProfile : Profile
         #region Server
         CreateMap<Server, ServerModel>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.DisplayStatus()))
-            .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.Select(x => x.Ip).FirstOrDefault(x => x.Type == Data.Enums.IpType.Host).DisplayIp()))
+            .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.FirstOrDefault(x => x.Type == Data.Enums.IpAssignmentType.Host).Ip.DisplayIp()))
             .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.Device.Size + src.Device.AdditionalSize))
             .ForMember(dest => dest.Power, opt => opt.MapFrom(src => src.Device.BasePower + src.Device.AdditionalPower))
             .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Request.Customer.User.Fullname));
         CreateMap<Server, ServerDetailModel>()
             .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Request.Customer.CompanyName))
+            .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Request.Customer.User.Fullname))
+            .ForMember(dest => dest.ReceiptOfRecipientFilePath, opt => opt.MapFrom(src => src.Request.ReceiptOfRecipientFilePath))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Request.Status))
             .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => src.Request.DateCreated))
             .ForMember(dest => dest.BasePower, opt => opt.MapFrom(src => src.Device.BasePower))
@@ -74,8 +75,9 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.Device.Size + src.Device.AdditionalSize))
             .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => src.Request.DateCreated))
             .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Device.Locations.FirstOrDefault().Rack.DisplayRack()))
-            .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.Select(x => x.Ip).FirstOrDefault(x => x.Type == Data.Enums.IpType.Host).DisplayIp()))
-            .ForMember(dest => dest.RequestExtendHistoryModel, opt => opt.MapFrom(src => src.Request.RequestExtendHistories.Where(x => x.IsAccepted)));
+            .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.FirstOrDefault(x => x.Type == Data.Enums.IpAssignmentType.Host).Ip.DisplayIp()))
+            .ForMember(dest => dest.RequestExtendHistoryModel, opt => opt.MapFrom(src => src.Request.RequestExtendHistories.Where(x => x.IsAccepted)))
+            .ForMember(dest => dest.ServiceRequests, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<List<ServiceRequestModel>>(src.Request.ServiceRequests)));
         #endregion
 
         #region Device
@@ -83,6 +85,13 @@ public class MapperProfile : Profile
              .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.DisplayStatus()))
              .ForMember(dest => dest.BaseSize, opt => opt.MapFrom(src => src.Size))
              .ForMember(dest => dest.Rack, opt => opt.MapFrom(src => src.Locations.FirstOrDefault().Rack.DisplayRack()));
+        #endregion
+
+        #region IpAssignment
+        CreateMap<IpAssignment, IpAssignmentModel>()
+             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.DisplayStatus()))
+             .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src.DisplayContent()))
+             .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.Ip.DisplayIp()));
         #endregion
     }
 }
