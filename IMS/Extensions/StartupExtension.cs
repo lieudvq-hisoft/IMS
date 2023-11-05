@@ -62,6 +62,8 @@ public static class StartupExtension
         services.AddScoped<IServiceService, ServiceService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IIpService, IpService>();
+        services.AddScoped<IAppointmentService, AppointmentService>();
+
 
         services.AddScoped<IEmailService, EmailService>();
 

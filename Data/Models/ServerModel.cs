@@ -14,6 +14,11 @@ public class ServerModel
     public string Customer { get; set; }
 }
 
+public class ServerAppointmentModel {
+    public int AppointmentScheduleId { get; set; }
+    public int ServerId { get; set; }
+}
+
 public class ServerSearchModel
 {
     public RequestStatus? Status { get; set; }

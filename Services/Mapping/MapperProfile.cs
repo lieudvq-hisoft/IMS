@@ -84,5 +84,16 @@ public class MapperProfile : Profile
              .ForMember(dest => dest.BaseSize, opt => opt.MapFrom(src => src.Size))
              .ForMember(dest => dest.Rack, opt => opt.MapFrom(src => src.Locations.FirstOrDefault().Rack.DisplayRack()));
         #endregion
+
+        #region AppointmentSchedule
+        CreateMap<AppointmentSchedule, AppointmentScheduleModel>()
+            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName))
+            .ForMember(dest => dest.ServerId, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<List<string>>(src.ServerAppointments.Select(x => x.ServerId))))
+            ;
+        CreateMap<AppointmentSchedule, AppointmentScheduleDetailModel>()
+            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName))
+            .ForMember(dest => dest.ServerId, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<List<string>>(src.ServerAppointments.Select(x => x.ServerId))))
+            ;
+        #endregion
     }
 }
