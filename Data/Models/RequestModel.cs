@@ -53,9 +53,10 @@ public class RequestCreateModel
 
 public class RequestSearchModel
 {
-    public string? SearchValue { get; set; } = "";
-    public int? Id { get; set; }
-    public RequestStatus? Status { get; set; }
+    public string? CompanyName { get; set; } = "";
+    public int? Id { get; set; } = null;
+    public List<RequestStatus>? Status { get; set; } = null;
+    public List<ServiceRequestStatus>? ServiceRequestStatus { get; set; } = null;
 }
 
 public class RequestImportModel

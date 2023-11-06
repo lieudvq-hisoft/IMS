@@ -99,16 +99,15 @@ public class RequestService : IRequestService
         try
         {
             var requests = _dbContext.Requests
-                .Include(x => x.Customer)
-                .ThenInclude(x => x.User)
+                .Include(x => x.Customer).ThenInclude(x => x.User)
                 .Include(x => x.RequestExtendHistories)
-                .Include(x => x.ServiceRequests).ThenInclude(x => x.Service)
+                .Include(x => x.ServiceRequests.Where(x => searchModel.ServiceRequestStatus != null ? searchModel.ServiceRequestStatus.Contains(x.Status) : true)).ThenInclude(x => x.Service)
                 .Where(x => ((x.Status != RequestStatus.Ongoing &&
                     x.Status != RequestStatus.Stopped) || x.ServiceRequests.Any(_ => _.Status != ServiceRequestStatus.Success)) && x.Status != RequestStatus.Ended)
                 .Where(delegate (Request x)
                 {
                     var matchCompanyName = MatchString(searchModel, x.Customer.CompanyName);
-                    var matchStatus = searchModel.Status != null ? x.Status.ToString() == searchModel.Status.ToString() : true;
+                    var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(x.Status) : true;
                     var matchId = searchModel.Id != null ? x.Id == searchModel.Id : true;
                     return matchCompanyName && matchStatus;
                 })
@@ -165,7 +164,7 @@ public class RequestService : IRequestService
     {
         return MyFunction
             .ConvertToUnSign(value ?? "")
-            .IndexOf(MyFunction.ConvertToUnSign(searchModel.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
+            .IndexOf(MyFunction.ConvertToUnSign(searchModel.CompanyName ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
     }
 
     public async Task<ResultModel> ImportRequest(string filePath)
