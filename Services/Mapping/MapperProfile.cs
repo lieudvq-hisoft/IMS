@@ -58,6 +58,7 @@ public class MapperProfile : Profile
         #endregion
 
         #region Server
+        CreateMap<Server, ServerForAppointmentModel>();
         CreateMap<Server, ServerModel>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.DisplayStatus()))
             .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.Select(x => x.Ip).FirstOrDefault(x => x.Type == Data.Enums.IpType.Host).DisplayIp()))
