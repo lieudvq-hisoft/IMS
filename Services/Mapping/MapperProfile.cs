@@ -97,12 +97,10 @@ public class MapperProfile : Profile
         #region AppointmentSchedule
         CreateMap<AppointmentSchedule, AppointmentScheduleModel>()
             .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName))
-            .ForMember(dest => dest.ServerModel, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<List<ServerForAppointmentModel>>(src.ServerAppointments.Select(x => x.Server))))
-            ;
+            .ForMember(dest => dest.ServerModel, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<List<ServerForAppointmentModel>>(src.ServerAppointments.Select(x => x.Server))));
         CreateMap<AppointmentSchedule, AppointmentScheduleDetailModel>()
             .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName))
-            .ForMember(dest => dest.ServerModel, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<List<ServerForAppointmentModel>>(src.ServerAppointments.Select(x => x.Server))))
-            ;
+            .ForMember(dest => dest.ServerModel, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<List<ServerForAppointmentModel>>(src.ServerAppointments.Select(x => x.Server))));
         #endregion
     }
 }

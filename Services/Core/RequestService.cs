@@ -108,7 +108,7 @@ public class RequestService : IRequestService
                 .Where(delegate (Request x)
                 {
                     var matchCompanyName = MatchString(searchModel, x.Customer.CompanyName);
-                    var matchStatus = searchModel.Status != null ? x.GetRequestStatus() == searchModel.Status.ToString() : true;
+                    var matchStatus = searchModel.Status != null ? x.Status.ToString() == searchModel.Status.ToString() : true;
                     var matchId = searchModel.Id != null ? x.Id == searchModel.Id : true;
                     return matchCompanyName && matchStatus;
                 })
