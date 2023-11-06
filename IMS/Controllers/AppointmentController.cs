@@ -29,7 +29,7 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [SwaggerOperation(Summary = "Get server list")]
+    [SwaggerOperation(Summary = "Get appointment detail")]
     public async Task<ActionResult> GetDetail(int id)
     {
         var result = await _appointmentService.GetDetail(id);
