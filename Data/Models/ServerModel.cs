@@ -14,9 +14,10 @@ public class ServerModel
     public string Customer { get; set; }
 }
 
-public class ServerAppointmentModel {
-    public int AppointmentScheduleId { get; set; }
-    public int ServerId { get; set; }
+public class ServerForAppointmentModel {
+    public int Id { get; set; }
+    public string SerialNumber { get; set; }
+    public string Model { get; set; }
 }
 
 public class ServerSearchModel

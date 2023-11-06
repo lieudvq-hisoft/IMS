@@ -14,7 +14,7 @@ public class AppointmentScheduleModel
     public string Reason { get; set; }
     public string Note { get; set; }
     public string CompanyName { get; set; }
-    public List<string>? ServerId { get; set; }
+    public List<ServerForAppointmentModel>? ServerModel { get; set; }
 }
 
 public class AppointmentScheduleDetailModel
@@ -28,7 +28,7 @@ public class AppointmentScheduleDetailModel
     public string VisitorEmployeedId { get; set; }
     public string Reason { get; set; }
     public string Note { get; set; }
-    public List<string>? ServerId { get; set; }
+    public List<ServerForAppointmentModel>? ServerModel { get; set; }
 
 }
 
