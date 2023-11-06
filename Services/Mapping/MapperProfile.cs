@@ -12,7 +12,7 @@ public class MapperProfile : Profile
         #region ServiceRequestModel
         CreateMap<ServiceRequest, ServiceRequestModel>()
             .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Service.Name))
-            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.Status.ToString()));
+            .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.DisplayStatus()));
         #endregion
 
         #region Request

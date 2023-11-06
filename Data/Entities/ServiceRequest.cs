@@ -22,4 +22,26 @@ public class ServiceRequest : BaseEntity
 
     public int? IpId { get; set; }
     public virtual Ip? Ip { get; set; }
+
+    public string DisplayStatus()
+    {
+        string status = string.Empty;
+        switch (Status)
+        {
+            case ServiceRequestStatus.Pending:
+                status = "Chờ xét duyệt";
+                break;
+            case ServiceRequestStatus.Accepted:
+                status = "Thành công";
+                break;
+            case ServiceRequestStatus.Denied:
+                status = "Không thành công";
+                break;
+            case ServiceRequestStatus.Success:
+                status = "Đang hoạt động";
+                break;
+        }
+
+        return status;
+    }
 }

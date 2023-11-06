@@ -53,30 +53,30 @@ public class Request : BaseEntity
 
     public string GetRequestStatus()
     {
-        string status;
-        if (Status != RequestStatus.Ongoing && Status != RequestStatus.Stopped)
+        string status = string.Empty;
+        switch (Status)
         {
-            status = Status.ToString();
-        }
-        else
-        {
-            var services = ServiceRequests;
-            if (services.All(x => x.Status == ServiceRequestStatus.Success))
-            {
-                status = "Accepted";
-            }
-            else if (services.All(x => x.Status == ServiceRequestStatus.Denied))
-            {
-                status = "Denied";
-            }
-            else if (services.All(x => x.Status == ServiceRequestStatus.Pending))
-            {
-                status = "Pending";
-            }
-            else
-            {
-                status = "Mixed";
-            }
+            case RequestStatus.Ongoing:
+                status = "Đang hoạt động";
+                break;
+            case RequestStatus.Stopped:
+                status = "Tạm ngừng";
+                break;
+            case RequestStatus.Incomplete:
+                status = "Chưa hoàn thiện";
+                break;
+            case RequestStatus.Pending:
+                status = "Chờ xét duyệt";
+                break;
+            case RequestStatus.Accepted:
+                status = "Thành công";
+                break;
+            case RequestStatus.Denied:
+                status = "Không thành công";
+                break;
+            case RequestStatus.Ended:
+                status = "Kết thúc";
+                break;
         }
 
         return status;

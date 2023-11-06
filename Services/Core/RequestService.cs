@@ -103,8 +103,8 @@ public class RequestService : IRequestService
                 .ThenInclude(x => x.User)
                 .Include(x => x.RequestExtendHistories)
                 .Include(x => x.ServiceRequests).ThenInclude(x => x.Service)
-                .Where(x => (x.Status != RequestStatus.Ongoing &&
-                    x.Status != RequestStatus.Stopped && x.Status != RequestStatus.Ended) || x.ServiceRequests.Any(_ => _.Status != ServiceRequestStatus.Success))
+                .Where(x => ((x.Status != RequestStatus.Ongoing &&
+                    x.Status != RequestStatus.Stopped) || x.ServiceRequests.Any(_ => _.Status != ServiceRequestStatus.Success)) && x.Status != RequestStatus.Ended)
                 .Where(delegate (Request x)
                 {
                     var matchCompanyName = MatchString(searchModel, x.Customer.CompanyName);
@@ -144,8 +144,9 @@ public class RequestService : IRequestService
                 .Include(x => x.RequestExtendHistories)
                 .Include(x => x.ServiceRequests).ThenInclude(x => x.Service)
                 .FirstOrDefault(x => x.Id == id);
-            if (request == null) { 
-                result.ErrorMessage = RequestErrorMessage.NOT_EXISTED; 
+            if (request == null)
+            {
+                result.ErrorMessage = RequestErrorMessage.NOT_EXISTED;
             }
             else
             {
