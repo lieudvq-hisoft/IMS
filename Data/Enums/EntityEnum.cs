@@ -89,3 +89,8 @@ public enum DeviceSortCriteria
 {
     Id
 }
+
+public enum AppointmentSortCriteria
+{
+    Id
+}

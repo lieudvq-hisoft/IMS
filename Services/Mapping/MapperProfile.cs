@@ -57,6 +57,7 @@ public class MapperProfile : Profile
         #endregion
 
         #region Server
+        CreateMap<Server, ServerForAppointmentModel>();
         CreateMap<Server, ServerModel>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.DisplayStatus()))
             .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.FirstOrDefault(x => x.Type == Data.Enums.IpAssignmentType.Host).Ip.DisplayIp()))
@@ -92,6 +93,16 @@ public class MapperProfile : Profile
              .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.DisplayStatus()))
              .ForMember(dest => dest.Content, opt => opt.MapFrom(src => src.DisplayContent()))
              .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.Ip.DisplayIp()));
+        #endregion
+        #region AppointmentSchedule
+        CreateMap<AppointmentSchedule, AppointmentScheduleModel>()
+            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName))
+            .ForMember(dest => dest.ServerModel, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<List<ServerForAppointmentModel>>(src.ServerAppointments.Select(x => x.Server))))
+            ;
+        CreateMap<AppointmentSchedule, AppointmentScheduleDetailModel>()
+            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName))
+            .ForMember(dest => dest.ServerModel, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<List<ServerForAppointmentModel>>(src.ServerAppointments.Select(x => x.Server))))
+            ;
         #endregion
     }
 }
