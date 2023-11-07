@@ -11,7 +11,7 @@ public class RequestModel
     public DateTime DateCreated { get; set; }
     public DateTime DateStop { get; set; }
     public string Type { get; set; }
-    public string CompanyName { get; set; }
+    public string CustomerName { get; set; }
     public int CustomerId { get; set; }
     public string Status { get; set; }
     public string? InspectionRecordFilePath { get; set; }

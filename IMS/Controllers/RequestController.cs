@@ -42,7 +42,6 @@ public class RequestController : ControllerBase
     }
 
     [HttpGet]
-    [AllowAnonymous]
     [SwaggerOperation(Summary = "Get requests, excluding ongoing or stopped requests, and those with unsuccessful additional services")]
     public async Task<ActionResult> GetRequest([FromQuery] PagingParam<RequestSortCriteria> pagingParam, [FromQuery] RequestSearchModel searchModel)
     {
@@ -51,10 +50,28 @@ public class RequestController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("Count")]
+    [SwaggerOperation(Summary = "Get request count base on request status")]
+    public async Task<ActionResult> GetRequestCount([FromQuery] List<RequestStatus> status)
+    {
+        var result = await _requestService.CountRequest(status);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("Service/Count")]
+    [SwaggerOperation(Summary = "Get service request count base on request status")]
+    public async Task<ActionResult> GetServiceRequestCount([FromQuery] List<ServiceRequestStatus> status)
+    {
+        var result = await _requestService.CountServiceRequest(status);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpGet("{id}")]
     [AllowAnonymous]
     [SwaggerOperation(Summary = "Get request detail")]
-    public async Task<ActionResult> GetRequest([FromRoute] int id)
+    public async Task<ActionResult> GetRequestDetail([FromRoute] int id)
     {
         var result = await _requestService.GetDetail(id);
         if (result.Succeed) return Ok(result.Data);
@@ -63,7 +80,7 @@ public class RequestController : ControllerBase
 
     [HttpPost("Bulk")]
     [Authorize(Roles = nameof(RoleType.Sale))]
-    [SwaggerOperation(Summary = "[Sale]: Create user, customer and request base on import excel. Create all 3 entity if success or nothing if any fail validation or have error when inserting. Return the result excel file with result on the right most column")]
+    [SwaggerOperation(Summary = "[Sale]: Create user, customer and request base on import excel.")]
     public async Task<ActionResult> Import([FromForm] ExcelFileUploadModel model)
     {
         string folderPath = Path.Combine(_environment.WebRootPath, "request", "import");

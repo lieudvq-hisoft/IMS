@@ -16,9 +16,8 @@ public class MapperProfile : Profile
         #endregion
 
         #region Request
-        //CreateMap<Request, RequestModel>();
         CreateMap<Request, RequestModel>()
-            .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Customer.CompanyName))
+            .ForMember(dest => dest.CustomerName, opt => opt.MapFrom(src => src.Customer.User.Fullname))
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.GetRequestType()))
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.GetRequestStatus()))
             .ForMember(dest => dest.ServiceRequestModels, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<List<ServiceRequestModel>>(src.ServiceRequests)));

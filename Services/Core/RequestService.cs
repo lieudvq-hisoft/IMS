@@ -16,6 +16,8 @@ namespace Services.Core;
 public interface IRequestService
 {
     Task<ResultModel> Get(PagingParam<RequestSortCriteria> paginationModel, RequestSearchModel searchModel);
+    Task<ResultModel> CountRequest(List<RequestStatus> status);
+    Task<ResultModel> CountServiceRequest(List<ServiceRequestStatus> status);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> ImportRequest(string filePath);
     Task<ResultModel> CreateRequest(InitialRequestCreateModel model);
@@ -74,6 +76,42 @@ public class RequestService : IRequestService
         {
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
+        return result;
+    }
+
+    public async Task<ResultModel> CountRequest(List<RequestStatus> status)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            result.Data = _dbContext.Requests.Where(x => status.Contains(x.Status)).Count();
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> CountServiceRequest(List<ServiceRequestStatus> status)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            result.Data = _dbContext.ServiceRequests.Where(x => status.Contains(x.Status)).Count();
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
         return result;
     }
 
