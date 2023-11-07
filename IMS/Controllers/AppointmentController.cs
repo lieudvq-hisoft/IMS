@@ -1,5 +1,6 @@
 ﻿using Data.Common.PaginationModel;
 using Data.Enums;
+using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
@@ -33,6 +34,16 @@ public class AppointmentController : ControllerBase
     public async Task<ActionResult> GetDetail(int id)
     {
         var result = await _appointmentService.GetDetail(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPost]
+    [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "Create a new appointment")]
+    public async Task<ActionResult> Create(AppointmentScheduleCreateModel model)
+    {
+        var result = await _appointmentService.Create(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

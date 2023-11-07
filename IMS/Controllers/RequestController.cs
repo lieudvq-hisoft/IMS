@@ -46,7 +46,7 @@ public class RequestController : ControllerBase
     [SwaggerOperation(Summary = "Get requests, excluding ongoing or stopped requests, and those with unsuccessful additional services")]
     public async Task<ActionResult> GetRequest([FromQuery] PagingParam<RequestSortCriteria> pagingParam, [FromQuery] RequestSearchModel searchModel)
     {
-        var result = await _requestService.GetRequest(pagingParam, searchModel);
+        var result = await _requestService.Get(pagingParam, searchModel);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

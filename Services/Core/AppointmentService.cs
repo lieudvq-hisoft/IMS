@@ -20,6 +20,7 @@ public interface IAppointmentService
 {
     Task<ResultModel> Get(PagingParam<AppointmentSortCriteria> paginationModel);
     Task<ResultModel> GetDetail(int id);
+    Task<ResultModel> Create(AppointmentScheduleCreateModel model);
 }
 
 public class AppointmentService : IAppointmentService
@@ -88,6 +89,67 @@ public class AppointmentService : IAppointmentService
             {
                 var appointmentModel = _mapper.Map<AppointmentScheduleDetailModel>(appointment);
                 result.Data = appointmentModel;
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Create(AppointmentScheduleCreateModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == model.CustomerId);
+            if (customer == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
+            }
+
+            if (validPrecondition)
+            {
+                List<int?> customerServerIds = _dbContext.Requests.Include(x => x.Server).Where(x => x.CustomerId == model.CustomerId && (x.Status == RequestStatus.Accepted || x.Status == RequestStatus.Ongoing || x.Status == RequestStatus.Stopped)).Select(x => x.ServerId).ToList();
+                foreach (int serverId in model.ServerIds)
+                {
+                    if (!customerServerIds.Contains(serverId))
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = AppointmentErrorMessgae.SERVER_NOT_BELONG_TO_CUSTOMER;
+                    }
+                }
+            }
+
+            if (validPrecondition)
+            {
+                var appointmentSchedule = new AppointmentSchedule
+                {
+                    DateAppointed = model.DateAppointed,
+                    Reason = model.Reason,
+                    Note = model.Note,
+                    VisitorName = model.VisitorName,
+                    CustomerId = model.CustomerId
+                };
+                _dbContext.AppointmentSchedules.Add(appointmentSchedule);
+                _dbContext.SaveChanges();
+
+                foreach (int serverId in model.ServerIds)
+                {
+                    _dbContext.Add(new ServerAppointment
+                    {
+                        AppointmentScheduleId = appointmentSchedule.Id,
+                        ServerId = serverId
+                    });
+                    _dbContext.SaveChanges();
+                }
                 result.Succeed = true;
             }
         }

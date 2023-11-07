@@ -32,3 +32,14 @@ public class AppointmentScheduleDetailModel
 
 }
 
+public class AppointmentScheduleCreateModel
+{
+    public string VisitorName { get; set; }
+    //public string VisitorPosition { get; set; }
+    //public string VisitorEmployeedId { get; set; }
+    public DateTime DateAppointed { get; set; }
+    public string Reason { get; set; }
+    public string Note { get; set; }
+    public int CustomerId { get; set; }
+    public List<int> ServerIds { get; set; }
+}

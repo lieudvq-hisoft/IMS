@@ -16,7 +16,6 @@ namespace Services.Core;
 public interface IRequestService
 {
     Task<ResultModel> Get(PagingParam<RequestSortCriteria> paginationModel, RequestSearchModel searchModel);
-    Task<ResultModel> GetRequest(PagingParam<RequestSortCriteria> paginationModel, RequestSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> ImportRequest(string filePath);
     Task<ResultModel> CreateRequest(InitialRequestCreateModel model);
@@ -39,59 +38,7 @@ public class RequestService : IRequestService
         _mapper = mapper;
     }
 
-    /// <summary>
-    /// Retrieves a paginated list of ongoing and stopped requests with optional search and sorting.
-    /// </summary>
-    /// <param name="paginationModel">Pagination and sorting parameters.</param>
-    /// <param name="searchModel">Criteria for filtering requests.</param>
-    /// <returns>The paginated request data or an error message.</returns>
-    /// <exception cref="Exception">Thrown when an error occurs during data retrieval.</exception>
     public async Task<ResultModel> Get(PagingParam<RequestSortCriteria> paginationModel, RequestSearchModel searchModel)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            var requests = _dbContext.Requests
-                .Include(x => x.Customer)
-                .Include(x => x.RequestExtendHistories)
-                .Include(x => x.ServiceRequests)
-                .Where(x => x.Status == RequestStatus.Ongoing
-                    || x.Status == RequestStatus.Stopped)
-                .Where(delegate (Request x)
-                {
-                    var matchCompanyName = MatchString(searchModel, x.Customer.CompanyName);
-                    var matchStatus = searchModel.Status != null ? x.Status.ToString() == searchModel.Status.ToString() : true;
-                    return matchCompanyName && matchStatus;
-                })
-                .AsQueryable();
-
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requests.Count());
-
-            requests = requests.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            requests = requests.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-
-            paging.Data = _mapper.ProjectTo<RequestModel>(requests).ToList();
-
-            result.Data = paging;
-            result.Succeed = true;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
-
-    /// <summary>
-    /// Retrieves a paginated list of request with is request that are not ongoing or stopped with optional search and sorting and request with service not success.
-    /// </summary>
-    /// <param name="paginationModel">Pagination and sorting parameters.</param>
-    /// <param name="searchModel">Criteria for filtering requests.</param>
-    /// <returns>The paginated request data or an error message.</returns>
-    /// <exception cref="Exception">Thrown when an error occurs during data retrieval.</exception>
-    public async Task<ResultModel> GetRequest(PagingParam<RequestSortCriteria> paginationModel, RequestSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
