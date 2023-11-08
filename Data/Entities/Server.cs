@@ -1,5 +1,4 @@
 ﻿using Data.Enums;
-using System.Linq.Expressions;
 
 namespace Data.Entities;
 
@@ -24,8 +23,6 @@ public class Server : BaseEntity
         switch (Request.Status)
         {
             case (RequestStatus.Accepted):
-                return "Được chấp nhận";
-            case (RequestStatus.Ongoing):
                 return "Đang hoạt động";
             case (RequestStatus.Ended):
                 return "Ngừng hoạt động";

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Data.Entities;
+﻿namespace Data.Entities;
 public class AppointmentSchedule : BaseEntity
 {
     public string VisitorName { get; set; }
@@ -21,6 +15,6 @@ public class AppointmentSchedule : BaseEntity
     public int? TechExecutionId { get; set; }
     public virtual TechExecution? TechExecution { get; set; }
 
-    
+
     public virtual ICollection<ServerAppointment> ServerAppointments { get; set; }
 }

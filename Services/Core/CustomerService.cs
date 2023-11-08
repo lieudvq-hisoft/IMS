@@ -229,7 +229,7 @@ public class CustomerService : ICustomerService
             if (validPrecondition)
             {
                 // Create new user
-                var role = _dbContext.Role.FirstOrDefault(x => !x.isDeactive && x.Name == "Customer");
+                var role = _dbContext.Role.FirstOrDefault(x => !x.IsDeactived && x.Name == "Customer");
                 var user = new User
                 {
                     UserName = GenerateUsername(model.CompanyName),

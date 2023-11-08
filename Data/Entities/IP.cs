@@ -1,6 +1,4 @@
-﻿using Data.Enums;
-
-namespace Data.Entities;
+﻿namespace Data.Entities;
 
 public class Ip : BaseEntity
 {

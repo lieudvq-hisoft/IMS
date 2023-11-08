@@ -15,7 +15,6 @@ public enum RequestStatus
     Pending,
     Accepted,
     Denied,
-    Ongoing,
     Stopped,
     Ended
 }
@@ -37,7 +36,7 @@ public enum IpAssignmentStatus
 
 public enum IpAssignmentType
 {
-    Host,
+    Master,
     Additional,
     Port
 }
@@ -63,7 +62,6 @@ public enum ServiceRequestStatus
     Pending,
     Accepted,
     Denied,
-    Success,
 }
 
 public enum UserSortCriteria

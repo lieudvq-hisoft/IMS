@@ -1,19 +1,13 @@
 ﻿using AutoMapper;
 using Data.Common.PaginationModel;
 using Data.DataAccess;
+using Data.DataAccess.Constant;
 using Data.Entities;
 using Data.Enums;
 using Data.Models;
+using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
-using Data.Utils.Paging;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Data.DataAccess.Constant;
-using Microsoft.AspNetCore.Hosting.Server;
 
 namespace Services.Core;
 public interface IAppointmentService
@@ -117,7 +111,7 @@ public class AppointmentService : IAppointmentService
 
             if (validPrecondition)
             {
-                List<int?> customerServerIds = _dbContext.Requests.Include(x => x.Server).Where(x => x.CustomerId == model.CustomerId && (x.Status == RequestStatus.Accepted || x.Status == RequestStatus.Ongoing || x.Status == RequestStatus.Stopped)).Select(x => x.ServerId).ToList();
+                List<int?> customerServerIds = _dbContext.Requests.Include(x => x.Server).Where(x => x.CustomerId == model.CustomerId && (x.Status == RequestStatus.Accepted || x.Status == RequestStatus.Stopped)).Select(x => x.ServerId).ToList();
                 foreach (int serverId in model.ServerIds)
                 {
                     if (!customerServerIds.Contains(serverId))

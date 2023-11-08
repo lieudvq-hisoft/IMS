@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Data.Entities;
 using Data.Models;
-using OfficeOpenXml.Style;
 
 namespace Services.Mapping;
 
@@ -59,7 +58,7 @@ public class MapperProfile : Profile
         CreateMap<Server, ServerForAppointmentModel>();
         CreateMap<Server, ServerModel>()
             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.DisplayStatus()))
-            .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.FirstOrDefault(x => x.Type == Data.Enums.IpAssignmentType.Host).Ip.DisplayIp()))
+            .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.FirstOrDefault(x => x.Type == Data.Enums.IpAssignmentType.Master).Ip.DisplayIp()))
             .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.Device.Size + src.Device.AdditionalSize))
             .ForMember(dest => dest.Power, opt => opt.MapFrom(src => src.Device.BasePower + src.Device.AdditionalPower))
             .ForMember(dest => dest.Customer, opt => opt.MapFrom(src => src.Request.Customer.User.Fullname));
@@ -75,16 +74,9 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.Device.Size + src.Device.AdditionalSize))
             .ForMember(dest => dest.DateCreated, opt => opt.MapFrom(src => src.Request.DateCreated))
             .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Device.Locations.FirstOrDefault().Rack.DisplayRack()))
-            .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.FirstOrDefault(x => x.Type == Data.Enums.IpAssignmentType.Host).Ip.DisplayIp()))
+            .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.IpAssignments.FirstOrDefault(x => x.Type == Data.Enums.IpAssignmentType.Master).Ip.DisplayIp()))
             .ForMember(dest => dest.RequestExtendHistoryModel, opt => opt.MapFrom(src => src.Request.RequestExtendHistories.Where(x => x.IsAccepted)))
             .ForMember(dest => dest.ServiceRequests, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<List<ServiceRequestModel>>(src.Request.ServiceRequests)));
-        #endregion
-
-        #region Device
-        CreateMap<Device, DeviceModel>()
-             .ForMember(dest => dest.Status, opt => opt.MapFrom(src => src.DisplayStatus()))
-             .ForMember(dest => dest.BaseSize, opt => opt.MapFrom(src => src.Size))
-             .ForMember(dest => dest.Rack, opt => opt.MapFrom(src => src.Locations.FirstOrDefault().Rack.DisplayRack()));
         #endregion
 
         #region IpAssignment

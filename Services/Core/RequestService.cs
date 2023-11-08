@@ -51,8 +51,6 @@ public class RequestService : IRequestService
                 .Include(x => x.Customer).ThenInclude(x => x.User)
                 .Include(x => x.RequestExtendHistories)
                 .Include(x => x.ServiceRequests.Where(x => searchModel.ServiceRequestStatus != null ? searchModel.ServiceRequestStatus.Contains(x.Status) : true)).ThenInclude(x => x.Service)
-                .Where(x => ((x.Status != RequestStatus.Ongoing &&
-                    x.Status != RequestStatus.Stopped) || x.ServiceRequests.Any(_ => _.Status != ServiceRequestStatus.Success)) && x.Status != RequestStatus.Ended)
                 .Where(delegate (Request x)
                 {
                     var matchCompanyName = MatchString(searchModel, x.Customer.CompanyName);
@@ -230,11 +228,6 @@ public class RequestService : IRequestService
         };
     }
 
-    /// <summary>
-    /// Create a new request for the customer created previous. Will hard delete the customer on fail
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns>The result model contain the new request</returns>
     private async Task<ResultModel> AttempCreateRequestFromExcel(RequestCreateModel model, Customer customer)
     {
         var result = await CreateRequest(new InitialRequestCreateModel
@@ -573,6 +566,22 @@ public class RequestService : IRequestService
                 result.Succeed = true;
                 result.Data = fileName;
             }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> DeniedRequest(int requestId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
         }
         catch (Exception e)
         {

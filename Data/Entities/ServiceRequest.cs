@@ -37,9 +37,6 @@ public class ServiceRequest : BaseEntity
             case ServiceRequestStatus.Denied:
                 status = "Không thành công";
                 break;
-            case ServiceRequestStatus.Success:
-                status = "Đang hoạt động";
-                break;
         }
 
         return status;

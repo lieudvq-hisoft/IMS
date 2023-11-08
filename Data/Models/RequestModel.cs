@@ -1,8 +1,6 @@
-﻿using Data.Entities;
-using Data.Enums;
+﻿using Data.Enums;
 using IMS.Data.Utils.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace Data.Models;
 public class RequestModel

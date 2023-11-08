@@ -32,9 +32,9 @@ public class Request : BaseEntity
     public string GetRequestType()
     {
         RequestType type;
-        if (Status != RequestStatus.Ongoing && Status != RequestStatus.Stopped)
+        if (Status != RequestStatus.Accepted && Status != RequestStatus.Stopped)
         {
-            if (ServiceRequests.Any(x => x.Status != ServiceRequestStatus.Success))
+            if (ServiceRequests.Any(x => x.Status != ServiceRequestStatus.Accepted))
             {
                 type = RequestType.Mixed;
             }
@@ -56,20 +56,17 @@ public class Request : BaseEntity
         string status = string.Empty;
         switch (Status)
         {
-            case RequestStatus.Ongoing:
-                status = "Đang hoạt động";
-                break;
             case RequestStatus.Stopped:
                 status = "Tạm ngừng";
+                break;
+            case RequestStatus.Accepted:
+                status = "Thành công";
                 break;
             case RequestStatus.Incomplete:
                 status = "Chưa hoàn thiện";
                 break;
             case RequestStatus.Pending:
                 status = "Chờ xét duyệt";
-                break;
-            case RequestStatus.Accepted:
-                status = "Thành công";
                 break;
             case RequestStatus.Denied:
                 status = "Không thành công";
