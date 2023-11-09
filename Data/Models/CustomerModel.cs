@@ -1,35 +1,36 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Data.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models;
 public class CustomerModel
 {
     public int Id { get; set; }
-    public string CompanyName { get; set; }
-    public string CompanyType { get; set; }
-    public string Fullname { get; set; }
-    public string TaxNumber { get; set; }
-    public Guid UserId { get; set; }
-    public string Address { get; set; }
-    public string PhoneNumber { get; set; }
-    public string Email { get; set; }
+    public string Username { get; set; }
+    public string? CompanyName { get; set; }
+    public string? Address { get; set; }
+    public string? TaxNumber { get; set; }
+    public string? Email { get; set; }
+    public string? PhoneNumber { get; set; }
+    public string? CustomerName { get; set; }
+
+    public int? CompanyTypeId { get; set; }
+    public DateTime DateCreated { get; set; } = DateTime.Now;
+    public DateTime DateUpdated { get; set; } = DateTime.Now;
 }
 
 public class CustomerCreateModel
 {
     [Required]
+    public string Username { get; set; }
+
+    [Required]
     public string CompanyName { get; set; }
 
     [Required]
-    public string TaxNumber { get; set; }
-
-    [Required]
-    public string Fullname { get; set; }
-
-    [Required]
-    public int CompanyTypeId { get; set; }
-
-    [Required]
     public string Address { get; set; }
+
+    [Required]
+    public string TaxNumber { get; set; }
 
     [EmailAddress]
     [Required]
@@ -38,6 +39,12 @@ public class CustomerCreateModel
     [Phone]
     [Required]
     public string PhoneNumber { get; set; }
+
+    [Required]
+    public string CustomerName { get; set; }
+
+    [Required]
+    public int CompanyTypeId { get; set; }
 }
 
 public class CustomerUpdateModel
@@ -45,22 +52,34 @@ public class CustomerUpdateModel
     [Required]
     public int Id { get; set; }
 
-    public string? CompanyName { get; set; }
+    [Required]
+    public string Username { get; set; }
 
-    public string? TaxNumber { get; set; }
+    [Required]
+    public string CompanyName { get; set; }
 
-    public string? Fullname { get; set; }
+    [Required]
+    public string Address { get; set; }
 
-    public string? Address { get; set; }
+    [Required]
+    public string TaxNumber { get; set; }
 
     [EmailAddress]
-    public string? Email { get; set; }
+    [Required]
+    public string Email { get; set; }
 
     [Phone]
-    public string? PhoneNumber { get; set; }
+    [Required]
+    public string PhoneNumber { get; set; }
+
+    [Required]
+    public string CustomerName { get; set; }
+
+    [Required]
+    public int CompanyTypeId { get; set; }
 }
 
 public class CustomerSearchModel
 {
-    public string? SearchValue { get; set; } = "";
+    public string? CustomerName { get; set; } = "";
 }

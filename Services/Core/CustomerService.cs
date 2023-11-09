@@ -20,12 +20,11 @@ public interface ICustomerService
 {
     Task<ResultModel> Get(PagingParam<CustomerSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> Import(string filePath);
+    //Task<ResultModel> Import(string filePath);
     Task<ResultModel> Create(CustomerCreateModel model);
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Update(CustomerUpdateModel model);
     Task<ResultModel> SendActivationEmail(List<int> customerIds);
-
 }
 
 public class CustomerService : ICustomerService
@@ -51,11 +50,10 @@ public class CustomerService : ICustomerService
         try
         {
             var customers = _dbContext.Customers
-                .Include(x => x.User)
                 .Include(x => x.CompanyType)
                 .Where(delegate (Customer x)
                 {
-                    return MatchString(searchModel, x.User.Email);
+                    return MatchString(searchModel.CustomerName, x.CustomerName);
                 })
                 .AsQueryable();
 
@@ -83,7 +81,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.Id == id);
+            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == id);
 
             if (customer != null)
             {
@@ -103,11 +101,11 @@ public class CustomerService : ICustomerService
         return result;
     }
 
-    private bool MatchString(CustomerSearchModel searchModel, string? value)
+    private bool MatchString(string searchValue, string? value)
     {
         return MyFunction
             .ConvertToUnSign(value ?? "")
-            .IndexOf(MyFunction.ConvertToUnSign(searchModel.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
+            .IndexOf(MyFunction.ConvertToUnSign(searchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
     }
 
     public async Task<ResultModel> Import(string filePath)
@@ -137,7 +135,7 @@ public class CustomerService : ICustomerService
                 {
                     CompanyName = worksheet.Cells[row, 1].Value?.ToString().Trim(),
                     CompanyTypeId = company.Id,
-                    Fullname = worksheet.Cells[row, 3].Value?.ToString().Trim(),
+                    CustomerName = worksheet.Cells[row, 3].Value?.ToString().Trim(),
                     TaxNumber = worksheet.Cells[row, 4].Value?.ToString().Trim(),
                     Address = worksheet.Cells[row, 5].Value?.ToString().Trim(),
                     Email = worksheet.Cells[row, 6].Value?.ToString().Trim(),
@@ -181,17 +179,11 @@ public class CustomerService : ICustomerService
         };
     }
 
-    /// <summary>
-    /// Create a new customer and its associate user. Check for duplicate of email or phone number of user. Check for duplicate of tax number of customer.
-    /// </summary>
-    /// <param name="model"></param>
-    /// <returns>The result model contain the new customer</returns>
     public async Task<ResultModel> Create(CustomerCreateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
         bool validPrecondition = true;
-        CompanyType companyType = null;
 
         try
         {
@@ -205,19 +197,8 @@ public class CustomerService : ICustomerService
 
             if (validPrecondition)
             {
-                // Check for duplicate customer by tax number
-                var existingCustomer = _dbContext.Customers.FirstOrDefault(x => x.TaxNumber == model.TaxNumber);
-                if (existingCustomer != null)
-                {
-                    result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
-                    validPrecondition = false;
-                }
-            }
-
-            if (validPrecondition)
-            {
                 // Find company type
-                companyType = _dbContext.CompanyTypes.FirstOrDefault(x => x.Id == model.CompanyTypeId);
+                var companyType = _dbContext.CompanyTypes.FirstOrDefault(x => x.Id == model.CompanyTypeId);
 
                 if (companyType == null)
                 {
@@ -228,49 +209,23 @@ public class CustomerService : ICustomerService
 
             if (validPrecondition)
             {
-                // Create new user
-                var role = _dbContext.Role.FirstOrDefault(x => !x.isDeactive && x.Name == "Customer");
-                var user = new User
+                var customer = new Customer
                 {
-                    UserName = GenerateUsername(model.CompanyName),
-                    Email = model.Email,
-                    Fullname = model.Fullname,
+                    Username = GenerateUsername(model.CompanyName),
+                    Password = MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")) + "@a123",
+                    CompanyName = model.CompanyName,
                     Address = model.Address,
+                    TaxNumber = model.TaxNumber,
+                    Email = model.Email,
                     PhoneNumber = model.PhoneNumber,
-                    IsDeleted = false,
-                    NormalizedEmail = model.Email.ToLower(),
+                    CustomerName = model.CustomerName,
+                    CompanyTypeId = model.CompanyTypeId
                 };
+                _dbContext.Customers.Add(customer);
+                _dbContext.SaveChanges();
 
-                var createUserResult = await _userManager.CreateAsync(user, MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")) + "@a123");
-                if (createUserResult.Succeeded)
-                {
-                    var userRole = new UserRole
-                    {
-                        RoleId = role.Id,
-                        UserId = user.Id
-                    };
-                    _dbContext.UserRole.Add(userRole);
-                    await _dbContext.SaveChangesAsync();
-
-                    // Create associate customer
-                    var customer = new Customer
-                    {
-                        CompanyName = model.CompanyName,
-                        TaxNumber = model.TaxNumber,
-                        UserId = user.Id,
-                        CompanyTypeId = companyType.Id
-                    };
-                    _dbContext.Customers.Add(customer);
-                    _dbContext.SaveChanges();
-
-                    result.Succeed = true;
-                    result.Data = _mapper.Map<CustomerModel>(customer);
-                }
-                else
-                {
-                    result.Succeed = false;
-                    result.ErrorMessage = UserErrorMessage.REGISTER_FAILED;
-                }
+                result.Succeed = true;
+                result.Data = _mapper.Map<CustomerModel>(customer);
             }
         }
         catch (Exception e)
@@ -285,7 +240,7 @@ public class CustomerService : ICustomerService
     {
         string username = "";
         var normalizedCompanyName = MyFunction.ConvertToUnSign(companyName.Trim().Replace(" ", ""));
-        var customerOfCompanyCount = _dbContext.Customers.IgnoreQueryFilters().Include(x => x.User).Where(x => x.User.UserName.Contains(normalizedCompanyName)).ToList().Count();
+        var customerOfCompanyCount = _dbContext.Customers.IgnoreQueryFilters().Where(x => x.CustomerName.Contains(normalizedCompanyName)).ToList().Count();
 
         username = normalizedCompanyName + (customerOfCompanyCount + 1).ToString();
 
@@ -299,15 +254,14 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.Id == id);
+            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == id);
             if (customer == null)
             {
-                result.ErrorMessage = CustomerErrorMessage.DELETE_FAILED;
+                result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
             }
             else
             {
                 customer.IsDeleted = true;
-                customer.User.IsDeleted = true;
                 customer.DateUpdated = DateTime.Now;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
@@ -329,7 +283,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.Id == model.Id);
+            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == model.Id);
 
             if (customer == null)
             {
@@ -337,31 +291,13 @@ public class CustomerService : ICustomerService
             }
             else
             {
-                if (!model.CompanyName.IsNullOrEmpty())
-                {
-                    customer.CompanyName = model.CompanyName;
-                }
-                if (!model.TaxNumber.IsNullOrEmpty())
-                {
-                    customer.TaxNumber = model.TaxNumber;
-                }
-                if (!model.Fullname.IsNullOrEmpty())
-                {
-                    customer.User.Fullname = model.Fullname;
-                }
-                if (!model.Address.IsNullOrEmpty())
-                {
-                    customer.User.Address = model.Address;
-                }
-                if (!model.Email.IsNullOrEmpty())
-                {
-                    customer.User.Email = model.Email;
-                }
-                if (!model.PhoneNumber.IsNullOrEmpty())
-                {
-                    customer.User.PhoneNumber = model.PhoneNumber;
-                }
-                customer.DateUpdated = DateTime.Now;
+                customer.Username = model.Username;
+                customer.CompanyName = model.CompanyName;
+                customer.Address = model.Address;
+                customer.TaxNumber = model.TaxNumber;
+                customer.Email = model.Email;
+                customer.PhoneNumber = model.PhoneNumber;
+                customer.CustomerName = model.CustomerName;
 
                 _dbContext.SaveChanges();
                 result.Succeed = true;
@@ -380,12 +316,12 @@ public class CustomerService : ICustomerService
     {
         foreach (int customerId in customerIds)
         {
-            var customer = _dbContext.Customers.Include(x => x.User).FirstOrDefault(x => x.Id == customerId);
+            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == customerId);
             if (customer != null)
             {
                 using var smtpClient = _emailService.GetClient();
-                var email = customer.User.Email;
-                var username = customer.User.UserName;
+                var email = customer.Email;
+                var username = customer.Username;
                 var password = username.Remove(username.Length - 1) + "@a123";
                 var mailMessage = _emailService.GetActivationMessage(username, password, email);
                 mailMessage.To.Add(email);

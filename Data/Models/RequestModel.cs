@@ -48,7 +48,7 @@ public class RequestUpdateModel
 
 public class RequestSearchModel
 {
-    public int? Id { get; set; } = null;
+    public int? CustomerId { get; set; } = null;
     public List<RequestStatus>? Status { get; set; } = null;
 }
 
