@@ -61,7 +61,6 @@ public class RequestImportModel
     public RequestCreateModel RequestCreateModel { get; set; }
 }
 
-
 public class RequestDetailCompleteModel
 {
     [Required]

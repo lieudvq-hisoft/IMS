@@ -51,11 +51,14 @@ public class IpErrorMessage
     public const string NOT_AVAILABLE = "Ip Not available";
 }
 
-public class LocationErrorMessage
+public class LocationServiceErrorMessage
 {
+    public const string NOT_EXISTED = "locationService " + ErrorMessage.NOT_EXISTED;
     public const string NO_AVAILABLE_FOUND = "No available location found";
     public const string HAVE_LOCATION_ALREADY = "Device already have a location";
     public const string NON_OPTIMAL_CHOICE = "Location choice is not optimal";
+    public const string INVALID_RACK = "Rack is not valid";
+    public const string INVALID_SERVICE = "Service is not valid";
 }
 
 public class RackErrorMessage
@@ -79,10 +82,8 @@ public class ServiceErrorMessgae
 {
     public const string NOT_EXISTED = "Service " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Service " + ErrorMessage.EXISTED;
-    public const string CREATE_FAILED = ErrorMessage.CREATE_FAILED +  " Service" ;
-    public const string UPDATE_FAILED = ErrorMessage.UPDATE_FAILED + " Service";
-    public const string DELETE_FAILED = ErrorMessage.DELETE_FAILED + " Service";
 }
+
 
 
 
