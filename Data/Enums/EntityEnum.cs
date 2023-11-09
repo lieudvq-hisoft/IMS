@@ -2,11 +2,10 @@
 
 public enum RoleType
 {
-    Customer = 1,
-    Tech = 2,
-    Sale = 3,
-    Manager = 4,
-    Admin = 5
+    Tech = 1,
+    Sale = 2,
+    Manager = 3,
+    Admin = 4
 }
 
 public enum RequestStatus
@@ -15,47 +14,15 @@ public enum RequestStatus
     Pending,
     Accepted,
     Denied,
-    Ongoing,
     Stopped,
-    Ended
-}
-
-public enum DeviceStatus
-{
-    Ongoing,
-    Stopped,
-    Ended
-}
-
-public enum IpAssignmentStatus
-{
-    Pending,
-    Denied,
-    Ongoing,
     Ended
 }
 
 public enum IpAssignmentType
 {
-    Host,
+    Master,
     Additional,
     Port
-}
-
-public enum RequestType
-{
-    New,
-    Additional,
-    Mixed
-}
-
-public enum IpType
-{
-    Host,
-    Port,
-    Additional,
-    DNS,
-    Gateway
 }
 
 public enum ServiceRequestStatus
@@ -63,7 +30,6 @@ public enum ServiceRequestStatus
     Pending,
     Accepted,
     Denied,
-    Success,
 }
 
 public enum UserSortCriteria

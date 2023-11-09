@@ -25,11 +25,6 @@ public class ServerSearchModel
     public RequestStatus? Status { get; set; }
 }
 
-public class DeviceSearchModel
-{
-    public DeviceStatus? Status { get; set; }
-}
-
 public class ServerDetailModel
 {
     public int Id { get; set; }

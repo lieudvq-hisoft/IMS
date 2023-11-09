@@ -10,7 +10,7 @@ public class Rack : BaseEntity
     public int AreaId { get; set; }
     public virtual Area Area { get; set; }
 
-    public virtual ICollection<Location> Locations { get; set; }
+    public virtual ICollection<LocationService> Locations { get; set; }
 
     public string DisplayRack()
     {

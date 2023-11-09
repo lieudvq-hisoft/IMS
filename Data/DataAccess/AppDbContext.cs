@@ -66,46 +66,26 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
                 .IsRequired();
         });
 
-        builder.Entity<Server>(b =>
-        {
-            b.HasIndex(e => e.SerialNumber).IsUnique();
-        });
-
-        builder.Entity<Area>(b =>
-        {
-            b.HasIndex(e => e.Name).IsUnique();
-        });
-
-        builder.Entity<Ip>(b =>
-        {
-            b.HasIndex(e => new { e.Address, e.NetworkId }).IsUnique();
-        });
-
         builder.Seed();
         builder.FilterSoftDeleted();
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
     }
 
-    public DbSet<AppointmentSchedule> AppointmentSchedules { get; set; }
     public DbSet<Area> Areas { get; set; }
     public DbSet<CompanyType> CompanyTypes { get; set; }
     public DbSet<Customer> Customers { get; set; }
-    public DbSet<Device> Devices { get; set; }
+    public DbSet<HardwareService> HardwareServices { get; set; }
+    public DbSet<HardwareCategory> HardwareCategories { get; set; }
     public DbSet<Ip> Ips { get; set; }
-    public DbSet<IpAssignment> IpAssignments { get; set; }
-    public DbSet<Location> Locations { get; set; }
+    public DbSet<IpService> IpServices { get; set; }
+    public DbSet<LocationService> LocationServices { get; set; }
     public DbSet<Network> Networks { get; set; }
     public DbSet<Rack> Racks { get; set; }
     public DbSet<Request> Requests { get; set; }
-    public DbSet<RequestExtendHistory> RequestExtendHistories { get; set; }
     public DbSet<Role> Role { get; set; }
-    public DbSet<SaleApproval> SaleApprovals { get; set; }
-    public DbSet<Server> Servers { get; set; }
-    public DbSet<ServerAppointment> ServerAppointments { get; set; }
     public DbSet<Service> Services { get; set; }
     public DbSet<ServiceRequest> ServiceRequests { get; set; }
-    public DbSet<TechExecution> TechExecutions { get; set; }
     public DbSet<User> User { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
 }

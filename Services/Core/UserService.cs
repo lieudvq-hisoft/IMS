@@ -118,11 +118,6 @@ public class UserService : IUserService
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
-        if (roles.Any(x => x == nameof(RoleType.Customer)))
-        {
-            var customer = _dbContext.Customers.FirstOrDefault(x => x.UserId == user.Id);
-            claims.Add(new Claim("CustomerId", customer.Id.ToString()));
-        }
         if (!string.IsNullOrEmpty(user.PhoneNumber)) claims.Add(new Claim("PhoneNumber", user.PhoneNumber));
         return claims;
     }

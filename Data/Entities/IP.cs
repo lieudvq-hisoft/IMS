@@ -11,7 +11,7 @@ public class Ip : BaseEntity
     public int NetworkId { get; set; }
     public virtual Network Network { get; set; }
 
-    public virtual ICollection<IpAssignment> IpAssignments { get; set; }
+    public virtual ICollection<IpService> IpAssignments { get; set; }
 
     public string DisplayIp()
     {
