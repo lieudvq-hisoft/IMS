@@ -38,6 +38,7 @@ public class UserErrorMessage
     public const string EXISTED = "User " + ErrorMessage.EXISTED;
     public const string REGISTER_FAILED = "Register user failed";
     public const string UPDATE_FAILED = "Update user failed";
+    public const string DELETE_FAILED = "Delete user failed";
     public const string ERROR_PASSWORD = "Error password";
     public const string LOGIN_ERROR = "Username or Password not correct!";
     public const string CREATE_CUSTOMER = "Cannot create a customer";
@@ -51,12 +52,12 @@ public class IpErrorMessage
     public const string NOT_AVAILABLE = "Ip Not available";
 }
 
-public class LocationServiceErrorMessage
+public class LocationAssignmentErrorMessage
 {
     public const string NOT_EXISTED = "locationService " + ErrorMessage.NOT_EXISTED;
     public const string NO_AVAILABLE_FOUND = "No available location found";
     public const string HAVE_LOCATION_ALREADY = "Device already have a location";
-    public const string NON_OPTIMAL_CHOICE = "Location choice is not optimal";
+    public const string CHOICE_NOT_AVAILABLE = "Location choice is not available";
     public const string INVALID_RACK = "Rack is not valid";
     public const string INVALID_SERVICE = "Service is not valid";
 }

@@ -44,27 +44,27 @@ public static class ModelBuilderExtentions
         #endregion
 
         #region HardwareCategory
-        builder.Entity<HardwareCategory>().HasData(new HardwareCategory
+        builder.Entity<ComponentCategory>().HasData(new ComponentCategory
         {
             Id = 1,
             Name = "CPU",
         });
-        builder.Entity<HardwareCategory>().HasData(new HardwareCategory
+        builder.Entity<ComponentCategory>().HasData(new ComponentCategory
         {
             Id = 2,
             Name = "GPU",
         });
-        builder.Entity<HardwareCategory>().HasData(new HardwareCategory
+        builder.Entity<ComponentCategory>().HasData(new ComponentCategory
         {
             Id = 3,
             Name = "RAM",
         });
-        builder.Entity<HardwareCategory>().HasData(new HardwareCategory
+        builder.Entity<ComponentCategory>().HasData(new ComponentCategory
         {
             Id = 4,
             Name = "OS",
         });
-        builder.Entity<HardwareCategory>().HasData(new HardwareCategory
+        builder.Entity<ComponentCategory>().HasData(new ComponentCategory
         {
             Id = 5,
             Name = "ROM",
@@ -122,6 +122,20 @@ public static class ModelBuilderExtentions
             }
         }
         builder.Entity<Rack>().HasData(racks.OrderBy(x => x.Id));
+
+        int locationId = 1;
+        for (int i = 1; i <= 104; i++)
+        {
+            for (int j = 1; i <= 42; j++)
+            {
+                builder.Entity<Location>().HasData(new Location
+                {
+                    Id = locationId++,
+                    Position = j,
+                    RackId = i
+                });
+            }
+        }
         #endregion
 
         #region IP
@@ -269,15 +283,15 @@ public static class ModelBuilderExtentions
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Customer>()
             .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<HardwareService>()
+        builder.Entity<ComponentAssignment>()
         .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<HardwareCategory>()
+        builder.Entity<ComponentCategory>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Ip>()
             .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<IpService>()
+        builder.Entity<IpAssignment>()
             .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<LocationService>()
+        builder.Entity<Location>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Network>()
             .HasQueryFilter(x => !x.IsDeleted);

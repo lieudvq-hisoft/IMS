@@ -1,7 +1,7 @@
 ﻿using Data.Enums;
 
 namespace Data.Entities;
-public class IpService : BaseEntity
+public class IpAssignment : BaseEntity
 {
     public DateTime DateAssign { get; set; }
     public DateTime? DateUnassign { get; set; }

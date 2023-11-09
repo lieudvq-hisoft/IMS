@@ -9,11 +9,11 @@ namespace IMS.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = "Bearer")]
-public class LocationServiceController : ControllerBase
+public class LocationController : ControllerBase
 {
-    private readonly ILocationService _locationService;
+    private readonly ILocationAssignmentService _locationService;
 
-    public LocationServiceController(ILocationService locationService)
+    public LocationController(ILocationAssignmentService locationService)
     {
         _locationService = locationService;
     }
@@ -22,25 +22,25 @@ public class LocationServiceController : ControllerBase
     [SwaggerOperation(Summary = "Get all LocationService")]
     public async Task<ActionResult> GetLocationService()
     {
-        var result = await _locationService.GetLocationService();
+        var result = await _locationService.Get();
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpPost("LocationService")]
     [SwaggerOperation(Summary = "Create LocationService")]
-    public async Task<ActionResult> CreateLocationService([FromBody] LocationServiceCreateModel model)
+    public async Task<ActionResult> CreateLocationService([FromBody] LocationCreateModel model)
     {
-        var result = await _locationService.CreateLocationService(model);
+        var result = await _locationService.Create(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpPut("LocationService")]
     [SwaggerOperation(Summary = "Update LocationService")]
-    public async Task<ActionResult> GetRackDetail(LocationServiceUpdateModel model)
+    public async Task<ActionResult> GetRackDetail(LocationUpdateModel model)
     {
-        var result = await _locationService.UpdateLocationService(model);
+        var result = await _locationService.Update(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -49,7 +49,7 @@ public class LocationServiceController : ControllerBase
     [SwaggerOperation(Summary = "Delete LocationService")]
     public async Task<ActionResult> GetRackAvailableLocationChoice(int id)
     {
-        var result = await _locationService.DeleteLocationService(id);
+        var result = await _locationService.Delete(id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

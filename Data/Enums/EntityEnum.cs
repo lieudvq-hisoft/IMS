@@ -18,6 +18,19 @@ public enum RequestStatus
     Ended
 }
 
+public enum ServiceType
+{
+    Location,
+    Expand,
+    Ip,
+    MasterIp,
+    Port,
+    PortPower,
+    Power,
+    Component,
+    Appointment
+}
+
 public enum IpAssignmentType
 {
     Master,
@@ -27,6 +40,7 @@ public enum IpAssignmentType
 
 public enum ServiceRequestStatus
 {
+    Incomplete,
     Pending,
     Accepted,
     Denied,
@@ -35,6 +49,11 @@ public enum ServiceRequestStatus
 public enum UserSortCriteria
 {
     Email
+}
+
+public enum LocationAssignmentSortingCriteria
+{
+    ServiceId
 }
 
 public enum CustomerSortCriteria

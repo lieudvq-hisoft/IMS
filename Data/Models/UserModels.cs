@@ -56,6 +56,9 @@ public class UserCreateModel
 public class UserUpdateModel
 {
     [Required]
+    public Guid Id { get; set; }
+
+    [Required]
     public string UserName { get; set; }
 
     //[Required]

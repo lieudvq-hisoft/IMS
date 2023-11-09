@@ -25,7 +25,6 @@ public class MapperProfile : Profile
         CreateMap<Area, AreaModel>();
         CreateMap<Rack, RackModel>()
             .ForMember(dest => dest.Area, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<AreaModel>(src.Area)));
-        CreateMap<LocationService, LocationServiceModel>();
         #endregion
     }
 }

@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Data.Entities;
-public class HardwareCategory: BaseEntity
+public class ComponentCategory: BaseEntity
 {
     public string Name { get; set; }
     public string? Description { get; set; }

@@ -56,7 +56,7 @@ public static class StartupExtension
         services.AddScoped<ICompanyTypeService, CompanyTypeService>();
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<IFileService, FileService>();
-        services.AddScoped<ILocationService, LocationServiceService>();
+        services.AddScoped<ILocationAssignmentService, LocationAssignmentService>();
         services.AddScoped<IServiceService, ServiceService>();
         services.AddScoped<IUserService, UserService>();
         //services.AddScoped<IIpService, IpService>();

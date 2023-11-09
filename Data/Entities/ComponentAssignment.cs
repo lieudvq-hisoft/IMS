@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Data.Entities;
-public class HardwareService : BaseEntity
+public class ComponentAssignment : BaseEntity
 {
     public bool IsCurrent { get; set; }
     public string Model { get; set; }
@@ -17,5 +17,5 @@ public class HardwareService : BaseEntity
     public virtual Service Service { get; set; }
 
     public int HardwareCategoryId { get; set; }
-    public virtual HardwareCategory HardwareCategory { get; set; }
+    public virtual ComponentCategory HardwareCategory { get; set; }
 }

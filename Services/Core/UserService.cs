@@ -233,7 +233,7 @@ public class UserService : IUserService
 
         try
         {
-            var user = _dbContext.User.FirstOrDefault(x => x.Email == model.Email || x.PhoneNumber == model.PhoneNumber);
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == model.Id);
             if (user == null)
             {
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
@@ -257,6 +257,42 @@ public class UserService : IUserService
                 {
                     result.Succeed = false;
                     result.ErrorMessage = UserErrorMessage.UPDATE_FAILED;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> Delete(Guid id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == id);
+            if (user == null)
+            {
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                user.IsDeleted = true;
+                var updateUserResult = await _userManager.UpdateAsync(user);
+
+                if (updateUserResult.Succeeded)
+                {
+                    result.Succeed = true;
+                    result.Data = _mapper.Map<UserModel>(user);
+                }
+                else
+                {
+                    result.Succeed = false;
+                    result.ErrorMessage = UserErrorMessage.DELETE_FAILED;
                 }
             }
         }

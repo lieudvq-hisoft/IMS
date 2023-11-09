@@ -1,38 +1,45 @@
 ﻿using Data.Entities;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace Data.Models;
 
-public class LocationServiceModel
+public class LocationAssignmentModel
 {
-    public int Id { get; set; }
-    public int StartPosition { get; set; }
-    public int Size { get; set; }
-    public int Power { get; set; }
-
-    public int RackId { get; set; }
     public int ServiceId { get; set; }
+    public int StartPosition { get; set; }
+    public string Rack { get; set; }
+    public int Size { get; set; }
 }
 
-public class LocationServiceCreateModel
+public class LocationCreateModel
 {
-    public int StartPosition { get; set; }
-    public int Size { get; set; }
-    public int Power { get; set; }
-
-    public int RackId { get; set; }
+    [Required]
     public int ServiceId { get; set; }
+
+    [Required]
+    public int StartPosition { get; set; }
+
+    [Required]
+    public int RackId { get; set; }
+
+    [Required]
+    public int Size { get; set; }
 }
 
-public class LocationServiceUpdateModel
+public class LocationUpdateModel
 {
-    public int Id { get; set; }
-    public int StartPosition { get; set; }
-    public int Size { get; set; }
-    public int Power { get; set; }
-
-    public int RackId { get; set; }
+    [Required]
     public int ServiceId { get; set; }
+
+    [Required]
+    public int StartPosition { get; set; }
+
+    [Required]
+    public int RackId { get; set; }
+
+    [Required]
+    public int Size { get; set; }
 }
 
 
@@ -86,4 +93,9 @@ public class LocationChoiceModel
 
     [Required]
     public int Position { get; set; }
+}
+
+public class LocationAssignmentSearchModel
+{
+    public int? ServiceId { get; set; } = null;
 }
