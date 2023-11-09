@@ -6,6 +6,9 @@ public class ErrorMessage
     public const string NOT_EXISTED = "NOT EXISTED";
     public const string GET_ALL_NULL = "GET ALL NULL";
     public const string INVALID = "INVALID";
+    public const string CREATE_FAILED = "FAILED TO CREATE";
+    public const string UPDATE_FAILED = "FAILED TO UPDATE";
+    public const string DELETE_FAILED = "FAILED TO DELETE";
 }
 
 public class CustomerErrorMessage
@@ -70,7 +73,16 @@ public class AppointmentErrorMessgae
 {
     public const string NOT_EXISTED = "Appointment " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Appointment " + ErrorMessage.EXISTED;
-    public const string SERVER_NOT_BELONG_TO_CUSTOMER = "Server not belong to customer";
 }
+
+public class ServiceErrorMessgae
+{
+    public const string NOT_EXISTED = "Service " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Service " + ErrorMessage.EXISTED;
+    public const string CREATE_FAILED = ErrorMessage.CREATE_FAILED +  " Service" ;
+    public const string UPDATE_FAILED = ErrorMessage.UPDATE_FAILED + " Service";
+    public const string DELETE_FAILED = ErrorMessage.DELETE_FAILED + " Service";
+}
+
 
 

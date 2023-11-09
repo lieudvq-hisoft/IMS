@@ -41,9 +41,9 @@ public class MapperProfile : Profile
         //    .ForMember(dest => dest.CompanyType, opt => opt.MapFrom(src => src.CompanyType.Name));
         //#endregion
 
-        //#region Service
-        //CreateMap<Service, ServiceModel>();
-        //#endregion
+        #region Service
+        CreateMap<Service, ServiceModel>();
+        #endregion
 
         //#region Location
         //CreateMap<Area, AreaModel>();
