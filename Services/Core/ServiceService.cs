@@ -99,7 +99,7 @@ public class ServiceService : IServiceService
 
             if (service == null)
             {
-                result.ErrorMessage = ServiceErrorMessgae.UPDATE_FAILED;
+                result.ErrorMessage = ServiceErrorMessgae.NOT_EXISTED;
             }
             else
             {
@@ -147,7 +147,7 @@ public class ServiceService : IServiceService
             var service = _dbContext.Services.FirstOrDefault(x => x.Id == id);
             if (service == null)
             {
-                result.ErrorMessage = ServiceErrorMessgae.DELETE_FAILED;
+                result.ErrorMessage = ServiceErrorMessgae.NOT_EXISTED;
             }
             else
             {

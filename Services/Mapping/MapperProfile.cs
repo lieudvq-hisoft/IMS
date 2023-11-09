@@ -46,15 +46,15 @@ public class MapperProfile : Profile
         CreateMap<Service, ServiceModel>();
         #endregion
 
-        //#region Location
-        //CreateMap<Area, AreaModel>();
-        //CreateMap<Rack, RackModel>();
-        //CreateMap<Rack, RackDetailModel>();
-        //CreateMap<Location, LocationModel>()
-        //    .ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Device.Server != null ? src.Device.Server.Model : src.Device.Type))
-        //    .ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.Device.Size))
-        //    .ForMember(dest => dest.StartPosition, opt => opt.MapFrom(src => src.StartPosition));
-        //#endregion
+        #region Location
+        CreateMap<Area, AreaModel>();
+        CreateMap<Rack, RackModel>()
+            .ForMember(dest => dest.Area, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<AreaModel>(src.Area)));;
+        CreateMap<LocationService, LocationServiceModel>();
+            //.ForMember(dest => dest.Name, opt => opt.MapFrom(src => src.Device.Server != null ? src.Device.Server.Model : src.Device.Type))
+            //.ForMember(dest => dest.Size, opt => opt.MapFrom(src => src.Device.Size))
+            //.ForMember(dest => dest.StartPosition, opt => opt.MapFrom(src => src.StartPosition));
+        #endregion
 
         //#region Server
         //CreateMap<Server, ServerForAppointmentModel>();
