@@ -1,5 +1,4 @@
-﻿using Data.Common.PaginationModel;
-using Data.Enums;
+﻿using Data.Enums;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,9 +20,9 @@ public class LocationController : ControllerBase
 
     [HttpGet("LocationService")]
     [SwaggerOperation(Summary = "Get all LocationService")]
-    public async Task<ActionResult> GetLocationService([FromQuery] PagingParam<LocationAssignmentSortingCriteria> pagingParam, [FromQuery] LocationAssignmentSearchModel searchModel)
+    public async Task<ActionResult> GetLocationService()
     {
-        var result = await _locationService.Get(pagingParam, searchModel);
+        var result = await _locationService.Get();
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -37,14 +36,14 @@ public class LocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpPut("LocationService")]
-    //[SwaggerOperation(Summary = "Update LocationService")]
-    //public async Task<ActionResult> GetRackDetail(LocationUpdateModel model)
-    //{
-    //    var result = await _locationService.Update(model);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
+    [HttpPut("LocationService")]
+    [SwaggerOperation(Summary = "Update LocationService")]
+    public async Task<ActionResult> GetRackDetail(LocationUpdateModel model)
+    {
+        var result = await _locationService.Update(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 
     [HttpDelete("LocationService")]
     [SwaggerOperation(Summary = "Delete LocationService")]

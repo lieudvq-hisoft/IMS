@@ -56,12 +56,20 @@ public class ServiceService : IServiceService
 
         try
         {
+            var existingService = _dbContext.Services.FirstOrDefault(x => x.Name == model.Name);
+            if (existingService != null)
+            {
+                result.ErrorMessage = ServiceErrorMessgae.EXISTED;
+                validPrecondition = false;
+            }
+
             if (validPrecondition)
             {
                 var service = new Service
                 {
                     Name = model.Name,
                     Type = model.Type,
+
                 };
 
                 _dbContext.Services.Add(service);
@@ -95,11 +103,26 @@ public class ServiceService : IServiceService
             }
             else
             {
-                service.Name = model.Name;
-                service.Type = model.Type;
+                if (!model.Name.IsNullOrEmpty())
+                {
+                    var existingService = _dbContext.Services.FirstOrDefault(x => x.Name == model.Name && x.Id != model.Id);
+                    if(existingService != null)
+                    {
+                        result.ErrorMessage = ServiceErrorMessgae.EXISTED;
+                        validPrecondition = false;
+                    }
+                    service.Name = model.Name;
+                }
+                   
+                if (!model.Type.IsNullOrEmpty())
+                {
+                    service.Type = model.Type;
+                }
+
 
                 if (validPrecondition)
                 {
+                    service.DateUpdated = DateTime.Now;
                     _dbContext.SaveChanges();
                     result.Succeed = true;
                     result.Data = _mapper.Map<ServiceModel>(service);
@@ -129,6 +152,7 @@ public class ServiceService : IServiceService
             else
             {
                 service.IsDeleted = true;
+                service.DateUpdated = DateTime.Now;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = service.Id;
