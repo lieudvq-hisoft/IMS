@@ -61,6 +61,11 @@ public enum CustomerSortCriteria
     Id
 }
 
+public enum ServiceSortCriteria
+{
+    Id
+}
+
 public enum RequestSortCriteria
 {
     Id
@@ -76,6 +81,11 @@ public enum DeviceSortCriteria
 }
 
 public enum AppointmentSortCriteria
+{
+    Id
+}
+
+public enum IpAssignmentSortCriteria
 {
     Id
 }

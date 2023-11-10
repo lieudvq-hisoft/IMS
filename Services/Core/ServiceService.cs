@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Data.Common.PaginationModel;
 using Data.DataAccess;
 using Data.DataAccess.Constant;
 using Data.Entities;
+using Data.Enums;
 using Data.Models;
+using Data.Utils.Paging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -11,7 +14,7 @@ using Services.Utilities;
 namespace Services.Core;
 public interface IServiceService
 {
-    Task<ResultModel> Get();
+    Task<ResultModel> Get(PagingParam<ServiceSortCriteria> paginationModel);
     Task<ResultModel> Create(ServiceCreateModel model);
     Task<ResultModel> Update(ServiceUpdateModel model);
     Task<ResultModel> Delete(int id);
@@ -28,16 +31,23 @@ public class ServiceService : IServiceService
         _mapper = mapper;
     }
 
-    public async Task<ResultModel> Get()
+    public async Task<ResultModel> Get(PagingParam<ServiceSortCriteria> paginationModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var services = _dbContext.Services.ToList();
+            var services = _dbContext.Services.AsQueryable();
 
-            result.Data = _mapper.Map<List<ServiceModel>>(services);
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, services.Count());
+
+            services = services.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            services = services.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            paging.Data = _mapper.ProjectTo<ServiceModel>(services).ToList();
+
+            result.Data = paging;
             result.Succeed = true;
         }
         catch (Exception e)

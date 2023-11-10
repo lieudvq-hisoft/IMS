@@ -1,4 +1,5 @@
-﻿using Data.Enums;
+﻿using Data.Common.PaginationModel;
+using Data.Enums;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -20,9 +21,9 @@ public class ServiceController : ControllerBase
 
     [HttpGet]
     [SwaggerOperation(Summary = "Get services")]
-    public async Task<ActionResult> Get()
+    public async Task<ActionResult> Get([FromQuery]PagingParam<ServiceSortCriteria> paginationModel)
     {
-        var result = await _serviceService.Get();
+        var result = await _serviceService.Get(paginationModel);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

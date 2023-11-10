@@ -26,5 +26,10 @@ public class MapperProfile : Profile
         CreateMap<Rack, RackModel>()
             .ForMember(dest => dest.Area, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<AreaModel>(src.Area)));
         #endregion
+
+        #region IpAssignment
+        CreateMap<IpAssignment, IpAssignmentModel>()
+            .ForMember(dest => dest.IpAddress, opt => opt.MapFrom(src => src.Ip.Address.ToString()));       
+        #endregion  
     }
 }
