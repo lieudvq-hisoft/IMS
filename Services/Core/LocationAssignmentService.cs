@@ -38,32 +38,32 @@ public class LocationAssignmentService : ILocationAssignmentService
 
         try
         {
-            var locationServices = _dbContext.Services
-               .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-                .Where(x => searchModel.ServiceId != null ? x.Id == searchModel.ServiceId : true)
-                .AsQueryable();
+            //var locationServices = _dbContext.Services
+            //   .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+            //    .Where(x => searchModel.ServiceId != null ? x.Id == searchModel.ServiceId : true)
+            //    .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, locationServices.Count());
+            //var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, locationServices.Count());
 
-            locationServices = locationServices.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            locationServices = locationServices.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            //locationServices = locationServices.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            //locationServices = locationServices.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            var locationAssignments = new List<LocationAssignmentModel>();
-            foreach (var locationService in locationServices)
-            {
-                var startLocation = locationService.LocationAssignments.Select(x => x.Location).MinBy(x => x.Position);
-                locationAssignments.Add(new LocationAssignmentModel
-                {
-                    ServiceId = locationService.Id,
-                    StartPosition = startLocation.Position,
-                    Rack = startLocation.Rack.DisplayRack(),
-                    Size = locationService.LocationAssignments.Count()
-                });
-            }
-            paging.Data = locationAssignments;
+            //var locationAssignments = new List<LocationAssignmentModel>();
+            //foreach (var locationService in locationServices)
+            //{
+            //    var startLocation = locationService.LocationAssignments.Select(x => x.Location).MinBy(x => x.Position);
+            //    locationAssignments.Add(new LocationAssignmentModel
+            //    {
+            //        ServiceId = locationService.Id,
+            //        StartPosition = startLocation.Position,
+            //        Rack = startLocation.Rack.DisplayRack(),
+            //        Size = locationService.LocationAssignments.Count()
+            //    });
+            //}
+            //paging.Data = locationAssignments;
 
-            result.Data = paging;
-            result.Succeed = true;
+            //result.Data = paging;
+            //result.Succeed = true;
         }
         catch (Exception e)
         {
@@ -80,56 +80,56 @@ public class LocationAssignmentService : ILocationAssignmentService
 
         try
         {
-            var rack = _dbContext.Racks.FirstOrDefault(x => x.Id == model.RackId);
-            if (rack == null)
-            {
-                result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
-                validPrecondition = false;
-            }
+            //var rack = _dbContext.Racks.FirstOrDefault(x => x.Id == model.RackId);
+            //if (rack == null)
+            //{
+            //    result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
+            //    validPrecondition = false;
+            //}
 
-            var service = _dbContext.Services.FirstOrDefault(x => x.Id == model.ServiceId && (x.Type == ServiceType.Location || x.Type == ServiceType.Expand));
-            if (service == null)
-            {
-                result.ErrorMessage = ServiceErrorMessgae.NOT_EXISTED;
-                validPrecondition = false;
-            }
-            else if (service.LocationAssignments.Any())
-            {
-                result.ErrorMessage = LocationAssignmentErrorMessage.HAVE_LOCATION_ALREADY;
-                validPrecondition = false;
-            }
+            //var service = _dbContext.Services.FirstOrDefault(x => x.Id == model.ServiceId && (x.Type == ServiceType.Location || x.Type == ServiceType.Expand));
+            //if (service == null)
+            //{
+            //    result.ErrorMessage = ServiceErrorMessgae.NOT_EXISTED;
+            //    validPrecondition = false;
+            //}
+            //else if (service.LocationAssignments.Any())
+            //{
+            //    result.ErrorMessage = LocationAssignmentErrorMessage.HAVE_LOCATION_ALREADY;
+            //    validPrecondition = false;
+            //}
 
-            var locations = new List<Location>();
-            for (int i = model.StartPosition; i <= model.Size; i++)
-            {
-                var location = _dbContext.Locations.FirstOrDefault(x => x.RackId == model.RackId && x.Position == i);
-                if (location.LocationAssignments.Any())
-                {
-                    result.ErrorMessage = LocationAssignmentErrorMessage.CHOICE_NOT_AVAILABLE;
-                    validPrecondition = false;
-                }
-                else
-                {
-                    locations.Add(location);
-                }
-            }
+            //var locations = new List<Location>();
+            //for (int i = model.StartPosition; i <= model.Size; i++)
+            //{
+            //    var location = _dbContext.Locations.FirstOrDefault(x => x.RackId == model.RackId && x.Position == i);
+            //    if (location.LocationAssignments.Any())
+            //    {
+            //        result.ErrorMessage = LocationAssignmentErrorMessage.CHOICE_NOT_AVAILABLE;
+            //        validPrecondition = false;
+            //    }
+            //    else
+            //    {
+            //        locations.Add(location);
+            //    }
+            //}
 
-            if (validPrecondition)
-            {
-                foreach (var location in locations)
-                {
-                    _dbContext.LocationAssignments.Add(new LocationAssignment
-                    {
-                        ServiceId = model.ServiceId,
-                        LocationId = location.Id,
-                    });
-                }
+            //if (validPrecondition)
+            //{
+            //    foreach (var location in locations)
+            //    {
+            //        _dbContext.LocationAssignments.Add(new LocationAssignment
+            //        {
+            //            ServiceId = model.ServiceId,
+            //            LocationId = location.Id,
+            //        });
+            //    }
 
-                _dbContext.SaveChanges();
+            //    _dbContext.SaveChanges();
 
-                result.Succeed = true;
-                result.Data = _mapper.Map<LocationAssignmentModel>(service);
-            }
+            //    result.Succeed = true;
+            //    //result.Data = _mapper.Map<LocationAssignmentModel>(service);
+            //}
         }
         catch (Exception e)
         {
@@ -202,19 +202,19 @@ public class LocationAssignmentService : ILocationAssignmentService
 
         try
         {
-            var locationService = _dbContext.Locations.FirstOrDefault(x => x.Id == id);
-            if (locationService == null)
-            {
-                result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                locationService.IsDeleted = true;
-                locationService.DateUpdated = DateTime.Now;
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = locationService.Id;
-            }
+            //var locationService = _dbContext.Locations.FirstOrDefault(x => x.Id == id);
+            //if (locationService == null)
+            //{
+            //    result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+            //}
+            //else
+            //{
+            //    locationService.IsDeleted = true;
+            //    locationService.DateUpdated = DateTime.Now;
+            //    _dbContext.SaveChanges();
+            //    result.Succeed = true;
+            //    result.Data = locationService.Id;
+            //}
         }
         catch (Exception e)
         {

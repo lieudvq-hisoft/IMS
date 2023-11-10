@@ -39,27 +39,27 @@ public class RequestService : IRequestService
 
         try
         {
-            var requests = _dbContext.Requests
-                .Include(x => x.ServiceRequests.Where(x => searchModel.Status != null ? searchModel.Status.Contains(x.Request.Status) : true)).ThenInclude(x => x.Service)
-                .Where(x => ((x.Status != RequestStatus.Pending &&
-                    x.Status != RequestStatus.Stopped) || x.ServiceRequests.Any(_ => _.Status != ServiceRequestStatus.Accepted)) && x.Status != RequestStatus.Ended)
-                .Where(delegate (Request x)
-                {
-                    var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(x.Status) : true;
-                    var matchCustomerId = searchModel.CustomerId != null ? x.Id == searchModel.CustomerId : true;
-                    return matchStatus;
-                })
-                .AsQueryable();
+            //var requests = _dbContext.Requests
+            //    .Include(x => x.ServiceRequests.Where(x => searchModel.Status != null ? searchModel.Status.Contains(x.Request.Status) : true)).ThenInclude(x => x.Service)
+            //    .Where(x => ((x.Status != RequestStatus.Pending &&
+            //        x.Status != RequestStatus.Stopped) || x.ServiceRequests.Any(_ => _.Status != ServiceRequestStatus.Accepted)) && x.Status != RequestStatus.Ended)
+            //    .Where(delegate (Request x)
+            //    {
+            //        var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(x.Status) : true;
+            //        var matchCustomerId = searchModel.CustomerId != null ? x.Id == searchModel.CustomerId : true;
+            //        return matchStatus;
+            //    })
+            //    .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requests.Count());
+            //var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requests.Count());
 
-            requests = requests.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            requests = requests.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            //requests = requests.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            //requests = requests.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.Map<List<RequestModel>>(requests.ToList());
+            //paging.Data = _mapper.Map<List<RequestModel>>(requests.ToList());
 
-            result.Data = paging;
-            result.Succeed = true;
+            //result.Data = paging;
+            //result.Succeed = true;
         }
         catch (Exception e)
         {
@@ -75,18 +75,18 @@ public class RequestService : IRequestService
 
         try
         {
-            var request = _dbContext.Requests
-                .Include(x => x.ServiceRequests).ThenInclude(x => x.Service)
-                .FirstOrDefault(x => x.Id == id);
-            if (request == null)
-            {
-                result.ErrorMessage = RequestErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                result.Data = _mapper.Map<RequestModel>(request);
-                result.Succeed = true;
-            }
+            //var request = _dbContext.Requests
+            //    .Include(x => x.ServiceRequests).ThenInclude(x => x.Service)
+            //    .FirstOrDefault(x => x.Id == id);
+            //if (request == null)
+            //{
+            //    result.ErrorMessage = RequestErrorMessage.NOT_EXISTED;
+            //}
+            //else
+            //{
+            //    result.Data = _mapper.Map<RequestModel>(request);
+            //    result.Succeed = true;
+            //}
         }
         catch (Exception e)
         {

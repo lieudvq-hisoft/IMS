@@ -19,5 +19,5 @@ public class IpAssignmentModel
 public class IpAssignmentSearchModel
 {
     public int? ServerId { get; set; } = null;
-    public IpAssignmentType Type { get; set; }
+    public IpAssignmentTypes Type { get; set; }
 }

@@ -18,7 +18,7 @@ public enum RequestStatus
     Ended
 }
 
-public enum ServiceType
+public enum ServiceCategory
 {
     Location,
     Expand,
@@ -31,7 +31,7 @@ public enum ServiceType
     Appointment
 }
 
-public enum IpAssignmentType
+public enum IpAssignmentTypes
 {
     Master,
     Additional,

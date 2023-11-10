@@ -56,28 +56,28 @@ public class ServiceService : IServiceService
 
         try
         {
-            var existingService = _dbContext.Services.FirstOrDefault(x => x.Name == model.Name);
-            if (existingService != null)
-            {
-                result.ErrorMessage = ServiceErrorMessgae.EXISTED;
-                validPrecondition = false;
-            }
+            //var existingService = _dbContext.Services.FirstOrDefault(x => x.Name == model.Name);
+            //if (existingService != null)
+            //{
+            //    result.ErrorMessage = ServiceErrorMessgae.EXISTED;
+            //    validPrecondition = false;
+            //}
 
-            if (validPrecondition)
-            {
-                var service = new Service
-                {
-                    Name = model.Name,
-                    Type = model.Type,
+            //if (validPrecondition)
+            //{
+            //    var service = new Service
+            //    {
+            //        Name = model.Name,
+            //        Type = model.Type,
 
-                };
+            //    };
 
-                _dbContext.Services.Add(service);
-                _dbContext.SaveChanges();
+            //    _dbContext.Services.Add(service);
+            //    _dbContext.SaveChanges();
 
-                result.Succeed = true;
-                result.Data = _mapper.Map<ServiceModel>(service);
-            }
+            //    result.Succeed = true;
+            //    result.Data = _mapper.Map<ServiceModel>(service);
+            //}
         }
         catch (Exception e)
         {
@@ -95,35 +95,35 @@ public class ServiceService : IServiceService
 
         try
         {
-            var service = _dbContext.Services.FirstOrDefault(x => x.Id == model.Id);
+            //var service = _dbContext.Services.FirstOrDefault(x => x.Id == model.Id);
 
-            if (service == null)
-            {
-                result.ErrorMessage = ServiceErrorMessgae.NOT_EXISTED;
-            }
-            else
-            {
-                if (!model.Name.IsNullOrEmpty())
-                {
-                    var existingService = _dbContext.Services.FirstOrDefault(x => x.Name == model.Name && x.Id != model.Id);
-                    if (existingService != null)
-                    {
-                        result.ErrorMessage = ServiceErrorMessgae.EXISTED;
-                        validPrecondition = false;
-                    }
-                    service.Name = model.Name;
-                }
+            //if (service == null)
+            //{
+            //    result.ErrorMessage = ServiceErrorMessgae.NOT_EXISTED;
+            //}
+            //else
+            //{
+            //    if (!model.Name.IsNullOrEmpty())
+            //    {
+            //        var existingService = _dbContext.Services.FirstOrDefault(x => x.Name == model.Name && x.Id != model.Id);
+            //        if (existingService != null)
+            //        {
+            //            result.ErrorMessage = ServiceErrorMessgae.EXISTED;
+            //            validPrecondition = false;
+            //        }
+            //        service.Name = model.Name;
+            //    }
 
-                service.Type = model.Type;
+            //    service.Type = model.Type;
 
-                if (validPrecondition)
-                {
-                    service.DateUpdated = DateTime.Now;
-                    _dbContext.SaveChanges();
-                    result.Succeed = true;
-                    result.Data = _mapper.Map<ServiceModel>(service);
-                }
-            }
+            //    if (validPrecondition)
+            //    {
+            //        service.DateUpdated = DateTime.Now;
+            //        _dbContext.SaveChanges();
+            //        result.Succeed = true;
+            //        result.Data = _mapper.Map<ServiceModel>(service);
+            //    }
+            //}
         }
         catch (Exception e)
         {

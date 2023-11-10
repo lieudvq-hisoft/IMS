@@ -71,72 +71,72 @@ public static class ModelBuilderExtentions
         });
         #endregion
 
-        #region Location
-        builder.Entity<Area>().HasData(new Area
-        {
-            Id = 1,
-            Name = "A",
-            RowCount = 8,
-            ColumnCount = 8,
-        });
-        builder.Entity<Area>().HasData(new Area
-        {
-            Id = 2,
-            Name = "B",
-            RowCount = 5,
-            ColumnCount = 8,
-        });
+        //#region Location
+        //builder.Entity<Area>().HasData(new Area
+        //{
+        //    Id = 1,
+        //    Name = "A",
+        //    RowCount = 8,
+        //    ColumnCount = 8,
+        //});
+        //builder.Entity<Area>().HasData(new Area
+        //{
+        //    Id = 2,
+        //    Name = "B",
+        //    RowCount = 5,
+        //    ColumnCount = 8,
+        //});
 
-        List<Rack> racks = new List<Rack>();
-        for (int i = 1; i <= 8; i++)
-        {
-            for (int j = 1; j <= 8; j++)
-            {
-                racks.Add(new Rack
-                {
-                    Id = (j - 1) * 8 + i,
-                    MaxPower = 3000,
-                    CurrentPower = (j - 1) * 8 + i == 1 ? 200 : 0,
-                    Column = i,
-                    Row = j,
-                    Size = 42,
-                    AreaId = 1
-                });
-            }
-        }
+        //List<Rack> racks = new List<Rack>();
+        //for (int i = 1; i <= 8; i++)
+        //{
+        //    for (int j = 1; j <= 8; j++)
+        //    {
+        //        racks.Add(new Rack
+        //        {
+        //            Id = (j - 1) * 8 + i,
+        //            MaxPower = 3000,
+        //            CurrentPower = (j - 1) * 8 + i == 1 ? 200 : 0,
+        //            Column = i,
+        //            Row = j,
+        //            Size = 42,
+        //            AreaId = 1
+        //        });
+        //    }
+        //}
 
-        for (int i = 1; i <= 8; i++)
-        {
-            for (int j = 1; j <= 5; j++)
-            {
-                racks.Add(new Rack
-                {
-                    Id = 8 * 8 + (j - 1) * 8 + i,
-                    MaxPower = 3500,
-                    CurrentPower = 0,
-                    Column = i,
-                    Row = j,
-                    Size = 42,
-                    AreaId = 2
-                });
-            }
-        }
-        builder.Entity<Rack>().HasData(racks.OrderBy(x => x.Id));
+        //for (int i = 1; i <= 8; i++)
+        //{
+        //    for (int j = 1; j <= 5; j++)
+        //    {
+        //        racks.Add(new Rack
+        //        {
+        //            Id = 8 * 8 + (j - 1) * 8 + i,
+        //            MaxPower = 3500,
+        //            CurrentPower = 0,
+        //            Column = i,
+        //            Row = j,
+        //            Size = 42,
+        //            AreaId = 2
+        //        });
+        //    }
+        //}
+        //builder.Entity<Rack>().HasData(racks.OrderBy(x => x.Id));
 
-        int locationId = 1;
-        for (int i = 1; i <= 104; i++)
-        {
-            for (int j = 1; i <= 42; j++)
-            {
-                builder.Entity<Location>().HasData(new Location
-                {
-                    Id = locationId++,
-                    Position = j,
-                    RackId = i
-                });
-            }
-        }
-        #endregion
+        //int locationId = 1;
+        //for (int i = 1; i <= 104; i++)
+        //{
+        //    for (int j = 1; j <= 42; j++)
+        //    {
+        //        builder.Entity<Location>().HasData(new Location
+        //        {
+        //            Id = locationId++,
+        //            Position = j,
+        //            RackId = i
+        //        });
+        //    }
+        //}
+        //#endregion
 
         #region IP
         builder.Entity<Network>().HasData(new Network
@@ -168,7 +168,7 @@ public static class ModelBuilderExtentions
         }
         #endregion
 
-        #region User, Request, ServiceRequest
+        #region User
         var hasher = new PasswordHasher<User>();
 
         List<Guid> seedGuids = new List<Guid>
@@ -272,7 +272,64 @@ public static class ModelBuilderExtentions
             }
             #endregion
         }
-        #endregion     
+        #endregion
+
+        #region ServiceType
+        builder.Entity<ServiceType>().HasData(new ServiceType
+        {
+            Id = 1,
+            Name = "Location",
+            Type = ServiceCategory.Location,
+        });
+        builder.Entity<ServiceType>().HasData(new ServiceType
+        {
+            Id = 2,
+            Name = "Expand",
+            Type = ServiceCategory.Expand,
+        });
+        builder.Entity<ServiceType>().HasData(new ServiceType
+        {
+            Id = 3,
+            Name = "Ip",
+            Type = ServiceCategory.Ip,
+        });
+        builder.Entity<ServiceType>().HasData(new ServiceType
+        {
+            Id = 4,
+            Name = "MasterIp",
+            Type = ServiceCategory.MasterIp,
+        });
+        builder.Entity<ServiceType>().HasData(new ServiceType
+        {
+            Id = 5,
+            Name = "Port",
+            Type = ServiceCategory.Port,
+        });
+        builder.Entity<ServiceType>().HasData(new ServiceType
+        {
+            Id = 6,
+            Name = "PortPower",
+            Type = ServiceCategory.PortPower,
+        });
+        builder.Entity<ServiceType>().HasData(new ServiceType
+        {
+            Id = 7,
+            Name = "Power",
+            Type = ServiceCategory.Power,
+        });
+        builder.Entity<ServiceType>().HasData(new ServiceType
+        {
+            Id = 8,
+            Name = "Component",
+            Type = ServiceCategory.Component,
+        });
+        builder.Entity<ServiceType>().HasData(new ServiceType
+        {
+            Id = 9,
+            Name = "Appointment",
+            Type = ServiceCategory.Appointment,
+        });
+        #endregion
     }
 
     public static void FilterSoftDeleted(this ModelBuilder builder)
@@ -303,7 +360,7 @@ public static class ModelBuilderExtentions
             .HasQueryFilter(x => !x.isDeactive);
         builder.Entity<Service>()
             .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<ServiceRequest>()
+        builder.Entity<Entities.ServiceType>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<User>()
             .HasQueryFilter(x => !x.IsDeleted);

@@ -13,5 +13,5 @@ public class Request : BaseEntity
     public int CustomerId { get; set; }
     public virtual Customer Customer { get; set; }
 
-    public virtual ICollection<ServiceRequest> ServiceRequests { get; set; }
+    public virtual ICollection<Service> Services { get; set; }
 }

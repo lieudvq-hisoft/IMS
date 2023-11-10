@@ -17,7 +17,7 @@ public class ServiceCreateModel
     public string Name { get; set; }
 
     [Required]
-    public ServiceType Type { get; set; }
+    public ServiceCategory Type { get; set; }
 }
 
 public class ServiceUpdateModel
@@ -29,6 +29,6 @@ public class ServiceUpdateModel
     public string Name { get; set; }
 
     [Required]
-    public ServiceType Type { get; set; }
+    public ServiceCategory Type { get; set; }
 }
 

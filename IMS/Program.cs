@@ -55,8 +55,6 @@ app.UseStaticFiles();
 
 app.MapControllers();
 
-app.MapControllers();
-
 app.Services.ApplyPendingMigrations();
 
 app.UseForwardedHeaders();
