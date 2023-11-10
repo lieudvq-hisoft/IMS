@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Data.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models;
 public class ServiceModel
@@ -16,7 +17,7 @@ public class ServiceCreateModel
     public string Name { get; set; }
 
     [Required]
-    public string Type { get; set; }
+    public ServiceType Type { get; set; }
 }
 
 public class ServiceUpdateModel
@@ -28,6 +29,6 @@ public class ServiceUpdateModel
     public string Name { get; set; }
 
     [Required]
-    public string Type { get; set; }
+    public ServiceType Type { get; set; }
 }
 

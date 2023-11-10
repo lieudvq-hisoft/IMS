@@ -106,19 +106,15 @@ public class ServiceService : IServiceService
                 if (!model.Name.IsNullOrEmpty())
                 {
                     var existingService = _dbContext.Services.FirstOrDefault(x => x.Name == model.Name && x.Id != model.Id);
-                    if(existingService != null)
+                    if (existingService != null)
                     {
                         result.ErrorMessage = ServiceErrorMessgae.EXISTED;
                         validPrecondition = false;
                     }
                     service.Name = model.Name;
                 }
-                   
-                if (!model.Type.IsNullOrEmpty())
-                {
-                    service.Type = model.Type;
-                }
 
+                service.Type = model.Type;
 
                 if (validPrecondition)
                 {

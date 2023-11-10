@@ -16,7 +16,7 @@ public interface ILocationAssignmentService
 {
     Task<ResultModel> Get(PagingParam<LocationAssignmentSortingCriteria> paginationModel, LocationAssignmentSearchModel searchModel);
     Task<ResultModel> Create(LocationCreateModel model);
-    Task<ResultModel> Update(LocationUpdateModel model);
+    //Task<ResultModel> Update(LocationUpdateModel model);
     Task<ResultModel> Delete(int id);
 }
 
@@ -139,61 +139,61 @@ public class LocationAssignmentService : ILocationAssignmentService
         return result;
     }
 
-    public async Task<ResultModel> Update(LocationUpdateModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-        bool validPrecondition = true;
+    //public async Task<ResultModel> Update(LocationUpdateModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+    //    bool validPrecondition = true;
 
-        try
-        {
-            var existingRack = _dbContext.Racks.FirstOrDefault(x => x.Id == model.RackId);
-            if (existingRack == null)
-            {
-                result.ErrorMessage = LocationAssignmentErrorMessage.INVALID_RACK;
-                validPrecondition = false;
-            }
+    //    try
+    //    {
+    //        var existingRack = _dbContext.Racks.FirstOrDefault(x => x.Id == model.RackId);
+    //        if (existingRack == null)
+    //        {
+    //            result.ErrorMessage = LocationAssignmentErrorMessage.INVALID_RACK;
+    //            validPrecondition = false;
+    //        }
 
-            var existingService = _dbContext.Services.FirstOrDefault(x => x.Id == model.ServiceId);
-            if (existingService == null)
-            {
-                result.ErrorMessage = LocationAssignmentErrorMessage.INVALID_SERVICE;
-                validPrecondition = false;
-            }
+    //        var existingService = _dbContext.Services.FirstOrDefault(x => x.Id == model.ServiceId);
+    //        if (existingService == null)
+    //        {
+    //            result.ErrorMessage = LocationAssignmentErrorMessage.INVALID_SERVICE;
+    //            validPrecondition = false;
+    //        }
 
-            var coincideLocation = _dbContext.Locations.FirstOrDefault(x => x.RackId == model.RackId && x.StartPosition == model.StartPosition);
-            if (coincideLocation != null)
-            {
-                result.ErrorMessage = LocationAssignmentErrorMessage.CHOICE_NOT_AVAILABLE;
-                validPrecondition = false;
-            }
+    //        var coincideLocation = _dbContext.Locations.FirstOrDefault(x => x.RackId == model.RackId && x.StartPosition == model.StartPosition);
+    //        if (coincideLocation != null)
+    //        {
+    //            result.ErrorMessage = LocationAssignmentErrorMessage.CHOICE_NOT_AVAILABLE;
+    //            validPrecondition = false;
+    //        }
 
-            var locationService = _dbContext.Locations.FirstOrDefault(x => x.Id == model.Id);
-            if (locationService == null)
-            {
-                result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
-            }
+    //        var locationService = _dbContext.Locations.FirstOrDefault(x => x.Id == model.Id);
+    //        if (locationService == null)
+    //        {
+    //            result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+    //        }
 
-            if (validPrecondition)
-            {
-                locationService.StartPosition = model.StartPosition;
-                locationService.Size = model.Size;
-                locationService.Power = model.Power;
-                locationService.RackId = model.RackId;
-                locationService.ServiceId = model.ServiceId;
+    //        if (validPrecondition)
+    //        {
+    //            locationService.StartPosition = model.StartPosition;
+    //            locationService.Size = model.Size;
+    //            locationService.Power = model.Power;
+    //            locationService.RackId = model.RackId;
+    //            locationService.ServiceId = model.ServiceId;
 
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = _mapper.Map<LocationAssignmentModel>(locationService);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //            _dbContext.SaveChanges();
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<LocationAssignmentModel>(locationService);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> Delete(int id)
     {
