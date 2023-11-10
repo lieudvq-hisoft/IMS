@@ -14,11 +14,11 @@ public class MapperProfile : Profile
         #endregion
 
         #region Request
-        CreateMap<Request, RequestModel>();
+        CreateMap<Order, OrderModel>();
         #endregion
 
         #region Service
-        CreateMap<Service, ServiceModel>();
+        CreateMap<Request, RequestModel>();
         #endregion
 
         #region Location

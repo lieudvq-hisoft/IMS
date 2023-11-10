@@ -10,6 +10,6 @@ public class IpAssignment : BaseEntity
     public int IpId { get; set; }
     public virtual Ip Ip { get; set; }
 
-    public int ServiceId { get; set; }
-    public virtual Service Service { get; set; }
+    public int RequestId { get; set; }
+    public virtual Request Request { get; set; }
 }

@@ -13,8 +13,8 @@ public class ComponentAssignment : BaseEntity
     public DateTime DateInstalled { get; set; }
     public DateTime DateUninstalled { get; set; }
 
-    public int ServiceId { get; set; }
-    public virtual Service Service { get; set; }
+    public int RequestId { get; set; }
+    public virtual Request Request { get; set; }
 
     public int HardwareCategoryId { get; set; }
     public virtual ComponentCategory HardwareCategory { get; set; }

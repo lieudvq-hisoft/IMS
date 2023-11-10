@@ -22,7 +22,7 @@ public class ServerForAppointmentModel {
 
 public class ServerSearchModel
 {
-    public RequestStatus? Status { get; set; }
+    public OrderStatus? Status { get; set; }
 }
 
 public class ServerDetailModel

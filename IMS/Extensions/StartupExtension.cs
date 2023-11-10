@@ -52,12 +52,12 @@ public static class StartupExtension
 
     public static void AddBussinessService(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IRequestService, RequestService>();
+        services.AddScoped<IOrderService, OrderService>();
         services.AddScoped<ICompanyTypeService, CompanyTypeService>();
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<ILocationAssignmentService, LocationAssignmentService>();
-        services.AddScoped<IServiceService, ServiceService>();
+        services.AddScoped<IRequestService, RequestService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IIpAssignmentService, IpAssignmentService>();
         //services.AddScoped<IIpService, IpService>();

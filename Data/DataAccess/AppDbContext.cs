@@ -72,21 +72,21 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 
-    //public DbSet<Area> Areas { get; set; }
+    public DbSet<Area> Areas { get; set; }
     public DbSet<CompanyType> CompanyTypes { get; set; }
     public DbSet<ComponentAssignment> ComponentAssignments { get; set; }
     public DbSet<ComponentCategory> ComponentCategories { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Ip> Ips { get; set; }
     public DbSet<IpAssignment> IpAssignments { get; set; }
-    //public DbSet<Location> Locations { get; set; }
-    //public DbSet<LocationAssignment> LocationAssignments { get; set; }
+    public DbSet<Location> Locations { get; set; }
+    public DbSet<LocationAssignment> LocationAssignments { get; set; }
     public DbSet<Network> Networks { get; set; }
-    //public DbSet<Rack> Racks { get; set; }
-    public DbSet<Request> Requests { get; set; }
+    public DbSet<Order> Orders { get; set; }
+    public DbSet<Rack> Racks { get; set; }
     public DbSet<Role> Role { get; set; }
+    public DbSet<Request> Requests { get; set; }
     public DbSet<Service> Services { get; set; }
-    public DbSet<ServiceType> ServiceTypes { get; set; }
     public DbSet<User> User { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
 }
