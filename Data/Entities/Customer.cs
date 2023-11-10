@@ -14,5 +14,5 @@ public class Customer : BaseEntity
     public int CompanyTypeId { get; set; }
     public virtual CompanyType CompanyType { get; set; }
 
-    public virtual ICollection<Request> Requests { get; set; }
+    public virtual ICollection<Order> Orders { get; set; }
 }

@@ -8,7 +8,7 @@ public enum RoleType
     Admin = 4
 }
 
-public enum RequestStatus
+public enum OrderStatus
 {
     Incomplete,
     Pending,
@@ -18,7 +18,7 @@ public enum RequestStatus
     Ended
 }
 
-public enum ServiceCategory
+public enum ServiceType
 {
     Location,
     Expand,
@@ -38,7 +38,7 @@ public enum IpAssignmentTypes
     Port
 }
 
-public enum ServiceRequestStatus
+public enum ServiceStatus
 {
     Incomplete,
     Pending,
@@ -61,7 +61,7 @@ public enum CustomerSortCriteria
     Id
 }
 
-public enum RequestSortCriteria
+public enum OrderSortCriteria
 {
     Id
 }
@@ -78,4 +78,11 @@ public enum DeviceSortCriteria
 public enum AppointmentSortCriteria
 {
     Id
+}
+
+public enum RequestSortCriteria
+{
+    Id,
+    OrderId,
+    ServiceId
 }

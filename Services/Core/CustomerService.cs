@@ -110,11 +110,10 @@ public class CustomerService : ICustomerService
 
     public async Task<ResultModel> Import(string filePath)
     {
-        //ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
         using var package = new ExcelPackage(new FileInfo(filePath));
         var worksheet = package.Workbook.Worksheets["Sheet1"];
-        int rowCount = worksheet.Dimension.End.Row;     //get row count
-        int colCount = worksheet.Dimension.End.Column;     //get col count
+        int rowCount = worksheet.Dimension.End.Row;
+        int colCount = worksheet.Dimension.End.Column;
         int successRow = 0;
 
         for (int row = 2; row <= rowCount; row++)
@@ -183,31 +182,15 @@ public class CustomerService : ICustomerService
     {
         var result = new ResultModel();
         result.Succeed = false;
-        bool validPrecondition = true;
 
         try
         {
-            // Check for duplicate user by email or phonenumber
-            var existingUser = _dbContext.User.FirstOrDefault(x => x.Email == model.Email || x.PhoneNumber == model.PhoneNumber);
-            if (existingUser != null)
+            var companyType = _dbContext.CompanyTypes.FirstOrDefault(x => x.Id == model.CompanyTypeId);
+            if (companyType == null)
             {
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-                validPrecondition = false;
+                result.ErrorMessage = CompanyTypeErrorMessage.NOT_EXISTED;
             }
-
-            if (validPrecondition)
-            {
-                // Find company type
-                var companyType = _dbContext.CompanyTypes.FirstOrDefault(x => x.Id == model.CompanyTypeId);
-
-                if (companyType == null)
-                {
-                    result.ErrorMessage = CompanyTypeErrorMessage.NOT_EXISTED;
-                    validPrecondition = false;
-                }
-            }
-
-            if (validPrecondition)
+            else
             {
                 var customer = new Customer
                 {

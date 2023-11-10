@@ -23,6 +23,7 @@ public interface IUserService
     Task<ResultModel> ActivateUser(string email);
     Task<ResultModel> GetAccountInfo(string email);
     Task<ResultModel> UpdateAccountInfo(UserUpdateModel model);
+    Task<ResultModel> Delete(Guid id);
 }
 public class UserService : IUserService
 {

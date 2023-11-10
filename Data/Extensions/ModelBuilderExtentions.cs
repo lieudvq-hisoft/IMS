@@ -274,60 +274,60 @@ public static class ModelBuilderExtentions
         }
         #endregion
 
-        #region ServiceType
-        builder.Entity<ServiceType>().HasData(new ServiceType
+        #region Service
+        builder.Entity<Service>().HasData(new Service
         {
             Id = 1,
             Name = "Location",
-            Type = ServiceCategory.Location,
+            Type = ServiceType.Location,
         });
-        builder.Entity<ServiceType>().HasData(new ServiceType
+        builder.Entity<Service>().HasData(new Service
         {
             Id = 2,
             Name = "Expand",
-            Type = ServiceCategory.Expand,
+            Type = ServiceType.Expand,
         });
-        builder.Entity<ServiceType>().HasData(new ServiceType
+        builder.Entity<Service>().HasData(new Service
         {
             Id = 3,
             Name = "Ip",
-            Type = ServiceCategory.Ip,
+            Type = ServiceType.Ip,
         });
-        builder.Entity<ServiceType>().HasData(new ServiceType
+        builder.Entity<Service>().HasData(new Service
         {
             Id = 4,
             Name = "MasterIp",
-            Type = ServiceCategory.MasterIp,
+            Type = ServiceType.MasterIp,
         });
-        builder.Entity<ServiceType>().HasData(new ServiceType
+        builder.Entity<Service>().HasData(new Service
         {
             Id = 5,
             Name = "Port",
-            Type = ServiceCategory.Port,
+            Type = ServiceType.Port,
         });
-        builder.Entity<ServiceType>().HasData(new ServiceType
+        builder.Entity<Service>().HasData(new Service
         {
             Id = 6,
             Name = "PortPower",
-            Type = ServiceCategory.PortPower,
+            Type = ServiceType.PortPower,
         });
-        builder.Entity<ServiceType>().HasData(new ServiceType
+        builder.Entity<Service>().HasData(new Service
         {
             Id = 7,
             Name = "Power",
-            Type = ServiceCategory.Power,
+            Type = ServiceType.Power,
         });
-        builder.Entity<ServiceType>().HasData(new ServiceType
+        builder.Entity<Service>().HasData(new Service
         {
             Id = 8,
             Name = "Component",
-            Type = ServiceCategory.Component,
+            Type = ServiceType.Component,
         });
-        builder.Entity<ServiceType>().HasData(new ServiceType
+        builder.Entity<Service>().HasData(new Service
         {
             Id = 9,
             Name = "Appointment",
-            Type = ServiceCategory.Appointment,
+            Type = ServiceType.Appointment,
         });
         #endregion
     }
@@ -354,13 +354,13 @@ public static class ModelBuilderExtentions
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Rack>()
             .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Request>()
+        builder.Entity<Order>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Role>()
             .HasQueryFilter(x => !x.isDeactive);
-        builder.Entity<Service>()
+        builder.Entity<Request>()
             .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Entities.ServiceType>()
+        builder.Entity<Entities.Service>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<User>()
             .HasQueryFilter(x => !x.IsDeleted);

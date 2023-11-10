@@ -1,74 +1,38 @@
 ﻿using Data.Entities;
 using Data.Enums;
-using IMS.Data.Utils.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace Data.Models;
 public class RequestModel
 {
     public int Id { get; set; }
-    public RequestStatus Status { get; set; }
-    public int ExpectedSize { get; set; }
-    public string? Note { get; set; }
-    public string? InspectorNote { get; set; }
-    public DateTime DateCreated { get; set; } = DateTime.Now;
-    public DateTime DateUpdated { get; set; } = DateTime.Now;
+    public DateTime DateCreated { get; set; }
+    public DateTime DateUpdated { get; set; }
+    public string Status { get; set; }
     public string? InspectionRecordFilePath { get; set; }
-    public string? ReceiptOfRecipientFilePath { get; set; }
-    public int CustomerId { get; set; }
+    public bool IsDelegated { get; set; }
+    public int OrderId { get; set; }
+    public int ServiceId { get; set; }
 }
 
 public class RequestCreateModel
 {
     [Required]
-    public int ExpectedSize { get; set; }
+    public bool IsDelegated { get; set; }
 
     [Required]
-    public string? Note { get; set; }
+    public int OrderId { get; set; }
 
     [Required]
-    public int CustomerId { get; set; }
-}
-public class RequestUpdateModel
-{
-    [Required]
-    public int Id { get; set; }
-
-    [Required]
-    public RequestStatus Status { get; set; }
-
-    [Required]
-    public int ExpectedSize { get; set; }
-
-    public string? Note { get; set; }
-
-    public string? InspectorNote { get; set; }
+    public int ServiceId { get; set; }
 }
 
 public class RequestSearchModel
 {
-    public int? CustomerId { get; set; } = null;
-    public List<RequestStatus>? Status { get; set; } = null;
-}
+    public int? OrderId { get; set; }
 
-public class RequestImportModel
-{
-    [Required]
-    public CustomerCreateModel CustomerCreateModel { get; set; }
+    public ServiceType? Type { get; set; }
 
-    [Required]
-    public RequestCreateModel RequestCreateModel { get; set; }
-}
-
-public class RequestDetailCompleteModel
-{
-    [Required]
-    public ServerCreateModel ServerCreateModel { get; set; }
-
-    [Required]
-    public LocationChoiceModel LocationChoiceModel { get; set; }
-
-    public int IpId { get; set; }
+    public ServiceStatus? Status { get; set; }
 }
 
