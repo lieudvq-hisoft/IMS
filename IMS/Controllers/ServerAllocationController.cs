@@ -1,5 +1,4 @@
 ﻿using Data.Common.PaginationModel;
-using Data.Entities;
 using Data.Enums;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -11,20 +10,20 @@ namespace IMS.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = "Bearer")]
-public class OrderController : ControllerBase
+public class ServerAllocationController : ControllerBase
 {
     private readonly ICustomerService _customerService;
     private readonly IWebHostEnvironment _environment;
-    private readonly IOrderService _requestService;
+    private readonly IServerAllocationService _requestService;
     private readonly IFileService _fileService;
     //private readonly IServerService _serverService;
     private readonly TransactionHelper _transactionHelper;
     //private readonly ILocationService _locationService;
     //private readonly IIpService _ipService;
 
-    public OrderController(ICustomerService customerService,
+    public ServerAllocationController(ICustomerService customerService,
         IWebHostEnvironment environment,
-        IOrderService requestService,
+        IServerAllocationService requestService,
         IFileService fileService,
         //IServerService serverService,
         TransactionHelper transactionHelper
@@ -44,7 +43,7 @@ public class OrderController : ControllerBase
 
     [HttpGet]
     [SwaggerOperation(Summary = "Get requests, excluding ongoing or stopped requests, and those with unsuccessful additional services")]
-    public async Task<ActionResult> GetRequest([FromQuery] PagingParam<OrderSortCriteria> pagingParam, [FromQuery] OrderSearchModel searchModel)
+    public async Task<ActionResult> GetRequest([FromQuery] PagingParam<OrderSortCriteria> pagingParam, [FromQuery] ServerAllocationSearchModel searchModel)
     {
         var result = await _requestService.Get(pagingParam, searchModel);
         if (result.Succeed) return Ok(result.Data);
@@ -112,7 +111,7 @@ public class OrderController : ControllerBase
     [HttpPost]
     //[Authorize(Roles = nameof(RoleType.Sale) + "," + nameof(RoleType.Customer))]
     [SwaggerOperation(Summary = "[Sale, Customer]: Create request for an existing customer")]
-    public async Task<ActionResult> CreateRequest([FromBody] OrderCreateModel model)
+    public async Task<ActionResult> CreateRequest([FromBody] ServerAllocationCreateModel model)
     {
         var result = await _requestService.Create(model);
         if (result.Succeed) return Ok(result.Data);
@@ -122,7 +121,7 @@ public class OrderController : ControllerBase
     [HttpPatch]
     [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "[Sale]: Update information of a request")]
-    public async Task<ActionResult> UpdateRequest([FromBody] OrderUpdateModel model)
+    public async Task<ActionResult> UpdateRequest([FromBody] ServerAllocationUpdateModel model)
     {
         var result = await _requestService.Update(model);
         if (result.Succeed) return Ok(result.Data);

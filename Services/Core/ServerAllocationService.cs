@@ -7,41 +7,37 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml;
-using OfficeOpenXml.Style;
 using Services.Utilities;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
 
 namespace Services.Core;
-public interface IOrderService
+public interface IServerAllocationService
 {
-    Task<ResultModel> Get(PagingParam<OrderSortCriteria> paginationModel, OrderSearchModel searchModel);
+    Task<ResultModel> Get(PagingParam<OrderSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> Create(OrderCreateModel model);
-    Task<ResultModel> Update(OrderUpdateModel model);
+    Task<ResultModel> Create(ServerAllocationCreateModel model);
+    Task<ResultModel> Update(ServerAllocationUpdateModel model);
 }
 
-public class OrderService : IOrderService
+public class ServerAllocationService : IServerAllocationService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public OrderService(AppDbContext dbContext, IMapper mapper)
+    public ServerAllocationService(AppDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
     }
 
-    public async Task<ResultModel> Get(PagingParam<OrderSortCriteria> paginationModel, OrderSearchModel searchModel)
+    public async Task<ResultModel> Get(PagingParam<OrderSortCriteria> paginationModel, ServerAllocationSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var orders = _dbContext.Orders
-                .Where(delegate (Order x)
+            var serverAllocations = _dbContext.ServerAllocations
+                .Where(delegate (ServerAllocation x)
                 {
                     var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(x.Status) : true;
                     var matchCustomerId = searchModel.CustomerId != null ? x.Id == searchModel.CustomerId : true;
@@ -49,12 +45,12 @@ public class OrderService : IOrderService
                 })
                 .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, orders.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, serverAllocations.Count());
 
-            orders = orders.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            orders = orders.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            serverAllocations = serverAllocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            serverAllocations = serverAllocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.Map<List<OrderModel>>(orders.ToList());
+            paging.Data = _mapper.Map<List<ServerAllocationModel>>(serverAllocations.ToList());
 
             result.Data = paging;
             result.Succeed = true;
@@ -73,16 +69,16 @@ public class OrderService : IOrderService
 
         try
         {
-            var request = _dbContext.Orders
-                .Include(x => x.Requests).ThenInclude(x => x.Service)
+            var serverAllocation = _dbContext.ServerAllocations
+                //.Include(x => x.Requests).ThenInclude(x => x.Service)
                 .FirstOrDefault(x => x.Id == id);
-            if (request == null)
+            if (serverAllocation == null)
             {
-                result.ErrorMessage = RequestErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
             {
-                result.Data = _mapper.Map<OrderModel>(request);
+                result.Data = _mapper.Map<ServerAllocationModel>(serverAllocation);
                 result.Succeed = true;
             }
         }
@@ -94,7 +90,7 @@ public class OrderService : IOrderService
     }
 
 
-    public async Task<ResultModel> Create(OrderCreateModel model)
+    public async Task<ResultModel> Create(ServerAllocationCreateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -112,19 +108,19 @@ public class OrderService : IOrderService
 
             else
             {
-                var order = new Order
+                var serverAllocation = new ServerAllocation
                 {
-                    Status = OrderStatus.Incomplete,
+                    Status = ServerAllocationStatus.Incomplete,
                     ExpectedSize = model.ExpectedSize,
                     Note = model.Note,
                     CustomerId = customerId,
                     DateCreated = DateTime.Now,
                 };
 
-                _dbContext.Orders.Add(order);
+                _dbContext.ServerAllocations.Add(serverAllocation);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<OrderModel>(order);
+                result.Data = _mapper.Map<ServerAllocationModel>(serverAllocation);
             }
         }
         catch (Exception e)
@@ -135,7 +131,7 @@ public class OrderService : IOrderService
         return result;
     }
 
-    public async Task<ResultModel> Update(OrderUpdateModel model)
+    public async Task<ResultModel> Update(ServerAllocationUpdateModel model)
     {
 
         var result = new ResultModel();
@@ -144,19 +140,19 @@ public class OrderService : IOrderService
 
         try
         {
-            var order = _dbContext.Orders.FirstOrDefault(x => x.Id == model.Id);
-            if (order == null)
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.Id);
+            if (serverAllocation == null)
             {
                 validPrecondition = false;
-                result.ErrorMessage = RequestErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
 
             if (validPrecondition)
             {
-                order.ExpectedSize = model.ExpectedSize;
-                order.Note = model.Note;
-                order.InspectorNote = model.InspectorNote;
-                order.DateCreated = DateTime.Now;
+                serverAllocation.ExpectedSize = model.ExpectedSize;
+                serverAllocation.Note = model.Note;
+                serverAllocation.InspectorNote = model.InspectorNote;
+                serverAllocation.DateCreated = DateTime.Now;
 
                 _dbContext.SaveChanges();
                 result.Succeed = true;

@@ -12,7 +12,7 @@ public class Customer : BaseEntity
     public string CustomerName { get; set; }
 
     public int CompanyTypeId { get; set; }
-    public virtual CompanyType CompanyType { get; set; }
+    public CompanyType CompanyType { get; set; }
 
-    public virtual ICollection<Order> Orders { get; set; }
+    public ICollection<ServerAllocation> ServerAllocations { get; set; }
 }

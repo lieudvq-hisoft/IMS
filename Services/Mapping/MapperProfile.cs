@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Data.Entities;
 using Data.Models;
-using OfficeOpenXml.Style;
 
 namespace Services.Mapping;
 
@@ -14,7 +13,7 @@ public class MapperProfile : Profile
         #endregion
 
         #region Request
-        CreateMap<Order, OrderModel>();
+        CreateMap<ServerAllocation, ServerAllocationModel>();
         #endregion
 
         #region Service

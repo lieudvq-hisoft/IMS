@@ -1,9 +1,9 @@
 ﻿using Data.Enums;
 
 namespace Data.Entities;
-public class Order : BaseEntity
+public class ServerAllocation : BaseEntity
 {
-    public OrderStatus Status { get; set; }
+    public ServerAllocationStatus Status { get; set; }
     public int ExpectedSize { get; set; }
     public string? Note { get; set; }
     public string? InspectorNote { get; set; }
@@ -11,7 +11,7 @@ public class Order : BaseEntity
     public string? ReceiptOfRecipientFilePath { get; set; }
 
     public int CustomerId { get; set; }
-    public virtual Customer Customer { get; set; }
+    public Customer Customer { get; set; }
 
-    public virtual ICollection<Request> Requests { get; set; }
+    public ICollection<ServerHardwareConfig> ServerHardwareConfigs { get; set; }
 }

@@ -18,13 +18,17 @@ public class CustomerErrorMessage
     public const string UPDATE_FAILED = "Update customer failed";
 }
 
+public class ServerAllocationErrorMessage
+{
+    public const string NOT_EXISTED = "Server allocation " + ErrorMessage.NOT_EXISTED;
+    public const string FILE_NOT_EXISTED = "Server allocation file " + ErrorMessage.NOT_EXISTED;
+    public const string ASSIGN_FILE_TO_NON_ACCEPTED = "Can only assign file to accepted server allocation";
+    public const string DOWNLOAD_FILE_FROM_NON_ACCEPTED = "Only accepted server allocation have file";
+}
+
 public class RequestErrorMessage
 {
     public const string NOT_EXISTED = "Request " + ErrorMessage.NOT_EXISTED;
-    public const string FILE_NOT_EXISTED = "Request file " + ErrorMessage.NOT_EXISTED;
-    public const string UPDATE_NON_PENDING = "Can only update pending request";
-    public const string ASSIGN_FILE_TO_NON_ACCEPTED = "Can only assign file to accepted request";
-    public const string DOWNLOAD_FILE_FROM_NON_ACCEPTED = "Only accepted request have file";
 }
 
 public class CompanyTypeErrorMessage
@@ -79,7 +83,7 @@ public class AppointmentErrorMessgae
     public const string EXISTED = "Appointment " + ErrorMessage.EXISTED;
 }
 
-public class ServiceErrorMessgae
+public class ServiceErrorMessage
 {
     public const string NOT_EXISTED = "Service " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Service " + ErrorMessage.EXISTED;

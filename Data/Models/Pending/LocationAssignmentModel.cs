@@ -1,6 +1,4 @@
-﻿using Data.Entities;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models;
 

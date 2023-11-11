@@ -8,7 +8,7 @@ public enum RoleType
     Admin = 4
 }
 
-public enum OrderStatus
+public enum ServerAllocationStatus
 {
     Incomplete,
     Pending,

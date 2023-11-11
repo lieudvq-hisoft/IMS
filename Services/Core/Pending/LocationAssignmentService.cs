@@ -1,14 +1,8 @@
 ﻿using AutoMapper;
 using Data.Common.PaginationModel;
 using Data.DataAccess;
-using Data.DataAccess.Constant;
-using Data.Entities;
 using Data.Enums;
 using Data.Models;
-using Data.Utils.Paging;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using Microsoft.IdentityModel.Tokens;
 using Services.Utilities;
 
 namespace Services.Core;

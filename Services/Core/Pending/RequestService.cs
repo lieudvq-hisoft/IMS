@@ -6,9 +6,7 @@ using Data.Entities;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Services.Utilities;
 
 namespace Services.Core;
@@ -37,23 +35,23 @@ public class RequestService : IRequestService
 
         try
         {
-            var requests = _dbContext.Requests
-                .Include(x => x.Service)
-                .Where(delegate (Request x)
-                {
-                    return FilterRequest(x, searchModel);
-                })
-                .AsQueryable();
+            //var requests = _dbContext.Requests
+            //    .Include(x => x.Service)
+            //    .Where(delegate (Request x)
+            //    {
+            //        return FilterRequest(x, searchModel);
+            //    })
+            //    .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requests.Count());
+            //var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requests.Count());
 
-            requests = requests.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            requests = requests.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            //requests = requests.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            //requests = requests.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<RequestModel>(requests).ToList();
+            //paging.Data = _mapper.ProjectTo<RequestModel>(requests).ToList();
 
-            result.Data = paging;
-            result.Succeed = true;
+            //result.Data = paging;
+            //result.Succeed = true;
         }
         catch (Exception e)
         {
@@ -86,21 +84,29 @@ public class RequestService : IRequestService
     {
         var result = new ResultModel();
         result.Succeed = false;
-        bool validPrecondition = true;
 
         try
         {
+            //var order = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.OrderId);
+            //if (order == null)
+            //{
+            //    result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            //}
+            //else
+            //{
+            //    var service = new Request
+            //    {
+            //        Status = ServiceStatus.Incomplete,
+            //        OrderId = model.OrderId,
+            //        IsDelegated = model.IsDelegated,
+            //    };
 
-            var service = new Request
-            {
+            //    _dbContext.Requests.Add(service);
+            //    _dbContext.SaveChanges();
 
-            };
-
-            _dbContext.Requests.Add(service);
-            _dbContext.SaveChanges();
-
-            result.Succeed = true;
-            result.Data = _mapper.Map<RequestModel>(service);
+            //    result.Succeed = true;
+            //    result.Data = _mapper.Map<RequestModel>(service);
+            //}
         }
         catch (Exception e)
         {
@@ -117,19 +123,19 @@ public class RequestService : IRequestService
 
         try
         {
-            var request = _dbContext.Requests.FirstOrDefault(x => x.Id == id);
-            if (request == null)
-            {
-                result.ErrorMessage = ServiceErrorMessgae.NOT_EXISTED;
-            }
-            else
-            {
-                request.IsDeleted = true;
-                request.DateUpdated = DateTime.Now;
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = request.Id;
-            }
+            //var request = _dbContext.Requests.FirstOrDefault(x => x.Id == id);
+            //if (request == null)
+            //{
+            //    result.ErrorMessage = ServiceErrorMessage.NOT_EXISTED;
+            //}
+            //else
+            //{
+            //    request.IsDeleted = true;
+            //    request.DateUpdated = DateTime.Now;
+            //    _dbContext.SaveChanges();
+            //    result.Succeed = true;
+            //    result.Data = request.Id;
+            //}
         }
         catch (Exception e)
         {

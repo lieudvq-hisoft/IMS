@@ -7,8 +7,8 @@ public class IpAssignment : BaseEntity
     public DateTime? DateUnassign { get; set; }
     public IpAssignmentTypes Type { get; set; }
 
-    public int IpId { get; set; }
-    public virtual Ip Ip { get; set; }
+    public int IpAddressId { get; set; }
+    public virtual IpAddress IpAddress { get; set; }
 
     public int RequestId { get; set; }
     public virtual Request Request { get; set; }

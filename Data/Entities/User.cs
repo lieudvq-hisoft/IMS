@@ -12,8 +12,8 @@ public class User : IdentityUser<Guid>
     public bool IsDeleted { get; set; }
     public int CurrenNoticeCount { get; set; } = 0;
 
-    public virtual ICollection<UserRole> UserRoles { get; set; }
+    public ICollection<UserRole> UserRoles { get; set; }
 
-    public virtual ICollection<Service>? ApprovedServices { get; set; }
-    public virtual ICollection<Service>? ExecutedServices { get; set; }
+    public ICollection<Service>? ApprovedServices { get; set; }
+    public ICollection<Service>? ExecutedServices { get; set; }
 }

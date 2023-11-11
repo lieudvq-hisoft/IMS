@@ -1,6 +1,5 @@
 ﻿using Data.Entities;
 using Data.Enums;
-using LoremNET;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -43,31 +42,36 @@ public static class ModelBuilderExtentions
         });
         #endregion
 
-        #region HardwareCategory
-        builder.Entity<ComponentCategory>().HasData(new ComponentCategory
+        #region Component
+        builder.Entity<Component>().HasData(new Component
         {
             Id = 1,
             Name = "CPU",
+            Unit = "Cái"
         });
-        builder.Entity<ComponentCategory>().HasData(new ComponentCategory
+        builder.Entity<Component>().HasData(new Component
         {
             Id = 2,
             Name = "GPU",
+            Unit = "Cái"
         });
-        builder.Entity<ComponentCategory>().HasData(new ComponentCategory
+        builder.Entity<Component>().HasData(new Component
         {
             Id = 3,
             Name = "RAM",
+            Unit = "Gb"
         });
-        builder.Entity<ComponentCategory>().HasData(new ComponentCategory
+        builder.Entity<Component>().HasData(new Component
         {
             Id = 4,
             Name = "OS",
+            Unit = "Cái"
         });
-        builder.Entity<ComponentCategory>().HasData(new ComponentCategory
+        builder.Entity<Component>().HasData(new Component
         {
             Id = 5,
             Name = "ROM",
+            Unit = "Cái"
         });
         #endregion
 
@@ -139,33 +143,33 @@ public static class ModelBuilderExtentions
         //#endregion
 
         #region IP
-        builder.Entity<Network>().HasData(new Network
-        {
-            Id = 1,
-            FirstOctet = 192,
-            SecondOctet = 112,
-            ThirdOctet = 121,
-            SubnetMask = 24
-        });
-        builder.Entity<Network>().HasData(new Network
-        {
-            Id = 2,
-            FirstOctet = 193,
-            SecondOctet = 122,
-            ThirdOctet = 111,
-            SubnetMask = 25
-        });
+        //builder.Entity<Network>().HasData(new Network
+        //{
+        //    Id = 1,
+        //    FirstOctet = 192,
+        //    SecondOctet = 112,
+        //    ThirdOctet = 121,
+        //    SubnetMask = 24
+        //});
+        //builder.Entity<Network>().HasData(new Network
+        //{
+        //    Id = 2,
+        //    FirstOctet = 193,
+        //    SecondOctet = 122,
+        //    ThirdOctet = 111,
+        //    SubnetMask = 25
+        //});
 
-        for (int i = 1; i <= 200; i++)
-        {
-            builder.Entity<Ip>().HasData(new Ip
-            {
-                Id = i,
-                Address = i,
-                IsReserved = false,
-                NetworkId = i % 2 == 0 ? 1 : 2,
-            });
-        }
+        //for (int i = 1; i <= 200; i++)
+        //{
+        //    builder.Entity<Ip>().HasData(new Ip
+        //    {
+        //        Id = i,
+        //        Address = i,
+        //        IsReserved = false,
+        //        NetworkId = i % 2 == 0 ? 1 : 2,
+        //    });
+        //}
         #endregion
 
         #region User
@@ -274,62 +278,62 @@ public static class ModelBuilderExtentions
         }
         #endregion
 
-        #region Service
-        builder.Entity<Service>().HasData(new Service
-        {
-            Id = 1,
-            Name = "Location",
-            Type = ServiceType.Location,
-        });
-        builder.Entity<Service>().HasData(new Service
-        {
-            Id = 2,
-            Name = "Expand",
-            Type = ServiceType.Expand,
-        });
-        builder.Entity<Service>().HasData(new Service
-        {
-            Id = 3,
-            Name = "Ip",
-            Type = ServiceType.Ip,
-        });
-        builder.Entity<Service>().HasData(new Service
-        {
-            Id = 4,
-            Name = "MasterIp",
-            Type = ServiceType.MasterIp,
-        });
-        builder.Entity<Service>().HasData(new Service
-        {
-            Id = 5,
-            Name = "Port",
-            Type = ServiceType.Port,
-        });
-        builder.Entity<Service>().HasData(new Service
-        {
-            Id = 6,
-            Name = "PortPower",
-            Type = ServiceType.PortPower,
-        });
-        builder.Entity<Service>().HasData(new Service
-        {
-            Id = 7,
-            Name = "Power",
-            Type = ServiceType.Power,
-        });
-        builder.Entity<Service>().HasData(new Service
-        {
-            Id = 8,
-            Name = "Component",
-            Type = ServiceType.Component,
-        });
-        builder.Entity<Service>().HasData(new Service
-        {
-            Id = 9,
-            Name = "Appointment",
-            Type = ServiceType.Appointment,
-        });
-        #endregion
+        //#region Service
+        //builder.Entity<Service>().HasData(new Service
+        //{
+        //    Id = 1,
+        //    Name = "Location",
+        //    Type = ServiceType.Location,
+        //});
+        //builder.Entity<Service>().HasData(new Service
+        //{
+        //    Id = 2,
+        //    Name = "Expand",
+        //    Type = ServiceType.Expand,
+        //});
+        //builder.Entity<Service>().HasData(new Service
+        //{
+        //    Id = 3,
+        //    Name = "Ip",
+        //    Type = ServiceType.Ip,
+        //});
+        //builder.Entity<Service>().HasData(new Service
+        //{
+        //    Id = 4,
+        //    Name = "MasterIp",
+        //    Type = ServiceType.MasterIp,
+        //});
+        //builder.Entity<Service>().HasData(new Service
+        //{
+        //    Id = 5,
+        //    Name = "Port",
+        //    Type = ServiceType.Port,
+        //});
+        //builder.Entity<Service>().HasData(new Service
+        //{
+        //    Id = 6,
+        //    Name = "PortPower",
+        //    Type = ServiceType.PortPower,
+        //});
+        //builder.Entity<Service>().HasData(new Service
+        //{
+        //    Id = 7,
+        //    Name = "Power",
+        //    Type = ServiceType.Power,
+        //});
+        //builder.Entity<Service>().HasData(new Service
+        //{
+        //    Id = 8,
+        //    Name = "Component",
+        //    Type = ServiceType.Component,
+        //});
+        //builder.Entity<Service>().HasData(new Service
+        //{
+        //    Id = 9,
+        //    Name = "Appointment",
+        //    Type = ServiceType.Appointment,
+        //});
+        //#endregion
     }
 
     public static void FilterSoftDeleted(this ModelBuilder builder)
@@ -340,21 +344,21 @@ public static class ModelBuilderExtentions
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Customer>()
             .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<ComponentAssignment>()
+        builder.Entity<ServerHardwareConfig>()
         .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<ComponentCategory>()
+        builder.Entity<Component>()
             .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Ip>()
+        builder.Entity<IpAddress>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<IpAssignment>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Location>()
             .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Network>()
+        builder.Entity<IpSubnet>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Rack>()
             .HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Order>()
+        builder.Entity<ServerAllocation>()
             .HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Role>()
             .HasQueryFilter(x => !x.isDeactive);

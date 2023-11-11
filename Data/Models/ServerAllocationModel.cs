@@ -1,14 +1,11 @@
-﻿using Data.Entities;
-using Data.Enums;
-using IMS.Data.Utils.ValidationAttributes;
+﻿using Data.Enums;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace Data.Models;
-public class OrderModel
+public class ServerAllocationModel
 {
     public int Id { get; set; }
-    public OrderStatus Status { get; set; }
+    public ServerAllocationStatus Status { get; set; }
     public int ExpectedSize { get; set; }
     public string? Note { get; set; }
     public string? InspectorNote { get; set; }
@@ -19,7 +16,7 @@ public class OrderModel
     public int CustomerId { get; set; }
 }
 
-public class OrderCreateModel
+public class ServerAllocationCreateModel
 {
     [Required]
     public int ExpectedSize { get; set; }
@@ -30,13 +27,14 @@ public class OrderCreateModel
     [Required]
     public int CustomerId { get; set; }
 }
-public class OrderUpdateModel
+
+public class ServerAllocationUpdateModel
 {
     [Required]
     public int Id { get; set; }
 
     [Required]
-    public OrderStatus Status { get; set; }
+    public ServerAllocationStatus Status { get; set; }
 
     [Required]
     public int ExpectedSize { get; set; }
@@ -46,18 +44,18 @@ public class OrderUpdateModel
     public string? InspectorNote { get; set; }
 }
 
-public class OrderSearchModel
+public class ServerAllocationSearchModel
 {
-    public int? CustomerId { get; set; } = null;
-    public List<OrderStatus>? Status { get; set; } = null;
+    public int? CustomerId { get; set; }
+    public List<ServerAllocationStatus>? Status { get; set; }
 }
 
-public class OrderImportModel
+public class ServerAllocationImportModel
 {
     [Required]
     public CustomerCreateModel CustomerCreateModel { get; set; }
 
     [Required]
-    public OrderCreateModel RequestCreateModel { get; set; }
+    public ServerAllocationCreateModel RequestCreateModel { get; set; }
 }
 

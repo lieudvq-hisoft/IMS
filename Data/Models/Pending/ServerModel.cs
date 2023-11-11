@@ -14,7 +14,8 @@ public class ServerModel
     public string Customer { get; set; }
 }
 
-public class ServerForAppointmentModel {
+public class ServerForAppointmentModel
+{
     public int Id { get; set; }
     public string SerialNumber { get; set; }
     public string Model { get; set; }
@@ -22,7 +23,7 @@ public class ServerForAppointmentModel {
 
 public class ServerSearchModel
 {
-    public OrderStatus? Status { get; set; }
+    public ServerAllocationStatus? Status { get; set; }
 }
 
 public class ServerDetailModel
@@ -43,8 +44,7 @@ public class ServerDetailModel
     public string Location { get; set; }
     public string IpAddress { get; set; }
 
-    public List<RequestExtendHistoryModel> RequestExtendHistoryModel { get; set; }
-    public List<ServiceRequestModel> ServiceRequests { get; set; }
+    public List<ServiceModel> ServiceRequests { get; set; }
 }
 
 public class ServerCreateModel
