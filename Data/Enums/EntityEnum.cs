@@ -86,3 +86,8 @@ public enum RequestSortCriteria
     OrderId,
     ServiceId
 }
+
+public enum IpAssignmentSortCriteria
+{
+    Id
+}

@@ -27,4 +27,31 @@ public class IpAssignmentController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPost]
+    [SwaggerOperation(Summary = "Create IpAssignmentService")]
+    public async Task<ActionResult> Post([FromBody] IpAssignmentCreateModel model)
+    {
+        var result = await _ipAssignmentService.Create(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPatch]
+    [SwaggerOperation(Summary = "Update IpAssignmentService")]
+    public async Task<ActionResult> Patch([FromBody] IpAssignmentUpdateModel model)
+    {
+        var result = await _ipAssignmentService.Update(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpDelete]
+    [SwaggerOperation(Summary = "Delete IpAssignmentService")]
+    public async Task<ActionResult> Delete([FromQuery] int id)
+    {
+        var result = await _ipAssignmentService.Delete(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }

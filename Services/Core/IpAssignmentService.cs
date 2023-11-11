@@ -19,8 +19,8 @@ public interface IIpAssignmentService
 {
     Task<ResultModel> Get(PagingParam<IpAssignmentSortCriteria> paginationModel, IpAssignmentSearchModel searchModel);
     Task<ResultModel> Create(IpAssignmentCreateModel model);
-    //Task<ResultModel> Update(ServiceUpdateModel model);
-    //Task<ResultModel> Delete(int id);
+    Task<ResultModel> Update(IpAssignmentUpdateModel model);
+    Task<ResultModel> Delete(int id);
 }
 
 public class IpAssignmentService : IIpAssignmentService
@@ -43,11 +43,10 @@ public class IpAssignmentService : IIpAssignmentService
         {
             var IpAssignments = _dbContext.IpAssignments
                 .Include(x => x.Ip)
-                .Include(x => x.Service)
+                .Include(x => x.Request)
                 .Where(delegate (IpAssignment x)
                 {
-                    return (x.ServiceId != 0 && x.Id == searchModel.ServiceId) &&
-                    MatchString(searchModel.Type.ToString(), x.Type.ToString());
+                    return MatchString(searchModel.Type.ToString(), x.Type.ToString());
                 })
                 .AsQueryable();
 
@@ -75,43 +74,89 @@ public class IpAssignmentService : IIpAssignmentService
             .IndexOf(MyFunction.ConvertToUnSign(searchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
     }
 
-
     public async Task<ResultModel> Create(IpAssignmentCreateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
-        bool validPrecondition = true;
 
         try
         {
-            //if (existingService != null)
-            //{
-            //    result.ErrorMessage = ServiceErrorMessgae.EXISTED;
-            //    validPrecondition = false;
-            //}
-            //if (existingService != null)
-            //{
-            //    result.ErrorMessage = ServiceErrorMessgae.EXISTED;
-            //    validPrecondition = false;
-            //}
+            var ipAssignment = new IpAssignment
+            {
+                DateAssign = model.DateAssign,
+                Type = model.Type,
+                IpId = model.IpId,
+                RequestId = model.RequestId,
+            };
 
-            //var existingService = _dbContext.Services.FirstOrDefault(x => x.Name == model.Name);
+            _dbContext.IpAssignments.Add(ipAssignment);
+            _dbContext.SaveChanges();
 
-            //if (validPrecondition)
-            //{
-            //    var service = new Service
-            //    {
-            //        Name = model.Name,
-            //        Type = model.Type,
+            result.Succeed = true;
+            result.Data = _mapper.Map<IpAssignmentModel>(ipAssignment);
+            
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
 
-            //    };
+        return result;
+    }
 
-            //    _dbContext.Services.Add(service);
-            //    _dbContext.SaveChanges();
+    public async Task<ResultModel> Update(IpAssignmentUpdateModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
 
-            //    result.Succeed = true;
-            //    result.Data = _mapper.Map<ServiceModel>(service);
-            //}
+        try
+        {
+            var ipAssignment = _dbContext.IpAssignments.FirstOrDefault(x => x.Id == model.Id);
+
+            if (ipAssignment == null)
+            {
+                result.ErrorMessage = IpAssignmentErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                ipAssignment.DateAssign = model.DateAssign;
+                ipAssignment.Type = model.Type;
+                ipAssignment.IpId = model.IpId;
+                ipAssignment.RequestId = model.RequestId;
+
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<IpAssignmentModel>(ipAssignment);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Delete(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var ipAssignment = _dbContext.IpAssignments.FirstOrDefault(x => x.Id == id);
+            if (ipAssignment == null)
+            {
+                result.ErrorMessage = IpAssignmentErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                ipAssignment.IsDeleted = true;
+                ipAssignment.DateUpdated = DateTime.Now;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = ipAssignment.Id;
+            }
         }
         catch (Exception e)
         {

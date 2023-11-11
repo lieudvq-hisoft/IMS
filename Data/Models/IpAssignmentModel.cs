@@ -30,7 +30,7 @@ public class IpAssignmentCreateModel
     [Required]
     public int IpId { get; set; }
     [Required]
-    public int ServiceId { get; set; }
+    public int RequestId { get; set; }
 }
 
 public class IpAssignmentUpdateModel
@@ -43,5 +43,5 @@ public class IpAssignmentUpdateModel
     [Required]
     public int IpId { get; set; }
     [Required]
-    public int ServiceId { get; set; }
+    public int RequestId { get; set; }
 }

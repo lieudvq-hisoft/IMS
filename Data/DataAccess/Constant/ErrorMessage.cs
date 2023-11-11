@@ -85,6 +85,13 @@ public class ServiceErrorMessgae
     public const string EXISTED = "Service " + ErrorMessage.EXISTED;
 }
 
+public class IpAssignmentErrorMessage
+{
+    public const string NOT_EXISTED = "IpAssignment " + ErrorMessage.NOT_EXISTED;
+    public const string DELETE_FAILED = "Delete customer failed";
+    public const string UPDATE_FAILED = "Update customer failed";
+}
+
 
 
 
