@@ -12,7 +12,17 @@ public class MapperProfile : Profile
         CreateMap<Customer, CustomerModel>();
         #endregion
 
-        #region Request
+        #region Server
+        CreateMap<Component, ComponentModel>();
+        CreateMap<ComponentCreateModel, Component>();
+        CreateMap<ComponentUpdateModel, Component>();
+
+        CreateMap<ServerHardwareConfig, ServerHardwareConfigModel>();
+        CreateMap<ServerHardwareConfigCreateModel, ServerHardwareConfig>();
+        CreateMap<ServerHardwareConfigUpdateModel, ServerHardwareConfig>();
+        #endregion'
+
+        #region ServerAllocationModel
         CreateMap<ServerAllocation, ServerAllocationModel>();
         #endregion
 

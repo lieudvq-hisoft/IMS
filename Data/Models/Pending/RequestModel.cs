@@ -32,6 +32,6 @@ public class RequestSearchModel
 
     public ServiceType? Type { get; set; }
 
-    public ServiceStatus? Status { get; set; }
+    public RequestStatus? Status { get; set; }
 }
 

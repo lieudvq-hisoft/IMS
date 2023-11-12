@@ -20,9 +20,6 @@ public class CustomerModel
 public class CustomerCreateModel
 {
     [Required]
-    public string Username { get; set; }
-
-    [Required]
     public string CompanyName { get; set; }
 
     [Required]

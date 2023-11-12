@@ -52,8 +52,10 @@ public static class StartupExtension
 
     public static void AddBussinessService(this IServiceCollection services, IConfiguration configuration)
     {
-        services.AddScoped<IServerAllocationService, ServerAllocationService>();
         services.AddScoped<ICompanyTypeService, CompanyTypeService>();
+        services.AddScoped<IComponentService, ComponentService>();
+        services.AddScoped<IServerAllocationService, ServerAllocationService>();
+        services.AddScoped<IServerHardwareConfigService, ServerHardwareConfigService>();
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<ILocationAssignmentService, LocationAssignmentService>();

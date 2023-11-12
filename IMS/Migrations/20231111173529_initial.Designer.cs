@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IMS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231111101451_initial")]
+    [Migration("20231111173529_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -24,38 +24,6 @@ namespace IMS.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("Data.Entities.Area", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("ColumnCount")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<int>("RowCount")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Area");
-                });
 
             modelBuilder.Entity("Data.Entities.CompanyType", b =>
                 {
@@ -90,8 +58,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 1,
-                            DateCreated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(473),
-                            DateUpdated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(485),
+                            DateCreated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(745),
+                            DateUpdated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(757),
                             Description = "Doanh nghiệp tư nhân",
                             IsDeleted = false,
                             Name = "Doanh nghiệp tư nhân"
@@ -99,8 +67,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 2,
-                            DateCreated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(508),
-                            DateUpdated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(509),
+                            DateCreated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(793),
+                            DateUpdated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(794),
                             Description = "Công ty trách nhiệm hữu hạn một thành viên",
                             IsDeleted = false,
                             Name = "Công ty trách nhiệm hữu hạn một thành viên"
@@ -108,8 +76,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 3,
-                            DateCreated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(519),
-                            DateUpdated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(520),
+                            DateCreated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(807),
+                            DateUpdated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(807),
                             Description = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên",
                             IsDeleted = false,
                             Name = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên"
@@ -117,8 +85,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 4,
-                            DateCreated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(529),
-                            DateUpdated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(529),
+                            DateCreated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(818),
+                            DateUpdated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(819),
                             Description = "Công ty cổ phần",
                             IsDeleted = false,
                             Name = "Công ty cổ phần"
@@ -126,8 +94,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 5,
-                            DateCreated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(538),
-                            DateUpdated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(538),
+                            DateCreated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(829),
+                            DateUpdated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(829),
                             Description = "Công ty hợp danh",
                             IsDeleted = false,
                             Name = "Công ty hợp danh"
@@ -170,8 +138,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 1,
-                            DateCreated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(552),
-                            DateUpdated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(553),
+                            DateCreated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(858),
+                            DateUpdated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(859),
                             IsDeleted = false,
                             Name = "CPU",
                             Unit = "Cái"
@@ -179,8 +147,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 2,
-                            DateCreated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(563),
-                            DateUpdated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(564),
+                            DateCreated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(884),
+                            DateUpdated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(885),
                             IsDeleted = false,
                             Name = "GPU",
                             Unit = "Cái"
@@ -188,8 +156,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 3,
-                            DateCreated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(613),
-                            DateUpdated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(613),
+                            DateCreated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(948),
+                            DateUpdated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(949),
                             IsDeleted = false,
                             Name = "RAM",
                             Unit = "Gb"
@@ -197,8 +165,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 4,
-                            DateCreated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(626),
-                            DateUpdated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(626),
+                            DateCreated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(962),
+                            DateUpdated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(962),
                             IsDeleted = false,
                             Name = "OS",
                             Unit = "Cái"
@@ -206,8 +174,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 5,
-                            DateCreated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(635),
-                            DateUpdated = new DateTime(2023, 11, 11, 17, 14, 50, 747, DateTimeKind.Local).AddTicks(636),
+                            DateCreated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(977),
+                            DateUpdated = new DateTime(2023, 11, 12, 0, 35, 28, 437, DateTimeKind.Local).AddTicks(977),
                             IsDeleted = false,
                             Name = "ROM",
                             Unit = "Cái"
@@ -392,110 +360,6 @@ namespace IMS.Migrations
                     b.ToTable("IpSubnet");
                 });
 
-            modelBuilder.Entity("Data.Entities.Location", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("Position")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RackId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RackId");
-
-                    b.ToTable("Location");
-                });
-
-            modelBuilder.Entity("Data.Entities.LocationAssignment", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("LocationId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("RequestId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("LocationId");
-
-                    b.HasIndex("RequestId");
-
-                    b.ToTable("LocationAssignment");
-                });
-
-            modelBuilder.Entity("Data.Entities.Rack", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AreaId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Column")
-                        .HasColumnType("integer");
-
-                    b.Property<double>("CurrentPower")
-                        .HasColumnType("double precision");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<double>("MaxPower")
-                        .HasColumnType("double precision");
-
-                    b.Property<int>("Row")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Size")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AreaId");
-
-                    b.ToTable("Rack");
-                });
-
             modelBuilder.Entity("Data.Entities.Request", b =>
                 {
                     b.Property<int>("Id")
@@ -519,7 +383,7 @@ namespace IMS.Migrations
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
 
-                    b.Property<int>("OrderId")
+                    b.Property<int>("ServerAllocationId")
                         .HasColumnType("integer");
 
                     b.Property<int?>("ServiceId")
@@ -530,11 +394,52 @@ namespace IMS.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("OrderId");
-
                     b.HasIndex("ServiceId");
 
                     b.ToTable("Request");
+                });
+
+            modelBuilder.Entity("Data.Entities.RequestUpgrade", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CustomerId")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("InspectionReportFilePath")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("ServerAllocationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ServerHardwareConfigId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CustomerId");
+
+                    b.HasIndex("ServerAllocationId");
+
+                    b.HasIndex("ServerHardwareConfigId");
+
+                    b.ToTable("RequestUpgrades");
                 });
 
             modelBuilder.Entity("Data.Entities.Role", b =>
@@ -660,11 +565,11 @@ namespace IMS.Migrations
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("timestamp without time zone");
 
-                    b.Property<DateTime>("DateInstalled")
-                        .HasColumnType("timestamp without time zone");
-
                     b.Property<DateTime>("DateUpdated")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsCurrent")
+                        .HasColumnType("boolean");
 
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("boolean");
@@ -673,21 +578,16 @@ namespace IMS.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("RequestId")
-                        .HasColumnType("integer");
-
                     b.Property<string>("SerialNumber")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int?>("ServerAllocationId")
+                    b.Property<int>("ServerAllocationId")
                         .HasColumnType("integer");
 
                     b.HasKey("Id");
 
                     b.HasIndex("ComponentId");
-
-                    b.HasIndex("RequestId");
 
                     b.HasIndex("ServerAllocationId");
 
@@ -826,7 +726,7 @@ namespace IMS.Migrations
                             Id = new Guid("57ffb575-7c79-4133-8433-aebbcd71f824"),
                             AccessFailedCount = 0,
                             Address = "Address1",
-                            ConcurrencyStamp = "ed80b33c-0eae-4008-bb78-fbab0120f7e9",
+                            ConcurrencyStamp = "08398f1c-1cc4-4a37-89a9-79dfb440ff1f",
                             CurrenNoticeCount = 0,
                             Email = "super@gmail.com",
                             EmailConfirmed = true,
@@ -835,7 +735,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "super@gmail.com",
                             NormalizedUserName = "super",
-                            PasswordHash = "AQAAAAIAAYagAAAAEGDbjeyENM+nVyxvcand0TFazXisy8fscGSNchS7IiWUjYAcEE925p0mafnlW2nAfg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIEiLqvuQZCBWqrGvM6z9YqsZ4ldeIu/YXZJO4HeopllTKorrfhKYfgDcIzeu8FGTw==",
                             PhoneNumber = "0000000001",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -847,7 +747,7 @@ namespace IMS.Migrations
                             Id = new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab"),
                             AccessFailedCount = 0,
                             Address = "Address2",
-                            ConcurrencyStamp = "d1d8da09-6004-4bb1-b8ac-5f4fd5df67de",
+                            ConcurrencyStamp = "932dd6e2-35ff-4abf-928e-a8dc76be99d5",
                             CurrenNoticeCount = 0,
                             Email = "tech@gmail.com",
                             EmailConfirmed = true,
@@ -856,7 +756,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "tech@gmail.com",
                             NormalizedUserName = "tech",
-                            PasswordHash = "AQAAAAIAAYagAAAAEC1IrBxoOBLC+eXrVOSEaG6dLcOMgAM0vsBG81msppTyIYd25Vk9UD99ZrI7L8/tFQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDRF4unaWPR7b7sTNG48dWxygH6jG1Bsr68ECN/qiVbRjpY8tODC+dS27tpNWNsj+A==",
                             PhoneNumber = "0000000002",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -868,7 +768,7 @@ namespace IMS.Migrations
                             Id = new Guid("1abb6e28-793d-460f-8a24-745998356da8"),
                             AccessFailedCount = 0,
                             Address = "Address3",
-                            ConcurrencyStamp = "551c06e5-72a0-4028-b341-df2deb5e6e1c",
+                            ConcurrencyStamp = "45d5d5be-882c-4a8e-94ac-0b1c36f203a2",
                             CurrenNoticeCount = 0,
                             Email = "sale@gmail.com",
                             EmailConfirmed = true,
@@ -877,7 +777,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "sale@gmail.com",
                             NormalizedUserName = "sale",
-                            PasswordHash = "AQAAAAIAAYagAAAAEKkCRdTQOL2PeCOU17bv1evfzpPlOHuoEyp8VXRP1ioq7/GxzSnx3EpcytAyDhvEkg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMYHMn+o8LTqxURr6eEJel7uOcw1g5T+sqkdRLu23rirZFprGDi+fiWWcbi9kP8QTw==",
                             PhoneNumber = "0000000003",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -889,7 +789,7 @@ namespace IMS.Migrations
                             Id = new Guid("2e3566a9-02b1-4ec4-a2d4-b3bb3c4f2b45"),
                             AccessFailedCount = 0,
                             Address = "Address4",
-                            ConcurrencyStamp = "f1550bed-c703-424f-943a-f914cd48fe46",
+                            ConcurrencyStamp = "9360bba5-ac59-4ebe-a587-911288880cb3",
                             CurrenNoticeCount = 0,
                             Email = "manager@gmail.com",
                             EmailConfirmed = true,
@@ -898,7 +798,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "manager@gmail.com",
                             NormalizedUserName = "manager",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJNiwB7GjE2y+BZb9CTddy7655Xf9JGHtvIdmLPm9PvKdrb2mVXVUhkAGlgH/P6BKw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMoT0Uw2t2n7PUCwNYuhCyOPh6vpblkzrzDw0gHBMNAmOXRVA6ACjKAR4yFt36r/ww==",
                             PhoneNumber = "0000000004",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -910,7 +810,7 @@ namespace IMS.Migrations
                             Id = new Guid("01fc684c-d9d0-4fcc-b0a7-56fea6945928"),
                             AccessFailedCount = 0,
                             Address = "Address5",
-                            ConcurrencyStamp = "c3f465fe-8cd3-44b8-bcf8-6f43743520d1",
+                            ConcurrencyStamp = "e5cacd43-8829-412f-859a-132d4a3bf6ae",
                             CurrenNoticeCount = 0,
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
@@ -919,7 +819,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "admin@gmail.com",
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEJ+K2LN+ZVFKeuksA/QjkAc4lyq7VtAcJoH6wbdpLSSkmA+rMUhPBoEczWkhZYm3Kg==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEHA+hK4XQamoP0laumyKQK9GcxrbzMDfHmHl4jSHzgT0ojJWw1FOfz6dmVzQflIPcw==",
                             PhoneNumber = "0000000005",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -1125,62 +1025,40 @@ namespace IMS.Migrations
                     b.Navigation("ParentNetwork");
                 });
 
-            modelBuilder.Entity("Data.Entities.Location", b =>
-                {
-                    b.HasOne("Data.Entities.Rack", "Rack")
-                        .WithMany("Locations")
-                        .HasForeignKey("RackId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Rack");
-                });
-
-            modelBuilder.Entity("Data.Entities.LocationAssignment", b =>
-                {
-                    b.HasOne("Data.Entities.Location", "Location")
-                        .WithMany("LocationAssignments")
-                        .HasForeignKey("LocationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entities.Request", "Request")
-                        .WithMany()
-                        .HasForeignKey("RequestId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Location");
-
-                    b.Navigation("Request");
-                });
-
-            modelBuilder.Entity("Data.Entities.Rack", b =>
-                {
-                    b.HasOne("Data.Entities.Area", "Area")
-                        .WithMany("Racks")
-                        .HasForeignKey("AreaId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Area");
-                });
-
             modelBuilder.Entity("Data.Entities.Request", b =>
                 {
-                    b.HasOne("Data.Entities.ServerAllocation", "Order")
-                        .WithMany()
-                        .HasForeignKey("OrderId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("Data.Entities.Service", "Service")
                         .WithMany("Requests")
                         .HasForeignKey("ServiceId");
 
-                    b.Navigation("Order");
-
                     b.Navigation("Service");
+                });
+
+            modelBuilder.Entity("Data.Entities.RequestUpgrade", b =>
+                {
+                    b.HasOne("Data.Entities.Customer", "Customer")
+                        .WithMany()
+                        .HasForeignKey("CustomerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Data.Entities.ServerAllocation", "ServerAllocation")
+                        .WithMany()
+                        .HasForeignKey("ServerAllocationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Data.Entities.ServerHardwareConfig", "ServerHardwareConfig")
+                        .WithMany()
+                        .HasForeignKey("ServerHardwareConfigId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Customer");
+
+                    b.Navigation("ServerAllocation");
+
+                    b.Navigation("ServerHardwareConfig");
                 });
 
             modelBuilder.Entity("Data.Entities.ServerAllocation", b =>
@@ -1202,19 +1080,15 @@ namespace IMS.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Data.Entities.Request", "Request")
-                        .WithMany("ComponentAssignments")
-                        .HasForeignKey("RequestId")
+                    b.HasOne("Data.Entities.ServerAllocation", "ServerAllocation")
+                        .WithMany("ServerHardwareConfigs")
+                        .HasForeignKey("ServerAllocationId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Data.Entities.ServerAllocation", null)
-                        .WithMany("ServerHardwareConfigs")
-                        .HasForeignKey("ServerAllocationId");
-
                     b.Navigation("Component");
 
-                    b.Navigation("Request");
+                    b.Navigation("ServerAllocation");
                 });
 
             modelBuilder.Entity("Data.Entities.Service", b =>
@@ -1283,11 +1157,6 @@ namespace IMS.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Data.Entities.Area", b =>
-                {
-                    b.Navigation("Racks");
-                });
-
             modelBuilder.Entity("Data.Entities.CompanyType", b =>
                 {
                     b.Navigation("Customer");
@@ -1315,20 +1184,8 @@ namespace IMS.Migrations
                     b.Navigation("SubNets");
                 });
 
-            modelBuilder.Entity("Data.Entities.Location", b =>
-                {
-                    b.Navigation("LocationAssignments");
-                });
-
-            modelBuilder.Entity("Data.Entities.Rack", b =>
-                {
-                    b.Navigation("Locations");
-                });
-
             modelBuilder.Entity("Data.Entities.Request", b =>
                 {
-                    b.Navigation("ComponentAssignments");
-
                     b.Navigation("IpAssignments");
                 });
 

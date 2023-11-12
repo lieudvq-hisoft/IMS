@@ -38,7 +38,7 @@ public enum IpAssignmentTypes
     Port
 }
 
-public enum ServiceStatus
+public enum RequestStatus
 {
     Incomplete,
     Pending,
@@ -85,4 +85,17 @@ public enum RequestSortCriteria
     Id,
     OrderId,
     ServiceId
+}
+
+public enum ServerHardwareConfigSortCriteria
+{
+    Id,
+    ServerAllocationId,
+    ComponentId
+}
+
+public enum RequestUpgradeSortCriteria
+{
+    Id,
+    CustomerId
 }

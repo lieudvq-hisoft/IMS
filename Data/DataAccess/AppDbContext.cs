@@ -77,6 +77,7 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<ServerHardwareConfig> ServerHardwareConfigs { get; set; }
     public DbSet<Component> Components { get; set; }
     public DbSet<Customer> Customers { get; set; }
+    public DbSet<RequestUpgrade> RequestUpgrades { get; set; }
     //public DbSet<IpAddress> Ips { get; set; }
     //public DbSet<IpAssignment> IpAssignments { get; set; }
     //public DbSet<Location> Locations { get; set; }
