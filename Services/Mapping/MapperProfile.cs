@@ -10,6 +10,7 @@ public class MapperProfile : Profile
     {
         #region
         CreateMap<Customer, CustomerModel>();
+        CreateMap<User, UserModel>();
         #endregion
 
         #region Server

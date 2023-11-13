@@ -45,7 +45,7 @@ public class UserService : IUserService
     {
         var result = new ResultModel();
 
-        var user = _dbContext.User.FirstOrDefault(x => x.UserName == model.Username && x.EmailConfirmed);
+        var user = _dbContext.User.FirstOrDefault(x => x.UserName == model.Username);
 
         if (user != null)
         {

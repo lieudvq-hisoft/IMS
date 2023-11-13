@@ -38,17 +38,6 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("Activate/{email}")]
-    [AllowAnonymous]
-    [SwaggerOperation(Summary = "Activate a user")]
-    public async Task<ActionResult> Activate(string email)
-    {
-        var result = await _userService.ActivateUser(email);
-        if (result.Succeed)
-            return Redirect("https://ims.hisoft.vn/signin");
-        return BadRequest(result.ErrorMessage);
-    }
-
     [HttpGet("MyAccount")]
     [SwaggerOperation(Summary = "Get your information")]
     public async Task<ActionResult> GetAccountInfo()
