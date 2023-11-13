@@ -58,7 +58,7 @@ public class RackModel
     public int Column { get; set; }
     public int Row { get; set; }
     public int Size { get; set; }
-    public virtual AreaModel Area { get; set; }
+    public int AreaId { get; set; }
 }
 
 //public class RackDetailModel

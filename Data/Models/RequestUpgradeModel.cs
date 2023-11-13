@@ -31,8 +31,6 @@ public class RequestUpgradeCreateModel
 public class RequestUpgradeSearchModel
 {
     public int? Id { get; set; }
-    public string Description { get; set; }
-    public int Capacity { get; set; }
     public int? ComponentId { get; set; }
     public int? ServerAllocationId { get; set; }
 }

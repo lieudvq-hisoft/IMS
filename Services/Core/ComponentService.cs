@@ -57,12 +57,20 @@ public class ComponentService : IComponentService
 
         try
         {
-            var component = _mapper.Map<Component>(model);
+            var existingComponent = _dbContext.Components.FirstOrDefault(x => x.Name == model.Name && x.Type == model.Type);
+            if (existingComponent != null)
+            {
+                result.ErrorMessage = ComponentErrorMessage.EXISTED;
+            }
+            else
+            {
+                var component = _mapper.Map<Component>(model);
 
-            _dbContext.Components.Add(component);
-            _dbContext.SaveChanges();
-            result.Succeed = true;
-            result.Data = _mapper.Map<ComponentModel>(component);
+                _dbContext.Components.Add(component);
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<ComponentModel>(component);
+            }
         }
         catch (Exception e)
         {
@@ -79,8 +87,13 @@ public class ComponentService : IComponentService
 
         try
         {
+            var existingComponent = _dbContext.Components.FirstOrDefault(x => x.Name == model.Name && x.Type == model.Type);
             var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.Id);
-            if (component == null)
+            if (existingComponent != null)
+            {
+                result.ErrorMessage = ComponentErrorMessage.EXISTED;
+            }
+            else if (component == null)
             {
                 result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
             }

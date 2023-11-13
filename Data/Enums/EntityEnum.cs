@@ -103,5 +103,6 @@ public enum ServerHardwareConfigSortCriteria
 public enum RequestUpgradeSortCriteria
 {
     Id,
-    CustomerId
+    CustomerId,
+    ComponentId
 }

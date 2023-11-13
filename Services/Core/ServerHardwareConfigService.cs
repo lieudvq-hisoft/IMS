@@ -96,12 +96,32 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
                 validPrecondition = false;
             }
 
+            if (serverAllocation.ServerHardwareConfigs.Any(x => x.Component.Name == component.Name))
+            {
+                result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
+                validPrecondition = false;
+            }
+
             if (validPrecondition)
             {
                 var serverHardwareConfig = _mapper.Map<ServerHardwareConfig>(model);
 
                 _dbContext.ServerHardwareConfigs.Add(serverHardwareConfig);
                 _dbContext.SaveChanges();
+
+                if (component.Type == ComponentType.Change)
+                {
+                    _dbContext.RequestUpgrades.Add(new RequestUpgrade
+                    {
+                        Description = model.Description,
+                        Capacity = model.Capacity,
+                        ServerAllocationId = model.ServerAllocationId,
+                        ComponentId = model.ComponentId,
+                        Status = RequestStatus.Accepted
+                    });
+                    _dbContext.SaveChanges();
+                }
+
                 result.Succeed = true;
                 result.Data = _mapper.Map<ServerHardwareConfigModel>(serverHardwareConfig);
             }

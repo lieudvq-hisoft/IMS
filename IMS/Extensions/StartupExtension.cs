@@ -60,6 +60,7 @@ public static class StartupExtension
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<ILocationAssignmentService, LocationAssignmentService>();
         services.AddScoped<IRequestService, RequestService>();
+        services.AddScoped<IRequestUpgradeService, RequestUpgradeService>();
         services.AddScoped<IUserService, UserService>();
         //services.AddScoped<IIpService, IpService>();
         //services.AddScoped<IAppointmentService, AppointmentService>();

@@ -13,13 +13,18 @@ public class MapperProfile : Profile
         #endregion
 
         #region Server
-        CreateMap<Component, ComponentModel>();
+        CreateMap<Component, ComponentModel>()
+            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
         CreateMap<ComponentCreateModel, Component>();
         CreateMap<ComponentUpdateModel, Component>();
 
         CreateMap<ServerHardwareConfig, ServerHardwareConfigModel>();
         CreateMap<ServerHardwareConfigCreateModel, ServerHardwareConfig>();
         CreateMap<ServerHardwareConfigUpdateModel, ServerHardwareConfig>();
+
+        CreateMap<RequestUpgrade, RequestUpgradeModel>();
+        CreateMap<RequestUpgradeCreateModel, RequestUpgrade>();
+        //CreateMap<RequestUpgradeUpdate, RequestUpgrade>();
         #endregion'
 
         #region ServerAllocationModel
@@ -32,8 +37,7 @@ public class MapperProfile : Profile
 
         #region Location
         CreateMap<Area, AreaModel>();
-        CreateMap<Rack, RackModel>()
-            .ForMember(dest => dest.Area, opt => opt.MapFrom((src, dest, i, context) => context.Mapper.Map<AreaModel>(src.Area)));
+        CreateMap<Rack, RackModel>();
         #endregion
     }
 }

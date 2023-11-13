@@ -92,11 +92,13 @@ public class ServiceErrorMessage
 public class ComponentErrorMessage
 {
     public const string NOT_EXISTED = "Component " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Component " + ErrorMessage.EXISTED;
 }
 
 public class ServerHardwareConfigErrorMessage
 {
     public const string NOT_EXISTED = "Server hardware config " + ErrorMessage.NOT_EXISTED;
+    public const string CONFIG_FOR_COMPONENT_EXISTED = "Config for component " + ErrorMessage.EXISTED;
     public const string DELETE_CURRENT = "Cannot delete current server hardware config";
 }
 
