@@ -79,3 +79,9 @@ public class CustomerSearchModel
 {
     public string? CustomerName { get; set; } = "";
 }
+
+public class CustomerLoginModel
+{
+    public string Username { get; set; }
+    public string Password { get; set; }
+}

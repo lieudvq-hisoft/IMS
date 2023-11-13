@@ -8,10 +8,15 @@ using Data.Models;
 using Data.Utils.Paging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 using Services.Utilities;
 using System.ComponentModel.DataAnnotations;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace Services.Core;
 
@@ -24,21 +29,26 @@ public interface ICustomerService
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Update(CustomerUpdateModel model);
     Task<ResultModel> SendActivationEmail(List<int> customerIds);
+    Task<ResultModel> Login(CustomerLoginModel model);
 }
 
 public class CustomerService : ICustomerService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly UserManager<User> _userManager;
     private readonly IEmailService _emailService;
+    private readonly IConfiguration _config;
 
-    public CustomerService(AppDbContext dbContext, IMapper mapper, UserManager<User> userManager, IEmailService emailService)
+    public CustomerService(
+        AppDbContext dbContext, 
+        IMapper mapper,
+        IEmailService emailService, 
+        IConfiguration config )
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _userManager = userManager;
         _emailService = emailService;
+        _config = config;
     }
 
     public async Task<ResultModel> Get(PagingParam<CustomerSortCriteria> paginationModel, CustomerSearchModel searchModel)
@@ -315,5 +325,66 @@ public class CustomerService : ICustomerService
         {
             Succeed = true
         };
+    }
+
+    public async Task<ResultModel> Login(CustomerLoginModel model)
+    {
+        var result = new ResultModel();
+
+        var customer = _dbContext.Customers.FirstOrDefault(x => x.Username == model.Username);
+
+        if (customer != null)
+        {
+
+            var token = await GetAccessToken(customer);
+            result.Succeed = true;
+             result.Data = token;
+        }
+        else
+        {
+            result.ErrorMessage = UserErrorMessage.LOGIN_ERROR;
+        }
+        return result;
+    }
+
+    private async Task<Token> GetAccessToken(Customer customer)
+    {
+        List<Claim> claims = GetClaims(customer);
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["Jwt:Key"]));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var token = new JwtSecurityToken(_config["Jwt:Issuer"],
+          _config["Jwt:Issuer"],
+          claims,
+          expires: DateTime.Now.AddDays(int.Parse(_config["Jwt:ExpireTimes"])),
+          //int.Parse(_configuration["Jwt:ExpireTimes"]) * 3600
+          signingCredentials: creds);
+
+        var serializedToken = new JwtSecurityTokenHandler().WriteToken(token);
+
+        return new Token
+        {
+            Access_token = serializedToken,
+            Token_type = "Bearer",
+            Expires_in = int.Parse(_config["Jwt:ExpireTimes"]) * 60,
+            UserID = customer.Id.ToString(),
+            UserName = customer.Username,
+            PhoneNumber = customer.PhoneNumber,
+        };
+    }
+
+    private List<Claim> GetClaims(Customer customer)
+    {
+        IdentityOptions _options = new IdentityOptions();
+        var claims = new List<Claim>
+        {
+            new Claim("UserId", customer.Id.ToString()),
+            new Claim("Email", customer.Email),
+            new Claim("FullName", customer.CustomerName),
+            new Claim("UserName", customer.Username),
+            new Claim(ClaimTypes.Role, "Customer")
+        };
+
+        if (!string.IsNullOrEmpty(customer.PhoneNumber)) claims.Add(new Claim("PhoneNumber", customer.PhoneNumber));
+        return claims;
     }
 }

@@ -67,4 +67,14 @@ public class CustomerController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPost("Login")]
+    [AllowAnonymous]
+    [SwaggerOperation(Summary = "Login")]
+    public async Task<ActionResult> Login([FromBody] CustomerLoginModel model)
+    {
+        var result = await _customerService.Login(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }
