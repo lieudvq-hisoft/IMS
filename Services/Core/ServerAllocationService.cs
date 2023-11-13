@@ -15,6 +15,7 @@ public interface IServerAllocationService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(ServerAllocationCreateModel model);
     Task<ResultModel> Update(ServerAllocationUpdateModel model);
+    Task<ResultModel> Delete(int serverAllocationId);
 }
 
 public class ServerAllocationService : IServerAllocationService
@@ -153,6 +154,36 @@ public class ServerAllocationService : IServerAllocationService
                 serverAllocation.InspectorNote = model.InspectorNote;
                 serverAllocation.DateCreated = DateTime.Now;
 
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Delete(int serverAllocationId)
+    {
+
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == serverAllocationId);
+            if (serverAllocation == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                serverAllocation.IsDeleted = true;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
             }

@@ -14,20 +14,20 @@ public class ServerAllocationController : ControllerBase
 {
     private readonly ICustomerService _customerService;
     private readonly IWebHostEnvironment _environment;
-    private readonly IServerAllocationService _requestService;
+    private readonly IServerAllocationService _serverAllocationService;
     private readonly IFileService _fileService;
     private readonly TransactionHelper _transactionHelper;
 
     public ServerAllocationController(ICustomerService customerService,
         IWebHostEnvironment environment,
-        IServerAllocationService requestService,
+        IServerAllocationService serverAllocationService,
         IFileService fileService,
         TransactionHelper transactionHelper
         )
     {
         _customerService = customerService;
         _environment = environment;
-        _requestService = requestService;
+        _serverAllocationService = serverAllocationService;
         _fileService = fileService;
         _transactionHelper = transactionHelper;
     }
@@ -36,7 +36,7 @@ public class ServerAllocationController : ControllerBase
     [SwaggerOperation(Summary = "Get requests, excluding ongoing or stopped requests, and those with unsuccessful additional services")]
     public async Task<ActionResult> GetRequest([FromQuery] PagingParam<OrderSortCriteria> pagingParam, [FromQuery] ServerAllocationSearchModel searchModel)
     {
-        var result = await _requestService.Get(pagingParam, searchModel);
+        var result = await _serverAllocationService.Get(pagingParam, searchModel);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -63,7 +63,7 @@ public class ServerAllocationController : ControllerBase
     [SwaggerOperation(Summary = "Get request detail")]
     public async Task<ActionResult> GetRequestDetail([FromRoute] int id)
     {
-        var result = await _requestService.GetDetail(id);
+        var result = await _serverAllocationService.GetDetail(id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -99,19 +99,25 @@ public class ServerAllocationController : ControllerBase
     //}
 
     [HttpPost]
-    [SwaggerOperation(Summary = "[Sale, Customer]: Create request for an existing customer")]
-    public async Task<ActionResult> CreateRequest([FromBody] ServerAllocationCreateModel model)
+    public async Task<ActionResult> Create([FromBody] ServerAllocationCreateModel model)
     {
-        var result = await _requestService.Create(model);
+        var result = await _serverAllocationService.Create(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpPut]
-    [SwaggerOperation(Summary = "[Sale]: Update information of a request")]
-    public async Task<ActionResult> UpdateRequest([FromBody] ServerAllocationUpdateModel model)
+    public async Task<ActionResult> Update([FromBody] ServerAllocationUpdateModel model)
     {
-        var result = await _requestService.Update(model);
+        var result = await _serverAllocationService.Update(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(int id)
+    {
+        var result = await _serverAllocationService.Delete(id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
