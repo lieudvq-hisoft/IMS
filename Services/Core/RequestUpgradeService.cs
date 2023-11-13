@@ -1,17 +1,12 @@
 ﻿using AutoMapper;
 using Data.Common.PaginationModel;
-using Data.DataAccess.Constant;
 using Data.DataAccess;
+using Data.DataAccess.Constant;
 using Data.Entities;
 using Data.Enums;
 using Data.Models;
-using Services.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Data.Utils.Paging;
+using Services.Utilities;
 
 namespace Services.Core;
 public interface IRequestUpgradeService
@@ -19,6 +14,7 @@ public interface IRequestUpgradeService
     Task<ResultModel> Get(PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
     Task<ResultModel> Delete(int requestUpgradeId);
+    Task<ResultModel> Update(RequestUpgradeUpdateModel model);
 }
 
 public class RequestUpgradeService : IRequestUpgradeService

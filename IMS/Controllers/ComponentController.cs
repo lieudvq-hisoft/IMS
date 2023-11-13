@@ -1,9 +1,7 @@
 ﻿using Data.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace IMS.Controllers;
 [Route("api/[controller]")]
@@ -34,7 +32,7 @@ public class ComponentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPatch]
+    [HttpPut]
     public async Task<ActionResult> Update([FromBody] ComponentUpdateModel model)
     {
         var result = await _componentService.Update(model);

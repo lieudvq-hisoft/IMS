@@ -244,7 +244,6 @@ public class UserService : IUserService
             }
             else
             {
-                user.UserName = model.UserName;
                 user.Email = model.Email;
                 user.Fullname = model.Fullname;
                 user.Address = model.Address;
@@ -347,7 +346,7 @@ public class UserService : IUserService
                 {
                     return MatchString(searchModel.SearchValue, x.Email)
                     || MatchString(searchModel.SearchValue, x.UserName);
-                }) 
+                })
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, users.Count());

@@ -39,7 +39,6 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "[Sale]: Create a customer and associate user")]
     public async Task<ActionResult> Create([FromBody] CustomerCreateModel model)
     {
@@ -48,8 +47,7 @@ public class CustomerController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPatch]
-    [Authorize(Roles = nameof(RoleType.Sale))]
+    [HttpPut]
     [SwaggerOperation(Summary = "[Sale]: Update a customer")]
     public async Task<ActionResult> Update([FromBody] CustomerUpdateModel model)
     {
@@ -59,7 +57,6 @@ public class CustomerController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "[Sale]: Delete a customer")]
     public async Task<ActionResult> Delete(int id)
     {

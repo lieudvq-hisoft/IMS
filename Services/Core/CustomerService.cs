@@ -283,7 +283,6 @@ public class CustomerService : ICustomerService
             }
             else
             {
-                customer.Username = model.Username;
                 customer.CompanyName = model.CompanyName;
                 customer.Address = model.Address;
                 customer.TaxNumber = model.TaxNumber;

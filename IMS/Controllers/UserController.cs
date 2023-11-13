@@ -30,8 +30,6 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("Register")]
-    //[Authorize(Roles = nameof(RoleType.Admin))]
-    [AllowAnonymous]
     [SwaggerOperation(Summary = "[Admin]: Register a new user, cannot register a customer")]
     public async Task<ActionResult> Register([FromBody] UserCreateModel model)
     {
