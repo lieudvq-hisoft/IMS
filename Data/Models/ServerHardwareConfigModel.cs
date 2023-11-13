@@ -8,9 +8,8 @@ namespace Data.Models;
 public class ServerHardwareConfigModel
 {
     public int Id { get; set; }
-    public string Model { get; set; }
-    public string SerialNumber { get; set; }
-    public DateTime DateInstalled { get; set; }
+    public string Description { get; set; }
+    public int Capacity { get; set; }
     public int ServerAllocationId { get; set; }
     public int ComponentId { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
@@ -19,8 +18,8 @@ public class ServerHardwareConfigModel
 
 public class ServerHardwareConfigCreateModel
 {
-    public string Model { get; set; }
-    public string SerialNumber { get; set; }
+    public string Description { get; set; }
+    public int Capacity { get; set; }
     public int ServerAllocationId { get; set; }
     public int ComponentId { get; set; }
 }
@@ -28,8 +27,8 @@ public class ServerHardwareConfigCreateModel
 public class ServerHardwareConfigUpdateModel
 {
     public int Id { get; set; }
-    public string Model { get; set; }
-    public string SerialNumber { get; set; }
+    public string Description { get; set; }
+    public int Capacity { get; set; }
     public int ServerAllocationId { get; set; }
     public int ComponentId { get; set; }
 }

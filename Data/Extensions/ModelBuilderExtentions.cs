@@ -47,31 +47,43 @@ public static class ModelBuilderExtentions
         {
             Id = 1,
             Name = "CPU",
-            Unit = "Cái"
+            Unit = "Cái",
+            Type = ComponentType.Change
         });
         builder.Entity<Component>().HasData(new Component
         {
             Id = 2,
             Name = "GPU",
-            Unit = "Cái"
+            Unit = "Cái",
+            Type = ComponentType.Change
         });
         builder.Entity<Component>().HasData(new Component
         {
             Id = 3,
             Name = "RAM",
-            Unit = "Gb"
+            Unit = "Gb",
+            Type = ComponentType.Change
+        });
+        builder.Entity<Component>().HasData(new Component
+        {
+            Id = 6,
+            Name = "RAM",
+            Unit = "Gb",
+            Type = ComponentType.Upgrade
         });
         builder.Entity<Component>().HasData(new Component
         {
             Id = 4,
             Name = "OS",
-            Unit = "Cái"
+            Unit = "Cái",
+            Type = ComponentType.Change
         });
         builder.Entity<Component>().HasData(new Component
         {
             Id = 5,
             Name = "ROM",
-            Unit = "Cái"
+            Unit = "Cái",
+            Type = ComponentType.Change
         });
         #endregion
 

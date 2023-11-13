@@ -14,4 +14,5 @@ public class ServerAllocation : BaseEntity
     public Customer Customer { get; set; }
 
     public ICollection<ServerHardwareConfig> ServerHardwareConfigs { get; set; }
+    public ICollection<RequestUpgrade> RequestUpgrades { get; set; }
 }

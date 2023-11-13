@@ -8,6 +8,12 @@ public enum RoleType
     Admin = 4
 }
 
+public enum ComponentType
+{
+    Upgrade,
+    Change
+}
+
 public enum ServerAllocationStatus
 {
     Incomplete,

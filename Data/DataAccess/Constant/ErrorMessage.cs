@@ -100,6 +100,11 @@ public class ServerHardwareConfigErrorMessage
     public const string DELETE_CURRENT = "Cannot delete current server hardware config";
 }
 
+public class RequestUpgradeErrorMessage
+{
+    public const string NOT_EXISTED = "Request upgrade " + ErrorMessage.NOT_EXISTED;
+}
+
 
 
 

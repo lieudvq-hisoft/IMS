@@ -171,10 +171,6 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
             {
                 result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
             }
-            else if (serverHardwareConfig.IsCurrent)
-            {
-                result.ErrorMessage = ServerHardwareConfigErrorMessage.DELETE_CURRENT;
-            }
             else
             {
                 serverHardwareConfig.IsDeleted = true;

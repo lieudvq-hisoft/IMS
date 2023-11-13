@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Data.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +12,7 @@ public class ComponentModel
     public string Name { get; set; }
     public string? Description { get; set; }
     public string Unit { get; set; }
+    public string Type { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
 }
@@ -20,6 +22,7 @@ public class ComponentCreateModel
     public string Name { get; set; }
     public string? Description { get; set; }
     public string Unit { get; set; }
+    public ComponentType Type { get; set; }
 }
 
 public class ComponentUpdateModel
@@ -28,6 +31,7 @@ public class ComponentUpdateModel
     public string Name { get; set; }
     public string? Description { get; set; }
     public string Unit { get; set; }
+    public ComponentType Type { get; set; }
 }
 
 

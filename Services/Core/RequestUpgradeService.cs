@@ -16,7 +16,9 @@ using Data.Utils.Paging;
 namespace Services.Core;
 public interface IRequestUpgradeService
 {
-
+    Task<ResultModel> Get(PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
+    Task<ResultModel> Create(RequestUpgradeCreateModel model);
+    Task<ResultModel> Delete(int requestUpgradeId);
 }
 
 public class RequestUpgradeService : IRequestUpgradeService
@@ -64,10 +66,10 @@ public class RequestUpgradeService : IRequestUpgradeService
     private bool FilterServerHardwareConfig(RequestUpgrade x, RequestUpgradeSearchModel model)
     {
         bool matchId = model.Id != null ? x.Id == model.Id : true;
-        bool matchCustomerId = model.CustomerId != null ? x.CustomerId == model.CustomerId : true;
+        bool matchComponentId = model.ComponentId != null ? x.ComponentId == model.ComponentId : true;
         bool matchServerAllocationId = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
 
-        return matchId && matchCustomerId && matchServerAllocationId;
+        return matchId && matchServerAllocationId;
     }
 
     public async Task<ResultModel> Create(RequestUpgradeCreateModel model)
@@ -78,22 +80,15 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == model.CustomerId);
-            if (customer == null)
+            var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
+            if (component == null)
             {
-                result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
-                validPrecondition = false;
-            }
-
-            var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault(x => x.Id == model.ServerHardwareConfigId);
-            if (serverHardwareConfig == null)
-            {
-                result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
 
             var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
-            if (serverHardwareConfig == null)
+            if (component == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
@@ -117,24 +112,24 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> Delete(int serverHardwareConfigId)
+    public async Task<ResultModel> Delete(int requestUpgradeId)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault(x => x.Id == serverHardwareConfigId);
-            if (serverHardwareConfig == null)
+            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
+            if (requestUpgrade == null)
             {
-                result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
             }
             else
             {
-                serverHardwareConfig.IsDeleted = true;
+                requestUpgrade.IsDeleted = true;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = serverHardwareConfigId;
+                result.Data = requestUpgradeId;
             }
         }
         catch (Exception e)
