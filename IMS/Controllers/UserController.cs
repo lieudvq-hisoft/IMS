@@ -70,7 +70,7 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("User list")]
+    [HttpGet]
     [SwaggerOperation(Summary = "Get list of users")]
     public async Task<ActionResult> Get([FromQuery] PagingParam<UserSortCriteria> paginationModel, [FromQuery] UserSearchModel searchModel)
     {
