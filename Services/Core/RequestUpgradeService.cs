@@ -112,6 +112,53 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
+    public async Task<ResultModel> Update(RequestUpgradeUpdateModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == model.Id);
+            if (requestUpgrade == null)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+
+            var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
+            if (component == null)
+            {
+                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
+            if (component == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+
+            if (validPrecondition)
+            {
+                _mapper.Map<RequestUpgradeUpdateModel, RequestUpgrade>(model, requestUpgrade);
+
+                _dbContext.RequestUpgrades.Add(requestUpgrade);
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<ServerHardwareConfigModel>(requestUpgrade);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
     public async Task<ResultModel> Delete(int requestUpgradeId)
     {
         var result = new ResultModel();

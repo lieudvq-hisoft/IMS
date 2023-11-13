@@ -24,7 +24,7 @@ public class MapperProfile : Profile
 
         CreateMap<RequestUpgrade, RequestUpgradeModel>();
         CreateMap<RequestUpgradeCreateModel, RequestUpgrade>();
-        //CreateMap<RequestUpgradeUpdate, RequestUpgrade>();
+        CreateMap<RequestUpgradeUpdateModel, RequestUpgrade>();
         #endregion'
 
         #region ServerAllocationModel

@@ -2,6 +2,7 @@
 using Data.Enums;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -22,9 +23,34 @@ public class RequestUpgradeModel
 
 public class RequestUpgradeCreateModel
 {
+    [Required]
     public string Description { get; set; }
+
+    [Required]
     public int Capacity { get; set; }
+
+    [Required]
     public int ComponentId { get; set; }
+
+    [Required]
+    public int ServerAllocationId { get; set; }
+}
+
+public class RequestUpgradeUpdateModel
+{
+    [Required]
+    public int Id { get; set; }
+
+    [Required]
+    public string Description { get; set; }
+
+    [Required]
+    public int Capacity { get; set; }
+
+    [Required]
+    public int ComponentId { get; set; }
+
+    [Required]
     public int ServerAllocationId { get; set; }
 }
 
