@@ -69,7 +69,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         bool matchComponentId = model.ComponentId != null ? x.ComponentId == model.ComponentId : true;
         bool matchServerAllocationId = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
 
-        return matchId && matchServerAllocationId;
+        return matchId && matchComponentId && matchServerAllocationId;
     }
 
     public async Task<ResultModel> Create(RequestUpgradeCreateModel model)
