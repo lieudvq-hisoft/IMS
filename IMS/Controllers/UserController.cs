@@ -1,4 +1,6 @@
-﻿using Data.Models;
+﻿using Data.Common.PaginationModel;
+using Data.Enums;
+using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
@@ -53,6 +55,15 @@ public class UserController : ControllerBase
     public async Task<ActionResult> UpdateAccountInfo([FromBody] UserUpdateModel model)
     {
         var result = await _userService.UpdateAccountInfo(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet]
+    [SwaggerOperation(Summary = "Get list of users")]
+    public async Task<ActionResult> Get([FromQuery] PagingParam<UserSortCriteria> paginationModel, [FromQuery] UserSearchModel searchModel)
+    {
+        var result = await _userService.Get(paginationModel, searchModel);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

@@ -40,5 +40,9 @@ public class MapperProfile : Profile
         CreateMap<Area, AreaModel>();
         CreateMap<Rack, RackModel>();
         #endregion
+
+        #region User
+        CreateMap<User, UserModel>();
+        #endregion
     }
 }
