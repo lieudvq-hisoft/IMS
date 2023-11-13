@@ -54,7 +54,7 @@ public enum RequestStatus
 
 public enum UserSortCriteria
 {
-    Email
+    Id
 }
 
 public enum LocationAssignmentSortingCriteria

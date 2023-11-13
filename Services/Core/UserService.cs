@@ -1,8 +1,11 @@
 ﻿using AutoMapper;
+using Data.Common.PaginationModel;
 using Data.DataAccess;
 using Data.DataAccess.Constant;
 using Data.Entities;
+using Data.Enums;
 using Data.Models;
+using Data.Utils.Paging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -23,6 +26,7 @@ public interface IUserService
     Task<ResultModel> GetAccountInfo(string email);
     Task<ResultModel> UpdateAccountInfo(UserUpdateModel model);
     Task<ResultModel> Delete(Guid id);
+    Task<ResultModel> Get(PagingParam<UserSortCriteria> paginationModel, UserSearchModel searchModel);
 }
 public class UserService : IUserService
 {
@@ -329,5 +333,44 @@ public class UserService : IUserService
         }
 
         return result;
+    }
+
+    public async Task<ResultModel> Get(PagingParam<UserSortCriteria> paginationModel, UserSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var users = _dbContext.Users
+                .Where(delegate (User x)
+                {
+                    return MatchString(searchModel.SearchValue, x.Email)
+                    || MatchString(searchModel.SearchValue, x.UserName);
+                }) 
+                .AsQueryable();
+
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, users.Count());
+
+            users = users.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            users = users.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            paging.Data = _mapper.ProjectTo<UserModel>(users).ToList();
+
+            result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    private bool MatchString(string searchValue, string? value)
+    {
+        return MyFunction
+            .ConvertToUnSign(value ?? "")
+            .IndexOf(MyFunction.ConvertToUnSign(searchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
     }
 }
