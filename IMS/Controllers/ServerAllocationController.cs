@@ -16,29 +16,20 @@ public class ServerAllocationController : ControllerBase
     private readonly IWebHostEnvironment _environment;
     private readonly IServerAllocationService _requestService;
     private readonly IFileService _fileService;
-    //private readonly IServerService _serverService;
     private readonly TransactionHelper _transactionHelper;
-    //private readonly ILocationService _locationService;
-    //private readonly IIpService _ipService;
 
     public ServerAllocationController(ICustomerService customerService,
         IWebHostEnvironment environment,
         IServerAllocationService requestService,
         IFileService fileService,
-        //IServerService serverService,
         TransactionHelper transactionHelper
-        //ILocationService locationService
-        //IIpService ipService,
         )
     {
         _customerService = customerService;
         _environment = environment;
         _requestService = requestService;
         _fileService = fileService;
-        //_serverService = serverService;
         _transactionHelper = transactionHelper;
-        //_locationService = locationService;
-        //_ipService = ipService;
     }
 
     [HttpGet]
@@ -69,7 +60,6 @@ public class ServerAllocationController : ControllerBase
     //}
 
     [HttpGet("{id}")]
-    [AllowAnonymous]
     [SwaggerOperation(Summary = "Get request detail")]
     public async Task<ActionResult> GetRequestDetail([FromRoute] int id)
     {
@@ -109,7 +99,6 @@ public class ServerAllocationController : ControllerBase
     //}
 
     [HttpPost]
-    //[Authorize(Roles = nameof(RoleType.Sale) + "," + nameof(RoleType.Customer))]
     [SwaggerOperation(Summary = "[Sale, Customer]: Create request for an existing customer")]
     public async Task<ActionResult> CreateRequest([FromBody] ServerAllocationCreateModel model)
     {
@@ -118,8 +107,7 @@ public class ServerAllocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPatch]
-    [Authorize(Roles = nameof(RoleType.Sale))]
+    [HttpPut]
     [SwaggerOperation(Summary = "[Sale]: Update information of a request")]
     public async Task<ActionResult> UpdateRequest([FromBody] ServerAllocationUpdateModel model)
     {

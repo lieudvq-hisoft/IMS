@@ -1,18 +1,13 @@
 ﻿using AutoMapper;
-using Data.DataAccess.Constant;
-using Data.DataAccess;
-using Data.Models;
-using Services.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Data.Entities;
 using Data.Common.PaginationModel;
+using Data.DataAccess;
+using Data.DataAccess.Constant;
+using Data.Entities;
 using Data.Enums;
-using Microsoft.EntityFrameworkCore;
+using Data.Models;
 using Data.Utils.Paging;
+using Microsoft.EntityFrameworkCore;
+using Services.Utilities;
 
 namespace Services.Core;
 public interface IServerHardwareConfigService

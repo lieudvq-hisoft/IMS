@@ -48,7 +48,7 @@ public class CustomerController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPatch]
+    [HttpPut]
     [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "[Sale]: Update a customer")]
     public async Task<ActionResult> Update([FromBody] CustomerUpdateModel model)

@@ -2,7 +2,6 @@
 using Data.Enums;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
 
@@ -35,7 +34,7 @@ public class ServerHardwareConfigController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPatch]
+    [HttpPut]
     public async Task<ActionResult> Update([FromBody] ServerHardwareConfigUpdateModel model)
     {
         var result = await _serverHardwareConfigService.Update(model);

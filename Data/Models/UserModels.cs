@@ -58,9 +58,6 @@ public class UserUpdateModel
     [Required]
     public Guid Id { get; set; }
 
-    [Required]
-    public string UserName { get; set; }
-
     //[Required]
     [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$")]
     public string? Password { get; set; }

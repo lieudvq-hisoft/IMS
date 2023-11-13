@@ -2,7 +2,6 @@
 using Data.Enums;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
 
@@ -35,13 +34,13 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpPatch]
-    //public async Task<ActionResult> Update([FromBody] RequestUpgradeUp model)
-    //{
-    //    var result = await _requestUpgradeService.Update(model);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
+    [HttpPut]
+    public async Task<ActionResult> Update([FromBody] RequestUpgradeUpdateModel model)
+    {
+        var result = await _requestUpgradeService.Update(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
