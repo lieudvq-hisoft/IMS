@@ -60,10 +60,17 @@ public class ServerAllocationController : ControllerBase
     //}
 
     [HttpGet("{id}")]
-    [SwaggerOperation(Summary = "Get request detail")]
     public async Task<ActionResult> GetRequestDetail([FromRoute] int id)
     {
         var result = await _serverAllocationService.GetDetail(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}/HardwareConfig")]
+    public async Task<ActionResult> GetHardwareConfig([FromRoute] int id)
+    {
+        var result = await _serverAllocationService.GetHardwareConfig(id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

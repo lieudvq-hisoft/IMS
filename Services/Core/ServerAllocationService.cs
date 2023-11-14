@@ -6,6 +6,7 @@ using Data.Entities;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
+using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
 
 namespace Services.Core;
@@ -13,6 +14,7 @@ public interface IServerAllocationService
 {
     Task<ResultModel> Get(PagingParam<OrderSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
+    Task<ResultModel> GetHardwareConfig(int id);
     Task<ResultModel> Create(ServerAllocationCreateModel model);
     Task<ResultModel> Update(ServerAllocationUpdateModel model);
     Task<ResultModel> Delete(int serverAllocationId);
@@ -70,7 +72,6 @@ public class ServerAllocationService : IServerAllocationService
         try
         {
             var serverAllocation = _dbContext.ServerAllocations
-                //.Include(x => x.Requests).ThenInclude(x => x.Service)
                 .FirstOrDefault(x => x.Id == id);
             if (serverAllocation == null)
             {
@@ -79,6 +80,31 @@ public class ServerAllocationService : IServerAllocationService
             else
             {
                 result.Data = _mapper.Map<ServerAllocationModel>(serverAllocation);
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetHardwareConfig(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == id);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                result.Data = _mapper.Map<List<ServerHardwareConfigModel>>(serverAllocation.ServerHardwareConfigs);
                 result.Succeed = true;
             }
         }
