@@ -26,7 +26,7 @@ public interface IUserService
     Task<ResultModel> GetAccountInfo(string email);
     Task<ResultModel> UpdateAccountInfo(UserUpdateModel model);
     Task<ResultModel> Delete(Guid id);
-    Task<ResultModel> Get(PagingParam<UserSortCriteria> paginationModel, UserSearchModel searchModel);
+    Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, UserSearchModel searchModel);
 }
 public class UserService : IUserService
 {
@@ -334,7 +334,7 @@ public class UserService : IUserService
         return result;
     }
 
-    public async Task<ResultModel> Get(PagingParam<UserSortCriteria> paginationModel, UserSearchModel searchModel)
+    public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, UserSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;

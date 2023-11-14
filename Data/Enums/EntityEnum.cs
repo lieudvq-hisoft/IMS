@@ -52,36 +52,13 @@ public enum RequestStatus
     Denied,
 }
 
-public enum UserSortCriteria
-{
-    Id
-}
-
 public enum LocationAssignmentSortingCriteria
 {
+    Id,
     ServiceId
 }
 
-public enum CustomerSortCriteria
-{
-    Id
-}
-
-public enum OrderSortCriteria
-{
-    Id
-}
-public enum ServerSortCriteria
-{
-    Id
-}
-
-public enum DeviceSortCriteria
-{
-    Id
-}
-
-public enum AppointmentSortCriteria
+public enum BaseSortCriteria
 {
     Id
 }

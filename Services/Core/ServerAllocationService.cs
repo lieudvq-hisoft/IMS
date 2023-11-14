@@ -12,7 +12,7 @@ using Services.Utilities;
 namespace Services.Core;
 public interface IServerAllocationService
 {
-    Task<ResultModel> Get(PagingParam<OrderSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
+    Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetHardwareConfig(int id);
     Task<ResultModel> Create(ServerAllocationCreateModel model);
@@ -31,7 +31,7 @@ public class ServerAllocationService : IServerAllocationService
         _mapper = mapper;
     }
 
-    public async Task<ResultModel> Get(PagingParam<OrderSortCriteria> paginationModel, ServerAllocationSearchModel searchModel)
+    public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;

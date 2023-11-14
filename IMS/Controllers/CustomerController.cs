@@ -22,7 +22,7 @@ public class CustomerController : ControllerBase
 
     [HttpGet]
     [SwaggerOperation(Summary = "Get all customer")]
-    public async Task<ActionResult> Get([FromQuery] PagingParam<CustomerSortCriteria> pagingParam, [FromQuery] CustomerSearchModel searchModel)
+    public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] CustomerSearchModel searchModel)
     {
         var result = await _customerService.Get(pagingParam, searchModel);
         if (result.Succeed) return Ok(result.Data);

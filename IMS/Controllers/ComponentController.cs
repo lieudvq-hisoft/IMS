@@ -1,4 +1,6 @@
-﻿using Data.Models;
+﻿using Data.Common.PaginationModel;
+using Data.Enums;
+using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
@@ -17,9 +19,9 @@ public class ComponentController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> Get()
+    public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] ComponentSearchModel searchModel)
     {
-        var result = await _componentService.Get();
+        var result = await _componentService.Get(paginationModel, searchModel);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

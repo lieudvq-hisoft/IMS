@@ -34,7 +34,7 @@ public class ServerAllocationController : ControllerBase
 
     [HttpGet]
     [SwaggerOperation(Summary = "Get requests, excluding ongoing or stopped requests, and those with unsuccessful additional services")]
-    public async Task<ActionResult> GetRequest([FromQuery] PagingParam<OrderSortCriteria> pagingParam, [FromQuery] ServerAllocationSearchModel searchModel)
+    public async Task<ActionResult> GetRequest([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] ServerAllocationSearchModel searchModel)
     {
         var result = await _serverAllocationService.Get(pagingParam, searchModel);
         if (result.Succeed) return Ok(result.Data);

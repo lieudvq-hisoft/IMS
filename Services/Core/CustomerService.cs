@@ -22,7 +22,7 @@ namespace Services.Core;
 
 public interface ICustomerService
 {
-    Task<ResultModel> Get(PagingParam<CustomerSortCriteria> paginationModel, CustomerSearchModel searchModel);
+    Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     //Task<ResultModel> Import(string filePath);
     Task<ResultModel> Create(CustomerCreateModel model);
@@ -51,7 +51,7 @@ public class CustomerService : ICustomerService
         _config = config;
     }
 
-    public async Task<ResultModel> Get(PagingParam<CustomerSortCriteria> paginationModel, CustomerSearchModel searchModel)
+    public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -62,7 +62,7 @@ public class CustomerService : ICustomerService
                 .Include(x => x.CompanyType)
                 .Where(delegate (Customer x)
                 {
-                    return MatchString(searchModel.CustomerName, x.CustomerName);
+                    return MyFunction.MatchString(searchModel.CustomerName, x.CustomerName);
                 })
                 .AsQueryable();
 
@@ -108,13 +108,6 @@ public class CustomerService : ICustomerService
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
         return result;
-    }
-
-    private bool MatchString(string searchValue, string? value)
-    {
-        return MyFunction
-            .ConvertToUnSign(value ?? "")
-            .IndexOf(MyFunction.ConvertToUnSign(searchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
     }
 
     public async Task<ResultModel> Import(string filePath)

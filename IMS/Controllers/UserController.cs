@@ -59,7 +59,7 @@ public class UserController : ControllerBase
 
     [HttpGet]
     [SwaggerOperation(Summary = "Get list of users")]
-    public async Task<ActionResult> Get([FromQuery] PagingParam<UserSortCriteria> paginationModel, [FromQuery] UserSearchModel searchModel)
+    public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] UserSearchModel searchModel)
     {
         var result = await _userService.Get(paginationModel, searchModel);
         if (result.Succeed) return Ok(result.Data);

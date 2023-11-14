@@ -29,4 +29,7 @@ public class ComponentUpdateModel
     public ComponentType Type { get; set; }
 }
 
-
+public class ComponentSearchModel
+{
+    public string? Name { get; set; } = "";
+}

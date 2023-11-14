@@ -1,14 +1,18 @@
 ﻿using AutoMapper;
+using Data.Common.PaginationModel;
 using Data.DataAccess;
 using Data.DataAccess.Constant;
 using Data.Entities;
+using Data.Enums;
 using Data.Models;
+using Data.Utils.Paging;
+using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
 
 namespace Services.Core;
 public interface IComponentService
 {
-    Task<ResultModel> Get();
+    Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ComponentSearchModel searchModel);
     Task<ResultModel> Create(ComponentCreateModel model);
     Task<ResultModel> Update(ComponentUpdateModel model);
     Task<ResultModel> Delete(int componentId);
@@ -25,23 +29,34 @@ public class ComponentService : IComponentService
         _mapper = mapper;
     }
 
-    public async Task<ResultModel> Get()
+    public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ComponentSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var components = _dbContext.Components.AsQueryable();
+            var components = _dbContext.Components
+                .Where(delegate (Component x)
+                {
+                    return MyFunction.MatchString(searchModel.Name, x.Name);
+                })
+                .AsQueryable();
 
-            result.Data = _mapper.ProjectTo<ComponentModel>(components);
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, components.Count());
+
+            components = components.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            components = components.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            paging.Data = _mapper.ProjectTo<ComponentModel>(components).ToList();
+
+            result.Data = paging;
             result.Succeed = true;
         }
         catch (Exception e)
         {
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
-
         return result;
     }
 

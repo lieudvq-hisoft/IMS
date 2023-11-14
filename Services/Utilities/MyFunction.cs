@@ -26,5 +26,12 @@ public static class MyFunction
     {
         return e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
     }
+
+    public static bool MatchString(string searchValue, string? value)
+    {
+        return MyFunction
+            .ConvertToUnSign(value ?? "")
+            .IndexOf(MyFunction.ConvertToUnSign(searchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
+    }
 }
 
