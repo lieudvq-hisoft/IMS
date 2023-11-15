@@ -8,6 +8,6 @@ public class Component : BaseEntity
     public string Unit { get; set; }
     public ComponentType Type { get; set; }
 
-    public ICollection<ServerHardwareConfig> HardwareConfigs { get; set; }
+    public ICollection<ServerHardwareConfig> ServerHardwareConfigs { get; set; }
     public ICollection<RequestUpgrade> RequestUpgrades { get; set; }
 }

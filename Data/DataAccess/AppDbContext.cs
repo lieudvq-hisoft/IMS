@@ -43,6 +43,58 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.Entity<Area>(b =>
+        {
+            b.HasMany(e => e.Racks)
+                .WithOne(e => e.Area)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<Component>(b =>
+        {
+            b.HasMany(e => e.ServerHardwareConfigs)
+                .WithOne(e => e.Component)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestUpgrades)
+                .WithOne(e => e.Component)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<Customer>(b =>
+        {
+            b.HasIndex(e => e.TaxNumber).IsUnique();
+            b.HasMany(e => e.ServerAllocations)
+                .WithOne(e => e.Customer)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<Location>(b =>
+        {
+            b.HasMany(e => e.LocationAssignments)
+                .WithOne(e => e.Location)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<Rack>(b =>
+        {
+            b.HasMany(e => e.Locations)
+                .WithOne(e => e.Rack)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<ServerAllocation>(b =>
+        {
+            b.HasMany(e => e.ServerHardwareConfigs)
+                .WithOne(e => e.ServerAllocation)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestUpgrades)
+                .WithOne(e => e.ServerAllocation)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.LocationAssignments)
+                .WithOne(e => e.ServerAllocation)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
         builder.Entity<User>(b =>
         {
             // Each User can have many entries in the UserRole join table
@@ -54,11 +106,6 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
             b.HasIndex(e => e.PhoneNumber).IsUnique();
         });
 
-        builder.Entity<Customer>(b =>
-        {
-            b.HasIndex(e => e.TaxNumber).IsUnique();
-        });
-
         builder.Entity<Role>(b =>
         {
             // Each Role can have many entries in the UserRole join table
@@ -66,22 +113,7 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
                 .WithOne(e => e.Role)
                 .HasForeignKey(ur => ur.RoleId)
                 .IsRequired();
-        });
-
-
-        builder.Entity<Area>(b =>
-        {
-            b.HasMany(e => e.Racks)
-                .WithOne(e => e.Area)
-                .OnDelete(DeleteBehavior.ClientCascade);
-        });
-
-        builder.Entity<Rack>(b =>
-        {
-            b.HasMany(e => e.Locations)
-                .WithOne(e => e.Rack)
-                .OnDelete(DeleteBehavior.ClientCascade);
-        });
+        }); 
 
         builder.Seed();
         builder.FilterSoftDeleted();
