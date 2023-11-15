@@ -3,6 +3,8 @@ using Data.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata;
 using System.Reflection;
 
 namespace Data.DataAccess;
@@ -34,7 +36,6 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
             {
                 entry.Property("IsDeleted").CurrentValue = true;
                 entry.State = EntityState.Modified;
-                entry.Property("DateUpdated").CurrentValue = DateTime.UtcNow;
             }
         }
     }
@@ -67,20 +68,19 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
                 .IsRequired();
         });
 
+
         builder.Entity<Area>(b =>
         {
             b.HasMany(e => e.Racks)
                 .WithOne(e => e.Area)
-                .HasForeignKey(ur => ur.AreaId)
-                .IsRequired();
+                .OnDelete(DeleteBehavior.ClientCascade);
         });
 
         builder.Entity<Rack>(b =>
         {
             b.HasMany(e => e.Locations)
                 .WithOne(e => e.Rack)
-                .HasForeignKey(ur => ur.RackId)
-                .IsRequired();
+                .OnDelete(DeleteBehavior.ClientCascade);
         });
 
         builder.Seed();

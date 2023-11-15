@@ -78,7 +78,7 @@ public class AreaService : IAreaService
 
         try
         {
-            var area = _dbContext.Areas.FirstOrDefault(x => x.Id == id);
+            var area = _dbContext.Areas.Include(x => x.Racks).ThenInclude(x => x.Locations).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == id);
             if (area == null)
             {
                 result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
