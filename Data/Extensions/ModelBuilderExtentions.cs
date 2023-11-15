@@ -142,7 +142,7 @@ public static class ModelBuilderExtentions
         int locationId = 1;
         for (int i = 1; i <= 104; i++)
         {
-            for (int j = 1; j <= 42; j++)
+            for (int j = 0; j < 42; j++)
             {
                 builder.Entity<Location>().HasData(new Location
                 {

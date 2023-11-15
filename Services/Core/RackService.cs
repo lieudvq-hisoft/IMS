@@ -147,6 +147,16 @@ public class RackService : IRackService
                 _dbContext.Racks.Add(rack);
                 _dbContext.SaveChanges();
 
+                for (int i = 0; i < rack.Size; i++)
+                {
+                    _dbContext.Locations.Add(new Location
+                    {
+                        RackId = rack.Id,
+                        Position = i
+                    });
+                }
+                _dbContext.SaveChanges();
+
                 result.Succeed = true;
                 result.Data = _mapper.Map<RackModel>(rack);
             }
