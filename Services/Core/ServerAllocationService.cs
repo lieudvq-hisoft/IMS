@@ -15,6 +15,7 @@ public interface IServerAllocationService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetHardwareConfig(int id);
+    Task<ResultModel> GetRequestUpgrade(int id);
     Task<ResultModel> Create(ServerAllocationCreateModel model);
     Task<ResultModel> Update(ServerAllocationUpdateModel model);
     Task<ResultModel> Delete(int serverAllocationId);
@@ -115,6 +116,30 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
+    public async Task<ResultModel> GetRequestUpgrade(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.RequestUpgrades).FirstOrDefault(x => x.Id == id);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                result.Data = _mapper.Map<List<RequestUpgradeModel>>(serverAllocation.RequestUpgrades);
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
 
     public async Task<ResultModel> Create(ServerAllocationCreateModel model)
     {

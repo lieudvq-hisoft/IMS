@@ -50,11 +50,19 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPut("{id}/Complete")]
+    public async Task<ActionResult> Complete(int id)
+    {
+        var result = await _requestUpgradeService.Complete(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut("{id}/Accept")]
     public async Task<ActionResult> Accept(int id)
     {
-        var userId = new Guid(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-        var result = await _requestUpgradeService.Accept(id, userId);
+        //var userId = new Guid(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+        var result = await _requestUpgradeService.ChangeStatus(id, RequestStatus.Accepted);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -62,8 +70,15 @@ public class RequestUpgradeController : ControllerBase
     [HttpPut("{id}/Deny")]
     public async Task<ActionResult> Deny(int id)
     {
-        var userId = new Guid(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
-        var result = await _requestUpgradeService.Deny(id, userId);
+        var result = await _requestUpgradeService.ChangeStatus(id, RequestStatus.Denied);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("{id}/Reject")]
+    public async Task<ActionResult> Reject(int id)
+    {
+        var result = await _requestUpgradeService.ChangeStatus(id, RequestStatus.Failed);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

@@ -16,8 +16,8 @@ public interface IRequestUpgradeService
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
     Task<ResultModel> Delete(int requestUpgradeId);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
-    Task<ResultModel> Accept(int requestUpgradeId, Guid userId);
-    Task<ResultModel> Deny(int requestUpgradeId, Guid userId);
+    Task<ResultModel> ChangeStatus(int requestUpgradeId, RequestStatus status);
+    Task<ResultModel> Complete(int requestUpgradeId);
 }
 
 public class RequestUpgradeService : IRequestUpgradeService
@@ -187,7 +187,40 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> Accept(int requestUpgradeId, Guid userId)
+    public async Task<ResultModel> ChangeStatus(int requestUpgradeId, RequestStatus status)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var requestUpgrade = _dbContext.RequestUpgrades
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
+                .Include(x => x.Component).FirstOrDefault(x => x.Id == requestUpgradeId && x.Status == RequestStatus.Pending);
+            if (requestUpgrade == null)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+            else
+            {
+                requestUpgrade.Status = status;
+
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Complete(int requestUpgradeId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -226,42 +259,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 {
                     serverHardwareConfig.Capacity += requestUpgrade.Capacity;
                 }
-                requestUpgrade.Status = RequestStatus.Accepted;
-                requestUpgrade.UserId = userId;
-
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
-
-    public async Task<ResultModel> Deny(int requestUpgradeId, Guid userId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-        bool validPrecondition = true;
-
-        try
-        {
-            var requestUpgrade = _dbContext.RequestUpgrades
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
-                .Include(x => x.Component).FirstOrDefault(x => x.Id == requestUpgradeId && x.Status == RequestStatus.Pending);
-            if (requestUpgrade == null)
-            {
-                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
-                validPrecondition = false;
-            }
-            else
-            {
-                requestUpgrade.Status = RequestStatus.Denied;
-                requestUpgrade.UserId = userId;
+                requestUpgrade.Status = RequestStatus.Completed;
 
                 _dbContext.SaveChanges();
                 result.Succeed = true;

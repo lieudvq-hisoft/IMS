@@ -49,6 +49,8 @@ public enum RequestStatus
     Pending,
     Accepted,
     Denied,
+    Completed,
+    Failed
 }
 
 public enum LocationAssignmentSortingCriteria

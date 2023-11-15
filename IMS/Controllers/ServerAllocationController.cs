@@ -75,6 +75,14 @@ public class ServerAllocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/RequestUpgrade")]
+    public async Task<ActionResult> GetRequestUpgrade([FromRoute] int id)
+    {
+        var result = await _serverAllocationService.GetRequestUpgrade(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     //[HttpPost("Bulk")]
     //[Authorize(Roles = nameof(RoleType.Sale))]
     //[SwaggerOperation(Summary = "[Sale]: Create user, customer and request base on import excel.")]

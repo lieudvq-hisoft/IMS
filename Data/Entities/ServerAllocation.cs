@@ -16,4 +16,5 @@ public class ServerAllocation : BaseEntity
 
     public ICollection<ServerHardwareConfig> ServerHardwareConfigs { get; set; }
     public ICollection<RequestUpgrade> RequestUpgrades { get; set; }
+    public ICollection<LocationAssignment> LocationAssignments { get; set; }
 }
