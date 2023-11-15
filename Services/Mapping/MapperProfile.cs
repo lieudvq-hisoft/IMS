@@ -44,6 +44,7 @@ public class MapperProfile : Profile
         CreateMap<Location, LocationModel>();
 
         CreateMap<LocationAssignment, LocationAssignmentModel>();
+        CreateMap<LocationAssignmentCreateModel, LocationAssignment>();
         #endregion
 
         #region User

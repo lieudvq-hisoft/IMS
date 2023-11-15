@@ -71,12 +71,15 @@ public class IpErrorMessage
 
 public class LocationAssignmentErrorMessage
 {
+    public const string EXISTED = "locationService " + ErrorMessage.EXISTED;
     public const string NOT_EXISTED = "locationService " + ErrorMessage.NOT_EXISTED;
     public const string NO_AVAILABLE_FOUND = "No available location found";
     public const string HAVE_LOCATION_ALREADY = "Device already have a location";
     public const string CHOICE_NOT_AVAILABLE = "Location choice is not available";
     public const string INVALID_RACK = "Rack is not valid";
     public const string INVALID_SERVICE = "Service is not valid";
+    public const string INVALID_SERVER = "Server is not valid";
+    public const string INVALID_LOCATION = "Location is not valid";
 }
 
 public class ServerErrorMessgae

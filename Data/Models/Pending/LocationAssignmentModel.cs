@@ -4,8 +4,18 @@ namespace Data.Models;
 
 public class LocationAssignmentModel
 {
-    public int ServiceId { get; set; }
-    public int StartPosition { get; set; }
+    public int ServerAllocationId { get; set; }
+    public int LocationId { get; set; }
+}
+
+public class LocationAssignmentCreateModel
+{
+    [Required]
+    [GreaterThanZero]
+    public int ServerAllocationId { get; set; }
+    [Required]
+    [GreaterThanZero]
+    public int LocationId { get; set; }
 }
 
 #region Area models
@@ -134,7 +144,7 @@ public class LocationChoiceModel
 
 public class LocationAssignmentSearchModel
 {
-    public int? ServiceId { get; set; } = null;
+    public int? ServerAllocationId { get; set; } = null;
 }
 
 [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property)]
