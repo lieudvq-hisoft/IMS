@@ -21,6 +21,7 @@ public interface IRackService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RackSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
+    Task<ResultModel> GetByAreaId(PagingParam<BaseSortCriteria> paginationModel, int areaId);
     Task<ResultModel> Create(RackCreateModel model);
     Task<ResultModel> Update(RackUpdateModel model);
     Task<ResultModel> Delete(int id);
@@ -87,6 +88,34 @@ public class RackService : IRackService
                 result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
                 result.Succeed = false;
             }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetByAreaId(PagingParam<BaseSortCriteria> paginationModel, int areaId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var Racks = _dbContext.Racks
+                .Where(x => x.AreaId == areaId)
+                .AsQueryable();
+
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, Racks.Count());
+
+            Racks = Racks.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            Racks = Racks.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            paging.Data = _mapper.ProjectTo<RackModel>(Racks).ToList();
+
+            result.Data = paging;
+            result.Succeed = true;
         }
         catch (Exception e)
         {

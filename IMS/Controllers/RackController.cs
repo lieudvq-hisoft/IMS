@@ -38,6 +38,15 @@ public class RackController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("byAreaId{id}")]
+    [SwaggerOperation(Summary = "Get all Rack by area Id")]
+    public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
+    {
+        var result = await _RackService.GetByAreaId(pagingParam, id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost]
     [SwaggerOperation(Summary = "Create an arae")]
     public async Task<ActionResult> Create([FromBody] RackCreateModel model)
