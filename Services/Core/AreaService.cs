@@ -39,30 +39,15 @@ public class AreaService : IAreaService
     {
         var result = new ResultModel();
         result.Succeed = false;
-        bool validPrecondition = true;
 
         try
         {
             var areaName = _dbContext.Areas.FirstOrDefault(x => x.Name.Trim() == model.Name.Trim());
             if (areaName != null)
             {
-                validPrecondition = false;
                 result.ErrorMessage = AreaErrorMessage.EXISTED;
             }
-
-            if (model.RowCount <= 0)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = AreaErrorMessage.ROW_WRONG_INPUT;
-            }
-
-            if (model.ColumnCount <= 0)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = AreaErrorMessage.COLUMN_WRONG_INPUT;
-            }
-
-            if (validPrecondition)
+            else
             {
                 var area = new Area
                 {
@@ -99,8 +84,7 @@ public class AreaService : IAreaService
             }
             else
             {
-                area.IsDeleted = true;
-                area.DateUpdated = DateTime.Now;
+                _dbContext.Areas.Remove(area);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = area.Id;
@@ -175,39 +159,15 @@ public class AreaService : IAreaService
     {
         var result = new ResultModel();
         result.Succeed = false;
-        bool validPrecondition = true;
 
         try
         {
             var area = _dbContext.Areas.FirstOrDefault(x => x.Id == model.Id);
             if (area == null)
             {
-                validPrecondition = false;
                 result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
             }
             else
-            {
-                var areaName = _dbContext.Areas.FirstOrDefault(x => x.Name.Trim() == model.Name.Trim() && x.Name.Trim() != area.Name.Trim());
-                if (areaName != null)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = AreaErrorMessage.EXISTED;
-                }
-
-                if (model.RowCount <= 0)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = AreaErrorMessage.ROW_WRONG_INPUT;
-                }
-
-                if (model.ColumnCount <= 0)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = AreaErrorMessage.COLUMN_WRONG_INPUT;
-                }
-            }
-
-            if (validPrecondition)
             {
                 area.Name = model.Name;
                 area.RowCount = model.RowCount;

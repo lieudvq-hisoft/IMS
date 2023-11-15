@@ -62,10 +62,13 @@ public class AreaDetailModel
 public class AreaCreateModel
 {
     [Required]
+    [GreaterThanZero]
     public string Name { get; set; }
     [Required]
+    [GreaterThanZero]
     public int RowCount { get; set; }
     [Required]
+    [GreaterThanZero]
     public int ColumnCount { get; set; }
 }
 
@@ -76,8 +79,10 @@ public class AreaUpdateModel
     [Required]
     public string Name { get; set; }
     [Required]
+    [GreaterThanZero]
     public int RowCount { get; set; }
     [Required]
+    [GreaterThanZero]
     public int ColumnCount { get; set; }
 }
 
@@ -115,19 +120,23 @@ public class RackDetailModel
 public class RackCreateModel
 {
     [Required]
-    [Range(1, double.MaxValue)]
+    [GreaterThanZero]
     public double MaxPower { get; set; }
 
     [Required]
-    [Range(1, double.MaxValue)]
+    [GreaterThanZero]
+    public double CurrentPower { get; set; }
+    
+    [Required]
+    [GreaterThanZero]
     public int Column { get; set; }
 
     [Required]
-    [Range(1, double.MaxValue)]
+    [GreaterThanZero]
     public int Row { get; set; }
 
     [Required]
-    [Range(1, double.MaxValue)]
+    [GreaterThanZero]
     public int Size { get; set; }
 
     [Required]
@@ -141,11 +150,11 @@ public class RackUpdateModel
     public int Id { get; set; }
 
     [Required]
-    [Range(1, double.MaxValue)]
+    [GreaterThanZero]
     public double MaxPower { get; set; }
 
     [Required]
-    [Range(1, double.MaxValue)]
+   [GreaterThanZero]
     public int Size { get; set; }
 }
 
@@ -184,6 +193,17 @@ public class LocationAssignmentSearchModel
     public int? ServiceId { get; set; } = null;
 }
 
+[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property)]
+public class GreaterThanZeroAttribute : ValidationAttribute
+{
+    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
+    {
+        if (value is int intValue && intValue > 0)
+        {
+            return ValidationResult.Success;
+        }
 
-
+        return new ValidationResult("The value must be greater than 0.");
+    }
+}
 
