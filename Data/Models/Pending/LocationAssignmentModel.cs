@@ -115,16 +115,23 @@ public class RackDetailModel
 public class RackCreateModel
 {
     [Required]
+    [Range(1, double.MaxValue)]
     public double MaxPower { get; set; }
+
     [Required]
-    public double CurrentPower { get; set; }
-    [Required]
+    [Range(1, double.MaxValue)]
     public int Column { get; set; }
+
     [Required]
+    [Range(1, double.MaxValue)]
     public int Row { get; set; }
+
     [Required]
+    [Range(1, double.MaxValue)]
     public int Size { get; set; }
+
     [Required]
+    [Range(1, double.MaxValue)]
     public int AreaId { get; set; }
 }
 
@@ -132,18 +139,14 @@ public class RackUpdateModel
 {
     [Required]
     public int Id { get; set; }
+
     [Required]
+    [Range(1, double.MaxValue)]
     public double MaxPower { get; set; }
+
     [Required]
-    public double CurrentPower { get; set; }
-    [Required]
-    public int Column { get; set; }
-    [Required]
-    public int Row { get; set; }
-    [Required]
+    [Range(1, double.MaxValue)]
     public int Size { get; set; }
-    [Required]
-    public int AreaId { get; set; }
 }
 
 public class RackSearchModel

@@ -30,17 +30,13 @@ public class AreaErrorMessage
 {
     public const string NOT_EXISTED = "Area " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Area " + ErrorMessage.EXISTED;
-    public const string ROW_WRONG_INPUT = "Row count must be greater than 0";
-    public const string COLUMN_WRONG_INPUT = "Column count must be greater than 0";
 }
 
 public class RackErrorMessage
 {
     public const string NOT_EXISTED = "Rack " + ErrorMessage.NOT_EXISTED;
-    public const string AREA_NOT_EXISTED = "Area " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Rack " + ErrorMessage.EXISTED;
-    public const string SIZE_WRONG_INPUT = "Power must be greater than 0";
-    public const string POWER_WRONG_INPUT = "Power must be greater than 0";
+    public const string POSITION_INVALID = "Rack position is invalid";
 }
 
 public class RequestErrorMessage
