@@ -41,36 +41,15 @@ public class RackService : IRackService
     {
         var result = new ResultModel();
         result.Succeed = false;
-        bool validPrecondition = true;
 
         try
         {
             var areaId = _dbContext.Areas.FirstOrDefault(x => x.Id == model.AreaId);
             if(areaId == null)
             {
-                validPrecondition = false;
                 result.ErrorMessage = RackErrorMessage.AREA_NOT_EXISTED;
             }
-
-            if (model.Size <= 0)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = RackErrorMessage.SIZE_WRONG_INPUT;
-            }
-
-            if (model.MaxPower <= 0)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = RackErrorMessage.POWER_WRONG_INPUT;
-            }
-
-            if (model.CurrentPower <= 0)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = RackErrorMessage.POWER_WRONG_INPUT;
-            }
-
-            if (validPrecondition)
+            else
             {
                 var Rack = new Rack
                 {
@@ -187,45 +166,15 @@ public class RackService : IRackService
     {
         var result = new ResultModel();
         result.Succeed = false;
-        bool validPrecondition = true;
 
         try
         {
             var Rack = _dbContext.Racks.FirstOrDefault(x => x.Id == model.Id);
             if (Rack == null)
             {
-                validPrecondition = false;
                 result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
             }
             else
-            {
-                var areaId = _dbContext.Areas.FirstOrDefault(x => x.Id == model.AreaId);
-                if (areaId == null)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = RackErrorMessage.AREA_NOT_EXISTED;
-                }
-
-                if (model.Size <= 0)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = RackErrorMessage.SIZE_WRONG_INPUT;
-                }
-
-                if (model.MaxPower <= 0)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = RackErrorMessage.POWER_WRONG_INPUT;
-                }
-
-                if (model.CurrentPower <= 0)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = RackErrorMessage.POWER_WRONG_INPUT;
-                }
-            }
-
-            if (validPrecondition)
             {
                 Rack.MaxPower = model.MaxPower;
                 Rack.CurrentPower = model.CurrentPower;
