@@ -183,8 +183,7 @@ public class RackService : IRackService
             }
             else
             {
-                rack.IsDeleted = true;
-                rack.DateUpdated = DateTime.Now;
+                _dbContext.Racks.Remove(rack);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = rack.Id;
