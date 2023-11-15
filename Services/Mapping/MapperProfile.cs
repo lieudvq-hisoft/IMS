@@ -38,14 +38,16 @@ public class MapperProfile : Profile
 
         #region Location
         CreateMap<Area, AreaModel>();
+        CreateMap<AreaCreateModel, Area>();
+        CreateMap<AreaUpdateModel, Area>();
+
         CreateMap<Rack, RackModel>();
-        CreateMap<Area, AreaDetailModel>()
-            .ForMember(dest => dest.Racks, opt => opt.MapFrom((src, dest, i, context) 
-            => context.Mapper.Map<List<RackModel>>(src.Racks)));
+        CreateMap<RackCreateModel, Rack>();
+        CreateMap<RackUpdateModel, Rack>();
+
         CreateMap<Location, LocationModel>();
-        CreateMap<Rack, RackDetailModel>()
-            .ForMember(dest => dest.DeviceLocations, opt => opt.MapFrom((src, dest, i, context)
-            => context.Mapper.Map<List<LocationModel>>(src.Locations)));
+        CreateMap<LocationCreateModel, Location>();
+        CreateMap<LocationUpdateModel, Location>();
         #endregion
 
         #region User

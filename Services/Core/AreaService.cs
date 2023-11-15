@@ -20,6 +20,7 @@ public interface IAreaService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AreaSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
+    Task<ResultModel> GetRack(int id);
     Task<ResultModel> Create(AreaCreateModel model);
     Task<ResultModel> Update(AreaUpdateModel model);
     Task<ResultModel> Delete(int id);
@@ -36,6 +37,91 @@ public class AreaService : IAreaService
         _mapper = mapper;
     }
 
+    public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AreaSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var areas = _dbContext.Areas
+                .Where(x => searchModel.AreaId != null ? x.Id == searchModel.AreaId : true)
+                .AsQueryable();
+
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, areas.Count());
+
+            areas = areas.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            areas = areas.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            paging.Data = _mapper.ProjectTo<AreaModel>(areas).ToList();
+
+            result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetDetail(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var area = _dbContext.Areas
+                .FirstOrDefault(x => x.Id == id);
+
+            if (area != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<AreaModel>(area);
+            }
+            else
+            {
+                result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
+                result.Succeed = false;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetRack(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var area = _dbContext.Areas
+                .Include(x => x.Racks)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (area != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<RackModel>>(area.Racks);
+            }
+            else
+            {
+                result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
+                result.Succeed = false;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
     public async Task<ResultModel> Create(AreaCreateModel model)
     {
         var result = new ResultModel();
@@ -50,12 +136,7 @@ public class AreaService : IAreaService
             }
             else
             {
-                var area = new Area
-                {
-                    Name = model.Name,
-                    RowCount = model.RowCount,
-                    ColumnCount = model.ColumnCount,
-                };
+                var area = _mapper.Map<Area>(model);
                 _dbContext.Areas.Add(area);
                 _dbContext.SaveChanges();
 
@@ -96,63 +177,6 @@ public class AreaService : IAreaService
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 
-        return result;
-    }
-
-    public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AreaSearchModel searchModel)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            var areas = _dbContext.Areas
-                .Where(x => searchModel.AreaId != null ? x.Id == searchModel.AreaId : true)
-                .AsQueryable();
-
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, areas.Count());
-
-            areas = areas.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            areas = areas.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-
-            paging.Data = _mapper.ProjectTo<AreaModel>(areas).ToList();
-
-            result.Data = paging;
-            result.Succeed = true;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
-
-    public async Task<ResultModel> GetDetail(int id)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            var area = _dbContext.Areas
-                .Include(x => x.Racks)
-                .FirstOrDefault(x => x.Id == id);
-
-            if (area != null)
-            {
-                result.Succeed = true;
-                result.Data = _mapper.Map<AreaDetailModel>(area);
-            }
-            else
-            {
-                result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
-                result.Succeed = false;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
         return result;
     }
 

@@ -21,7 +21,6 @@ public class AreaController : ControllerBase
     }
 
     [HttpGet]
-    [SwaggerOperation(Summary = "Get all area")]
     public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] AreaSearchModel searchModel)
     {
         var result = await _areaService.Get(pagingParam, searchModel);
@@ -30,7 +29,6 @@ public class AreaController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [SwaggerOperation(Summary = "Get detail information of an area")]
     public async Task<ActionResult> GetDetail(int id)
     {
         var result = await _areaService.GetDetail(id);
@@ -38,8 +36,15 @@ public class AreaController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/Rack")]
+    public async Task<ActionResult> GetRack(int id)
+    {
+        var result = await _areaService.GetRack(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost]
-    [SwaggerOperation(Summary = "Create an arae")]
     public async Task<ActionResult> Create([FromBody] AreaCreateModel model)
     {
         var result = await _areaService.Create(model);
@@ -48,7 +53,6 @@ public class AreaController : ControllerBase
     }
 
     [HttpPut]
-    [SwaggerOperation(Summary = "Update an area")]
     public async Task<ActionResult> Update([FromBody] AreaUpdateModel model)
     {
         var result = await _areaService.Update(model);
@@ -57,7 +61,6 @@ public class AreaController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [SwaggerOperation(Summary = "Delete an area")]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _areaService.Delete(id);
