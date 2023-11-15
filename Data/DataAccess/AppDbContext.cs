@@ -72,7 +72,7 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 
-    //public DbSet<Area> Areas { get; set; }
+    public DbSet<Area> Areas { get; set; }
     public DbSet<CompanyType> CompanyTypes { get; set; }
     public DbSet<ServerHardwareConfig> ServerHardwareConfigs { get; set; }
     public DbSet<Component> Components { get; set; }
@@ -80,11 +80,11 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<RequestUpgrade> RequestUpgrades { get; set; }
     //public DbSet<IpAddress> Ips { get; set; }
     //public DbSet<IpAssignment> IpAssignments { get; set; }
-    //public DbSet<Location> Locations { get; set; }
+    public DbSet<Location> Locations { get; set; }
     //public DbSet<LocationAssignment> LocationAssignments { get; set; }
     //public DbSet<IpSubnet> Networks { get; set; }
     public DbSet<ServerAllocation> ServerAllocations { get; set; }
-    //public DbSet<Rack> Racks { get; set; }
+    public DbSet<Rack> Racks { get; set; }
     public DbSet<Role> Role { get; set; }
     //public DbSet<Request> Requests { get; set; }
     //public DbSet<Service> Services { get; set; }
