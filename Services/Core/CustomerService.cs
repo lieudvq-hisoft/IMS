@@ -24,6 +24,7 @@ public interface ICustomerService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
+    Task<ResultModel> GetServerAllocation(int id);
     //Task<ResultModel> Import(string filePath);
     Task<ResultModel> Create(CustomerCreateModel model);
     Task<ResultModel> Delete(int id);
@@ -101,6 +102,33 @@ public class CustomerService : ICustomerService
             {
                 result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
                 result.Succeed = false;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetServerAllocation(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var customer = _dbContext.Customers.Include(x => x.ServerAllocations).FirstOrDefault(x => x.Id == id);
+
+            if (customer == null)
+            {
+                result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
+                result.Succeed = false;
+            }
+            else
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<ServerAllocationModel>>(customer.ServerAllocations);
             }
         }
         catch (Exception e)

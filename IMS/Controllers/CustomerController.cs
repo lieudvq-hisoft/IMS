@@ -38,6 +38,14 @@ public class CustomerController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/ServerAllocation")]
+    public async Task<ActionResult> GetServerAllocation(int id)
+    {
+        var result = await _customerService.GetServerAllocation(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost]
     [SwaggerOperation(Summary = "[Sale]: Create a customer and associate user")]
     public async Task<ActionResult> Create([FromBody] CustomerCreateModel model)
