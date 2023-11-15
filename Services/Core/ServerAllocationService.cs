@@ -141,6 +141,31 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
+    public async Task<ResultModel> GetLocationAssignment(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.LocationAssignments).FirstOrDefault(x => x.Id == id);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                result.Data = _mapper.Map<List<LocationAssignmentModel>>(serverAllocation.RequestUpgrades);
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
     public async Task<ResultModel> Create(ServerAllocationCreateModel model)
     {
         var result = new ResultModel();

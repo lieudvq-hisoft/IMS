@@ -9,7 +9,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IMS.Migrations
 {
     /// <inheritdoc />
-    public partial class location : Migration
+    public partial class initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -33,47 +33,86 @@ namespace IMS.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "IpSubnet",
+                name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    FirstOctet = table.Column<int>(type: "integer", nullable: false),
-                    SecondOctet = table.Column<int>(type: "integer", nullable: false),
-                    ThirdOctet = table.Column<int>(type: "integer", nullable: false),
-                    SubnetMask = table.Column<int>(type: "integer", nullable: false),
-                    ParentNetworkId = table.Column<int>(type: "integer", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Description = table.Column<string>(type: "varchar(350)", nullable: false),
+                    isDeactive = table.Column<bool>(type: "boolean", nullable: false),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IpSubnet", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_IpSubnet_IpSubnet_ParentNetworkId",
-                        column: x => x.ParentNetworkId,
-                        principalTable: "IpSubnet",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_AspNetRoles", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
-                name: "Service",
+                name: "AspNetUsers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    Fullname = table.Column<string>(type: "varchar(1000)", nullable: false),
+                    Address = table.Column<string>(type: "text", nullable: false),
+                    CurrenNoticeCount = table.Column<int>(type: "integer", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUsers", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CompanyTypes",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Name = table.Column<string>(type: "text", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    IsDeletable = table.Column<bool>(type: "boolean", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Service", x => x.Id);
+                    table.PrimaryKey("PK_CompanyTypes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Components",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Description = table.Column<string>(type: "text", nullable: true),
+                    Unit = table.Column<string>(type: "text", nullable: false),
+                    Type = table.Column<int>(type: "integer", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Components", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -99,58 +138,143 @@ namespace IMS.Migrations
                         name: "FK_Racks_Areas_AreaId",
                         column: x => x.AreaId,
                         principalTable: "Areas",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "IpAddress",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Address = table.Column<int>(type: "integer", nullable: false),
-                    Blocked = table.Column<bool>(type: "boolean", nullable: false),
-                    IsReserved = table.Column<bool>(type: "boolean", nullable: false),
-                    IpSubnetId = table.Column<int>(type: "integer", nullable: false),
-                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_IpAddress", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_IpAddress_IpSubnet_IpSubnetId",
-                        column: x => x.IpSubnetId,
-                        principalTable: "IpSubnet",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Request",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Status = table.Column<int>(type: "integer", nullable: false),
-                    InspectionRecordFilePath = table.Column<string>(type: "text", nullable: true),
-                    IsDelegated = table.Column<bool>(type: "boolean", nullable: false),
-                    ServerAllocationId = table.Column<int>(type: "integer", nullable: false),
-                    ServiceId = table.Column<int>(type: "integer", nullable: true),
-                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Request", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Request_Service_ServiceId",
-                        column: x => x.ServiceId,
-                        principalTable: "Service",
                         principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetRoleClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetRoleClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetRoleClaims_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserClaims",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserClaims", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserClaims_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserLogins",
+                columns: table => new
+                {
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    ProviderKey = table.Column<string>(type: "text", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserLogins", x => new { x.LoginProvider, x.ProviderKey });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserLogins_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserRoles",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    RoleId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserRoles", x => new { x.UserId, x.RoleId });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetRoles_RoleId",
+                        column: x => x.RoleId,
+                        principalTable: "AspNetRoles",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_AspNetUserRoles_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AspNetUserTokens",
+                columns: table => new
+                {
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AspNetUserTokens", x => new { x.UserId, x.LoginProvider, x.Name });
+                    table.ForeignKey(
+                        name: "FK_AspNetUserTokens_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Customers",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Username = table.Column<string>(type: "text", nullable: false),
+                    Password = table.Column<string>(type: "text", nullable: false),
+                    CompanyName = table.Column<string>(type: "text", nullable: false),
+                    Address = table.Column<string>(type: "text", nullable: false),
+                    TaxNumber = table.Column<string>(type: "text", nullable: false),
+                    Email = table.Column<string>(type: "text", nullable: false),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: false),
+                    CustomerName = table.Column<string>(type: "text", nullable: false),
+                    CompanyTypeId = table.Column<int>(type: "integer", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Customers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Customers_CompanyTypes_CompanyTypeId",
+                        column: x => x.CompanyTypeId,
+                        principalTable: "CompanyTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -170,49 +294,45 @@ namespace IMS.Migrations
                         name: "FK_Locations_Racks_RackId",
                         column: x => x.RackId,
                         principalTable: "Racks",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
-                name: "IpAssignment",
+                name: "ServerAllocations",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    DateAssign = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
-                    DateUnassign = table.Column<DateTime>(type: "timestamp without time zone", nullable: true),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    IpAddressId = table.Column<int>(type: "integer", nullable: false),
-                    RequestId = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    ExpectedSize = table.Column<int>(type: "integer", nullable: false),
+                    Note = table.Column<string>(type: "text", nullable: true),
+                    TechNote = table.Column<string>(type: "text", nullable: true),
+                    SaleNote = table.Column<string>(type: "text", nullable: true),
+                    InspectionRecordFilePath = table.Column<string>(type: "text", nullable: true),
+                    ReceiptOfRecipientFilePath = table.Column<string>(type: "text", nullable: true),
+                    CustomerId = table.Column<int>(type: "integer", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_IpAssignment", x => x.Id);
+                    table.PrimaryKey("PK_ServerAllocations", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_IpAssignment_IpAddress_IpAddressId",
-                        column: x => x.IpAddressId,
-                        principalTable: "IpAddress",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_IpAssignment_Request_RequestId",
-                        column: x => x.RequestId,
-                        principalTable: "Request",
+                        name: "FK_ServerAllocations_Customers_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Customers",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
-                name: "LocationAssignment",
+                name: "LocationAssignments",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    RequestId = table.Column<int>(type: "integer", nullable: false),
+                    ServerAllocationId = table.Column<int>(type: "integer", nullable: false),
                     LocationId = table.Column<int>(type: "integer", nullable: false),
                     DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
                     DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
@@ -220,17 +340,87 @@ namespace IMS.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_LocationAssignment", x => x.Id);
+                    table.PrimaryKey("PK_LocationAssignments", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_LocationAssignment_Locations_LocationId",
+                        name: "FK_LocationAssignments_Locations_LocationId",
                         column: x => x.LocationId,
                         principalTable: "Locations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_LocationAssignment_Request_RequestId",
-                        column: x => x.RequestId,
-                        principalTable: "Request",
+                        name: "FK_LocationAssignments_ServerAllocations_ServerAllocationId",
+                        column: x => x.ServerAllocationId,
+                        principalTable: "ServerAllocations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "RequestUpgrades",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Capacity = table.Column<int>(type: "integer", nullable: false),
+                    Status = table.Column<int>(type: "integer", nullable: false),
+                    InspectionReportFilePath = table.Column<string>(type: "text", nullable: true),
+                    ComponentId = table.Column<int>(type: "integer", nullable: false),
+                    ServerAllocationId = table.Column<int>(type: "integer", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: true),
+                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_RequestUpgrades", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_RequestUpgrades_AspNetUsers_UserId",
+                        column: x => x.UserId,
+                        principalTable: "AspNetUsers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_RequestUpgrades_Components_ComponentId",
+                        column: x => x.ComponentId,
+                        principalTable: "Components",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_RequestUpgrades_ServerAllocations_ServerAllocationId",
+                        column: x => x.ServerAllocationId,
+                        principalTable: "ServerAllocations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ServerHardwareConfigs",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Description = table.Column<string>(type: "text", nullable: false),
+                    Capacity = table.Column<int>(type: "integer", nullable: false),
+                    ServerAllocationId = table.Column<int>(type: "integer", nullable: false),
+                    ComponentId = table.Column<int>(type: "integer", nullable: false),
+                    DateCreated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    DateUpdated = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ServerHardwareConfigs", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_ServerHardwareConfigs_Components_ComponentId",
+                        column: x => x.ComponentId,
+                        principalTable: "Components",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_ServerHardwareConfigs_ServerAllocations_ServerAllocationId",
+                        column: x => x.ServerAllocationId,
+                        principalTable: "ServerAllocations",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -240,231 +430,182 @@ namespace IMS.Migrations
                 columns: new[] { "Id", "ColumnCount", "DateCreated", "DateUpdated", "IsDeleted", "Name", "RowCount" },
                 values: new object[,]
                 {
-                    { 1, 8, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9327), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9327), false, "A", 8 },
-                    { 2, 8, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9345), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9345), false, "B", 5 }
+                    { 1, 8, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(559), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(559), false, "A", 8 },
+                    { 2, 8, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(577), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(578), false, "B", 5 }
                 });
 
-            migrationBuilder.UpdateData(
+            migrationBuilder.InsertData(
+                table: "AspNetRoles",
+                columns: new[] { "Id", "ConcurrencyStamp", "Description", "Name", "NormalizedName", "isDeactive" },
+                values: new object[,]
+                {
+                    { new Guid("1abb6e28-793d-460f-8a24-745998356da8"), null, "Manager", "Manager", null, false },
+                    { new Guid("2e3566a9-02b1-4ec4-a2d4-b3bb3c4f2b45"), null, "Admin", "Admin", null, false },
+                    { new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab"), null, "Sale", "Sale", null, false },
+                    { new Guid("57ffb575-7c79-4133-8433-aebbcd71f824"), null, "IT Staff", "Tech", null, false }
+                });
+
+            migrationBuilder.InsertData(
                 table: "AspNetUsers",
-                keyColumn: "Id",
-                keyValue: new Guid("01fc684c-d9d0-4fcc-b0a7-56fea6945928"),
-                columns: new[] { "ConcurrencyStamp", "DateCreated", "DateUpdated", "PasswordHash" },
-                values: new object[] { "3c279b90-a0cc-4723-ab49-f8ad95255a55", new DateTime(2023, 11, 15, 11, 32, 26, 491, DateTimeKind.Local).AddTicks(6336), new DateTime(2023, 11, 15, 11, 32, 26, 491, DateTimeKind.Local).AddTicks(6352), "AQAAAAIAAYagAAAAEEGWHSkDtU0uHZ+Bfeqbjh9zl89rYIYOX9KPQsE9lluaFNW7fuvD+uH9utw7Ypwihw==" });
+                columns: new[] { "Id", "AccessFailedCount", "Address", "ConcurrencyStamp", "CurrenNoticeCount", "DateCreated", "DateUpdated", "Email", "EmailConfirmed", "Fullname", "IsDeleted", "LockoutEnabled", "LockoutEnd", "NormalizedEmail", "NormalizedUserName", "PasswordHash", "PhoneNumber", "PhoneNumberConfirmed", "SecurityStamp", "TwoFactorEnabled", "UserName" },
+                values: new object[,]
+                {
+                    { new Guid("01fc684c-d9d0-4fcc-b0a7-56fea6945928"), 0, "Address5", "8c2060a0-0515-4613-8adb-1ade553fa595", 0, new DateTime(2023, 11, 15, 23, 30, 33, 633, DateTimeKind.Local).AddTicks(3276), new DateTime(2023, 11, 15, 23, 30, 33, 633, DateTimeKind.Local).AddTicks(3287), "admin@gmail.com", true, "Fullname5", false, false, null, "admin@gmail.com", "admin", "AQAAAAIAAYagAAAAEF/s4UfzpGkPsxMAnakLVtVKWPOSou3Ybz8Am5AY3PFSL4NMnCXv5Xxv3mYlJl50CA==", "0000000005", false, "", false, "admin" },
+                    { new Guid("1abb6e28-793d-460f-8a24-745998356da8"), 0, "Address3", "ddbe56f2-3a2e-472a-9ee1-2da8ff101190", 0, new DateTime(2023, 11, 15, 23, 30, 33, 460, DateTimeKind.Local).AddTicks(3640), new DateTime(2023, 11, 15, 23, 30, 33, 460, DateTimeKind.Local).AddTicks(3651), "sale@gmail.com", true, "Fullname3", false, false, null, "sale@gmail.com", "sale", "AQAAAAIAAYagAAAAEJb3kmuRTiO9vKbZTvAG8iPcGrB2fOp30tFVTm4n9ZxMUy7NxUiwepqbnahHdkA95g==", "0000000003", false, "", false, "sale" },
+                    { new Guid("2e3566a9-02b1-4ec4-a2d4-b3bb3c4f2b45"), 0, "Address4", "1f38aebb-b467-4fc8-b968-76f751c71306", 0, new DateTime(2023, 11, 15, 23, 30, 33, 550, DateTimeKind.Local).AddTicks(6696), new DateTime(2023, 11, 15, 23, 30, 33, 550, DateTimeKind.Local).AddTicks(6709), "manager@gmail.com", true, "Fullname4", false, false, null, "manager@gmail.com", "manager", "AQAAAAIAAYagAAAAECVI3jB6jMOufyFvBjizcCbpgFKryWmOOciOp5uGE36p+10ORv0YujlHGOd9HeaeKQ==", "0000000004", false, "", false, "manager" },
+                    { new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab"), 0, "Address2", "6bd1bcac-01be-46cc-9ab5-34bc9803ea39", 0, new DateTime(2023, 11, 15, 23, 30, 33, 384, DateTimeKind.Local).AddTicks(9933), new DateTime(2023, 11, 15, 23, 30, 33, 384, DateTimeKind.Local).AddTicks(9952), "tech@gmail.com", true, "Fullname2", false, false, null, "tech@gmail.com", "tech", "AQAAAAIAAYagAAAAEKL30aG+zyFifI1MfmqM+LjewpQ21zeNliqKB+d1J6G52YXD+yE1GO9n6rDR0ivb4Q==", "0000000002", false, "", false, "tech" },
+                    { new Guid("57ffb575-7c79-4133-8433-aebbcd71f824"), 0, "Address1", "78df16b4-98b9-457b-a803-646fe02ed2f3", 0, new DateTime(2023, 11, 15, 23, 30, 33, 314, DateTimeKind.Local).AddTicks(223), new DateTime(2023, 11, 15, 23, 30, 33, 314, DateTimeKind.Local).AddTicks(232), "super@gmail.com", true, "Fullname1", false, false, null, "super@gmail.com", "super", "AQAAAAIAAYagAAAAEJQtr1cJ9BmfBk8WDl1Q1CMm+Ov5MHpYii8QlKjWnnkb9La6CujB1UxOqq1YeZT3zQ==", "0000000001", false, "", false, "super" }
+                });
 
-            migrationBuilder.UpdateData(
-                table: "AspNetUsers",
-                keyColumn: "Id",
-                keyValue: new Guid("1abb6e28-793d-460f-8a24-745998356da8"),
-                columns: new[] { "ConcurrencyStamp", "DateCreated", "DateUpdated", "PasswordHash" },
-                values: new object[] { "ed0599bd-2e12-4ea6-8635-d20502475f71", new DateTime(2023, 11, 15, 11, 32, 26, 350, DateTimeKind.Local).AddTicks(9639), new DateTime(2023, 11, 15, 11, 32, 26, 350, DateTimeKind.Local).AddTicks(9703), "AQAAAAIAAYagAAAAEDcCn3gXrSe3xg8cwDwpelP9TjYiibMBvU5YzpSRg0Ire4CSPzqSq3HGDI8IBO27wA==" });
-
-            migrationBuilder.UpdateData(
-                table: "AspNetUsers",
-                keyColumn: "Id",
-                keyValue: new Guid("2e3566a9-02b1-4ec4-a2d4-b3bb3c4f2b45"),
-                columns: new[] { "ConcurrencyStamp", "DateCreated", "DateUpdated", "PasswordHash" },
-                values: new object[] { "b6f25910-1f2a-4463-aee2-20f0d6c9ba73", new DateTime(2023, 11, 15, 11, 32, 26, 421, DateTimeKind.Local).AddTicks(5534), new DateTime(2023, 11, 15, 11, 32, 26, 421, DateTimeKind.Local).AddTicks(5546), "AQAAAAIAAYagAAAAEFLy5ZE9vipb+7zvqDvV7qk0cbauAet6XFWDqLaPUwikreB9U57XRKh4RuEO9U4Q8A==" });
-
-            migrationBuilder.UpdateData(
-                table: "AspNetUsers",
-                keyColumn: "Id",
-                keyValue: new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab"),
-                columns: new[] { "ConcurrencyStamp", "DateCreated", "DateUpdated", "PasswordHash" },
-                values: new object[] { "1cc5d827-c621-49fa-894f-07a8e1885672", new DateTime(2023, 11, 15, 11, 32, 26, 283, DateTimeKind.Local).AddTicks(577), new DateTime(2023, 11, 15, 11, 32, 26, 283, DateTimeKind.Local).AddTicks(588), "AQAAAAIAAYagAAAAECh7ddO719etwXQoNgwwRzvzwb5W8CIjPAUzFdzDO+09PKUl7MDdi+QOPFJZco3NuQ==" });
-
-            migrationBuilder.UpdateData(
-                table: "AspNetUsers",
-                keyColumn: "Id",
-                keyValue: new Guid("57ffb575-7c79-4133-8433-aebbcd71f824"),
-                columns: new[] { "ConcurrencyStamp", "DateCreated", "DateUpdated", "PasswordHash" },
-                values: new object[] { "f48aa5de-9b73-45b5-8470-42bcdc4a5cbf", new DateTime(2023, 11, 15, 11, 32, 26, 213, DateTimeKind.Local).AddTicks(7874), new DateTime(2023, 11, 15, 11, 32, 26, 213, DateTimeKind.Local).AddTicks(7878), "AQAAAAIAAYagAAAAEF8WhcD3K9f6EtTZ0uP3Zchlf7J3k+qppcDIqIU81xYcOyIYcExTT+Wf97g5OgdrBA==" });
-
-            migrationBuilder.UpdateData(
+            migrationBuilder.InsertData(
                 table: "CompanyTypes",
-                keyColumn: "Id",
-                keyValue: 1,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9038), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9048) });
+                columns: new[] { "Id", "DateCreated", "DateUpdated", "Description", "IsDeleted", "Name" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(249), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(263), "Doanh nghiệp tư nhân", false, "Doanh nghiệp tư nhân" },
+                    { 2, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(380), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(380), "Công ty trách nhiệm hữu hạn một thành viên", false, "Công ty trách nhiệm hữu hạn một thành viên" },
+                    { 3, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(406), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(406), "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên", false, "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên" },
+                    { 4, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(430), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(430), "Công ty cổ phần", false, "Công ty cổ phần" },
+                    { 5, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(442), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(443), "Công ty hợp danh", false, "Công ty hợp danh" }
+                });
 
-            migrationBuilder.UpdateData(
-                table: "CompanyTypes",
-                keyColumn: "Id",
-                keyValue: 2,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9148), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9149) });
-
-            migrationBuilder.UpdateData(
-                table: "CompanyTypes",
-                keyColumn: "Id",
-                keyValue: 3,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9161), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9162) });
-
-            migrationBuilder.UpdateData(
-                table: "CompanyTypes",
-                keyColumn: "Id",
-                keyValue: 4,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9173), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9174) });
-
-            migrationBuilder.UpdateData(
-                table: "CompanyTypes",
-                keyColumn: "Id",
-                keyValue: 5,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9195), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9195) });
-
-            migrationBuilder.UpdateData(
+            migrationBuilder.InsertData(
                 table: "Components",
-                keyColumn: "Id",
-                keyValue: 1,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9232), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9233) });
+                columns: new[] { "Id", "DateCreated", "DateUpdated", "Description", "IsDeleted", "Name", "Type", "Unit" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(464), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(464), null, false, "CPU", 1, "Cái" },
+                    { 2, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(483), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(483), null, false, "GPU", 1, "Cái" },
+                    { 3, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(495), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(496), null, false, "RAM", 1, "Gb" },
+                    { 4, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(529), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(529), null, false, "OS", 1, "Cái" },
+                    { 5, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(542), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(543), null, false, "ROM", 1, "Cái" },
+                    { 6, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(516), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(516), null, false, "RAM", 0, "Gb" }
+                });
 
-            migrationBuilder.UpdateData(
-                table: "Components",
-                keyColumn: "Id",
-                keyValue: 2,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9250), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9251) });
-
-            migrationBuilder.UpdateData(
-                table: "Components",
-                keyColumn: "Id",
-                keyValue: 3,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9263), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9263) });
-
-            migrationBuilder.UpdateData(
-                table: "Components",
-                keyColumn: "Id",
-                keyValue: 4,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9288), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9288) });
-
-            migrationBuilder.UpdateData(
-                table: "Components",
-                keyColumn: "Id",
-                keyValue: 5,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9301), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9302) });
-
-            migrationBuilder.UpdateData(
-                table: "Components",
-                keyColumn: "Id",
-                keyValue: 6,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9275), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9276) });
+            migrationBuilder.InsertData(
+                table: "AspNetUserRoles",
+                columns: new[] { "RoleId", "UserId" },
+                values: new object[,]
+                {
+                    { new Guid("2e3566a9-02b1-4ec4-a2d4-b3bb3c4f2b45"), new Guid("01fc684c-d9d0-4fcc-b0a7-56fea6945928") },
+                    { new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab"), new Guid("1abb6e28-793d-460f-8a24-745998356da8") },
+                    { new Guid("1abb6e28-793d-460f-8a24-745998356da8"), new Guid("2e3566a9-02b1-4ec4-a2d4-b3bb3c4f2b45") },
+                    { new Guid("57ffb575-7c79-4133-8433-aebbcd71f824"), new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab") },
+                    { new Guid("1abb6e28-793d-460f-8a24-745998356da8"), new Guid("57ffb575-7c79-4133-8433-aebbcd71f824") },
+                    { new Guid("2e3566a9-02b1-4ec4-a2d4-b3bb3c4f2b45"), new Guid("57ffb575-7c79-4133-8433-aebbcd71f824") },
+                    { new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab"), new Guid("57ffb575-7c79-4133-8433-aebbcd71f824") },
+                    { new Guid("57ffb575-7c79-4133-8433-aebbcd71f824"), new Guid("57ffb575-7c79-4133-8433-aebbcd71f824") }
+                });
 
             migrationBuilder.InsertData(
                 table: "Racks",
                 columns: new[] { "Id", "AreaId", "Column", "CurrentPower", "DateCreated", "DateUpdated", "IsDeleted", "MaxPower", "Row", "Size" },
                 values: new object[,]
                 {
-                    { 1, 1, 1, 200.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9353), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9359), false, 3000.0, 1, 42 },
-                    { 2, 1, 2, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9382), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9382), false, 3000.0, 1, 42 },
-                    { 3, 1, 3, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9457), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9457), false, 3000.0, 1, 42 },
-                    { 4, 1, 4, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9467), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9467), false, 3000.0, 1, 42 },
-                    { 5, 1, 5, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9475), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9475), false, 3000.0, 1, 42 },
-                    { 6, 1, 6, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9484), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9484), false, 3000.0, 1, 42 },
-                    { 7, 1, 7, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9492), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9493), false, 3000.0, 1, 42 },
-                    { 8, 1, 8, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9501), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9501), false, 3000.0, 1, 42 },
-                    { 9, 1, 1, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9372), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9373), false, 3000.0, 2, 42 },
-                    { 10, 1, 2, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9449), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9449), false, 3000.0, 2, 42 },
-                    { 11, 1, 3, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9459), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9459), false, 3000.0, 2, 42 },
-                    { 12, 1, 4, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9468), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9468), false, 3000.0, 2, 42 },
-                    { 13, 1, 5, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9477), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9477), false, 3000.0, 2, 42 },
-                    { 14, 1, 6, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9485), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9485), false, 3000.0, 2, 42 },
-                    { 15, 1, 7, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9493), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9494), false, 3000.0, 2, 42 },
-                    { 16, 1, 8, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9502), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9502), false, 3000.0, 2, 42 },
-                    { 17, 1, 1, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9374), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9375), false, 3000.0, 3, 42 },
-                    { 18, 1, 2, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9450), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9451), false, 3000.0, 3, 42 },
-                    { 19, 1, 3, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9460), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9460), false, 3000.0, 3, 42 },
-                    { 20, 1, 4, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9468), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9469), false, 3000.0, 3, 42 },
-                    { 21, 1, 5, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9478), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9478), false, 3000.0, 3, 42 },
-                    { 22, 1, 6, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9486), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9486), false, 3000.0, 3, 42 },
-                    { 23, 1, 7, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9494), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9495), false, 3000.0, 3, 42 },
-                    { 24, 1, 8, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9503), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9503), false, 3000.0, 3, 42 },
-                    { 25, 1, 1, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9375), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9376), false, 3000.0, 4, 42 },
-                    { 26, 1, 2, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9451), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9452), false, 3000.0, 4, 42 },
-                    { 27, 1, 3, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9461), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9461), false, 3000.0, 4, 42 },
-                    { 28, 1, 4, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9469), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9470), false, 3000.0, 4, 42 },
-                    { 29, 1, 5, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9479), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9479), false, 3000.0, 4, 42 },
-                    { 30, 1, 6, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9487), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9487), false, 3000.0, 4, 42 },
-                    { 31, 1, 7, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9496), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9496), false, 3000.0, 4, 42 },
-                    { 32, 1, 8, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9504), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9504), false, 3000.0, 4, 42 },
-                    { 33, 1, 1, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9376), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9377), false, 3000.0, 5, 42 },
-                    { 34, 1, 2, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9452), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9453), false, 3000.0, 5, 42 },
-                    { 35, 1, 3, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9462), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9462), false, 3000.0, 5, 42 },
-                    { 36, 1, 4, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9471), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9471), false, 3000.0, 5, 42 },
-                    { 37, 1, 5, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9480), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9480), false, 3000.0, 5, 42 },
-                    { 38, 1, 6, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9488), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9488), false, 3000.0, 5, 42 },
-                    { 39, 1, 7, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9497), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9497), false, 3000.0, 5, 42 },
-                    { 40, 1, 8, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9505), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9505), false, 3000.0, 5, 42 },
-                    { 41, 1, 1, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9378), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9379), false, 3000.0, 6, 42 },
-                    { 42, 1, 2, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9453), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9454), false, 3000.0, 6, 42 },
-                    { 43, 1, 3, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9463), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9463), false, 3000.0, 6, 42 },
-                    { 44, 1, 4, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9472), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9472), false, 3000.0, 6, 42 },
-                    { 45, 1, 5, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9481), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9481), false, 3000.0, 6, 42 },
-                    { 46, 1, 6, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9489), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9490), false, 3000.0, 6, 42 },
-                    { 47, 1, 7, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9498), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9498), false, 3000.0, 6, 42 },
-                    { 48, 1, 8, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9506), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9506), false, 3000.0, 6, 42 },
-                    { 49, 1, 1, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9380), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9380), false, 3000.0, 7, 42 },
-                    { 50, 1, 2, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9454), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9455), false, 3000.0, 7, 42 },
-                    { 51, 1, 3, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9464), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9465), false, 3000.0, 7, 42 },
-                    { 52, 1, 4, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9473), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9473), false, 3000.0, 7, 42 },
-                    { 53, 1, 5, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9482), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9482), false, 3000.0, 7, 42 },
-                    { 54, 1, 6, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9490), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9491), false, 3000.0, 7, 42 },
-                    { 55, 1, 7, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9499), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9499), false, 3000.0, 7, 42 },
-                    { 56, 1, 8, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9507), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9507), false, 3000.0, 7, 42 },
-                    { 57, 1, 1, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9381), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9381), false, 3000.0, 8, 42 },
-                    { 58, 1, 2, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9455), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9456), false, 3000.0, 8, 42 },
-                    { 59, 1, 3, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9465), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9466), false, 3000.0, 8, 42 },
-                    { 60, 1, 4, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9474), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9474), false, 3000.0, 8, 42 },
-                    { 61, 1, 5, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9483), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9483), false, 3000.0, 8, 42 },
-                    { 62, 1, 6, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9491), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9492), false, 3000.0, 8, 42 },
-                    { 63, 1, 7, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9500), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9500), false, 3000.0, 8, 42 },
-                    { 64, 1, 8, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9508), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9508), false, 3000.0, 8, 42 },
-                    { 65, 2, 1, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9510), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9510), false, 3500.0, 1, 42 },
-                    { 66, 2, 2, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9517), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9517), false, 3500.0, 1, 42 },
-                    { 67, 2, 3, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9522), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9522), false, 3500.0, 1, 42 },
-                    { 68, 2, 4, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9528), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9528), false, 3500.0, 1, 42 },
-                    { 69, 2, 5, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9570), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9570), false, 3500.0, 1, 42 },
-                    { 70, 2, 6, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9575), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9575), false, 3500.0, 1, 42 },
-                    { 71, 2, 7, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9580), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9581), false, 3500.0, 1, 42 },
-                    { 72, 2, 8, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9585), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9586), false, 3500.0, 1, 42 },
-                    { 73, 2, 1, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9512), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9513), false, 3500.0, 2, 42 },
-                    { 74, 2, 2, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9518), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9518), false, 3500.0, 2, 42 },
-                    { 75, 2, 3, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9523), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9524), false, 3500.0, 2, 42 },
-                    { 76, 2, 4, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9565), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9566), false, 3500.0, 2, 42 },
-                    { 77, 2, 5, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9571), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9571), false, 3500.0, 2, 42 },
-                    { 78, 2, 6, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9576), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9576), false, 3500.0, 2, 42 },
-                    { 79, 2, 7, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9581), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9582), false, 3500.0, 2, 42 },
-                    { 80, 2, 8, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9586), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9587), false, 3500.0, 2, 42 },
-                    { 81, 2, 1, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9514), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9514), false, 3500.0, 3, 42 },
-                    { 82, 2, 2, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9519), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9519), false, 3500.0, 3, 42 },
-                    { 83, 2, 3, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9524), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9525), false, 3500.0, 3, 42 },
-                    { 84, 2, 4, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9567), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9567), false, 3500.0, 3, 42 },
-                    { 85, 2, 5, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9572), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9572), false, 3500.0, 3, 42 },
-                    { 86, 2, 6, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9577), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9577), false, 3500.0, 3, 42 },
-                    { 87, 2, 7, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9582), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9582), false, 3500.0, 3, 42 },
-                    { 88, 2, 8, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9587), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9588), false, 3500.0, 3, 42 },
-                    { 89, 2, 1, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9515), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9515), false, 3500.0, 4, 42 },
-                    { 90, 2, 2, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9520), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9520), false, 3500.0, 4, 42 },
-                    { 91, 2, 3, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9525), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9526), false, 3500.0, 4, 42 },
-                    { 92, 2, 4, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9568), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9568), false, 3500.0, 4, 42 },
-                    { 93, 2, 5, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9573), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9573), false, 3500.0, 4, 42 },
-                    { 94, 2, 6, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9578), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9578), false, 3500.0, 4, 42 },
-                    { 95, 2, 7, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9583), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9583), false, 3500.0, 4, 42 },
-                    { 96, 2, 8, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9588), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9589), false, 3500.0, 4, 42 },
-                    { 97, 2, 1, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9515), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9516), false, 3500.0, 5, 42 },
-                    { 98, 2, 2, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9521), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9521), false, 3500.0, 5, 42 },
-                    { 99, 2, 3, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9526), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9527), false, 3500.0, 5, 42 },
-                    { 100, 2, 4, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9569), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9569), false, 3500.0, 5, 42 },
-                    { 101, 2, 5, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9574), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9574), false, 3500.0, 5, 42 },
-                    { 102, 2, 6, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9579), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9579), false, 3500.0, 5, 42 },
-                    { 103, 2, 7, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9584), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9585), false, 3500.0, 5, 42 },
-                    { 104, 2, 8, 0.0, new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9589), new DateTime(2023, 11, 15, 11, 32, 26, 208, DateTimeKind.Local).AddTicks(9590), false, 3500.0, 5, 42 }
+                    { 1, 1, 1, 200.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(589), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(590), false, 3000.0, 1, 42 },
+                    { 2, 1, 2, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(617), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(618), false, 3000.0, 1, 42 },
+                    { 3, 1, 3, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(627), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(627), false, 3000.0, 1, 42 },
+                    { 4, 1, 4, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(636), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(636), false, 3000.0, 1, 42 },
+                    { 5, 1, 5, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(644), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(644), false, 3000.0, 1, 42 },
+                    { 6, 1, 6, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(653), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(653), false, 3000.0, 1, 42 },
+                    { 7, 1, 7, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(661), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(661), false, 3000.0, 1, 42 },
+                    { 8, 1, 8, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(669), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(669), false, 3000.0, 1, 42 },
+                    { 9, 1, 1, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(595), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(598), false, 3000.0, 2, 42 },
+                    { 10, 1, 2, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(619), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(619), false, 3000.0, 2, 42 },
+                    { 11, 1, 3, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(629), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(629), false, 3000.0, 2, 42 },
+                    { 12, 1, 4, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(637), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(637), false, 3000.0, 2, 42 },
+                    { 13, 1, 5, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(646), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(646), false, 3000.0, 2, 42 },
+                    { 14, 1, 6, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(654), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(654), false, 3000.0, 2, 42 },
+                    { 15, 1, 7, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(662), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(662), false, 3000.0, 2, 42 },
+                    { 16, 1, 8, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(670), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(670), false, 3000.0, 2, 42 },
+                    { 17, 1, 1, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(609), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(609), false, 3000.0, 3, 42 },
+                    { 18, 1, 2, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(620), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(621), false, 3000.0, 3, 42 },
+                    { 19, 1, 3, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(630), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(630), false, 3000.0, 3, 42 },
+                    { 20, 1, 4, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(638), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(638), false, 3000.0, 3, 42 },
+                    { 21, 1, 5, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(647), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(647), false, 3000.0, 3, 42 },
+                    { 22, 1, 6, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(655), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(655), false, 3000.0, 3, 42 },
+                    { 23, 1, 7, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(663), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(663), false, 3000.0, 3, 42 },
+                    { 24, 1, 8, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(671), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(671), false, 3000.0, 3, 42 },
+                    { 25, 1, 1, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(610), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(611), false, 3000.0, 4, 42 },
+                    { 26, 1, 2, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(621), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(622), false, 3000.0, 4, 42 },
+                    { 27, 1, 3, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(631), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(631), false, 3000.0, 4, 42 },
+                    { 28, 1, 4, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(639), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(639), false, 3000.0, 4, 42 },
+                    { 29, 1, 5, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(648), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(648), false, 3000.0, 4, 42 },
+                    { 30, 1, 6, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(656), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(656), false, 3000.0, 4, 42 },
+                    { 31, 1, 7, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(664), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(664), false, 3000.0, 4, 42 },
+                    { 32, 1, 8, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(672), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(672), false, 3000.0, 4, 42 },
+                    { 33, 1, 1, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(611), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(612), false, 3000.0, 5, 42 },
+                    { 34, 1, 2, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(622), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(623), false, 3000.0, 5, 42 },
+                    { 35, 1, 3, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(632), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(632), false, 3000.0, 5, 42 },
+                    { 36, 1, 4, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(640), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(640), false, 3000.0, 5, 42 },
+                    { 37, 1, 5, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(649), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(649), false, 3000.0, 5, 42 },
+                    { 38, 1, 6, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(657), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(657), false, 3000.0, 5, 42 },
+                    { 39, 1, 7, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(665), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(665), false, 3000.0, 5, 42 },
+                    { 40, 1, 8, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(673), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(673), false, 3000.0, 5, 42 },
+                    { 41, 1, 1, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(614), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(614), false, 3000.0, 6, 42 },
+                    { 42, 1, 2, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(623), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(624), false, 3000.0, 6, 42 },
+                    { 43, 1, 3, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(633), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(633), false, 3000.0, 6, 42 },
+                    { 44, 1, 4, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(641), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(641), false, 3000.0, 6, 42 },
+                    { 45, 1, 5, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(650), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(650), false, 3000.0, 6, 42 },
+                    { 46, 1, 6, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(658), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(658), false, 3000.0, 6, 42 },
+                    { 47, 1, 7, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(666), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(666), false, 3000.0, 6, 42 },
+                    { 48, 1, 8, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(674), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(674), false, 3000.0, 6, 42 },
+                    { 49, 1, 1, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(615), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(615), false, 3000.0, 7, 42 },
+                    { 50, 1, 2, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(624), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(625), false, 3000.0, 7, 42 },
+                    { 51, 1, 3, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(634), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(634), false, 3000.0, 7, 42 },
+                    { 52, 1, 4, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(642), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(642), false, 3000.0, 7, 42 },
+                    { 53, 1, 5, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(651), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(651), false, 3000.0, 7, 42 },
+                    { 54, 1, 6, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(659), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(659), false, 3000.0, 7, 42 },
+                    { 55, 1, 7, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(667), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(667), false, 3000.0, 7, 42 },
+                    { 56, 1, 8, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(680), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(681), false, 3000.0, 7, 42 },
+                    { 57, 1, 1, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(616), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(616), false, 3000.0, 8, 42 },
+                    { 58, 1, 2, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(625), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(626), false, 3000.0, 8, 42 },
+                    { 59, 1, 3, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(635), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(635), false, 3000.0, 8, 42 },
+                    { 60, 1, 4, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(643), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(643), false, 3000.0, 8, 42 },
+                    { 61, 1, 5, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(652), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(652), false, 3000.0, 8, 42 },
+                    { 62, 1, 6, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(660), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(660), false, 3000.0, 8, 42 },
+                    { 63, 1, 7, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(668), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(668), false, 3000.0, 8, 42 },
+                    { 64, 1, 8, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(682), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(682), false, 3000.0, 8, 42 },
+                    { 65, 2, 1, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(683), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(683), false, 3500.0, 1, 42 },
+                    { 66, 2, 2, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(690), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(690), false, 3500.0, 1, 42 },
+                    { 67, 2, 3, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(695), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(695), false, 3500.0, 1, 42 },
+                    { 68, 2, 4, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(700), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(701), false, 3500.0, 1, 42 },
+                    { 69, 2, 5, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(705), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(705), false, 3500.0, 1, 42 },
+                    { 70, 2, 6, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(710), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(710), false, 3500.0, 1, 42 },
+                    { 71, 2, 7, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(715), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(715), false, 3500.0, 1, 42 },
+                    { 72, 2, 8, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(720), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(720), false, 3500.0, 1, 42 },
+                    { 73, 2, 1, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(686), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(686), false, 3500.0, 2, 42 },
+                    { 74, 2, 2, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(691), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(691), false, 3500.0, 2, 42 },
+                    { 75, 2, 3, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(696), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(696), false, 3500.0, 2, 42 },
+                    { 76, 2, 4, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(701), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(701), false, 3500.0, 2, 42 },
+                    { 77, 2, 5, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(706), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(706), false, 3500.0, 2, 42 },
+                    { 78, 2, 6, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(711), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(711), false, 3500.0, 2, 42 },
+                    { 79, 2, 7, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(716), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(716), false, 3500.0, 2, 42 },
+                    { 80, 2, 8, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(721), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(721), false, 3500.0, 2, 42 },
+                    { 81, 2, 1, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(687), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(687), false, 3500.0, 3, 42 },
+                    { 82, 2, 2, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(692), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(692), false, 3500.0, 3, 42 },
+                    { 83, 2, 3, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(697), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(697), false, 3500.0, 3, 42 },
+                    { 84, 2, 4, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(702), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(702), false, 3500.0, 3, 42 },
+                    { 85, 2, 5, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(707), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(707), false, 3500.0, 3, 42 },
+                    { 86, 2, 6, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(712), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(712), false, 3500.0, 3, 42 },
+                    { 87, 2, 7, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(717), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(717), false, 3500.0, 3, 42 },
+                    { 88, 2, 8, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(722), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(722), false, 3500.0, 3, 42 },
+                    { 89, 2, 1, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(688), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(688), false, 3500.0, 4, 42 },
+                    { 90, 2, 2, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(693), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(693), false, 3500.0, 4, 42 },
+                    { 91, 2, 3, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(698), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(698), false, 3500.0, 4, 42 },
+                    { 92, 2, 4, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(703), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(703), false, 3500.0, 4, 42 },
+                    { 93, 2, 5, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(708), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(708), false, 3500.0, 4, 42 },
+                    { 94, 2, 6, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(713), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(713), false, 3500.0, 4, 42 },
+                    { 95, 2, 7, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(718), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(718), false, 3500.0, 4, 42 },
+                    { 96, 2, 8, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(723), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(723), false, 3500.0, 4, 42 },
+                    { 97, 2, 1, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(689), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(689), false, 3500.0, 5, 42 },
+                    { 98, 2, 2, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(694), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(694), false, 3500.0, 5, 42 },
+                    { 99, 2, 3, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(699), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(699), false, 3500.0, 5, 42 },
+                    { 100, 2, 4, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(704), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(704), false, 3500.0, 5, 42 },
+                    { 101, 2, 5, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(709), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(709), false, 3500.0, 5, 42 },
+                    { 102, 2, 6, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(714), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(714), false, 3500.0, 5, 42 },
+                    { 103, 2, 7, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(719), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(719), false, 3500.0, 5, 42 },
+                    { 104, 2, 8, 0.0, new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(724), new DateTime(2023, 11, 15, 23, 30, 33, 309, DateTimeKind.Local).AddTicks(724), false, 3500.0, 5, 42 }
                 });
 
             migrationBuilder.InsertData(
@@ -4843,34 +4984,74 @@ namespace IMS.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_IpAddress_IpSubnetId",
-                table: "IpAddress",
-                column: "IpSubnetId");
+                name: "IX_AspNetRoleClaims_RoleId",
+                table: "AspNetRoleClaims",
+                column: "RoleId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IpAssignment_IpAddressId",
-                table: "IpAssignment",
-                column: "IpAddressId");
+                name: "RoleNameIndex",
+                table: "AspNetRoles",
+                column: "NormalizedName",
+                unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_IpAssignment_RequestId",
-                table: "IpAssignment",
-                column: "RequestId");
+                name: "IX_AspNetUserClaims_UserId",
+                table: "AspNetUserClaims",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_IpSubnet_ParentNetworkId",
-                table: "IpSubnet",
-                column: "ParentNetworkId");
+                name: "IX_AspNetUserLogins_UserId",
+                table: "AspNetUserLogins",
+                column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LocationAssignment_LocationId",
-                table: "LocationAssignment",
+                name: "IX_AspNetUserRoles_RoleId",
+                table: "AspNetUserRoles",
+                column: "RoleId");
+
+            migrationBuilder.CreateIndex(
+                name: "EmailIndex",
+                table: "AspNetUsers",
+                column: "NormalizedEmail");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_Email",
+                table: "AspNetUsers",
+                column: "Email",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_AspNetUsers_PhoneNumber",
+                table: "AspNetUsers",
+                column: "PhoneNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "UserNameIndex",
+                table: "AspNetUsers",
+                column: "NormalizedUserName",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customers_CompanyTypeId",
+                table: "Customers",
+                column: "CompanyTypeId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Customers_TaxNumber",
+                table: "Customers",
+                column: "TaxNumber",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_LocationAssignments_LocationId",
+                table: "LocationAssignments",
                 column: "LocationId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_LocationAssignment_RequestId",
-                table: "LocationAssignment",
-                column: "RequestId");
+                name: "IX_LocationAssignments_ServerAllocationId",
+                table: "LocationAssignments",
+                column: "ServerAllocationId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Locations_RackId",
@@ -4883,152 +5064,89 @@ namespace IMS.Migrations
                 column: "AreaId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Request_ServiceId",
-                table: "Request",
-                column: "ServiceId");
+                name: "IX_RequestUpgrades_ComponentId",
+                table: "RequestUpgrades",
+                column: "ComponentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RequestUpgrades_ServerAllocationId",
+                table: "RequestUpgrades",
+                column: "ServerAllocationId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_RequestUpgrades_UserId",
+                table: "RequestUpgrades",
+                column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServerAllocations_CustomerId",
+                table: "ServerAllocations",
+                column: "CustomerId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServerHardwareConfigs_ComponentId",
+                table: "ServerHardwareConfigs",
+                column: "ComponentId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_ServerHardwareConfigs_ServerAllocationId",
+                table: "ServerHardwareConfigs",
+                column: "ServerAllocationId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "IpAssignment");
+                name: "AspNetRoleClaims");
 
             migrationBuilder.DropTable(
-                name: "LocationAssignment");
+                name: "AspNetUserClaims");
 
             migrationBuilder.DropTable(
-                name: "IpAddress");
+                name: "AspNetUserLogins");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserRoles");
+
+            migrationBuilder.DropTable(
+                name: "AspNetUserTokens");
+
+            migrationBuilder.DropTable(
+                name: "LocationAssignments");
+
+            migrationBuilder.DropTable(
+                name: "RequestUpgrades");
+
+            migrationBuilder.DropTable(
+                name: "ServerHardwareConfigs");
+
+            migrationBuilder.DropTable(
+                name: "AspNetRoles");
 
             migrationBuilder.DropTable(
                 name: "Locations");
 
             migrationBuilder.DropTable(
-                name: "Request");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
-                name: "IpSubnet");
+                name: "Components");
+
+            migrationBuilder.DropTable(
+                name: "ServerAllocations");
 
             migrationBuilder.DropTable(
                 name: "Racks");
 
             migrationBuilder.DropTable(
-                name: "Service");
+                name: "Customers");
 
             migrationBuilder.DropTable(
                 name: "Areas");
 
-            migrationBuilder.UpdateData(
-                table: "AspNetUsers",
-                keyColumn: "Id",
-                keyValue: new Guid("01fc684c-d9d0-4fcc-b0a7-56fea6945928"),
-                columns: new[] { "ConcurrencyStamp", "DateCreated", "DateUpdated", "PasswordHash" },
-                values: new object[] { "8d3f553e-f05f-4175-bcb2-c58bcda45494", new DateTime(2023, 11, 13, 17, 50, 47, 669, DateTimeKind.Local).AddTicks(8354), new DateTime(2023, 11, 13, 17, 50, 47, 669, DateTimeKind.Local).AddTicks(8367), "AQAAAAIAAYagAAAAEIzVTZ/nOuyrG1ESf3YvLgxTzJFEYurS3XxA4Q+2/OuHG/RTEv/vJVV6fjGtSKHK0A==" });
-
-            migrationBuilder.UpdateData(
-                table: "AspNetUsers",
-                keyColumn: "Id",
-                keyValue: new Guid("1abb6e28-793d-460f-8a24-745998356da8"),
-                columns: new[] { "ConcurrencyStamp", "DateCreated", "DateUpdated", "PasswordHash" },
-                values: new object[] { "cf2591ae-9b8c-4afb-8ebc-f550f7233513", new DateTime(2023, 11, 13, 17, 50, 47, 474, DateTimeKind.Local).AddTicks(6399), new DateTime(2023, 11, 13, 17, 50, 47, 474, DateTimeKind.Local).AddTicks(6417), "AQAAAAIAAYagAAAAEEwKiXXCUBiIr8RK9eN75Ea88oXrkQrC83J9iejC0LU6Fs0UsRBIjVavp2c+6z5fwg==" });
-
-            migrationBuilder.UpdateData(
-                table: "AspNetUsers",
-                keyColumn: "Id",
-                keyValue: new Guid("2e3566a9-02b1-4ec4-a2d4-b3bb3c4f2b45"),
-                columns: new[] { "ConcurrencyStamp", "DateCreated", "DateUpdated", "PasswordHash" },
-                values: new object[] { "2d646f42-fd40-41ac-83f7-9beb43b7edb0", new DateTime(2023, 11, 13, 17, 50, 47, 591, DateTimeKind.Local).AddTicks(3100), new DateTime(2023, 11, 13, 17, 50, 47, 591, DateTimeKind.Local).AddTicks(3112), "AQAAAAIAAYagAAAAECXP/4dwHRu332QkOq4SY3odynZVaJGHrK4OpgEq6ujUBbJ/Ts5J4hNpFIONPt/MXQ==" });
-
-            migrationBuilder.UpdateData(
-                table: "AspNetUsers",
-                keyColumn: "Id",
-                keyValue: new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab"),
-                columns: new[] { "ConcurrencyStamp", "DateCreated", "DateUpdated", "PasswordHash" },
-                values: new object[] { "eb2aac8f-2107-45e5-a521-1429ebfb2958", new DateTime(2023, 11, 13, 17, 50, 47, 398, DateTimeKind.Local).AddTicks(2232), new DateTime(2023, 11, 13, 17, 50, 47, 398, DateTimeKind.Local).AddTicks(2264), "AQAAAAIAAYagAAAAELtyKTMUDf+AlMe2odrcOWHg8pX8Q9vg3dD/mu3Wa+L9BlmUBcjzYsBNDMhDRQP2PA==" });
-
-            migrationBuilder.UpdateData(
-                table: "AspNetUsers",
-                keyColumn: "Id",
-                keyValue: new Guid("57ffb575-7c79-4133-8433-aebbcd71f824"),
-                columns: new[] { "ConcurrencyStamp", "DateCreated", "DateUpdated", "PasswordHash" },
-                values: new object[] { "1734a571-57b2-4d50-8efc-b30a6ee71cf7", new DateTime(2023, 11, 13, 17, 50, 47, 320, DateTimeKind.Local).AddTicks(134), new DateTime(2023, 11, 13, 17, 50, 47, 320, DateTimeKind.Local).AddTicks(134), "AQAAAAIAAYagAAAAEHG6IQkzlvosX6gg3DA07EYO55t3OGFIKkZM+E3sbhjVMlptlREbB5A4nwCPbcZEfA==" });
-
-            migrationBuilder.UpdateData(
-                table: "CompanyTypes",
-                keyColumn: "Id",
-                keyValue: 1,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9784), new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9800) });
-
-            migrationBuilder.UpdateData(
-                table: "CompanyTypes",
-                keyColumn: "Id",
-                keyValue: 2,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9827), new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9828) });
-
-            migrationBuilder.UpdateData(
-                table: "CompanyTypes",
-                keyColumn: "Id",
-                keyValue: 3,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9840), new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9840) });
-
-            migrationBuilder.UpdateData(
-                table: "CompanyTypes",
-                keyColumn: "Id",
-                keyValue: 4,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9850), new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9851) });
-
-            migrationBuilder.UpdateData(
-                table: "CompanyTypes",
-                keyColumn: "Id",
-                keyValue: 5,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9861), new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9861) });
-
-            migrationBuilder.UpdateData(
-                table: "Components",
-                keyColumn: "Id",
-                keyValue: 1,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9894), new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9894) });
-
-            migrationBuilder.UpdateData(
-                table: "Components",
-                keyColumn: "Id",
-                keyValue: 2,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9982), new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9983) });
-
-            migrationBuilder.UpdateData(
-                table: "Components",
-                keyColumn: "Id",
-                keyValue: 3,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9997), new DateTime(2023, 11, 13, 17, 50, 47, 319, DateTimeKind.Local).AddTicks(9998) });
-
-            migrationBuilder.UpdateData(
-                table: "Components",
-                keyColumn: "Id",
-                keyValue: 4,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 13, 17, 50, 47, 320, DateTimeKind.Local).AddTicks(21), new DateTime(2023, 11, 13, 17, 50, 47, 320, DateTimeKind.Local).AddTicks(22) });
-
-            migrationBuilder.UpdateData(
-                table: "Components",
-                keyColumn: "Id",
-                keyValue: 5,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 13, 17, 50, 47, 320, DateTimeKind.Local).AddTicks(33), new DateTime(2023, 11, 13, 17, 50, 47, 320, DateTimeKind.Local).AddTicks(33) });
-
-            migrationBuilder.UpdateData(
-                table: "Components",
-                keyColumn: "Id",
-                keyValue: 6,
-                columns: new[] { "DateCreated", "DateUpdated" },
-                values: new object[] { new DateTime(2023, 11, 13, 17, 50, 47, 320, DateTimeKind.Local).AddTicks(8), new DateTime(2023, 11, 13, 17, 50, 47, 320, DateTimeKind.Local).AddTicks(9) });
+            migrationBuilder.DropTable(
+                name: "CompanyTypes");
         }
     }
 }

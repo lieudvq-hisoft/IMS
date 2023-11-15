@@ -32,10 +32,6 @@ public class MapperProfile : Profile
         CreateMap<ServerAllocation, ServerAllocationModel>();
         #endregion
 
-        #region Service
-        CreateMap<Request, RequestModel>();
-        #endregion
-
         #region Location
         CreateMap<Area, AreaModel>();
         CreateMap<AreaCreateModel, Area>();
@@ -46,8 +42,8 @@ public class MapperProfile : Profile
         CreateMap<RackUpdateModel, Rack>();
 
         CreateMap<Location, LocationModel>();
-        CreateMap<LocationCreateModel, Location>();
-        CreateMap<LocationUpdateModel, Location>();
+
+        CreateMap<LocationAssignment, LocationAssignmentModel>();
         #endregion
 
         #region User

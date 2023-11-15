@@ -9,9 +9,9 @@ namespace Services.Core;
 public interface ILocationAssignmentService
 {
     Task<ResultModel> Get(PagingParam<LocationAssignmentSortingCriteria> paginationModel, LocationAssignmentSearchModel searchModel);
-    Task<ResultModel> Create(LocationCreateModel model);
-    //Task<ResultModel> Update(LocationUpdateModel model);
-    Task<ResultModel> Delete(int id);
+    //Task<ResultModel> Create(LocationCreateModel model);
+    ////Task<ResultModel> Update(LocationUpdateModel model);
+    //Task<ResultModel> Delete(int id);
 }
 
 public class LocationAssignmentService : ILocationAssignmentService
@@ -66,72 +66,72 @@ public class LocationAssignmentService : ILocationAssignmentService
         return result;
     }
 
-    public async Task<ResultModel> Create(LocationCreateModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-        bool validPrecondition = true;
+    //public async Task<ResultModel> Create(LocationCreateModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+    //    bool validPrecondition = true;
 
-        try
-        {
-            //var rack = _dbContext.Racks.FirstOrDefault(x => x.Id == model.RackId);
-            //if (rack == null)
-            //{
-            //    result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
-            //    validPrecondition = false;
-            //}
+    //    try
+    //    {
+    //        var rack = _dbContext.Racks.FirstOrDefault(x => x.Id == model.RackId);
+    //        if (rack == null)
+    //        {
+    //            result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
+    //            validPrecondition = false;
+    //        }
 
-            //var service = _dbContext.Services.FirstOrDefault(x => x.Id == model.ServiceId && (x.Type == ServiceType.Location || x.Type == ServiceType.Expand));
-            //if (service == null)
-            //{
-            //    result.ErrorMessage = ServiceErrorMessgae.NOT_EXISTED;
-            //    validPrecondition = false;
-            //}
-            //else if (service.LocationAssignments.Any())
-            //{
-            //    result.ErrorMessage = LocationAssignmentErrorMessage.HAVE_LOCATION_ALREADY;
-            //    validPrecondition = false;
-            //}
+    //        var service = _dbContext.Services.FirstOrDefault(x => x.Id == model.ServiceId && (x.Type == ServiceType.Location || x.Type == ServiceType.Expand));
+    //        if (service == null)
+    //        {
+    //            result.ErrorMessage = ServiceErrorMessgae.NOT_EXISTED;
+    //            validPrecondition = false;
+    //        }
+    //        else if (service.LocationAssignments.Any())
+    //        {
+    //            result.ErrorMessage = LocationAssignmentErrorMessage.HAVE_LOCATION_ALREADY;
+    //            validPrecondition = false;
+    //        }
 
-            //var locations = new List<Location>();
-            //for (int i = model.StartPosition; i <= model.Size; i++)
-            //{
-            //    var location = _dbContext.Locations.FirstOrDefault(x => x.RackId == model.RackId && x.Position == i);
-            //    if (location.LocationAssignments.Any())
-            //    {
-            //        result.ErrorMessage = LocationAssignmentErrorMessage.CHOICE_NOT_AVAILABLE;
-            //        validPrecondition = false;
-            //    }
-            //    else
-            //    {
-            //        locations.Add(location);
-            //    }
-            //}
+    //        var locations = new List<Location>();
+    //        for (int i = model.StartPosition; i <= model.Size; i++)
+    //        {
+    //            var location = _dbContext.Locations.FirstOrDefault(x => x.RackId == model.RackId && x.Position == i);
+    //            if (location.LocationAssignments.Any())
+    //            {
+    //                result.ErrorMessage = LocationAssignmentErrorMessage.CHOICE_NOT_AVAILABLE;
+    //                validPrecondition = false;
+    //            }
+    //            else
+    //            {
+    //                locations.Add(location);
+    //            }
+    //        }
 
-            //if (validPrecondition)
-            //{
-            //    foreach (var location in locations)
-            //    {
-            //        _dbContext.LocationAssignments.Add(new LocationAssignment
-            //        {
-            //            ServiceId = model.ServiceId,
-            //            LocationId = location.Id,
-            //        });
-            //    }
+    //        if (validPrecondition)
+    //        {
+    //            foreach (var location in locations)
+    //            {
+    //                _dbContext.LocationAssignments.Add(new LocationAssignment
+    //                {
+    //                    ServiceId = model.ServiceId,
+    //                    LocationId = location.Id,
+    //                });
+    //            }
 
-            //    _dbContext.SaveChanges();
+    //            _dbContext.SaveChanges();
 
-            //    result.Succeed = true;
-            //    //result.Data = _mapper.Map<LocationAssignmentModel>(service);
-            //}
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //            result.Succeed = true;
+    //            //result.Data = _mapper.Map<LocationAssignmentModel>(service);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     //public async Task<ResultModel> Update(LocationUpdateModel model)
     //{

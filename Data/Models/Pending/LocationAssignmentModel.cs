@@ -6,38 +6,6 @@ public class LocationAssignmentModel
 {
     public int ServiceId { get; set; }
     public int StartPosition { get; set; }
-    public string Rack { get; set; }
-    public int Size { get; set; }
-}
-
-public class LocationCreateModel
-{
-    [Required]
-    public int ServiceId { get; set; }
-
-    [Required]
-    public int StartPosition { get; set; }
-
-    [Required]
-    public int RackId { get; set; }
-
-    [Required]
-    public int Size { get; set; }
-}
-
-public class LocationUpdateModel
-{
-    [Required]
-    public int ServiceId { get; set; }
-
-    [Required]
-    public int StartPosition { get; set; }
-
-    [Required]
-    public int RackId { get; set; }
-
-    [Required]
-    public int Size { get; set; }
 }
 
 #region Area models
@@ -47,16 +15,6 @@ public class AreaModel
     public string Name { get; set; }
     public int RowCount { get; set; }
     public int ColumnCount { get; set; }
-}
-
-public class AreaDetailModel
-{
-    public int Id { get; set; }
-    public string Name { get; set; }
-    public int RowCount { get; set; }
-    public int ColumnCount { get; set; }
-
-    public List<RackModel> Racks { get; set; }
 }
 
 public class AreaCreateModel
@@ -154,7 +112,6 @@ public class RackSearchModel
 public class LocationModel
 {
     public int Id { get; set; }
-    public bool IsDeleted { get; set; }
     public int Position { get; set; }
     public int RackId { get; set; }
 }

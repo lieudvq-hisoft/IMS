@@ -52,26 +52,24 @@ public static class StartupExtension
 
     public static void AddBussinessService(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddScoped<IAreaService, AreaService>();
         services.AddScoped<ICompanyTypeService, CompanyTypeService>();
         services.AddScoped<IComponentService, ComponentService>();
-        services.AddScoped<IServerAllocationService, ServerAllocationService>();
-        services.AddScoped<IServerHardwareConfigService, ServerHardwareConfigService>();
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<ILocationAssignmentService, LocationAssignmentService>();
-        services.AddScoped<IRequestService, RequestService>();
-        services.AddScoped<IRequestUpgradeService, RequestUpgradeService>();
-        services.AddScoped<IUserService, UserService>();
-        services.AddScoped<IAreaService, AreaService>();
-        services.AddScoped<IRackService, RackService>();
         services.AddScoped<ILocationService, LocationService>();
+        services.AddScoped<IRackService, RackService>();
+        services.AddScoped<IRequestUpgradeService, RequestUpgradeService>();
+        services.AddScoped<IServerAllocationService, ServerAllocationService>();
+        services.AddScoped<IServerHardwareConfigService, ServerHardwareConfigService>();
+        services.AddScoped<IUserService, UserService>();
 
         //services.AddScoped<IIpService, IpService>();
         //services.AddScoped<IAppointmentService, AppointmentService>();
 
 
         services.AddScoped<IEmailService, EmailService>();
-
         services.AddScoped<TransactionHelper>();
     }
 

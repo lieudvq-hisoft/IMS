@@ -352,18 +352,20 @@ public static class ModelBuilderExtentions
     {
         builder.Entity<Area>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<CompanyType>().HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Customer>().HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<ServerHardwareConfig>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Component>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Customer>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Location>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<LocationAssignment>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Rack>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<RequestUpgrade>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Role>().HasQueryFilter(x => !x.isDeactive);
+        builder.Entity<ServerAllocation>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<ServerHardwareConfig>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<User>().HasQueryFilter(x => !x.IsDeleted);
         //builder.Entity<IpAddress>().HasQueryFilter(x => !x.IsDeleted);
         //builder.Entity<IpAssignment>().HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Location>().HasQueryFilter(x => !x.IsDeleted);
         //builder.Entity<IpSubnet>().HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Rack>().HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<ServerAllocation>().HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<Role>().HasQueryFilter(x => !x.isDeactive);
         //builder.Entity<Request>().HasQueryFilter(x => !x.IsDeleted);
         //builder.Entity<Service>().HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<User>().HasQueryFilter(x => !x.IsDeleted);
     }
 }

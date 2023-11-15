@@ -98,7 +98,7 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     //public DbSet<IpAddress> Ips { get; set; }
     //public DbSet<IpAssignment> IpAssignments { get; set; }
     public DbSet<Location> Locations { get; set; }
-    //public DbSet<LocationAssignment> LocationAssignments { get; set; }
+    public DbSet<LocationAssignment> LocationAssignments { get; set; }
     //public DbSet<IpSubnet> Networks { get; set; }
     public DbSet<ServerAllocation> ServerAllocations { get; set; }
     public DbSet<Rack> Racks { get; set; }
