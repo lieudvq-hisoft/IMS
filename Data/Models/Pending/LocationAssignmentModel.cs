@@ -80,6 +80,11 @@ public class AreaUpdateModel
     [Required]
     public int ColumnCount { get; set; }
 }
+
+public class AreaSearchModel
+{
+    public int? AreaId { get; set; } = null;
+}
 #endregion
 
 #region Rack models
@@ -106,7 +111,6 @@ public class RackDetailModel
 
     public List<LocationModel> DeviceLocations { get; set; }
 }
-
 
 public class RackCreateModel
 {
@@ -141,14 +145,24 @@ public class RackUpdateModel
     [Required]
     public int AreaId { get; set; }
 }
+
+public class RackSearchModel
+{
+    public int? RackId { get; set; } = null;
+}
 #endregion
 
 public class LocationModel
 {
     public int Id { get; set; }
-    public string Name { get; set; }
-    public int Size { get; set; }
-    public int StartPosition { get; set; }
+    public bool IsDeleted { get; set; }
+    public int Position { get; set; }
+    public int RackId { get; set; }
+}
+
+public class LocationSearchModel
+{
+    public int? LocationId { get; set; } = null;
 }
 
 public class LocationChoiceModel
@@ -167,13 +181,6 @@ public class LocationAssignmentSearchModel
     public int? ServiceId { get; set; } = null;
 }
 
-public class AreaSearchModel
-{
-    public int? AreaId { get; set; } = null;
-}
 
-public class RackSearchModel
-{
-    public int? RackId { get; set; } = null;
-}
+
 
