@@ -30,11 +30,12 @@ public class AreaModel
 public class AreaCreateModel
 {
     [Required]
-    [GreaterThanZero]
     public string Name { get; set; }
+
     [Required]
     [GreaterThanZero]
     public int RowCount { get; set; }
+    
     [Required]
     [GreaterThanZero]
     public int ColumnCount { get; set; }
