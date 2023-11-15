@@ -38,11 +38,11 @@ public class RackController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("byAreaId{id}")]
+    [HttpGet("{id}/Location")]
     [SwaggerOperation(Summary = "Get all Rack by area Id")]
-    public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
+    public async Task<ActionResult> Get(int id)
     {
-        var result = await _RackService.GetByAreaId(pagingParam, id);
+        var result = await _RackService.GetLocation(id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

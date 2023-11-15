@@ -21,7 +21,7 @@ public interface IRackService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RackSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> GetByAreaId(PagingParam<BaseSortCriteria> paginationModel, int areaId);
+    Task<ResultModel> GetLocation(int id);
     Task<ResultModel> Create(RackCreateModel model);
     Task<ResultModel> Update(RackUpdateModel model);
     Task<ResultModel> Delete(int id);
@@ -45,16 +45,16 @@ public class RackService : IRackService
 
         try
         {
-            var Racks = _dbContext.Racks
+            var racks = _dbContext.Racks
                 .Where(x => searchModel.RackId != null ? x.Id == searchModel.RackId : true)
                 .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, Racks.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, racks.Count());
 
-            Racks = Racks.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            Racks = Racks.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            racks = racks.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            racks = racks.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<RackModel>(Racks).ToList();
+            paging.Data = _mapper.ProjectTo<RackModel>(racks).ToList();
 
             result.Data = paging;
             result.Succeed = true;
@@ -73,15 +73,13 @@ public class RackService : IRackService
 
         try
         {
-            var Rack = _dbContext.Racks
-                .Include(x => x.Area)
-                .Include(x => x.Locations)
+            var rack = _dbContext.Racks
                 .FirstOrDefault(x => x.Id == id);
 
-            if (Rack != null)
+            if (rack != null)
             {
                 result.Succeed = true;
-                result.Data = _mapper.Map<RackDetailModel>(Rack);
+                result.Data = _mapper.Map<RackModel>(rack);
             }
             else
             {
@@ -96,25 +94,16 @@ public class RackService : IRackService
         return result;
     }
 
-    public async Task<ResultModel> GetByAreaId(PagingParam<BaseSortCriteria> paginationModel, int areaId)
+    public async Task<ResultModel> GetLocation(int id)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var Racks = _dbContext.Racks
-                .Where(x => x.AreaId == areaId)
-                .AsQueryable();
+            var racks = _dbContext.Racks.Include(x => x.Locations).Where(x => x.AreaId == id);
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, Racks.Count());
-
-            Racks = Racks.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            Racks = Racks.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-
-            paging.Data = _mapper.ProjectTo<RackModel>(Racks).ToList();
-
-            result.Data = paging;
+            result.Data = _mapper.ProjectTo<List<RackModel>>(racks).ToList();
             result.Succeed = true;
         }
         catch (Exception e)

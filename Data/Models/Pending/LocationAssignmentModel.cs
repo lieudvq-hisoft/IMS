@@ -104,19 +104,6 @@ public class RackModel
     public int AreaId { get; set; }
 }
 
-public class RackDetailModel
-{
-    public int Id { get; set; }
-    public double MaxPower { get; set; }
-    public double CurrentPower { get; set; }
-    public int Column { get; set; }
-    public int Row { get; set; }
-    public int Size { get; set; }
-    public int AreaId { get; set; }
-
-    public List<LocationModel> DeviceLocations { get; set; }
-}
-
 public class RackCreateModel
 {
     [Required]

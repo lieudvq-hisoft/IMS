@@ -4,7 +4,6 @@ using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
-using Swashbuckle.AspNetCore.Annotations;
 
 namespace IMS.Controllers;
 
