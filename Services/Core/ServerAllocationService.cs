@@ -177,7 +177,7 @@ public class ServerAllocationService : IServerAllocationService
             {
                 serverAllocation.ExpectedSize = model.ExpectedSize;
                 serverAllocation.Note = model.Note;
-                serverAllocation.InspectorNote = model.InspectorNote;
+                serverAllocation.TechNote = model.TechNote;
                 serverAllocation.DateCreated = DateTime.Now;
 
                 _dbContext.SaveChanges();

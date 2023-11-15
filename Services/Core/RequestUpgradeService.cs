@@ -6,6 +6,7 @@ using Data.Entities;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
+using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
 
 namespace Services.Core;
@@ -15,6 +16,8 @@ public interface IRequestUpgradeService
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
     Task<ResultModel> Delete(int requestUpgradeId);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
+    Task<ResultModel> Accept(int requestUpgradeId, Guid userId);
+    Task<ResultModel> Deny(int requestUpgradeId, Guid userId);
 }
 
 public class RequestUpgradeService : IRequestUpgradeService
@@ -93,11 +96,12 @@ public class RequestUpgradeService : IRequestUpgradeService
             if (validPrecondition)
             {
                 var requestUpgrade = _mapper.Map<RequestUpgrade>(model);
+                requestUpgrade.Status = RequestStatus.Pending;
 
                 _dbContext.RequestUpgrades.Add(requestUpgrade);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<ServerHardwareConfigModel>(requestUpgrade);
+                result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
             }
         }
         catch (Exception e)
@@ -144,7 +148,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 _dbContext.RequestUpgrades.Add(requestUpgrade);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<ServerHardwareConfigModel>(requestUpgrade);
+                result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
             }
         }
         catch (Exception e)
@@ -173,6 +177,95 @@ public class RequestUpgradeService : IRequestUpgradeService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = requestUpgradeId;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Accept(int requestUpgradeId, Guid userId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var requestUpgrade = _dbContext.RequestUpgrades
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
+                .Include(x => x.Component).FirstOrDefault(x => x.Id == requestUpgradeId && x.Status == RequestStatus.Pending);
+            if (requestUpgrade == null)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+
+            ServerHardwareConfig serverHardwareConfig = null;
+            if (validPrecondition)
+            {
+                serverHardwareConfig = requestUpgrade.ServerAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId);
+                if (serverHardwareConfig == null)
+                {
+                    result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
+                    validPrecondition = true;
+                }
+            }
+
+            if (validPrecondition)
+            {
+                if (requestUpgrade.Component.Type == ComponentType.Change)
+                {
+                    serverHardwareConfig.Description = requestUpgrade.Description;
+                    serverHardwareConfig.Capacity = requestUpgrade.Capacity;
+                }
+                else
+                {
+                    serverHardwareConfig.Capacity += requestUpgrade.Capacity;
+                }
+                requestUpgrade.Status = RequestStatus.Accepted;
+                requestUpgrade.UserId = userId;
+
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Deny(int requestUpgradeId, Guid userId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var requestUpgrade = _dbContext.RequestUpgrades
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
+                .Include(x => x.Component).FirstOrDefault(x => x.Id == requestUpgradeId && x.Status == RequestStatus.Pending);
+            if (requestUpgrade == null)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+            else
+            {
+                requestUpgrade.Status = RequestStatus.Denied;
+                requestUpgrade.UserId = userId;
+
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
             }
         }
         catch (Exception e)

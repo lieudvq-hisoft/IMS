@@ -46,7 +46,6 @@ public enum IpAssignmentTypes
 
 public enum RequestStatus
 {
-    Incomplete,
     Pending,
     Accepted,
     Denied,

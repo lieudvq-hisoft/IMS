@@ -160,6 +160,12 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
                 validPrecondition = false;
             }
 
+            if (serverAllocation.ServerHardwareConfigs.Any(x => x.Component.Name == component.Name))
+            {
+                result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
+                validPrecondition = false;
+            }
+
             if (validPrecondition)
             {
                 _mapper.Map<ServerHardwareConfigUpdateModel, ServerHardwareConfig>(model, serverHardwareConfig);

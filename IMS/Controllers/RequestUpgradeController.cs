@@ -49,4 +49,22 @@ public class RequestUpgradeController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPut("{id}/Accept")]
+    public async Task<ActionResult> Accept(int id)
+    {
+        var userId = new Guid(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+        var result = await _requestUpgradeService.Accept(id, userId);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("{id}/Deny")]
+    public async Task<ActionResult> Deny(int id)
+    {
+        var userId = new Guid(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
+        var result = await _requestUpgradeService.Deny(id, userId);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }
