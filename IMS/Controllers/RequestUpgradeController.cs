@@ -61,7 +61,6 @@ public class RequestUpgradeController : ControllerBase
     [HttpPut("{id}/Accept")]
     public async Task<ActionResult> Accept(int id)
     {
-        //var userId = new Guid(User.Claims.FirstOrDefault(x => x.Type == "UserId").Value);
         var result = await _requestUpgradeService.ChangeStatus(id, RequestStatus.Accepted);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);

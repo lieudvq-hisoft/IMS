@@ -96,7 +96,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             if (validPrecondition)
             {
                 var requestUpgrade = _mapper.Map<RequestUpgrade>(model);
-                requestUpgrade.Status = RequestStatus.Pending;
+                requestUpgrade.Status = RequestStatus.Waiting;
 
                 _dbContext.RequestUpgrades.Add(requestUpgrade);
                 _dbContext.SaveChanges();
@@ -197,7 +197,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         {
             var requestUpgrade = _dbContext.RequestUpgrades
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
-                .Include(x => x.Component).FirstOrDefault(x => x.Id == requestUpgradeId && x.Status == RequestStatus.Pending);
+                .Include(x => x.Component).FirstOrDefault(x => x.Id == requestUpgradeId && x.Status == RequestStatus.Waiting);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
@@ -230,7 +230,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         {
             var requestUpgrade = _dbContext.RequestUpgrades
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
-                .Include(x => x.Component).FirstOrDefault(x => x.Id == requestUpgradeId && x.Status == RequestStatus.Pending);
+                .Include(x => x.Component).FirstOrDefault(x => x.Id == requestUpgradeId && x.Status == RequestStatus.Waiting);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
@@ -259,7 +259,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 {
                     serverHardwareConfig.Capacity += requestUpgrade.Capacity;
                 }
-                requestUpgrade.Status = RequestStatus.Completed;
+                requestUpgrade.Status = RequestStatus.Success;
 
                 _dbContext.SaveChanges();
                 result.Succeed = true;
