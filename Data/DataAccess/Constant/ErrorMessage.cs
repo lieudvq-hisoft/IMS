@@ -26,6 +26,23 @@ public class ServerAllocationErrorMessage
     public const string DOWNLOAD_FILE_FROM_NON_ACCEPTED = "Only accepted server allocation have file";
 }
 
+public class AreaErrorMessage
+{
+    public const string NOT_EXISTED = "Area " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Area " + ErrorMessage.EXISTED;
+    public const string ROW_WRONG_INPUT = "Row count must be greater than 0";
+    public const string COLUMN_WRONG_INPUT = "Column count must be greater than 0";
+}
+
+public class RackErrorMessage
+{
+    public const string NOT_EXISTED = "Rack " + ErrorMessage.NOT_EXISTED;
+    public const string AREA_NOT_EXISTED = "Area " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Rack " + ErrorMessage.EXISTED;
+    public const string SIZE_WRONG_INPUT = "Power must be greater than 0";
+    public const string POWER_WRONG_INPUT = "Power must be greater than 0";
+}
+
 public class RequestErrorMessage
 {
     public const string NOT_EXISTED = "Request " + ErrorMessage.NOT_EXISTED;
@@ -64,11 +81,6 @@ public class LocationAssignmentErrorMessage
     public const string CHOICE_NOT_AVAILABLE = "Location choice is not available";
     public const string INVALID_RACK = "Rack is not valid";
     public const string INVALID_SERVICE = "Service is not valid";
-}
-
-public class RackErrorMessage
-{
-    public const string NOT_EXISTED = "Rack " + ErrorMessage.NOT_EXISTED;
 }
 
 public class ServerErrorMessgae
