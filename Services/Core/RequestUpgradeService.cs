@@ -18,6 +18,8 @@ public interface IRequestUpgradeService
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
     Task<ResultModel> ChangeStatus(int requestUpgradeId, RequestStatus status);
     Task<ResultModel> Complete(int requestUpgradeId);
+    Task<ResultModel> GetInspectionReport(int requestUpgradeId);
+    Task<ResultModel> AssignInspectionReport(int requestUpgradeId, string fileName);
 }
 
 public class RequestUpgradeService : IRequestUpgradeService
@@ -197,13 +199,36 @@ public class RequestUpgradeService : IRequestUpgradeService
         {
             var requestUpgrade = _dbContext.RequestUpgrades
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
-                .Include(x => x.Component).FirstOrDefault(x => x.Id == requestUpgradeId && x.Status == RequestStatus.Waiting);
+                .Include(x => x.Component).FirstOrDefault(x => x.Id == requestUpgradeId);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
-            else
+
+            if (validPrecondition)
+            {
+                switch (status)
+                {
+                    case RequestStatus.Denied:
+                    case RequestStatus.Accepted:
+                        if (requestUpgrade.Status != RequestStatus.Waiting)
+                        {
+                            result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING;
+                            validPrecondition = false;
+                        }
+                        break;
+                    case RequestStatus.Failed:
+                        if (requestUpgrade.Status != RequestStatus.Accepted)
+                        {
+                            result.ErrorMessage = RequestUpgradeErrorMessage.NOT_ACCEPTED;
+                            validPrecondition = false;
+                        }
+                        break;
+                }
+            }
+
+            if (validPrecondition)
             {
                 requestUpgrade.Status = status;
 
@@ -264,6 +289,72 @@ public class RequestUpgradeService : IRequestUpgradeService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> GetInspectionReport(int requestUpgradeId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
+            if (requestUpgrade == null)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+            }
+            else if (requestUpgrade.Status != RequestStatus.Accepted)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_ACCEPTED;
+            }
+            else if (requestUpgrade.InspectionReportFilePath == null)
+            {
+                result.ErrorMessage = ErrorMessage.FILE_NOT_EXISTED;
+            }
+            else
+            {
+                result.Succeed = true;
+                result.Data = requestUpgrade.InspectionReportFilePath;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> AssignInspectionReport(int requestUpgradeId, string fileName)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
+            if (requestUpgrade == null)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+            }
+            else if (requestUpgrade.Status != RequestStatus.Accepted)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_ACCEPTED;
+            }
+            else
+            {
+                requestUpgrade.InspectionReportFilePath = fileName;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = fileName;
             }
         }
         catch (Exception e)

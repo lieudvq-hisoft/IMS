@@ -12,10 +12,14 @@ namespace IMS.Controllers;
 public class RequestUpgradeController : ControllerBase
 {
     private readonly IRequestUpgradeService _requestUpgradeService;
+    private readonly IWebHostEnvironment _environment;
+    private readonly IFileService _fileService;
 
-    public RequestUpgradeController(IRequestUpgradeService requestUpgradeService)
+    public RequestUpgradeController(IRequestUpgradeService requestUpgradeService, IWebHostEnvironment environment, IFileService fileService)
     {
         this._requestUpgradeService = requestUpgradeService;
+        _environment = environment;
+        _fileService = fileService;
     }
 
     [HttpGet]
@@ -80,5 +84,33 @@ public class RequestUpgradeController : ControllerBase
         var result = await _requestUpgradeService.ChangeStatus(id, RequestStatus.Failed);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}/InspectionReport")]
+    public async Task<ActionResult> DownloadInspectionReport(int id)
+    {
+        var result = await _requestUpgradeService.GetInspectionReport(id);
+        string folderPath = Path.Combine(_environment.WebRootPath, "RequestUpgrade");
+        if (result.Succeed)
+        {
+            string filePath = Path.Combine(folderPath, result.Data as string);
+            return File(System.IO.File.OpenRead(filePath), "application/pdf", "InspectionReport.pdf");
+        }
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPost("{id}/InspectionReport")]
+    public async Task<ActionResult> UploadInspectionReport(int id, [FromForm] DocumentFileUploadModel model)
+    {
+        string folderPath = Path.Combine(_environment.WebRootPath, "RequestUpgrade");
+        string fileName = await _fileService.SaveFileWithGuidName(model.File, folderPath);
+        var result = await _requestUpgradeService.AssignInspectionReport(id, fileName);
+        if (!result.Succeed)
+        {
+            await _fileService.DeleteFile(fileName);
+            return BadRequest(result.ErrorMessage);
+        }
+
+        return Ok(fileName);
     }
 }
