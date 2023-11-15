@@ -16,6 +16,8 @@ public interface IServerAllocationService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetHardwareConfig(int id);
     Task<ResultModel> GetRequestUpgrade(int id);
+    Task<ResultModel> GetLocationAssignment(int id);
+    Task<ResultModel> GetLocation(int id);
     Task<ResultModel> Create(ServerAllocationCreateModel model);
     Task<ResultModel> Update(ServerAllocationUpdateModel model);
     Task<ResultModel> Delete(int serverAllocationId);
@@ -155,7 +157,32 @@ public class ServerAllocationService : IServerAllocationService
             }
             else
             {
-                result.Data = _mapper.Map<List<LocationAssignmentModel>>(serverAllocation.RequestUpgrades);
+                result.Data = _mapper.Map<List<LocationAssignmentModel>>(serverAllocation.LocationAssignments);
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetLocation(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.LocationAssignments).ThenInclude(x => x.Location).FirstOrDefault(x => x.Id == id);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                result.Data = _mapper.Map<List<LocationModel>>(serverAllocation.LocationAssignments.Select(x => x.Location));
                 result.Succeed = true;
             }
         }

@@ -83,6 +83,23 @@ public class ServerAllocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+
+    [HttpGet("{id}/LocationAssignment")]
+    public async Task<ActionResult> GetLocationAssignment([FromRoute] int id)
+    {
+        var result = await _serverAllocationService.GetLocationAssignment(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}/Location")]
+    public async Task<ActionResult> GetLocation([FromRoute] int id)
+    {
+        var result = await _serverAllocationService.GetLocation(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     //[HttpPost("Bulk")]
     //[Authorize(Roles = nameof(RoleType.Sale))]
     //[SwaggerOperation(Summary = "[Sale]: Create user, customer and request base on import excel.")]
