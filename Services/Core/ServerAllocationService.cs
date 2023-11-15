@@ -209,7 +209,7 @@ public class ServerAllocationService : IServerAllocationService
             }
             else
             {
-                serverAllocation.IsDeleted = true;
+                _dbContext.ServerAllocations.Remove(serverAllocation);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
             }

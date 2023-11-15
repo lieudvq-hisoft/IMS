@@ -67,8 +67,25 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
                 .IsRequired();
         });
 
+        builder.Entity<Area>(b =>
+        {
+            b.HasMany(e => e.Racks)
+                .WithOne(e => e.Area)
+                .HasForeignKey(ur => ur.AreaId)
+                .IsRequired();
+        });
+
+        builder.Entity<Rack>(b =>
+        {
+            b.HasMany(e => e.Locations)
+                .WithOne(e => e.Rack)
+                .HasForeignKey(ur => ur.RackId)
+                .IsRequired();
+        });
+
         builder.Seed();
         builder.FilterSoftDeleted();
+
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 

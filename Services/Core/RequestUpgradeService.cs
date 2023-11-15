@@ -173,7 +173,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             }
             else
             {
-                requestUpgrade.IsDeleted = true;
+                _dbContext.RequestUpgrades.Remove(requestUpgrade);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = requestUpgradeId;

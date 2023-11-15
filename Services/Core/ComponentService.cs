@@ -137,7 +137,7 @@ public class ComponentService : IComponentService
             }
             else
             {
-                component.IsDeleted = true;
+                _dbContext.Components.Remove(component);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = componentId;

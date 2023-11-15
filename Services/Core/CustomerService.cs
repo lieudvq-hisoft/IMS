@@ -246,8 +246,7 @@ public class CustomerService : ICustomerService
             }
             else
             {
-                customer.IsDeleted = true;
-                customer.DateUpdated = DateTime.Now;
+                _dbContext.Customers.Remove(customer);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = customer.Id;
@@ -276,13 +275,7 @@ public class CustomerService : ICustomerService
             }
             else
             {
-                customer.CompanyName = model.CompanyName;
-                customer.Address = model.Address;
-                customer.TaxNumber = model.TaxNumber;
-                customer.Email = model.Email;
-                customer.PhoneNumber = model.PhoneNumber;
-                customer.CustomerName = model.CustomerName;
-
+                _mapper.Map<CustomerUpdateModel, Customer>(model, customer);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<CustomerModel>(customer);

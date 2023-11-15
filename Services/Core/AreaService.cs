@@ -7,6 +7,7 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using Services.Utilities;
 using System;
 using System.Collections.Generic;
@@ -159,6 +160,7 @@ public class AreaService : IAreaService
     {
         var result = new ResultModel();
         result.Succeed = false;
+        bool validPrecondition = true;
 
         try
         {
@@ -168,6 +170,16 @@ public class AreaService : IAreaService
                 result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
             }
             else
+            {
+                var areaName = _dbContext.Areas.FirstOrDefault(x => x.Name.Trim() == model.Name.Trim() && x.Name.Trim() != area.Name.Trim());
+                if (areaName != null)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = AreaErrorMessage.EXISTED;
+                }
+            }
+
+            if (validPrecondition)
             {
                 area.Name = model.Name;
                 area.RowCount = model.RowCount;
