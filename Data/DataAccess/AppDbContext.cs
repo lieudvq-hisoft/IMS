@@ -72,7 +72,8 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
             b.HasMany(e => e.Racks)
                 .WithOne(e => e.Area)
                 .HasForeignKey(ur => ur.AreaId)
-                .IsRequired();
+                .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Entity<Rack>(b =>
@@ -80,7 +81,8 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
             b.HasMany(e => e.Locations)
                 .WithOne(e => e.Rack)
                 .HasForeignKey(ur => ur.RackId)
-                .IsRequired();
+                .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
         });
 
         builder.Seed();
