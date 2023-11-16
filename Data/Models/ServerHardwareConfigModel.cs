@@ -1,4 +1,6 @@
-﻿namespace Data.Models;
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace Data.Models;
 public class ServerHardwareConfigModel
 {
     public int Id { get; set; }
@@ -12,18 +14,41 @@ public class ServerHardwareConfigModel
 
 public class ServerHardwareConfigCreateModel
 {
+    [Required]
     public string Description { get; set; }
+
+    [Required]
+    [GreaterThanZero]
     public int Capacity { get; set; }
+
+    [Required]
+    [GreaterThanZero]
     public int ServerAllocationId { get; set; }
+
+    [Required]
+    [GreaterThanZero]
     public int ComponentId { get; set; }
 }
 
 public class ServerHardwareConfigUpdateModel
 {
+    [Required]
+    [GreaterThanZero]
     public int Id { get; set; }
+
+    [Required]
     public string Description { get; set; }
+
+    [Required]
+    [GreaterThanZero]
     public int Capacity { get; set; }
+
+    [Required]
+    [GreaterThanZero]
     public int ServerAllocationId { get; set; }
+
+    [Required]
+    [GreaterThanZero]
     public int ComponentId { get; set; }
 }
 

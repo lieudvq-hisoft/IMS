@@ -100,6 +100,14 @@ public class ServerAllocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/Appointment")]
+    public async Task<ActionResult> GetAppointment([FromRoute] int id)
+    {
+        var result = await _serverAllocationService.GetAppointment(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     //[HttpPost("Bulk")]
     //[Authorize(Roles = nameof(RoleType.Sale))]
     //[SwaggerOperation(Summary = "[Sale]: Create user, customer and request base on import excel.")]

@@ -21,6 +21,7 @@ public interface IAppointmentService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> GetAll();
     Task<ResultModel> GetRequestUpgradeAppointment(int id);
+    Task<ResultModel> GetRequestUpgrade(int id);
     Task<ResultModel> Create(AppointmentCreateModel model);
     Task<ResultModel> Update(AppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
@@ -45,12 +46,10 @@ public class AppointmentService : IAppointmentService
         try
         {
             var appointments = _dbContext.Appointments
-                .Where(x 
-                => 
-                //searchModel.DateAppointed != null ? x.DateAppointed == searchModel.DateAppointed : true || 
-                //searchModel.Status != null ? x.Status == searchModel.Status : true ||
-                //searchModel.ServerAllocationId != null ? x.ServerAllocationId == searchModel.ServerAllocationId : true ||
-                searchModel.Id != null ? x.Id == searchModel.Id : true)
+                .Where(delegate (Appointment x)
+                {
+                    return FilterAppointment(x, searchModel);
+                })
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, appointments.Count());
@@ -68,6 +67,15 @@ public class AppointmentService : IAppointmentService
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
         return result;
+    }
+
+    private bool FilterAppointment(Appointment x, AppointmentSearchModel model)
+    {
+        bool matchId = model.Id != null ? x.Id == model.Id : true;
+        bool matchStatus = model.Status != null ? x.Status == model.Status : true;
+        bool matchServerAllocationId = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
+
+        return matchId && matchStatus && matchServerAllocationId;
     }
 
     public async Task<ResultModel> GetAll()
@@ -104,6 +112,36 @@ public class AppointmentService : IAppointmentService
             {
                 result.Succeed = true;
                 result.Data = _mapper.Map<List<RequestUpgradeAppointmentModel>>(appointment.RequestUpgradeAppointment);
+            }
+            else
+            {
+                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                result.Succeed = false;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetRequestUpgrade(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var appointment = _dbContext.Appointments
+                .Include(x => x.RequestUpgradeAppointment)
+                .ThenInclude(x => x.RequestUpgrade)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (appointment != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<RequestUpgradeModel>>(appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade));
             }
             else
             {
