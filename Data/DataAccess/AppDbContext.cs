@@ -43,6 +43,16 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
+        builder.Entity<Appointment>(b =>
+        {
+            b.HasMany(e => e.RequestUpgradeAppointment)
+                .WithOne(e => e.Appointment)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.AppointmentUsers)
+                .WithOne(e => e.Appointment)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
         builder.Entity<Area>(b =>
         {
             b.HasMany(e => e.Racks)
@@ -82,6 +92,16 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
                 .OnDelete(DeleteBehavior.ClientCascade);
         });
 
+        builder.Entity<RequestUpgrade>(b =>
+        {
+            b.HasMany(e => e.RequestUpgradeAppointments)
+                .WithOne(e => e.RequestUpgrade)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestUpgradeAppointments)
+                .WithOne(e => e.RequestUpgrade)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
         builder.Entity<ServerAllocation>(b =>
         {
             b.HasMany(e => e.ServerHardwareConfigs)
@@ -104,6 +124,12 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
                 .IsRequired();
             b.HasIndex(e => e.Email).IsUnique();
             b.HasIndex(e => e.PhoneNumber).IsUnique();
+            b.HasMany(e => e.RequestUpgradeUsers)
+                .WithOne(e => e.User)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.AppointmentUsers)
+                .WithOne(e => e.User)
+                .OnDelete(DeleteBehavior.ClientCascade);
         });
 
         builder.Entity<Role>(b =>
@@ -113,7 +139,7 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
                 .WithOne(e => e.Role)
                 .HasForeignKey(ur => ur.RoleId)
                 .IsRequired();
-        }); 
+        });
 
         builder.Seed();
         builder.FilterSoftDeleted();
@@ -121,22 +147,26 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
     }
 
+    public DbSet<Appointment> Appointments { get; set; }
+    public DbSet<AppointmentUser> AppointmentUsers { get; set; }
     public DbSet<Area> Areas { get; set; }
     public DbSet<CompanyType> CompanyTypes { get; set; }
-    public DbSet<ServerHardwareConfig> ServerHardwareConfigs { get; set; }
     public DbSet<Component> Components { get; set; }
     public DbSet<Customer> Customers { get; set; }
-    public DbSet<RequestUpgrade> RequestUpgrades { get; set; }
-    //public DbSet<IpAddress> Ips { get; set; }
-    //public DbSet<IpAssignment> IpAssignments { get; set; }
     public DbSet<Location> Locations { get; set; }
     public DbSet<LocationAssignment> LocationAssignments { get; set; }
-    //public DbSet<IpSubnet> Networks { get; set; }
-    public DbSet<ServerAllocation> ServerAllocations { get; set; }
     public DbSet<Rack> Racks { get; set; }
+    public DbSet<RequestUpgrade> RequestUpgrades { get; set; }
+    public DbSet<RequestUpgradeAppointment> RequestUpgradeAppointments { get; set; }
+    public DbSet<RequestUpgradeUser> RequestUpgradeUsers { get; set; }
     public DbSet<Role> Role { get; set; }
-    //public DbSet<Request> Requests { get; set; }
-    //public DbSet<Service> Services { get; set; }
+    public DbSet<ServerAllocation> ServerAllocations { get; set; }
+    public DbSet<ServerHardwareConfig> ServerHardwareConfigs { get; set; }
     public DbSet<User> User { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
+    //public DbSet<IpAddress> Ips { get; set; }
+    //public DbSet<IpAssignment> IpAssignments { get; set; }
+    //public DbSet<IpSubnet> Networks { get; set; }
+    //public DbSet<Request> Requests { get; set; }
+    //public DbSet<Service> Services { get; set; }
 }

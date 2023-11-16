@@ -348,6 +348,8 @@ public static class ModelBuilderExtentions
 
     public static void FilterSoftDeleted(this ModelBuilder builder)
     {
+        builder.Entity<Appointment>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<AppointmentUser>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Area>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<CompanyType>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Component>().HasQueryFilter(x => !x.IsDeleted);
@@ -356,6 +358,8 @@ public static class ModelBuilderExtentions
         builder.Entity<LocationAssignment>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Rack>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestUpgrade>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<RequestUpgradeAppointment>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<RequestUpgradeUser>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Role>().HasQueryFilter(x => !x.isDeactive);
         builder.Entity<ServerAllocation>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<ServerHardwareConfig>().HasQueryFilter(x => !x.IsDeleted);

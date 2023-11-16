@@ -15,6 +15,6 @@ public class RequestUpgrade : BaseEntity
     public int ServerAllocationId { get; set; }
     public ServerAllocation ServerAllocation { get; set; }
 
-    public Guid? UserId { get; set; }
-    public User? User { get; set; }
+    public ICollection<RequestUpgradeAppointment> RequestUpgradeAppointments { get; set; }
+    public ICollection<RequestUpgradeUser> RequestUpgradeUsers { get; set; }
 }
