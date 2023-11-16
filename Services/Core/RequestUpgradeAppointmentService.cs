@@ -123,7 +123,7 @@ public class RequestUpgradeAppointmentService : IRequestUpgradeAppointmentServic
                     }
                     else if (requestUpgrade.ServerAllocationId != appoitment.ServerAllocationId)
                     {
-
+                        validPrecondition = false;
                     }
                 }
             }

@@ -234,7 +234,6 @@ public class ServerAllocationService : IServerAllocationService
                 validPrecondition = false;
                 result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
             }
-
             else
             {
                 var serverAllocation = _mapper.Map<ServerAllocation>(model);
