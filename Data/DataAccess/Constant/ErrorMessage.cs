@@ -28,6 +28,16 @@ public class ServerAllocationErrorMessage
     public const string DOWNLOAD_FILE_FROM_NON_ACCEPTED = "Only accepted server allocation have file";
 }
 
+public class AppointmentUserErrorMessage
+{
+    public const string NOT_EXISTED = "Appointment User " + ErrorMessage.NOT_EXISTED;
+}
+
+public class RequestUpgradeUserErrorMessage
+{
+    public const string NOT_EXISTED = "Request Upgrade User " + ErrorMessage.NOT_EXISTED;
+}
+
 public class AreaErrorMessage
 {
     public const string NOT_EXISTED = "Area " + ErrorMessage.NOT_EXISTED;

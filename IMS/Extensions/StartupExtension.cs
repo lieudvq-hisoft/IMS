@@ -66,6 +66,8 @@ public static class StartupExtension
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddScoped<IRequestUpgradeAppointmentService, RequestUpgradeAppointmentService>();
+        services.AddScoped<IRequestUpgradeUserService, RequestUpgradeUserService>();
+        services.AddScoped<IAppointmentUserService, AppointmentUserService>();
         //services.AddScoped<IIpService, IpService>();
 
 
