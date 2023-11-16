@@ -13,6 +13,7 @@ namespace Services.Core;
 public interface IRequestUpgradeService
 {
     Task<ResultModel> Get(PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
+    Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
     Task<ResultModel> Initiate(RequestUpgradeCreateModel model);
     Task<ResultModel> Delete(int requestUpgradeId);
@@ -75,6 +76,32 @@ public class RequestUpgradeService : IRequestUpgradeService
         bool matchServerAllocationId = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
 
         return matchId && matchComponentId && matchServerAllocationId;
+    }
+
+    public async Task<ResultModel> GetDetail(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestUpgrade = _dbContext.RequestUpgrades
+                .FirstOrDefault(x => x.Id == id);
+            if (requestUpgrade == null)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                result.Data = _mapper.Map<RequestUpgrade>(requestUpgrade);
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
     }
 
     public async Task<ResultModel> Create(RequestUpgradeCreateModel model)

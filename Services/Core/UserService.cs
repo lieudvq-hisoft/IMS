@@ -27,6 +27,7 @@ public interface IUserService
     Task<ResultModel> UpdateAccountInfo(UserUpdateModel model);
     Task<ResultModel> Delete(Guid id);
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, UserSearchModel searchModel);
+    Task<ResultModel> GetDetail(string id);
 }
 public class UserService : IUserService
 {
@@ -371,5 +372,31 @@ public class UserService : IUserService
         return MyFunction
             .ConvertToUnSign(value ?? "")
             .IndexOf(MyFunction.ConvertToUnSign(searchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
+    }
+
+    public async Task<ResultModel> GetDetail(string id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var user = _dbContext.User
+                .FirstOrDefault(x => x.Id == new Guid(id));
+            if (user == null)
+            {
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                result.Data = _mapper.Map<UserModel>(user);
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
     }
 }

@@ -65,4 +65,12 @@ public class UserController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult> GetDetail(string id)
+    {
+        var result = await _userService.GetDetail(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }

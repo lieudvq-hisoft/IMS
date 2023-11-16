@@ -31,6 +31,14 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult> GetDetail(int id)
+    {
+        var result = await _requestUpgradeService.GetDetail(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost]
     [SwaggerOperation(Summary = "Create new request upgrade, state is waiting")]
     public async Task<ActionResult> Create([FromBody] RequestUpgradeCreateModel model)
