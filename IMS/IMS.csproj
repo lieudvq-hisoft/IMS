@@ -38,8 +38,4 @@
     <ProjectReference Include="..\Services\Services.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="wwwroot\RequestUpgrade\" />
-  </ItemGroup>
-
 </Project>

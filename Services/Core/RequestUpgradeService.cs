@@ -191,7 +191,6 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 _mapper.Map<RequestUpgradeUpdateModel, RequestUpgrade>(model, requestUpgrade);
 
-                _dbContext.RequestUpgrades.Add(requestUpgrade);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
