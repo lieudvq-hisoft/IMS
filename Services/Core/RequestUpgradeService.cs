@@ -457,10 +457,6 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
             }
-            else if (requestUpgrade.Status != RequestStatus.Accepted)
-            {
-                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_ACCEPTED;
-            }
             else if (requestUpgrade.InspectionReportFilePath == null)
             {
                 result.ErrorMessage = ErrorMessage.FILE_NOT_EXISTED;
