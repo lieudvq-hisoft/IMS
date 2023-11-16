@@ -52,6 +52,8 @@ public class MapperProfile : Profile
         #endregion
 
         #region Appointment
+        CreateMap<RequestUpgradeAppointmentUpdateModel, RequestUpgradeAppointment>();
+        CreateMap<RequestUpgradeAppointmentCreateModel, RequestUpgradeAppointment>();
         CreateMap<RequestUpgradeAppointment, RequestUpgradeAppointmentModel>();
         CreateMap<Appointment, AppointmentModel>();
         CreateMap<AppointmentCreateModel, Appointment>();

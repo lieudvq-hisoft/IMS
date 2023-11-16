@@ -168,7 +168,7 @@ public class AppointmentService : IAppointmentService
             var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
             if (serverAllocation == null)
             {
-                result.ErrorMessage = AppointmentErrorMessgae.SERVER_ALLOCATION_NOT_EXISTED;
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
             {
@@ -208,7 +208,7 @@ public class AppointmentService : IAppointmentService
                 if (serverAllocation == null)
                 {
                     validPrecondition = false;
-                    result.ErrorMessage = AppointmentErrorMessgae.SERVER_ALLOCATION_NOT_EXISTED;
+                    result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
                 }
             }
 
@@ -217,7 +217,7 @@ public class AppointmentService : IAppointmentService
                 _mapper.Map<AppointmentUpdateModel, Appointment>(model, appointment);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<AreaModel>(appointment);
+                result.Data = _mapper.Map<AppointmentModel>(appointment);
             }
         }
         catch (Exception e)

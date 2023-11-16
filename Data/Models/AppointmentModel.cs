@@ -42,6 +42,7 @@ public class AppointmentUpdateModel
     public string Reason { get; set; }
 
     [Required]
+    [GreaterThanZero]
     public int ServerAllocationId { get; set; }
 }
 
