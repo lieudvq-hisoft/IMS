@@ -65,4 +65,20 @@ public class ComponentController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpGet("{id}/ServerHardwareConfig")]
+    public async Task<ActionResult> GetServerHardwareConfig(int id)
+    {
+        var result = await _componentService.GetServerHardwareConfig(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}/RequestUpgrade")]
+    public async Task<ActionResult> GetRequestUpgrade(int id)
+    {
+        var result = await _componentService.GetRequestUpgrade(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }
