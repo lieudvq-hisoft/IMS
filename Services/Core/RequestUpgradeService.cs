@@ -20,7 +20,6 @@ public interface IRequestUpgradeService
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
     Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, string userId);
     Task<ResultModel> Reject(int requestUpgradeId);
-    Task<ResultModel> CheckAppointmentSucceeded(int requestUpgradeId);
     Task<ResultModel> CheckCompletability(int requestUpgradeId);
     Task<ResultModel> Complete(int requestUpgradeId);
     Task<ResultModel> GetInspectionReport(int requestUpgradeId);
@@ -351,35 +350,6 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> CheckAppointmentSucceeded(int requestUpgradeId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            result.Data = AppointmentSucceeded(requestUpgradeId);
-            result.Succeed = true;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
-
-    private bool AppointmentSucceeded(int requestUpgradeId)
-    {
-        var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment).FirstOrDefault(x => x.Id == requestUpgradeId);
-        if (requestUpgrade == null)
-        {
-            return false;
-        }
-
-        return requestUpgrade.RequestUpgradeAppointments.Any(x => x.Appointment.Status == RequestStatus.Success);
-    }
-
     public async Task<ResultModel> CheckCompletability(int requestUpgradeId)
     {
         var result = new ResultModel();
@@ -406,8 +376,9 @@ public class RequestUpgradeService : IRequestUpgradeService
             return false;
         }
 
+        bool appointmentSucceeded = requestUpgrade.RequestUpgradeAppointments.Any(x => x.Appointment.Status == RequestStatus.Success);
         bool haveInspectionFile = requestUpgrade.InspectionReportFilePath != null;
-        return AppointmentSucceeded(requestUpgradeId) && haveInspectionFile;
+        return appointmentSucceeded && haveInspectionFile;
     }
 
     public async Task<ResultModel> Complete(int requestUpgradeId)
@@ -519,10 +490,6 @@ public class RequestUpgradeService : IRequestUpgradeService
             else if (requestUpgrade.Status != RequestStatus.Accepted)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_ACCEPTED;
-            }
-            else if (!AppointmentSucceeded(requestUpgradeId))
-            {
-                result.ErrorMessage = RequestUpgradeErrorMessage.APPOINTMENT_NOT_COMPLETE;
             }
             else
             {

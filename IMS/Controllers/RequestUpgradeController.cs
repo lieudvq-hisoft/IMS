@@ -100,15 +100,6 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("{id}/AppointmentSucceeded")]
-    [SwaggerOperation(Summary = "True if any appointment success")]
-    public async Task<ActionResult> GetAppointmentSucceeded(int id)
-    {
-        var result = await _requestUpgradeService.CheckAppointmentSucceeded(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
     [HttpGet("{id}/Completability")]
     [SwaggerOperation(Summary = "True if any appointment success and have inspection record")]
     public async Task<ActionResult> GetCompletability(int id)

@@ -7,6 +7,7 @@ using Data.Entities;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
+using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
 using System;
 using System.Collections.Generic;
@@ -20,7 +21,7 @@ public interface IRequestUpgradeAppointmentService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestUpgradeAppointmentSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(RequestUpgradeAppointmentCreateModel model);
-    Task<ResultModel> Update(RequestUpgradeAppointmentUpdateModel model);
+    //Task<ResultModel> Update(RequestUpgradeAppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
 }
 
@@ -98,7 +99,7 @@ public class RequestUpgradeAppointmentService : IRequestUpgradeAppointmentServic
 
         try
         {
-            var existedRequestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.FirstOrDefault(x => x.AppointmentId == model.AppointmentId && x.RequestUpgradeId == model.RequestUpgradeId);
+            var existedRequestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == model.AppointmentId && x.RequestUpgradeId == model.RequestUpgradeId && x.Appointment.Status == RequestStatus.Waiting);
             if (existedRequestUpgradeAppointment != null)
             {
                 validPrecondition = false;
@@ -106,22 +107,28 @@ public class RequestUpgradeAppointmentService : IRequestUpgradeAppointmentServic
             }
             else
             {
-                var appoitment = _dbContext.Appointments.FirstOrDefault(x => x.Id == model.AppointmentId);
+                var appoitment = _dbContext.Appointments.FirstOrDefault(x => x.Id == model.AppointmentId && x.Status == RequestStatus.Waiting);
                 if (appoitment == null)
                 {
                     validPrecondition = false;
                     result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
                 }
-
-                var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == model.RequestUpgradeId);
-                if (requestUpgrade == null)
+                else
                 {
-                    validPrecondition = false;
-                    result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+                    var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == model.RequestUpgradeId);
+                    if (requestUpgrade == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+                    }
+                    else if (requestUpgrade.ServerAllocationId != appoitment.ServerAllocationId)
+                    {
+
+                    }
                 }
             }
-            
-            if(validPrecondition)
+
+            if (validPrecondition)
             {
                 var requestUpgradeAppointment = _mapper.Map<RequestUpgradeAppointment>(model);
                 _dbContext.RequestUpgradeAppointments.Add(requestUpgradeAppointment);
@@ -139,61 +146,61 @@ public class RequestUpgradeAppointmentService : IRequestUpgradeAppointmentServic
         return result;
     }
 
-    public async Task<ResultModel> Update(RequestUpgradeAppointmentUpdateModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-        bool validPrecondition = true;
+    //public async Task<ResultModel> Update(RequestUpgradeAppointmentUpdateModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+    //    bool validPrecondition = true;
 
-        try
-        {
-            var requestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.FirstOrDefault(x => x.Id == model.Id);
-            if (requestUpgradeAppointment == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = RequestUpgradeAppointmentErrorMessgae.NOT_EXISTED;
-            }
-            else
-            {
-                var existedRequestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.FirstOrDefault(x => x.AppointmentId == model.AppointmentId && x.RequestUpgradeId == model.RequestUpgradeId && x.Id != model.Id);
-                if (existedRequestUpgradeAppointment != null)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = RequestUpgradeAppointmentErrorMessgae.EXISTED;
-                }
-                else
-                {
-                    var appoitment = _dbContext.Appointments.FirstOrDefault(x => x.Id == model.AppointmentId);
-                    if (appoitment == null)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
-                    }
+    //    try
+    //    {
+    //        var requestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.FirstOrDefault(x => x.Id == model.Id);
+    //        if (requestUpgradeAppointment == null)
+    //        {
+    //            validPrecondition = false;
+    //            result.ErrorMessage = RequestUpgradeAppointmentErrorMessgae.NOT_EXISTED;
+    //        }
+    //        else
+    //        {
+    //            var existedRequestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.FirstOrDefault(x => x.AppointmentId == model.AppointmentId && x.RequestUpgradeId == model.RequestUpgradeId && x.Id != model.Id);
+    //            if (existedRequestUpgradeAppointment != null)
+    //            {
+    //                validPrecondition = false;
+    //                result.ErrorMessage = RequestUpgradeAppointmentErrorMessgae.EXISTED;
+    //            }
+    //            else
+    //            {
+    //                var appoitment = _dbContext.Appointments.FirstOrDefault(x => x.Id == model.AppointmentId);
+    //                if (appoitment == null)
+    //                {
+    //                    validPrecondition = false;
+    //                    result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+    //                }
 
-                    var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == model.RequestUpgradeId);
-                    if (requestUpgrade == null)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
-                    }
-                }
-            }
+    //                var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == model.RequestUpgradeId);
+    //                if (requestUpgrade == null)
+    //                {
+    //                    validPrecondition = false;
+    //                    result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+    //                }
+    //            }
+    //        }
 
-            if (validPrecondition)
-            {
-                _mapper.Map<RequestUpgradeAppointmentUpdateModel, RequestUpgradeAppointment>(model, requestUpgradeAppointment);
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = _mapper.Map<RequestUpgradeAppointmentModel>(requestUpgradeAppointment);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //        if (validPrecondition)
+    //        {
+    //            _mapper.Map<RequestUpgradeAppointmentUpdateModel, RequestUpgradeAppointment>(model, requestUpgradeAppointment);
+    //            _dbContext.SaveChanges();
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<RequestUpgradeAppointmentModel>(requestUpgradeAppointment);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> Delete(int id)
     {

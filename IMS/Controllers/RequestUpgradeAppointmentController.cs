@@ -43,14 +43,6 @@ public class RequestUpgradeAppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPut]
-    public async Task<ActionResult> Update([FromBody] RequestUpgradeAppointmentUpdateModel model)
-    {
-        var result = await _RequestUpgradeAppointmentService.Update(model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
