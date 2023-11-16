@@ -51,6 +51,8 @@ public class MapperProfile : Profile
         CreateMap<User, UserModel>();
         CreateMap<AppointmentUser, AppointmentUserModel>();
         CreateMap<RequestUpgradeUser, RequestUpgradeUserModel>();
+        CreateMap<RequestExpandUser, RequestExpandUserModel>();
+
         #endregion
 
         #region Appointment
@@ -60,6 +62,13 @@ public class MapperProfile : Profile
         CreateMap<Appointment, AppointmentModel>();
         CreateMap<AppointmentCreateModel, Appointment>();
         CreateMap<AppointmentUpdateModel, Appointment>();
+        #endregion
+
+        #region RequestExpand
+        CreateMap<RequestExpand, RequestExpandModel>();
+        CreateMap<RequestExpandCreateModel, RequestExpand>();
+        CreateMap<RequestExpandLocation, RequestExpandLocationModel>();
+        CreateMap<RequestExpandLocationCreateModel, RequestExpandLocation>();
         #endregion
     }
 }
