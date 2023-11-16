@@ -179,9 +179,9 @@ public static class StartupExtension
         {
             c.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "OnlineMarketplaceSystem",
+                Title = "IMS",
                 Version = "v1.1.k8s",
-                Description = "Online Marketplace System",
+                Description = "Information Management System API",
             });
             c.UseInlineDefinitionsForEnums();
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme

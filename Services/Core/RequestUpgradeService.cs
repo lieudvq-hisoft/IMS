@@ -267,7 +267,7 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            if (status != RequestStatus.Accepted || status != RequestStatus.Denied)
+            if (status != RequestStatus.Accepted && status != RequestStatus.Denied)
             {
                 throw new Exception(ErrorMessage.WRONG_PURPOSE);
             }
