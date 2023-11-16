@@ -404,27 +404,31 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
             }
 
-            ServerHardwareConfig serverHardwareConfig = null;
-            if (validPrecondition)
-            {
-                serverHardwareConfig = requestUpgrade.ServerAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId);
-                if (serverHardwareConfig == null)
-                {
-                    result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
-                    validPrecondition = true;
-                }
-            }
+            ServerHardwareConfig serverHardwareConfig = requestUpgrade.ServerAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId);
 
             if (validPrecondition)
             {
-                if (requestUpgrade.Component.Type == ComponentType.Change)
+                if (serverHardwareConfig == null)
                 {
-                    serverHardwareConfig.Description = requestUpgrade.Description;
-                    serverHardwareConfig.Capacity = requestUpgrade.Capacity;
+                    _dbContext.ServerHardwareConfigs.Add(new ServerHardwareConfig
+                    {
+                        Description = requestUpgrade.Description,
+                        Capacity = requestUpgrade.Capacity,
+                        ServerAllocationId = requestUpgrade.ServerAllocationId,
+                        ComponentId = requestUpgrade.ComponentId,
+                    });
                 }
                 else
                 {
-                    serverHardwareConfig.Capacity += requestUpgrade.Capacity;
+                    if (requestUpgrade.Component.Type == ComponentType.Change)
+                    {
+                        serverHardwareConfig.Description = requestUpgrade.Description;
+                        serverHardwareConfig.Capacity = requestUpgrade.Capacity;
+                    }
+                    else
+                    {
+                        serverHardwareConfig.Capacity += requestUpgrade.Capacity;
+                    }
                 }
                 requestUpgrade.Status = RequestStatus.Success;
 
