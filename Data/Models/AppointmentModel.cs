@@ -25,12 +25,14 @@ public class AppointmentCreateModel
     [Required]
     public RequestStatus Status { get; set; }
     [Required]
+    [GreaterThanZero]
     public int ServerAllocationId { get; set; }
 }
 
 public class AppointmentUpdateModel
 {
     [Required]
+    [GreaterThanZero]
     public int Id { get; set; }
     [Required]
     public DateTime DateAppointed { get; set; }
@@ -39,14 +41,12 @@ public class AppointmentUpdateModel
     [Required]
     public RequestStatus Status { get; set; }
     [Required]
+    [GreaterThanZero]
     public int ServerAllocationId { get; set; }
 }
 
 public class AppointmentSearchModel
 {
     public int? Id { get; set; } = null;
-    public DateTime? DateAppointed { get; set; }= null;
-    public RequestStatus? Status { get; set; } = null;
-public int? ServerAllocationId { get; set; } = null;
 }
 

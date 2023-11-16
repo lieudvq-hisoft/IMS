@@ -65,6 +65,7 @@ public static class StartupExtension
         services.AddScoped<IServerHardwareConfigService, ServerHardwareConfigService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAppointmentService, AppointmentService>();
+        services.AddScoped<IRequestUpgradeAppointmentService, RequestUpgradeAppointmentService>();
         //services.AddScoped<IIpService, IpService>();
 
 
