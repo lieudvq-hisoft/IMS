@@ -46,10 +46,11 @@ public class AppointmentService : IAppointmentService
         {
             var appointments = _dbContext.Appointments
                 .Where(x 
-                => searchModel.DateAppointed != null ? x.DateAppointed == searchModel.DateAppointed : true
-                || searchModel.Status != null ? x.Status == searchModel.Status : true
-                || searchModel.ServerAllocationId != null ? x.ServerAllocationId == searchModel.ServerAllocationId : true
-                || searchModel.Id != null ? x.Id == searchModel.Id : true)
+                => 
+                //searchModel.DateAppointed != null ? x.DateAppointed == searchModel.DateAppointed : true || 
+                //searchModel.Status != null ? x.Status == searchModel.Status : true ||
+                //searchModel.ServerAllocationId != null ? x.ServerAllocationId == searchModel.ServerAllocationId : true ||
+                searchModel.Id != null ? x.Id == searchModel.Id : true)
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, appointments.Count());
@@ -124,7 +125,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var serverAllocation = _dbContext.Appointments.FirstOrDefault(x => x.ServerAllocationId == model.ServerAllocationId);
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = AppointmentErrorMessgae.SERVER_ALLOCATION_NOT_EXISTED;
@@ -162,7 +163,7 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
-                var serverAllocation = _dbContext.Appointments.FirstOrDefault(x => x.ServerAllocationId == model.ServerAllocationId);
+                var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
                 if (serverAllocation == null)
                 {
                     result.ErrorMessage = AppointmentErrorMessgae.SERVER_ALLOCATION_NOT_EXISTED;

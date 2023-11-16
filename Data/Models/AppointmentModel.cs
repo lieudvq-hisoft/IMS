@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 namespace Data.Models;
 public class AppointmentModel
 {
+    public int Id { get; set; }
     public DateTime DateAppointed { get; set; }
     public string Reason { get; set; }
     public RequestStatus Status { get; set; }

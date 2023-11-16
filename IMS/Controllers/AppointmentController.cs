@@ -27,7 +27,7 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("[resource]/All")]
+    [HttpGet("Appointment/All")]
     public async Task<ActionResult> Get()
     {
         var result = await _AppointmentService.GetAll();
