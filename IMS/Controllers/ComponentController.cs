@@ -26,6 +26,14 @@ public class ComponentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("All")]
+    public async Task<ActionResult> GetAll()
+    {
+        var result = await _componentService.GetAll();
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] ComponentCreateModel model)
     {

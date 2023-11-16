@@ -54,26 +54,18 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPut("{id}/Complete")]
-    public async Task<ActionResult> Complete(int id)
-    {
-        var result = await _requestUpgradeService.Complete(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
     [HttpPut("{id}/Accept")]
-    public async Task<ActionResult> Accept(int id)
+    public async Task<ActionResult> Accept(int id, [FromBody] Guid userId)
     {
-        var result = await _requestUpgradeService.ChangeStatus(id, RequestStatus.Accepted);
+        var result = await _requestUpgradeService.Evaluate(id, RequestStatus.Accepted, userId);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpPut("{id}/Deny")]
-    public async Task<ActionResult> Deny(int id)
+    public async Task<ActionResult> Deny(int id, [FromBody] Guid userId)
     {
-        var result = await _requestUpgradeService.ChangeStatus(id, RequestStatus.Denied);
+        var result = await _requestUpgradeService.Evaluate(id, RequestStatus.Denied, userId);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -81,7 +73,23 @@ public class RequestUpgradeController : ControllerBase
     [HttpPut("{id}/Reject")]
     public async Task<ActionResult> Reject(int id)
     {
-        var result = await _requestUpgradeService.ChangeStatus(id, RequestStatus.Failed);
+        var result = await _requestUpgradeService.Reject(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}/Completability")]
+    public async Task<ActionResult> GetCompletability(int id)
+    {
+        var result = await _requestUpgradeService.CheckCompletability(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("{id}/Complete")]
+    public async Task<ActionResult> Complete(int id)
+    {
+        var result = await _requestUpgradeService.Complete(id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

@@ -16,7 +16,9 @@ public interface IRequestUpgradeService
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
     Task<ResultModel> Delete(int requestUpgradeId);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
-    Task<ResultModel> ChangeStatus(int requestUpgradeId, RequestStatus status);
+    Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, Guid userId);
+    Task<ResultModel> Reject(int requestUpgradeId);
+    Task<ResultModel> CheckCompletability(int requestUpgradeId);
     Task<ResultModel> Complete(int requestUpgradeId);
     Task<ResultModel> GetInspectionReport(int requestUpgradeId);
     Task<ResultModel> AssignInspectionReport(int requestUpgradeId, string fileName);
@@ -189,7 +191,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> ChangeStatus(int requestUpgradeId, RequestStatus status)
+    public async Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -197,41 +199,32 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var requestUpgrade = _dbContext.RequestUpgrades
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
-                .Include(x => x.Component).FirstOrDefault(x => x.Id == requestUpgradeId);
+            if (status != RequestStatus.Accepted || status != RequestStatus.Denied)
+            {
+                throw new Exception(ErrorMessage.WRONG_PURPOSE);
+            }
+
+            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
 
-            if (validPrecondition)
+            if (validPrecondition && requestUpgrade.Status != RequestStatus.Waiting)
             {
-                switch (status)
-                {
-                    case RequestStatus.Denied:
-                    case RequestStatus.Accepted:
-                        if (requestUpgrade.Status != RequestStatus.Waiting)
-                        {
-                            result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING;
-                            validPrecondition = false;
-                        }
-                        break;
-                    case RequestStatus.Failed:
-                        if (requestUpgrade.Status != RequestStatus.Accepted)
-                        {
-                            result.ErrorMessage = RequestUpgradeErrorMessage.NOT_ACCEPTED;
-                            validPrecondition = false;
-                        }
-                        break;
-                }
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING;
+                validPrecondition = false;
             }
 
             if (validPrecondition)
             {
                 requestUpgrade.Status = status;
-
+                _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
+                {
+                    RequestUpgradeId = requestUpgrade.Id,
+                    UserId = userId
+                });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
@@ -243,6 +236,74 @@ public class RequestUpgradeService : IRequestUpgradeService
         }
 
         return result;
+    }
+
+    public async Task<ResultModel> Reject(int requestUpgradeId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
+            if (requestUpgrade == null)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+
+            if (validPrecondition && requestUpgrade.Status != RequestStatus.Accepted)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_ACCEPTED;
+                validPrecondition = false;
+            }
+
+            if (validPrecondition)
+            {
+                requestUpgrade.Status = RequestStatus.Failed;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> CheckCompletability(int requestUpgradeId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            result.Data = IsCompletable(requestUpgradeId);
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    private bool IsCompletable(int requestUpgradeId)
+    {
+        var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment).FirstOrDefault(x => x.Id == requestUpgradeId);
+        if (requestUpgrade == null)
+        {
+            return false;
+        }
+
+        bool appointmentSucceeded = requestUpgrade.RequestUpgradeAppointments.Any(x => x.Appointment.Status == RequestStatus.Success);
+        bool haveInspectionFile = requestUpgrade.InspectionReportFilePath != null;
+        return appointmentSucceeded && haveInspectionFile;
     }
 
     public async Task<ResultModel> Complete(int requestUpgradeId)
@@ -259,6 +320,12 @@ public class RequestUpgradeService : IRequestUpgradeService
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+
+            if (!IsCompletable(requestUpgradeId))
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_COMPLETABLE;
                 validPrecondition = false;
             }
 
