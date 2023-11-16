@@ -18,4 +18,5 @@ public class User : IdentityUser<Guid>
 
     public ICollection<RequestUpgradeUser> RequestUpgradeUsers { get; set; }
     public ICollection<AppointmentUser> AppointmentUsers { get; set; }
+    public ICollection<RequestExpandUser> RequestExpandUsers { get; set; }
 }

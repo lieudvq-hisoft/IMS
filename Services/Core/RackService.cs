@@ -101,10 +101,42 @@ public class RackService : IRackService
 
         try
         {
-            var racks = _dbContext.Racks.Include(x => x.Locations).Where(x => x.AreaId == id);
+            var rack = _dbContext.Racks.Include(x => x.Locations).FirstOrDefault(x => x.Id == id);
+            if (rack == null)
+            {
+                result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                result.Data = _mapper.Map<List<LocationModel>>(rack.Locations);
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
 
-            result.Data = _mapper.ProjectTo<List<RackModel>>(racks).ToList();
-            result.Succeed = true;
+    public async Task<ResultModel> GetServerAllocation(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var rack = _dbContext.Racks.Include(x => x.Locations).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).FirstOrDefault(x => x.Id == id);
+            if (rack == null)
+            {
+                result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var serverAllocations = rack.Locations.Where(x => x.LocationAssignments.Any()).Select(x => x.LocationAssignments.FirstOrDefault()).Select(x => x.ServerAllocation);
+                result.Data = _mapper.Map<List<ServerAllocation>>(serverAllocations);
+                result.Succeed = true;
+            }
         }
         catch (Exception e)
         {
