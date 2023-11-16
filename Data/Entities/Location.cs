@@ -9,4 +9,5 @@ public class Location
     public Rack Rack { get; set; }
 
     public ICollection<LocationAssignment> LocationAssignments { get; set; }
+    public ICollection<RequestExpandLocation> RequestExpandLocations { get; set; }
 }

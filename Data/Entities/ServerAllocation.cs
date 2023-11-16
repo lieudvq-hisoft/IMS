@@ -5,6 +5,7 @@ public class ServerAllocation : BaseEntity
 {
     public ServerAllocationStatus Status { get; set; }
     public int ExpectedSize { get; set; }
+    public int Power { get; set; }
     public string? Note { get; set; }
     public string? TechNote { get; set; }
     public string? SaleNote { get; set; }
@@ -18,4 +19,5 @@ public class ServerAllocation : BaseEntity
     public ICollection<RequestUpgrade> RequestUpgrades { get; set; }
     public ICollection<LocationAssignment> LocationAssignments { get; set; }
     public ICollection<Appointment> Appointments { get; set; }
+    public ICollection<RequestExpand> RequestExpands { get; set; }
 }

@@ -83,12 +83,25 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
             b.HasMany(e => e.LocationAssignments)
                 .WithOne(e => e.Location)
                 .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestExpandLocations)
+                .WithOne(e => e.Location)
+                .OnDelete(DeleteBehavior.ClientCascade);
         });
 
         builder.Entity<Rack>(b =>
         {
             b.HasMany(e => e.Locations)
                 .WithOne(e => e.Rack)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<RequestExpand>(b =>
+        {
+            b.HasMany(e => e.RequestExpandLocations)
+                .WithOne(e => e.RequestExpand)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestExpandUsers)
+                .WithOne(e => e.RequestExpand)
                 .OnDelete(DeleteBehavior.ClientCascade);
         });
 
@@ -116,6 +129,9 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
             b.HasMany(e => e.Appointments)
                 .WithOne(e => e.ServerAllocation)
                 .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestExpands)
+               .WithOne(e => e.ServerAllocation)
+               .OnDelete(DeleteBehavior.ClientCascade);
         });
 
         builder.Entity<User>(b =>
@@ -131,6 +147,9 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
                 .WithOne(e => e.User)
                 .OnDelete(DeleteBehavior.ClientCascade);
             b.HasMany(e => e.AppointmentUsers)
+                .WithOne(e => e.User)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestExpandUsers)
                 .WithOne(e => e.User)
                 .OnDelete(DeleteBehavior.ClientCascade);
         });
@@ -159,6 +178,9 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<Location> Locations { get; set; }
     public DbSet<LocationAssignment> LocationAssignments { get; set; }
     public DbSet<Rack> Racks { get; set; }
+    public DbSet<RequestExpand> RequestExpands { get; set; }
+    public DbSet<RequestExpandLocation> RequestExpandLocations { get; set; }
+    public DbSet<RequestExpandUser> RequestExpandUsers { get; set; }
     public DbSet<RequestUpgrade> RequestUpgrades { get; set; }
     public DbSet<RequestUpgradeAppointment> RequestUpgradeAppointments { get; set; }
     public DbSet<RequestUpgradeUser> RequestUpgradeUsers { get; set; }
