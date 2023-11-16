@@ -237,14 +237,8 @@ public class ServerAllocationService : IServerAllocationService
 
             else
             {
-                var serverAllocation = new ServerAllocation
-                {
-                    Status = ServerAllocationStatus.Incomplete,
-                    ExpectedSize = model.ExpectedSize,
-                    Note = model.Note,
-                    CustomerId = customerId,
-                    DateCreated = DateTime.Now,
-                };
+                var serverAllocation = _mapper.Map<ServerAllocation>(model);
+                serverAllocation.Status = ServerAllocationStatus.Incomplete;
 
                 _dbContext.ServerAllocations.Add(serverAllocation);
                 _dbContext.SaveChanges();

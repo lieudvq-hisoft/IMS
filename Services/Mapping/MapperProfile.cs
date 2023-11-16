@@ -30,6 +30,7 @@ public class MapperProfile : Profile
 
         #region ServerAllocationModel
         CreateMap<ServerAllocation, ServerAllocationModel>();
+        CreateMap<ServerAllocationCreateModel, ServerAllocation>();
         #endregion
 
         #region Location
