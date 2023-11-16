@@ -94,6 +94,8 @@ public class AppointmentErrorMessgae
 {
     public const string NOT_EXISTED = "Appointment " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Appointment " + ErrorMessage.EXISTED;
+    public const string SERVER_ALLOCATION_NOT_EXISTED = "Server allocation " + ErrorMessage.NOT_EXISTED;
+
 }
 
 public class ServiceErrorMessage
