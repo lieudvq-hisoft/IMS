@@ -113,6 +113,9 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
             b.HasMany(e => e.LocationAssignments)
                 .WithOne(e => e.ServerAllocation)
                 .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.Appointments)
+                .WithOne(e => e.ServerAllocation)
+                .OnDelete(DeleteBehavior.ClientCascade);
         });
 
         builder.Entity<User>(b =>
