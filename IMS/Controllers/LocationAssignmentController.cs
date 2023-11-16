@@ -27,6 +27,14 @@ public class LocationAssignmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}")]
+    public async Task<ActionResult> GetDetail(int id)
+    {
+        var result = await _LocationAssignmentService.GetDetail(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] LocationAssignmentCreateModel model)
     {

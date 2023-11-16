@@ -12,6 +12,7 @@ namespace Services.Core;
 public interface ILocationAssignmentService
 {
     Task<ResultModel> Get(PagingParam<LocationAssignmentSortingCriteria> paginationModel, LocationAssignmentSearchModel searchModel);
+    Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(LocationAssignmentCreateModel model);
     ////Task<ResultModel> Update(LocationUpdateModel model);
     Task<ResultModel> Delete(int id);
@@ -48,6 +49,33 @@ public class LocationAssignmentService : ILocationAssignmentService
 
             result.Data = paging;
             result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetDetail(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var locationAssignments = _dbContext.LocationAssignments.FirstOrDefault(x => x.Id == id);
+
+            if (locationAssignments != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<LocationAssignmentModel>(locationAssignments);
+            }
+            else
+            {
+                result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+                result.Succeed = false;
+            }
         }
         catch (Exception e)
         {

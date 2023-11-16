@@ -13,6 +13,7 @@ namespace Services.Core;
 public interface IServerHardwareConfigService
 {
     Task<ResultModel> Get(PagingParam<ServerHardwareConfigSortCriteria> paginationModel, ServerHardwareConfigSearchModel searchModel);
+    Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(ServerHardwareConfigCreateModel model);
     Task<ResultModel> Update(ServerHardwareConfigUpdateModel model);
     Task<ResultModel> Delete(int serverHardwareConfigId);
@@ -67,6 +68,33 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
         bool matchComponentId = model.ComponentId != null ? x.ComponentId == model.ComponentId : true;
 
         return matchId && matchServerAllocationId && matchComponentId;
+    }
+
+    public async Task<ResultModel> GetDetail(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault(x => x.Id == id);
+
+            if (serverHardwareConfig != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<ServerHardwareConfigModel>(serverHardwareConfig);
+            }
+            else
+            {
+                result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
+                result.Succeed = false;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
     }
 
     public async Task<ResultModel> Create(ServerHardwareConfigCreateModel model)

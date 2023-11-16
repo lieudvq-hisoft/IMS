@@ -20,6 +20,7 @@ public interface IAppointmentService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> GetAll();
+    Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetRequestUpgradeAppointment(int id);
     Task<ResultModel> GetRequestUpgrade(int id);
     Task<ResultModel> Create(AppointmentCreateModel model);
@@ -91,6 +92,33 @@ public class AppointmentService : IAppointmentService
 
             result.Data = _mapper.ProjectTo<AppointmentModel>(appointments).ToList();
             result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetDetail(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == id);
+
+            if (appointment != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<AppointmentModel>(appointment);
+            }
+            else
+            {
+                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                result.Succeed = false;
+            }
         }
         catch (Exception e)
         {

@@ -96,6 +96,25 @@ public class AppointmentErrorMessgae
     public const string EXISTED = "Appointment " + ErrorMessage.EXISTED;
 }
 
+public class LocationErrorMessgae
+{
+    public const string NOT_EXISTED = "Location " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Location " + ErrorMessage.EXISTED;
+}
+
+public class ComponentErrorMessgae
+{
+    public const string NOT_EXISTED = "Appointment " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Appointment " + ErrorMessage.EXISTED;
+}
+
+
+public class CompanyTypeErrorMessgae
+{
+    public const string NOT_EXISTED = "Company Type " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Company Type " + ErrorMessage.EXISTED;
+}
+
 public class RequestUpgradeAppointmentErrorMessgae
 {
     public const string NOT_EXISTED = "Request Upgrade Appointment " + ErrorMessage.NOT_EXISTED;

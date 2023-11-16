@@ -14,6 +14,7 @@ public interface IComponentService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ComponentSearchModel searchModel);
     Task<ResultModel> GetAll();
+    Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(ComponentCreateModel model);
     Task<ResultModel> Update(ComponentUpdateModel model);
     Task<ResultModel> Delete(int componentId);
@@ -72,6 +73,33 @@ public class ComponentService : IComponentService
 
             result.Data = _mapper.ProjectTo<ComponentModel>(components).ToList();
             result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetDetail(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var component = _dbContext.Components.FirstOrDefault(x => x.Id == id);
+
+            if (component != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<ComponentModel>(component);
+            }
+            else
+            {
+                result.ErrorMessage = ComponentErrorMessgae.NOT_EXISTED;
+                result.Succeed = false;
+            }
         }
         catch (Exception e)
         {

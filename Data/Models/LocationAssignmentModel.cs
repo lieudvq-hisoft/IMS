@@ -4,6 +4,7 @@ namespace Data.Models;
 
 public class LocationAssignmentModel
 {
+    public int Id { get; set; }
     public int ServerAllocationId { get; set; }
     public int LocationId { get; set; }
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Data.Common.PaginationModel;
 using Data.DataAccess;
+using Data.DataAccess.Constant;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
@@ -10,6 +11,7 @@ namespace Services.Core;
 public interface ILocationService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, LocationSearchModel searchModel);
+    Task<ResultModel> GetDetail(int id);
 }
 
 public class LocationService : ILocationService
@@ -43,6 +45,33 @@ public class LocationService : ILocationService
 
             result.Data = paging;
             result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetDetail(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var location = _dbContext.Locations.FirstOrDefault(x => x.Id == id);
+
+            if (location != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<LocationModel>(location);
+            }
+            else
+            {
+                result.ErrorMessage = LocationErrorMessgae.NOT_EXISTED;
+                result.Succeed = false;
+            }
         }
         catch (Exception e)
         {

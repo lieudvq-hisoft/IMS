@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Data.DataAccess;
+using Data.DataAccess.Constant;
 using Data.Models;
 using Services.Utilities;
 
@@ -7,6 +8,7 @@ namespace Services.Core;
 public interface ICompanyTypeService
 {
     Task<ResultModel> Get();
+    Task<ResultModel> GetDetail(int id);
 }
 
 public class CompanyTypeService : ICompanyTypeService
@@ -37,6 +39,33 @@ public class CompanyTypeService : ICompanyTypeService
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 
+        return result;
+    }
+
+    public async Task<ResultModel> GetDetail(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var companyType = _dbContext.CompanyTypes.FirstOrDefault(x => x.Id == id);
+
+            if (companyType != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<CompanyTypeModel>(companyType);
+            }
+            else
+            {
+                result.ErrorMessage = CompanyTypeErrorMessgae.NOT_EXISTED;
+                result.Succeed = false;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
         return result;
     }
 }

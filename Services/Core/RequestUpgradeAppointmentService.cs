@@ -18,6 +18,7 @@ namespace Services.Core;
 public interface IRequestUpgradeAppointmentService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestUpgradeAppointmentSearchModel searchModel);
+    Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(RequestUpgradeAppointmentCreateModel model);
     Task<ResultModel> Update(RequestUpgradeAppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
@@ -54,6 +55,33 @@ public class RequestUpgradeAppointmentService : IRequestUpgradeAppointmentServic
 
             result.Data = paging;
             result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetDetail(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.FirstOrDefault(x => x.Id == id);
+
+            if (requestUpgradeAppointment != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestUpgradeAppointmentModel>(requestUpgradeAppointment);
+            }
+            else
+            {
+                result.ErrorMessage = RequestUpgradeAppointmentErrorMessgae.NOT_EXISTED;
+                result.Succeed = false;
+            }
         }
         catch (Exception e)
         {
