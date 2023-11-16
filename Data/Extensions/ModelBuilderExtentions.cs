@@ -112,7 +112,6 @@ public static class ModelBuilderExtentions
                 {
                     Id = (j - 1) * 8 + i,
                     MaxPower = 3000,
-                    CurrentPower = (j - 1) * 8 + i == 1 ? 200 : 0,
                     Column = i,
                     Row = j,
                     Size = 42,
@@ -129,7 +128,6 @@ public static class ModelBuilderExtentions
                 {
                     Id = 8 * 8 + (j - 1) * 8 + i,
                     MaxPower = 3500,
-                    CurrentPower = 0,
                     Column = i,
                     Row = j,
                     Size = 42,

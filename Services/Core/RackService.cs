@@ -127,19 +127,22 @@ public class RackService : IRackService
                 validPrecondition = false;
                 result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
             }
-
-            var existingRack = area.Racks.FirstOrDefault(x => x.Column == model.Column && x.Row == model.Row);
-            if (existingRack != null)
+            else
             {
-                validPrecondition = false;
-                result.ErrorMessage = RackErrorMessage.EXISTED;
+                var existingRack = area.Racks.FirstOrDefault(x => x.Column == model.Column && x.Row == model.Row);
+                if (existingRack != null)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = RackErrorMessage.EXISTED;
+                }
+
+                if (model.Column > area.ColumnCount || model.Row > area.ColumnCount)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = RackErrorMessage.POSITION_INVALID;
+                }
             }
 
-            if (model.Column > area.ColumnCount || model.Row > area.ColumnCount)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = RackErrorMessage.POSITION_INVALID;
-            }
 
             if (validPrecondition)
             {
