@@ -16,8 +16,8 @@ public class CompanyTypeController : ControllerBase
         _companyTypeService = companyTypeService;
     }
 
-    [SwaggerOperation(Summary = "Get all company type")]
     [HttpGet]
+    [SwaggerOperation(Summary = "Get all company type")]
     public async Task<ActionResult> Get()
     {
         var result = await _companyTypeService.Get();

@@ -14,6 +14,7 @@ public interface IRequestUpgradeService
 {
     Task<ResultModel> Get(PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
+    Task<ResultModel> Initiate(RequestUpgradeCreateModel model);
     Task<ResultModel> Delete(int requestUpgradeId);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
     Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, Guid userId);
@@ -101,6 +102,47 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 var requestUpgrade = _mapper.Map<RequestUpgrade>(model);
                 requestUpgrade.Status = RequestStatus.Waiting;
+
+                _dbContext.RequestUpgrades.Add(requestUpgrade);
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Initiate(RequestUpgradeCreateModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
+            if (component == null)
+            {
+                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
+            if (component == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+
+            if (validPrecondition)
+            {
+                var requestUpgrade = _mapper.Map<RequestUpgrade>(model);
+                requestUpgrade.Status = RequestStatus.Accepted;
 
                 _dbContext.RequestUpgrades.Add(requestUpgrade);
                 _dbContext.SaveChanges();

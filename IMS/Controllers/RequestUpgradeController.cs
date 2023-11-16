@@ -4,6 +4,7 @@ using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace IMS.Controllers;
 [Route("api/[controller]")]
@@ -31,9 +32,19 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPost]
+    [SwaggerOperation(Summary = "Create new request upgrade, state is waiting")]
     public async Task<ActionResult> Create([FromBody] RequestUpgradeCreateModel model)
     {
         var result = await _requestUpgradeService.Create(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPost("Initial")]
+    [SwaggerOperation(Summary = "Create inital request upgrade for server, state is accepted")]
+    public async Task<ActionResult> Initiate([FromBody] RequestUpgradeCreateModel model)
+    {
+        var result = await _requestUpgradeService.Initiate(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -55,6 +66,7 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPut("{id}/Accept")]
+    [SwaggerOperation(Summary = "Accept a waiting request upgrade")]
     public async Task<ActionResult> Accept(int id, [FromBody] Guid userId)
     {
         var result = await _requestUpgradeService.Evaluate(id, RequestStatus.Accepted, userId);
@@ -63,6 +75,7 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPut("{id}/Deny")]
+    [SwaggerOperation(Summary = "Deny a waiting request upgrade")]
     public async Task<ActionResult> Deny(int id, [FromBody] Guid userId)
     {
         var result = await _requestUpgradeService.Evaluate(id, RequestStatus.Denied, userId);
@@ -71,6 +84,7 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPut("{id}/Reject")]
+    [SwaggerOperation(Summary = "Reject a accepted request upgrade")]
     public async Task<ActionResult> Reject(int id)
     {
         var result = await _requestUpgradeService.Reject(id);
@@ -87,6 +101,7 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPut("{id}/Complete")]
+    [SwaggerOperation(Summary = "Complete a completable accepted request upgrade. Change serverHardwareconfig")]
     public async Task<ActionResult> Complete(int id)
     {
         var result = await _requestUpgradeService.Complete(id);
