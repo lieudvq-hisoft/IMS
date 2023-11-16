@@ -27,7 +27,7 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("Appointment/All")]
+    [HttpGet("All")]
     public async Task<ActionResult> Get()
     {
         var result = await _AppointmentService.GetAll();
@@ -71,6 +71,22 @@ public class AppointmentController : ControllerBase
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _AppointmentService.Delete(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("{id}/Complete")]
+    public async Task<ActionResult> Complete(int id, [FromBody] string userId)
+    {
+        var result = await _AppointmentService.Complete(id, userId);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("{id}/Fail")]
+    public async Task<ActionResult> Fail(int id, [FromBody] string userId)
+    {
+        var result = await _AppointmentService.Fail(id, userId);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

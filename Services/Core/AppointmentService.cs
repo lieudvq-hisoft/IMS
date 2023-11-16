@@ -25,6 +25,8 @@ public interface IAppointmentService
     Task<ResultModel> Create(AppointmentCreateModel model);
     Task<ResultModel> Update(AppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
+    Task<ResultModel> Complete(int appointmentId, string userId);
+    Task<ResultModel> Fail(int appointmentId, string userId);
 }
 
 public class AppointmentService : IAppointmentService
@@ -197,6 +199,7 @@ public class AppointmentService : IAppointmentService
             var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == model.Id);
             if (appointment == null)
             {
+                validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
             }
             else
@@ -204,6 +207,7 @@ public class AppointmentService : IAppointmentService
                 var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
                 if (serverAllocation == null)
                 {
+                    validPrecondition = false;
                     result.ErrorMessage = AppointmentErrorMessgae.SERVER_ALLOCATION_NOT_EXISTED;
                 }
             }
@@ -242,6 +246,92 @@ public class AppointmentService : IAppointmentService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = appointment.Id;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Complete(int appointmentId, string userId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
+            if (appointment == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+            }
+
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(userId));
+            if (user == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+
+            if (validPrecondition)
+            {
+                appointment.Status = RequestStatus.Success;
+                _dbContext.AppointmentUsers.Add(new AppointmentUser
+                {
+                    AppointmentId = appointmentId,
+                    UserId = new Guid(userId)
+                });
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<AreaModel>(appointment);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Fail(int appointmentId, string userId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
+            if (appointment == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+            }
+
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(userId));
+            if (user == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+
+            if (validPrecondition)
+            {
+                appointment.Status = RequestStatus.Failed;
+                _dbContext.AppointmentUsers.Add(new AppointmentUser
+                {
+                    AppointmentId = appointmentId,
+                    UserId = new Guid(userId)
+                });
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<AreaModel>(appointment);
             }
         }
         catch (Exception e)

@@ -123,6 +123,7 @@ public class RequestUpgradeErrorMessage
     public const string NOT_ACCEPTED = "Request upgrade not accepted";
     public const string NOT_WAITING = "Request upgrade not waiting";
     public const string NOT_COMPLETABLE = "Request upgrade is not completable";
+    public const string APPOINTMENT_NOT_COMPLETE = "Request upgrade dont have complete appointment";
 }
 
 
