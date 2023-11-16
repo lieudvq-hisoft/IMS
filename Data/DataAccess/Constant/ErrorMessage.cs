@@ -10,6 +10,7 @@ public class ErrorMessage
     public const string UPDATE_FAILED = "FAILED TO UPDATE";
     public const string DELETE_FAILED = "FAILED TO DELETE";
     public const string FILE_NOT_EXISTED = "FILE NOT EXIST";
+    public const string WRONG_PURPOSE = "Wrong purpose";
 }
 
 public class CustomerErrorMessage
@@ -119,6 +120,7 @@ public class RequestUpgradeErrorMessage
     public const string NOT_EXISTED = "Request upgrade " + ErrorMessage.NOT_EXISTED;
     public const string NOT_ACCEPTED = "Request upgrade not accepted";
     public const string NOT_WAITING = "Request upgrade not waiting";
+    public const string NOT_COMPLETABLE = "Request upgrade is not completable";
 }
 
 

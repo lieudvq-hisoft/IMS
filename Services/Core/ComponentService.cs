@@ -13,6 +13,7 @@ namespace Services.Core;
 public interface IComponentService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ComponentSearchModel searchModel);
+    Task<ResultModel> GetAll();
     Task<ResultModel> Create(ComponentCreateModel model);
     Task<ResultModel> Update(ComponentUpdateModel model);
     Task<ResultModel> Delete(int componentId);
@@ -51,6 +52,25 @@ public class ComponentService : IComponentService
             paging.Data = _mapper.ProjectTo<ComponentModel>(components).ToList();
 
             result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetAll()
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var components = _dbContext.Components.AsQueryable();
+
+            result.Data = _mapper.ProjectTo<ComponentModel>(components).ToList();
             result.Succeed = true;
         }
         catch (Exception e)
