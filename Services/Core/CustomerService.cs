@@ -301,12 +301,12 @@ public class CustomerService : ICustomerService
             {
                 validPrecondition = false;
                 result.ErrorMessage = CustomerErrorMessage.UPDATE_FAILED;
+            }
 
-                if (_dbContext.Customers.Any(x => (x.CompanyName == model.CompanyName && x.CompanyTypeId == model.CompanyTypeId) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber))
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = CustomerErrorMessage.EXISTED;
-                }
+            if (_dbContext.Customers.Any(x => (x.CompanyName == model.CompanyName && x.CompanyTypeId == model.CompanyTypeId) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = CustomerErrorMessage.EXISTED;
             }
 
             if (validPrecondition)
