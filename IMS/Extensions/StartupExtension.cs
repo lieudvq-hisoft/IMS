@@ -71,6 +71,7 @@ public static class StartupExtension
         services.AddScoped<IRequestExpandService, RequestExpandService>();
         services.AddScoped<IRequestExpandLocationService, RequestExpandLocationService>();
         services.AddScoped<IRequestExpandUserService, RequestExpandUserService>();
+        services.AddScoped<IRequestExpandAppointmentService, RequestExpandAppointmentService>();
 
         //services.AddScoped<IIpService, IpService>();
 
