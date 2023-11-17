@@ -6,6 +6,7 @@ using Data.Entities;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
+using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
 
 namespace Services.Core;
@@ -13,6 +14,7 @@ public interface IRequestExpandService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
+    Task<ResultModel> GetRequestExpandLocation(int id);
     Task<ResultModel> Create(RequestExpandCreateModel model);
     Task<ResultModel> Delete(int id);
 }
@@ -139,6 +141,35 @@ public class RequestExpandService : IRequestExpandService
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 
+        return result;
+    }
+
+    public async Task<ResultModel> GetRequestExpandLocation(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestExpand = _dbContext.RequestExpands
+                .Include(x => x.RequestExpandLocations)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (requestExpand != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<RequestExpandLocationModel>>(requestExpand.RequestExpandLocations);
+            }
+            else
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+                result.Succeed = false;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
         return result;
     }
 }

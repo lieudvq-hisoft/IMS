@@ -36,4 +36,20 @@ public class LocationController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpGet("{id}/RequestExpandLocation")]
+    public async Task<ActionResult> GetRequestExpandLocation(int id)
+    {
+        var result = await _LocationService.GetRequestExpandLocation(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}/LocationAssignment")]
+    public async Task<ActionResult> GetLocationAssignment(int id)
+    {
+        var result = await _LocationService.GetLocationAssignment(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }
