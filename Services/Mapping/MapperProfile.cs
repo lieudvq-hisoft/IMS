@@ -8,8 +8,10 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
-        #region
+        #region Customer
         CreateMap<Customer, CustomerModel>();
+        CreateMap<CustomerCreateModel, Customer>();
+        CreateMap<CustomerUpdateModel, Customer>();
         CreateMap<User, UserModel>();
         #endregion
 

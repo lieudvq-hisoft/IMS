@@ -212,28 +212,28 @@ public class CustomerService : ICustomerService
     {
         var result = new ResultModel();
         result.Succeed = false;
+        bool validPrecondition = true;
 
         try
         {
+            var existedCustomer = _dbContext.Customers.FirstOrDefault(x => x.CompanyTypeId == model.CompanyTypeId);
+            if(existedCustomer != null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = CompanyTypeErrorMessage.EXISTED;
+            }
             var companyType = _dbContext.CompanyTypes.FirstOrDefault(x => x.Id == model.CompanyTypeId);
             if (companyType == null)
             {
+                validPrecondition = false;
                 result.ErrorMessage = CompanyTypeErrorMessage.NOT_EXISTED;
             }
-            else
+            
+            if(validPrecondition)
             {
-                var customer = new Customer
-                {
-                    Username = GenerateUsername(model.CompanyName),
-                    Password = MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")) + "@a123",
-                    CompanyName = model.CompanyName,
-                    Address = model.Address,
-                    TaxNumber = model.TaxNumber,
-                    Email = model.Email,
-                    PhoneNumber = model.PhoneNumber,
-                    CustomerName = model.CustomerName,
-                    CompanyTypeId = model.CompanyTypeId
-                };
+                var customer = _mapper.Map<Customer>(model);
+                customer.Username = GenerateUsername(model.CompanyName);
+                customer.Password = MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")) + "@a123";
                 _dbContext.Customers.Add(customer);
                 _dbContext.SaveChanges();
 
@@ -253,7 +253,7 @@ public class CustomerService : ICustomerService
     {
         string username = "";
         var normalizedCompanyName = MyFunction.ConvertToUnSign(companyName.Trim().Replace(" ", ""));
-        var customerOfCompanyCount = _dbContext.Customers.IgnoreQueryFilters().Where(x => x.CustomerName.Contains(normalizedCompanyName)).ToList().Count();
+        var customerOfCompanyCount = _dbContext.Customers.IgnoreQueryFilters().Where(x => x.Username.Contains(normalizedCompanyName)).ToList().Count();
 
         username = normalizedCompanyName + (customerOfCompanyCount + 1).ToString();
 
@@ -292,16 +292,25 @@ public class CustomerService : ICustomerService
     {
         var result = new ResultModel();
         result.Succeed = false;
+        bool validPrecondition = true;
 
         try
         {
             var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == model.Id);
-
             if (customer == null)
             {
+                validPrecondition = false;
                 result.ErrorMessage = CustomerErrorMessage.UPDATE_FAILED;
+
+                var existedCompanyId = _dbContext.Customers.FirstOrDefault(x => x.CompanyTypeId == model.CompanyTypeId && x.Id != customer.Id);
+                if (existedCompanyId != null)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = CompanyTypeErrorMessage.EXISTED;
+                }
             }
-            else
+
+            if(validPrecondition)
             {
                 _mapper.Map<CustomerUpdateModel, Customer>(model, customer);
                 _dbContext.SaveChanges();

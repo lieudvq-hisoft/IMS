@@ -16,7 +16,6 @@ public interface IRackService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetLocation(int id);
     Task<ResultModel> Create(RackCreateModel model);
-    Task<ResultModel> Update(RackUpdateModel model);
     Task<ResultModel> Delete(int id);
 }
 
@@ -185,34 +184,6 @@ public class RackService : IRackService
                 }
                 _dbContext.SaveChanges();
 
-                result.Succeed = true;
-                result.Data = _mapper.Map<RackModel>(rack);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
-
-    public async Task<ResultModel> Update(RackUpdateModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            var rack = _dbContext.Racks.FirstOrDefault(x => x.Id == model.Id);
-            if (rack == null)
-            {
-                result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                _mapper.Map<RackUpdateModel, Rack>(model, rack);
-                _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<RackModel>(rack);
             }

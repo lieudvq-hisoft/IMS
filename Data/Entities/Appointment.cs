@@ -8,8 +8,8 @@ public class Appointment : BaseEntity
     public DateTime DateCheckedIn { get; set; }
     public DateTime DateCheckedOut { get; set; }
     public string Reason { get; set; }
-    public string Note { get; set; }
-    public string TechNote { get; set; }
+    public string? Note { get; set; }
+    public string? TechNote { get; set; }
     public bool IsCorrectPerson { get; set; }
     public RequestStatus Status { get; set; }
 
