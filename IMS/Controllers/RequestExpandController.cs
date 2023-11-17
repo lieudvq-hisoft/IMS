@@ -4,6 +4,7 @@ using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace IMS.Controllers;
 
@@ -55,6 +56,40 @@ public class RequestExpandController : ControllerBase
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _requestExpandService.Delete(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("{id}/Accept")]
+    [SwaggerOperation(Summary = "Accept a waiting request expand")]
+    public async Task<ActionResult> Accept(int id, [FromBody] UserAssignModel model)
+    {
+        var result = await _requestExpandService.Evaluate(id, RequestStatus.Accepted, model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("{id}/Deny")]
+    [SwaggerOperation(Summary = "Deny a waiting request expand")]
+    public async Task<ActionResult> Deny(int id, [FromBody] UserAssignModel model)
+    {
+        var result = await _requestExpandService.Evaluate(id, RequestStatus.Denied, model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpDelete("{id}/RequestExpandLocation")]
+    public async Task<ActionResult> DeleteRequestExpandLocation(int id)
+    {
+        var result = await _requestExpandService.DeleteRequestExpandLocation(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPost("{id}/RequestExpandLocation")]
+    public async Task<ActionResult> AssignRequestExpandLocation(int id, RequestExpandAssignLocationModel model)
+    {
+        var result = await _requestExpandService.AssignLocation(id, model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

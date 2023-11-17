@@ -72,8 +72,6 @@ public class RequestExpandLocationErrorMessage
     public const string INVALID_LOCATION = "Location is not valid";
 }
 
-
-
 public class RackErrorMessage
 {
     public const string NOT_EXISTED = "Rack " + ErrorMessage.NOT_EXISTED;
@@ -136,6 +134,7 @@ public class AppointmentErrorMessgae
     public const string NOT_EXISTED = "Appointment " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Appointment " + ErrorMessage.EXISTED;
     public const string NOT_ACCEPTED = "Appointment not accepted";
+    public const string NOT_SUCCESS = "Appointment not success";
     public const string NOT_WAITING = "Appointment not waiting";
 }
 
@@ -191,7 +190,6 @@ public class RequestUpgradeErrorMessage
     public const string NOT_COMPLETABLE = "Request upgrade is not completable";
     public const string APPOINTMENT_NOT_COMPLETE = "Request upgrade dont have complete appointment";
 }
-
 
 
 

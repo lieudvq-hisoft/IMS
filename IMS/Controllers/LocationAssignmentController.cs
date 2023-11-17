@@ -35,19 +35,19 @@ public class LocationAssignmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPost]
-    public async Task<ActionResult> Create([FromBody] LocationAssignmentCreateModel model)
-    {
-        var result = await _LocationAssignmentService.Create(model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPost]
+    //public async Task<ActionResult> Create([FromBody] LocationAssignmentCreateModel model)
+    //{
+    //    var result = await _LocationAssignmentService.Create(model);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(int id)
-    {
-        var result = await _LocationAssignmentService.Delete(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpDelete("{id}")]
+    //public async Task<ActionResult> Delete(int id)
+    //{
+    //    var result = await _LocationAssignmentService.Delete(id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 }

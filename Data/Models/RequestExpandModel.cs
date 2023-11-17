@@ -17,15 +17,34 @@ public class RequestExpandCreateModel
 {
     [Required]
     public int Power { get; set; }
+
     [Required]
     public RequestStatus Status { get; set; }
+
     [Required]
     public string? Note { get; set; }
+
     [Required]
     public string? TechNote { get; set; }
+
     [Required]
     [GreaterThanZero]
     public int ServerAllocationId { get; set; }
+}
+
+public class RequestExpandAssignLocationModel
+{
+    [Required]
+    [GreaterThanZero]
+    public int RackId { get; set; }
+
+    [Required]
+    [GreaterThanZero]
+    public int StartPosition { get; set; }
+
+    [Required]
+    [GreaterThanZero]
+    public int Size { get; set; }
 }
 
 public class RequestExpandSearchModel

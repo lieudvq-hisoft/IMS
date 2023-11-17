@@ -439,7 +439,11 @@ public class AppointmentService : IAppointmentService
                 .FirstOrDefault(x => x.Id == appointmentId);
             if (appointment == null)
             {
-                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+            }
+            else if (appointment.Status != RequestStatus.Success)
+            {
+                result.ErrorMessage = AppointmentErrorMessgae.NOT_SUCCESS;
             }
             else
             {

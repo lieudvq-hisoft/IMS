@@ -33,20 +33,4 @@ public class RequestExpandLocationController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
-
-    [HttpPost]
-    public async Task<ActionResult> Create([FromBody] RequestExpandLocationCreateModel model)
-    {
-        var result = await _requestExpandLocationService.Create(model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(int id)
-    {
-        var result = await _requestExpandLocationService.Delete(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
 }

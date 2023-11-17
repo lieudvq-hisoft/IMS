@@ -87,7 +87,6 @@ public class RequestExpandAppointmentService : IRequestExpandAppointmentService
     {
         var result = new ResultModel();
         result.Succeed = false;
-        bool validPrecondition = true;
 
         try
         {
@@ -99,31 +98,25 @@ public class RequestExpandAppointmentService : IRequestExpandAppointmentService
 
             if (existedRequestExpandAppointment != null)
             {
-                validPrecondition = false;
                 result.ErrorMessage = RequestExpandAppointmentErrorMessage.EXISTED;
             }
             else if (requestExpand == null)
             {
-                validPrecondition = false;
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
             }
             else if (appointment == null)
             {
-                validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
             }
             else if (requestExpand.Status != RequestStatus.Accepted)
             {
-                validPrecondition = false;
                 result.ErrorMessage = RequestExpandAppointmentErrorMessage.APPOINTMENT_NOT_ACCEPTED;
             }
             else if (requestExpand.ServerAllocationId != appointment.ServerAllocationId)
             {
-                validPrecondition = false;
                 result.ErrorMessage = RequestExpandAppointmentErrorMessage.INVALID_SERVER_ALLOCATION;
             }
-
-            if (validPrecondition)
+            else
             {
                 var requestExpandAppointmentn = _mapper.Map<RequestExpandAppointment>(model);
                 _dbContext.RequestExpandAppointments.Add(requestExpandAppointmentn);

@@ -159,7 +159,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             }
 
             var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
-            if (component == null)
+            if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
