@@ -35,6 +35,14 @@ public class RequestExpandController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/RequestExpandLocation")]
+    public async Task<ActionResult> GetRequestExpandLocation(int id)
+    {
+        var result = await _requestExpandService.GetRequestExpandLocation(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] RequestExpandCreateModel model)
     {
