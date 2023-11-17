@@ -6,6 +6,7 @@ using Data.Entities;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
+using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
 
 public interface IRequestExpandAppointmentService
@@ -92,10 +93,9 @@ public class RequestExpandAppointmentService : IRequestExpandAppointmentService
         {
             var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == model.RequestExpandId);
             var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == model.AppointmentId);
-            var existedRequestExpandAppointment = _dbContext.RequestExpandAppointments
+            var existedRequestExpandAppointment = _dbContext.RequestExpandAppointments.Include(x => x.RequestExpand)
                 .FirstOrDefault(x => x.RequestExpandId == model.RequestExpandId
-                && x.AppointmentId == model.AppointmentId);
-
+                && x.AppointmentId == model.AppointmentId && x.RequestExpand.Status != RequestStatus.Denied);
 
             if (existedRequestExpandAppointment != null)
             {
