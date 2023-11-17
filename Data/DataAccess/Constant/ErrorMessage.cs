@@ -54,6 +54,15 @@ public class RequestExpandErrorMessage
 {
     public const string NOT_EXISTED = "Request Expand " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Request Expand " + ErrorMessage.EXISTED;
+    public const string NOT_ACCEPTED = "Request Expand is not accepted";
+}
+
+public class RequestExpandAppointmentErrorMessage
+{
+    public const string NOT_EXISTED = "Request Expand Appointment " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Request Expand Appointment " + ErrorMessage.EXISTED;
+    public const string INVALID_APPOINTMENT = "Appointment is not valid";
+    public const string INVALID_INPUT = "Appointment and Request expand have different server allocation";
 }
 
 public class RequestExpandLocationErrorMessage
@@ -62,6 +71,8 @@ public class RequestExpandLocationErrorMessage
     public const string EXISTED = "Request Expand Location " + ErrorMessage.EXISTED;
     public const string INVALID_LOCATION = "Location is not valid";
 }
+
+
 
 public class RackErrorMessage
 {

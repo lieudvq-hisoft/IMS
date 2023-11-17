@@ -25,7 +25,6 @@ public class RequestExpandAppointmentCreateModel
 
 public class RequestExpandAppointmentSearchModel
 {
-    public int RequestExpandId { get; set; }
-    public int AppointmentId { get; set; }
+    public int? Id { get; set; } = null;
 }
 

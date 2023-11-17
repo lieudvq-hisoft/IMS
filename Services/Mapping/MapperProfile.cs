@@ -72,8 +72,12 @@ public class MapperProfile : Profile
         #region RequestExpand
         CreateMap<RequestExpand, RequestExpandModel>();
         CreateMap<RequestExpandCreateModel, RequestExpand>();
+
         CreateMap<RequestExpandLocation, RequestExpandLocationModel>();
         CreateMap<RequestExpandLocationCreateModel, RequestExpandLocation>();
+
+        CreateMap<RequestExpandAppointment, RequestExpandAppointmentModel>();
+        CreateMap<RequestExpandAppointmentCreateModel, RequestExpandAppointment>();
         #endregion
 
         #region CompanyType
