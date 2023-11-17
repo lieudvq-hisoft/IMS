@@ -1,6 +1,8 @@
 ﻿namespace Data.Entities;
 public class LocationAssignment : BaseEntity
 {
+    public bool IsServer { get; set; }
+
     public int ServerAllocationId { get; set; }
     public virtual ServerAllocation ServerAllocation { get; set; }
 

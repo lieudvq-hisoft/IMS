@@ -433,7 +433,10 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
+            var appointment = _dbContext.Appointments
+                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade)
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand)
+                .FirstOrDefault(x => x.Id == appointmentId);
             if (appointment == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
@@ -441,9 +444,14 @@ public class AppointmentService : IAppointmentService
             else
             {
                 var requestUpgrades = appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade);
+                var requestExpands = appointment.RequestExpandAppointments.Select(x => x.RequestExpand);
                 foreach (var requestUpgrade in requestUpgrades)
                 {
                     requestUpgrade.InspectionReportFilePath = fileName;
+                }
+                foreach (var requestExpand in requestExpands)
+                {
+                    requestExpand.InspectionReportFilePath = fileName;
                 }
                 _dbContext.SaveChanges();
                 result.Succeed = true;
