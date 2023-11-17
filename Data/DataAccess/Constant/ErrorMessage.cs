@@ -15,6 +15,7 @@ public class ErrorMessage
 
 public class CustomerErrorMessage
 {
+    public const string EXISTED = "Customer " + ErrorMessage.EXISTED;
     public const string NOT_EXISTED = "Customer " + ErrorMessage.NOT_EXISTED;
     public const string DELETE_FAILED = "Delete customer failed";
     public const string UPDATE_FAILED = "Update customer failed";
