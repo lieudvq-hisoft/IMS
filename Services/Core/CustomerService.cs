@@ -303,7 +303,8 @@ public class CustomerService : ICustomerService
                 result.ErrorMessage = CustomerErrorMessage.UPDATE_FAILED;
             }
 
-            if (_dbContext.Customers.Any(x => (x.CompanyName == model.CompanyName && x.CompanyTypeId == model.CompanyTypeId) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber))
+            var existingCustomer = _dbContext.Customers.FirstOrDefault(x => ((x.CompanyName == model.CompanyName && x.CompanyTypeId == model.CompanyTypeId) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber) && x.Id != model.Id);
+            if (existingCustomer != null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = CustomerErrorMessage.EXISTED;
