@@ -216,17 +216,17 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var existedCustomer = _dbContext.Customers.FirstOrDefault(x => x.CompanyTypeId == model.CompanyTypeId);
-            if(existedCustomer != null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = CompanyTypeErrorMessage.EXISTED;
-            }
             var companyType = _dbContext.CompanyTypes.FirstOrDefault(x => x.Id == model.CompanyTypeId);
             if (companyType == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = CompanyTypeErrorMessage.NOT_EXISTED;
+            }
+
+            if (_dbContext.Customers.Any(x => x.CompanyName == model.CompanyName && x.CompanyTypeId == model.CompanyTypeId))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = CompanyTypeErrorMessage.EXISTED;
             }
             
             if(validPrecondition)
