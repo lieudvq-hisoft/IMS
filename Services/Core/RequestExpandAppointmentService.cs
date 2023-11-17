@@ -102,22 +102,25 @@ public class RequestExpandAppointmentService : IRequestExpandAppointmentService
                 validPrecondition = false;
                 result.ErrorMessage = RequestExpandAppointmentErrorMessage.EXISTED;
             }
-            else if (requestExpand == null || appointment == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = requestExpand == null ?
-                    RequestExpandErrorMessage.NOT_EXISTED :
-                    RequestExpandAppointmentErrorMessage.INVALID_APPOINTMENT;
-            }
-            else if (requestExpand.Status != RequestStatus.Accepted)
+            else if (requestExpand == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
             }
+            else if (appointment == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+            }
+            else if (requestExpand.Status != RequestStatus.Accepted)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = RequestExpandAppointmentErrorMessage.APPOINTMENT_NOT_ACCEPTED;
+            }
             else if (requestExpand.ServerAllocationId != appointment.ServerAllocationId)
             {
                 validPrecondition = false;
-                result.ErrorMessage = RequestExpandAppointmentErrorMessage.INVALID_INPUT;
+                result.ErrorMessage = RequestExpandAppointmentErrorMessage.INVALID_SERVER_ALLOCATION;
             }
 
             if (validPrecondition)

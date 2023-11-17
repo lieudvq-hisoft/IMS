@@ -61,8 +61,8 @@ public class RequestExpandAppointmentErrorMessage
 {
     public const string NOT_EXISTED = "Request Expand Appointment " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Request Expand Appointment " + ErrorMessage.EXISTED;
-    public const string INVALID_APPOINTMENT = "Appointment is not valid";
-    public const string INVALID_INPUT = "Appointment and Request expand have different server allocation";
+    public const string APPOINTMENT_NOT_ACCEPTED = "Appointment is not accepted";
+    public const string INVALID_SERVER_ALLOCATION = "Appointment and Request expand have different server allocation";
 }
 
 public class RequestExpandLocationErrorMessage
