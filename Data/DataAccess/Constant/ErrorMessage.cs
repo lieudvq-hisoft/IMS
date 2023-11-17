@@ -77,6 +77,7 @@ public class RequestErrorMessage
 public class CompanyTypeErrorMessage
 {
     public const string NOT_EXISTED = "Company type " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Company type " + ErrorMessage.NOT_EXISTED;
 }
 
 public class UserErrorMessage

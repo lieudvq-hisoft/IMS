@@ -212,15 +212,24 @@ public class CustomerService : ICustomerService
     {
         var result = new ResultModel();
         result.Succeed = false;
+        bool validPrecondition = true;
 
         try
         {
+            var existedCustomer = _dbContext.Customers.FirstOrDefault(x => x.CompanyTypeId == model.CompanyTypeId);
+            if(existedCustomer != null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = CompanyTypeErrorMessage.EXISTED;
+            }
             var companyType = _dbContext.CompanyTypes.FirstOrDefault(x => x.Id == model.CompanyTypeId);
             if (companyType == null)
             {
+                validPrecondition = false;
                 result.ErrorMessage = CompanyTypeErrorMessage.NOT_EXISTED;
             }
-            else
+            
+            if(validPrecondition)
             {
                 var customer = _mapper.Map<Customer>(model);
                 customer.Username = GenerateUsername(model.CompanyName);
@@ -283,16 +292,25 @@ public class CustomerService : ICustomerService
     {
         var result = new ResultModel();
         result.Succeed = false;
+        bool validPrecondition = true;
 
         try
         {
             var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == model.Id);
-
             if (customer == null)
             {
+                validPrecondition = false;
                 result.ErrorMessage = CustomerErrorMessage.UPDATE_FAILED;
+
+                var existedCompanyId = _dbContext.Customers.FirstOrDefault(x => x.CompanyTypeId == model.CompanyTypeId && x.Id != customer.Id);
+                if (existedCompanyId != null)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = CompanyTypeErrorMessage.EXISTED;
+                }
             }
-            else
+
+            if(validPrecondition)
             {
                 _mapper.Map<CustomerUpdateModel, Customer>(model, customer);
                 _dbContext.SaveChanges();
