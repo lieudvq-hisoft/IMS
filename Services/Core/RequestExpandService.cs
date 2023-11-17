@@ -354,12 +354,14 @@ public class RequestExpandService : IRequestExpandService
 
             if (validPrecondition)
             {
+                var haveLocation = requestExpand.ServerAllocation.LocationAssignments.Any();
                 foreach (var location in locations)
                 {
                     _dbContext.RequestExpandLocations.Add(new RequestExpandLocation
                     {
                         LocationId = location.Id,
-                        RequestExpandId = requestExpandId
+                        RequestExpandId = requestExpandId,
+                        IsServer = !haveLocation
                     });
                 }
                 _dbContext.SaveChanges();
