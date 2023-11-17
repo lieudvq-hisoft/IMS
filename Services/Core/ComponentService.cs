@@ -13,6 +13,8 @@ namespace Services.Core;
 public interface IComponentService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ComponentSearchModel searchModel);
+    Task<ResultModel> GetServerHardwareConfig(int id);
+    Task<ResultModel> GetRequestUpgrade(int id);
     Task<ResultModel> GetAll();
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(ComponentCreateModel model);
@@ -196,6 +198,64 @@ public class ComponentService : IComponentService
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 
+        return result;
+    }
+
+    public async Task<ResultModel> GetServerHardwareConfig(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var component = _dbContext.Components
+                .Include(x => x.ServerHardwareConfigs)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (component != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<ServerHardwareConfigModel>>(component.ServerHardwareConfigs);
+            }
+            else
+            {
+                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
+                result.Succeed = false;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetRequestUpgrade(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var component = _dbContext.Components
+                .Include(x => x.RequestUpgrades)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (component != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<RequestUpgradeModel>>(component.RequestUpgrades);
+            }
+            else
+            {
+                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
+                result.Succeed = false;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
         return result;
     }
 }
