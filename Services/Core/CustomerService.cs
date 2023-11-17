@@ -244,7 +244,7 @@ public class CustomerService : ICustomerService
     {
         string username = "";
         var normalizedCompanyName = MyFunction.ConvertToUnSign(companyName.Trim().Replace(" ", ""));
-        var customerOfCompanyCount = _dbContext.Customers.IgnoreQueryFilters().Where(x => x.CustomerName.Contains(normalizedCompanyName)).ToList().Count();
+        var customerOfCompanyCount = _dbContext.Customers.IgnoreQueryFilters().Where(x => x.Username.Contains(normalizedCompanyName)).ToList().Count();
 
         username = normalizedCompanyName + (customerOfCompanyCount + 1).ToString();
 
