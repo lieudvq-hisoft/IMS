@@ -222,18 +222,9 @@ public class CustomerService : ICustomerService
             }
             else
             {
-                var customer = new Customer
-                {
-                    Username = GenerateUsername(model.CompanyName),
-                    Password = MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")) + "@a123",
-                    CompanyName = model.CompanyName,
-                    Address = model.Address,
-                    TaxNumber = model.TaxNumber,
-                    Email = model.Email,
-                    PhoneNumber = model.PhoneNumber,
-                    CustomerName = model.CustomerName,
-                    CompanyTypeId = model.CompanyTypeId
-                };
+                var customer = _mapper.Map<Customer>(model);
+                customer.Username = GenerateUsername(model.CompanyName);
+                customer.Password = MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")) + "@a123";
                 _dbContext.Customers.Add(customer);
                 _dbContext.SaveChanges();
 
