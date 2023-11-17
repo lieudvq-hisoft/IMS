@@ -14,13 +14,11 @@ public class RequestUpgradeController : ControllerBase
 {
     private readonly IRequestUpgradeService _requestUpgradeService;
     private readonly IWebHostEnvironment _environment;
-    private readonly IFileService _fileService;
 
-    public RequestUpgradeController(IRequestUpgradeService requestUpgradeService, IWebHostEnvironment environment, IFileService fileService)
+    public RequestUpgradeController(IRequestUpgradeService requestUpgradeService, IWebHostEnvironment environment)
     {
         this._requestUpgradeService = requestUpgradeService;
         _environment = environment;
-        _fileService = fileService;
     }
 
     [HttpGet]
@@ -75,18 +73,18 @@ public class RequestUpgradeController : ControllerBase
 
     [HttpPut("{id}/Accept")]
     [SwaggerOperation(Summary = "Accept a waiting request upgrade")]
-    public async Task<ActionResult> Accept(int id, [FromBody] string userId)
+    public async Task<ActionResult> Accept(int id, [FromBody] UserAssignModel model)
     {
-        var result = await _requestUpgradeService.Evaluate(id, RequestStatus.Accepted, userId);
+        var result = await _requestUpgradeService.Evaluate(id, RequestStatus.Accepted, model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpPut("{id}/Deny")]
     [SwaggerOperation(Summary = "Deny a waiting request upgrade")]
-    public async Task<ActionResult> Deny(int id, [FromBody] string userId)
+    public async Task<ActionResult> Deny(int id, [FromBody] UserAssignModel model)
     {
-        var result = await _requestUpgradeService.Evaluate(id, RequestStatus.Denied, userId);
+        var result = await _requestUpgradeService.Evaluate(id, RequestStatus.Denied, model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -129,20 +127,5 @@ public class RequestUpgradeController : ControllerBase
             return File(System.IO.File.OpenRead(filePath), "application/pdf", "InspectionReport.pdf");
         }
         return BadRequest(result.ErrorMessage);
-    }
-
-    [HttpPost("{id}/InspectionReport")]
-    public async Task<ActionResult> UploadInspectionReport(int id, [FromForm] DocumentFileUploadModel model)
-    {
-        string folderPath = Path.Combine(_environment.WebRootPath, "RequestUpgrade");
-        string fileName = await _fileService.SaveFileWithGuidName(model.File, folderPath);
-        var result = await _requestUpgradeService.AssignInspectionReport(id, fileName);
-        if (!result.Succeed)
-        {
-            await _fileService.DeleteFile(fileName);
-            return BadRequest(result.ErrorMessage);
-        }
-
-        return Ok(fileName);
     }
 }

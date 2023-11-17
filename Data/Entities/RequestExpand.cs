@@ -18,4 +18,5 @@ public class RequestExpand: BaseEntity
 
     public ICollection<RequestExpandLocation> RequestExpandLocations { get; set; }
     public ICollection<RequestExpandUser> RequestExpandUsers { get; set; }
+    public ICollection<RequestExpandAppointment> RequestExpandAppointments { get; set; }
 }

@@ -104,6 +104,8 @@ public class AppointmentErrorMessgae
 {
     public const string NOT_EXISTED = "Appointment " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Appointment " + ErrorMessage.EXISTED;
+    public const string NOT_ACCEPTED = "Appointment not accepted";
+    public const string NOT_WAITING = "Appointment not waiting";
 }
 
 public class LocationErrorMessgae

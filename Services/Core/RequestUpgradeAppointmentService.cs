@@ -121,8 +121,14 @@ public class RequestUpgradeAppointmentService : IRequestUpgradeAppointmentServic
                         validPrecondition = false;
                         result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
                     }
+                    else if (requestUpgrade.Status != RequestStatus.Accepted)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = RequestUpgradeErrorMessage.NOT_ACCEPTED;
+                    }
                     else if (requestUpgrade.ServerAllocationId != appoitment.ServerAllocationId)
                     {
+                        result.ErrorMessage = "Wrong server allocation";
                         validPrecondition = false;
                     }
                 }
@@ -145,62 +151,6 @@ public class RequestUpgradeAppointmentService : IRequestUpgradeAppointmentServic
 
         return result;
     }
-
-    //public async Task<ResultModel> Update(RequestUpgradeAppointmentUpdateModel model)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
-    //    bool validPrecondition = true;
-
-    //    try
-    //    {
-    //        var requestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.FirstOrDefault(x => x.Id == model.Id);
-    //        if (requestUpgradeAppointment == null)
-    //        {
-    //            validPrecondition = false;
-    //            result.ErrorMessage = RequestUpgradeAppointmentErrorMessgae.NOT_EXISTED;
-    //        }
-    //        else
-    //        {
-    //            var existedRequestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.FirstOrDefault(x => x.AppointmentId == model.AppointmentId && x.RequestUpgradeId == model.RequestUpgradeId && x.Id != model.Id);
-    //            if (existedRequestUpgradeAppointment != null)
-    //            {
-    //                validPrecondition = false;
-    //                result.ErrorMessage = RequestUpgradeAppointmentErrorMessgae.EXISTED;
-    //            }
-    //            else
-    //            {
-    //                var appoitment = _dbContext.Appointments.FirstOrDefault(x => x.Id == model.AppointmentId);
-    //                if (appoitment == null)
-    //                {
-    //                    validPrecondition = false;
-    //                    result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
-    //                }
-
-    //                var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == model.RequestUpgradeId);
-    //                if (requestUpgrade == null)
-    //                {
-    //                    validPrecondition = false;
-    //                    result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
-    //                }
-    //            }
-    //        }
-
-    //        if (validPrecondition)
-    //        {
-    //            _mapper.Map<RequestUpgradeAppointmentUpdateModel, RequestUpgradeAppointment>(model, requestUpgradeAppointment);
-    //            _dbContext.SaveChanges();
-    //            result.Succeed = true;
-    //            result.Data = _mapper.Map<RequestUpgradeAppointmentModel>(requestUpgradeAppointment);
-    //        }
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
-
-    //    return result;
-    //}
 
     public async Task<ResultModel> Delete(int id)
     {

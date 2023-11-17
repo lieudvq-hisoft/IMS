@@ -26,8 +26,10 @@ public interface IAppointmentService
     Task<ResultModel> Create(AppointmentCreateModel model);
     Task<ResultModel> Update(AppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
-    Task<ResultModel> Complete(int appointmentId, string userId);
+    Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, UserAssignModel model);
+    Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model);
     Task<ResultModel> Fail(int appointmentId, string userId);
+    Task<ResultModel> AssignInspectionReport(int appointmentId, string fileName);
 }
 
 public class AppointmentService : IAppointmentService
@@ -284,7 +286,61 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> Complete(int appointmentId, string userId)
+    public async Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, UserAssignModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            if (status != RequestStatus.Accepted && status != RequestStatus.Denied)
+            {
+                throw new Exception(ErrorMessage.WRONG_PURPOSE);
+            }
+
+            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
+            if (appointment == null)
+            {
+                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                validPrecondition = false;
+            }
+
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
+            if (user == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+
+            if (validPrecondition && appointment.Status != RequestStatus.Waiting)
+            {
+                result.ErrorMessage = AppointmentErrorMessgae.NOT_WAITING;
+                validPrecondition = false;
+            }
+
+            if (validPrecondition)
+            {
+                appointment.Status = status;
+                _dbContext.AppointmentUsers.Add(new AppointmentUser
+                {
+                    AppointmentId = appointment.Id,
+                    UserId = new Guid(model.UserId)
+                });
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<AppointmentModel>(appointment);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -298,8 +354,13 @@ public class AppointmentService : IAppointmentService
                 validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
             }
+            if (appointment.Status != RequestStatus.Accepted)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = AppointmentErrorMessgae.NOT_ACCEPTED;
+            }
 
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(userId));
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
             if (user == null)
             {
                 validPrecondition = false;
@@ -308,11 +369,12 @@ public class AppointmentService : IAppointmentService
 
             if (validPrecondition)
             {
+                _mapper.Map<AppointmentCompleteModel, Appointment>(model, appointment);
                 appointment.Status = RequestStatus.Success;
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
                     AppointmentId = appointmentId,
-                    UserId = new Guid(userId)
+                    UserId = new Guid(model.UserId)
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
@@ -360,6 +422,38 @@ public class AppointmentService : IAppointmentService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<AreaModel>(appointment);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> AssignInspectionReport(int appointmentId, string fileName)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
+            if (appointment == null)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var requestUpgrades = appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade);
+                foreach(var requestUpgrade in requestUpgrades)
+                {
+                    requestUpgrade.InspectionReportFilePath = fileName;
+                }
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = fileName;
             }
         }
         catch (Exception e)

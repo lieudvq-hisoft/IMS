@@ -51,6 +51,9 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
             b.HasMany(e => e.AppointmentUsers)
                 .WithOne(e => e.Appointment)
                 .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestExpandAppointments)
+               .WithOne(e => e.Appointment)
+               .OnDelete(DeleteBehavior.ClientCascade);
         });
 
         builder.Entity<Area>(b =>
@@ -101,6 +104,9 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
                 .WithOne(e => e.RequestExpand)
                 .OnDelete(DeleteBehavior.ClientCascade);
             b.HasMany(e => e.RequestExpandUsers)
+                .WithOne(e => e.RequestExpand)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestExpandAppointments)
                 .WithOne(e => e.RequestExpand)
                 .OnDelete(DeleteBehavior.ClientCascade);
         });
@@ -179,6 +185,7 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<LocationAssignment> LocationAssignments { get; set; }
     public DbSet<Rack> Racks { get; set; }
     public DbSet<RequestExpand> RequestExpands { get; set; }
+    public DbSet<RequestExpandAppointment> RequestExpandAppointments { get; set; }
     public DbSet<RequestExpandLocation> RequestExpandLocations { get; set; }
     public DbSet<RequestExpandUser> RequestExpandUsers { get; set; }
     public DbSet<RequestUpgrade> RequestUpgrades { get; set; }

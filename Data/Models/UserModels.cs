@@ -23,6 +23,12 @@ public class UserViewModel
     public string Address { get; set; }
 }
 
+public class UserAssignModel
+{
+    [Required]
+    public string UserId { get; set; }
+}
+
 public class UserRoleModel
 {
     public RoleModel role { get; set; }

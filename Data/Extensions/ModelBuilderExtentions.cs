@@ -358,6 +358,7 @@ public static class ModelBuilderExtentions
         builder.Entity<LocationAssignment>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Rack>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestExpand>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<RequestExpandAppointment>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestExpandLocation>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestExpandUser>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestUpgrade>().HasQueryFilter(x => !x.IsDeleted);
