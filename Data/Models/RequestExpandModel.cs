@@ -28,6 +28,19 @@ public class RequestExpandCreateModel
     public int ServerAllocationId { get; set; }
 }
 
+public class RequestExpandUpdateModel
+{
+    [Required]
+    [GreaterThanZero]
+    public int Id { get; set; }
+    [Required]
+    public int Power { get; set; }
+    [Required]
+    public string? Note { get; set; }
+    [Required]
+    public string? TechNote { get; set; }
+}
+
 public class RequestExpandSearchModel
 {
     public int? Id { get; set; } = null;
