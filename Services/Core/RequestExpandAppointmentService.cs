@@ -90,27 +90,34 @@ public class RequestExpandAppointmentService : IRequestExpandAppointmentService
 
         try
         {
+            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == model.RequestExpandId);
+            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == model.AppointmentId);
             var existedRequestExpandAppointment = _dbContext.RequestExpandAppointments
                 .FirstOrDefault(x => x.RequestExpandId == model.RequestExpandId
                 && x.AppointmentId == model.AppointmentId);
+
+
             if (existedRequestExpandAppointment != null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = RequestExpandAppointmentErrorMessage.EXISTED;
             }
-
-            var requestExpendId = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == model.RequestExpandId);
-            if (requestExpendId == null)
+            else if (requestExpand == null || appointment == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = requestExpand == null ?
+                    RequestExpandErrorMessage.NOT_EXISTED :
+                    RequestExpandAppointmentErrorMessage.INVALID_APPOINTMENT;
+            }
+            else if (requestExpand.Status != RequestStatus.Accepted)
             {
                 validPrecondition = false;
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
             }
-
-            var appointmentId = _dbContext.Appointments.FirstOrDefault(x => x.Id == model.AppointmentId);
-            if (appointmentId == null)
+            else if (requestExpand.ServerAllocationId != appointment.ServerAllocationId)
             {
                 validPrecondition = false;
-                result.ErrorMessage = RequestExpandAppointmentErrorMessage.INVALID_APPOINTMENT;
+                result.ErrorMessage = RequestExpandAppointmentErrorMessage.INVALID_INPUT;
             }
 
             if (validPrecondition)
