@@ -7,6 +7,7 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml.FormulaParsing.Utilities;
 using Services.Utilities;
 
 namespace Services.Core;
@@ -16,6 +17,7 @@ public interface IRequestExpandService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetRequestExpandLocation(int id);
     Task<ResultModel> Create(RequestExpandCreateModel model);
+    Task<ResultModel> Update(RequestExpandUpdateModel model);
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Evaluate(int requestExpandId, RequestStatus status, UserAssignModel model);
     Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
@@ -106,6 +108,35 @@ public class RequestExpandService : IRequestExpandService
                 var requestExpand = _mapper.Map<RequestExpand>(model);
                 requestExpand.Status = RequestStatus.Waiting;
                 _dbContext.RequestExpands.Add(requestExpand);
+                _dbContext.SaveChanges();
+
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestExpandModel>(requestExpand);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Update(RequestExpandUpdateModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == model.Id);
+            if (requestExpand == null)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                _mapper.Map<RequestExpandUpdateModel, RequestExpand>(model, requestExpand);
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;

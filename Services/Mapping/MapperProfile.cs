@@ -72,6 +72,7 @@ public class MapperProfile : Profile
         #region RequestExpand
         CreateMap<RequestExpand, RequestExpandModel>();
         CreateMap<RequestExpandCreateModel, RequestExpand>();
+        CreateMap<RequestExpandUpdateModel, RequestExpand>();
 
         CreateMap<RequestExpandLocation, RequestExpandLocationModel>();
         CreateMap<RequestExpandLocationCreateModel, RequestExpandLocation>();
