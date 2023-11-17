@@ -216,20 +216,20 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var existedCustomer = _dbContext.Customers.FirstOrDefault(x => x.CompanyTypeId == model.CompanyTypeId);
-            if(existedCustomer != null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = CompanyTypeErrorMessage.EXISTED;
-            }
             var companyType = _dbContext.CompanyTypes.FirstOrDefault(x => x.Id == model.CompanyTypeId);
             if (companyType == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = CompanyTypeErrorMessage.NOT_EXISTED;
             }
-            
-            if(validPrecondition)
+
+            if (_dbContext.Customers.Any(x => x.CompanyName == model.CompanyName && x.CompanyTypeId == model.CompanyTypeId))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = ErrorMessage.EXISTED;
+            }
+
+            if (validPrecondition)
             {
                 var customer = _mapper.Map<Customer>(model);
                 customer.Username = GenerateUsername(model.CompanyName);
@@ -302,15 +302,14 @@ public class CustomerService : ICustomerService
                 validPrecondition = false;
                 result.ErrorMessage = CustomerErrorMessage.UPDATE_FAILED;
 
-                var existedCompanyId = _dbContext.Customers.FirstOrDefault(x => x.CompanyTypeId == model.CompanyTypeId && x.Id != customer.Id);
-                if (existedCompanyId != null)
+                if (_dbContext.Customers.Any(x => x.CompanyName == model.CompanyName && x.CompanyTypeId == model.CompanyTypeId))
                 {
                     validPrecondition = false;
-                    result.ErrorMessage = CompanyTypeErrorMessage.EXISTED;
+                    result.ErrorMessage = ErrorMessage.EXISTED;
                 }
             }
 
-            if(validPrecondition)
+            if (validPrecondition)
             {
                 _mapper.Map<CustomerUpdateModel, Customer>(model, customer);
                 _dbContext.SaveChanges();
