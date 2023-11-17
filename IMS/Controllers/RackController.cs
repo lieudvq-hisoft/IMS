@@ -56,15 +56,6 @@ public class RackController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPut]
-    [SwaggerOperation(Summary = "Update an Rack")]
-    public async Task<ActionResult> Update([FromBody] RackUpdateModel model)
-    {
-        var result = await _RackService.Update(model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
     [HttpDelete("{id}")]
     [SwaggerOperation(Summary = "Delete an Rack")]
     public async Task<ActionResult> Delete(int id)
