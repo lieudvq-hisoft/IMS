@@ -1,12 +1,12 @@
 ﻿using AutoMapper;
 using Data.Common.PaginationModel;
-using Data.DataAccess.Constant;
 using Data.DataAccess;
+using Data.DataAccess.Constant;
 using Data.Entities;
 using Data.Enums;
 using Data.Models;
-using Services.Utilities;
 using Data.Utils.Paging;
+using Services.Utilities;
 
 public interface IRequestExpandLocationService
 {

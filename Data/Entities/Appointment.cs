@@ -1,12 +1,7 @@
 ﻿using Data.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data.Entities;
-public class Appointment: BaseEntity
+public class Appointment : BaseEntity
 {
     public string AppointedCustomer { get; set; }
     public DateTime DateAppointed { get; set; }

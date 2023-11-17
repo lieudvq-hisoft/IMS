@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Data.Models;
+﻿namespace Data.Models;
 public class RequestUpgradeUserModel
 {
     public int Id { get; set; }
@@ -14,6 +8,6 @@ public class RequestUpgradeUserModel
 
 public class RequestUpgradeUserSearchModel
 {
-    public int? Id { get; set; } = null;    
+    public int? Id { get; set; } = null;
 }
 

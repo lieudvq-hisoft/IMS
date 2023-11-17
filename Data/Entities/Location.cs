@@ -2,7 +2,7 @@
 public class Location
 {
     public int Id { get; set; }
-    public bool IsDeleted { get; set; } 
+    public bool IsDeleted { get; set; }
     public int Position { get; set; }
 
     public int RackId { get; set; }

@@ -38,12 +38,12 @@ public class RequestUpgradeUserErrorMessage
     public const string NOT_EXISTED = "Request Upgrade User " + ErrorMessage.NOT_EXISTED;
 }
 
-    public class RequestExpandUserErrorMessage
-    {
-        public const string NOT_EXISTED = "Request Expand User " + ErrorMessage.NOT_EXISTED;
-    }
+public class RequestExpandUserErrorMessage
+{
+    public const string NOT_EXISTED = "Request Expand User " + ErrorMessage.NOT_EXISTED;
+}
 
-    public class AreaErrorMessage
+public class AreaErrorMessage
 {
     public const string NOT_EXISTED = "Area " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Area " + ErrorMessage.EXISTED;

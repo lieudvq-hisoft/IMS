@@ -93,7 +93,7 @@ public class LocationAssignmentService : ILocationAssignmentService
         try
         {
             var existedLocationAssignment = _dbContext.LocationAssignments
-                .FirstOrDefault(x => x.ServerAllocationId == model.ServerAllocationId 
+                .FirstOrDefault(x => x.ServerAllocationId == model.ServerAllocationId
                 && x.LocationId == model.LocationId);
             if (existedLocationAssignment != null)
             {
@@ -115,7 +115,7 @@ public class LocationAssignmentService : ILocationAssignmentService
                 result.ErrorMessage = LocationAssignmentErrorMessage.INVALID_LOCATION;
             }
 
-            if(validPrecondition)
+            if (validPrecondition)
             {
                 var locationAssignment = _mapper.Map<LocationAssignment>(model);
                 _dbContext.LocationAssignments.Add(locationAssignment);

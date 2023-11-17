@@ -41,10 +41,10 @@ public class CustomerService : ICustomerService
     private readonly IConfiguration _config;
 
     public CustomerService(
-        AppDbContext dbContext, 
+        AppDbContext dbContext,
         IMapper mapper,
-        IEmailService emailService, 
-        IConfiguration config )
+        IEmailService emailService,
+        IConfiguration config)
     {
         _dbContext = dbContext;
         _mapper = mapper;
@@ -351,7 +351,7 @@ public class CustomerService : ICustomerService
 
             var token = await GetAccessToken(customer);
             result.Succeed = true;
-             result.Data = token;
+            result.Data = token;
         }
         else
         {

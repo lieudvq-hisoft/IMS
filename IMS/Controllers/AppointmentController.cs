@@ -125,7 +125,7 @@ public class AppointmentController : ControllerBase
     [HttpPost("{id}/InspectionReport")]
     public async Task<ActionResult> UploadInspectionReport(int id, [FromForm] DocumentFileUploadModel model)
     {
-        string folderPath = Path.Combine(_environment.WebRootPath, "RequestUpgrade");
+        string folderPath = Path.Combine(_environment.WebRootPath, "InspectionReport");
         string fileName = await _fileService.SaveFileWithGuidName(model.File, folderPath);
         var result = await _appointmentService.AssignInspectionReport(id, fileName);
         if (!result.Succeed)

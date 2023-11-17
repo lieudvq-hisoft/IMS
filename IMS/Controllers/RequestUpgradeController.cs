@@ -120,7 +120,7 @@ public class RequestUpgradeController : ControllerBase
     public async Task<ActionResult> DownloadInspectionReport(int id)
     {
         var result = await _requestUpgradeService.GetInspectionReport(id);
-        string folderPath = Path.Combine(_environment.WebRootPath, "RequestUpgrade");
+        string folderPath = Path.Combine(_environment.WebRootPath, "InspectionReport");
         if (result.Succeed)
         {
             string filePath = Path.Combine(folderPath, result.Data as string);
