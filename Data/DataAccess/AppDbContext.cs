@@ -1,4 +1,5 @@
 ﻿using Data.Entities;
+using Data.Entities.Pending;
 using Data.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -41,131 +42,7 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
-        builder.Entity<Appointment>(b =>
-        {
-            b.HasMany(e => e.RequestUpgradeAppointment)
-                .WithOne(e => e.Appointment)
-                .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.AppointmentUsers)
-                .WithOne(e => e.Appointment)
-                .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.RequestExpandAppointments)
-               .WithOne(e => e.Appointment)
-               .OnDelete(DeleteBehavior.ClientCascade);
-        });
-
-        builder.Entity<Area>(b =>
-        {
-            b.HasMany(e => e.Racks)
-                .WithOne(e => e.Area)
-                .OnDelete(DeleteBehavior.ClientCascade);
-        });
-
-        builder.Entity<Component>(b =>
-        {
-            b.HasMany(e => e.ServerHardwareConfigs)
-                .WithOne(e => e.Component)
-                .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.RequestUpgrades)
-                .WithOne(e => e.Component)
-                .OnDelete(DeleteBehavior.ClientCascade);
-        });
-
-        builder.Entity<Customer>(b =>
-        {
-            b.HasIndex(e => e.TaxNumber).IsUnique();
-            b.HasMany(e => e.ServerAllocations)
-                .WithOne(e => e.Customer)
-                .OnDelete(DeleteBehavior.ClientCascade);
-        });
-
-        builder.Entity<Location>(b =>
-        {
-            b.HasMany(e => e.LocationAssignments)
-                .WithOne(e => e.Location)
-                .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.RequestExpandLocations)
-                .WithOne(e => e.Location)
-                .OnDelete(DeleteBehavior.ClientCascade);
-        });
-
-        builder.Entity<Rack>(b =>
-        {
-            b.HasMany(e => e.Locations)
-                .WithOne(e => e.Rack)
-                .OnDelete(DeleteBehavior.ClientCascade);
-        });
-
-        builder.Entity<RequestExpand>(b =>
-        {
-            b.HasMany(e => e.RequestExpandLocations)
-                .WithOne(e => e.RequestExpand)
-                .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.RequestExpandUsers)
-                .WithOne(e => e.RequestExpand)
-                .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.RequestExpandAppointments)
-                .WithOne(e => e.RequestExpand)
-                .OnDelete(DeleteBehavior.ClientCascade);
-        });
-
-        builder.Entity<RequestUpgrade>(b =>
-        {
-            b.HasMany(e => e.RequestUpgradeAppointments)
-                .WithOne(e => e.RequestUpgrade)
-                .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.RequestUpgradeAppointments)
-                .WithOne(e => e.RequestUpgrade)
-                .OnDelete(DeleteBehavior.ClientCascade);
-        });
-
-        builder.Entity<ServerAllocation>(b =>
-        {
-            b.HasMany(e => e.ServerHardwareConfigs)
-                .WithOne(e => e.ServerAllocation)
-                .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.RequestUpgrades)
-                .WithOne(e => e.ServerAllocation)
-                .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.LocationAssignments)
-                .WithOne(e => e.ServerAllocation)
-                .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.Appointments)
-                .WithOne(e => e.ServerAllocation)
-                .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.RequestExpands)
-               .WithOne(e => e.ServerAllocation)
-               .OnDelete(DeleteBehavior.ClientCascade);
-        });
-
-        builder.Entity<User>(b =>
-        {
-            // Each User can have many entries in the UserRole join table
-            b.HasMany(e => e.UserRoles)
-                .WithOne(e => e.User)
-                .HasForeignKey(ur => ur.UserId)
-                .IsRequired();
-            b.HasIndex(e => e.Email).IsUnique();
-            b.HasIndex(e => e.PhoneNumber).IsUnique();
-            b.HasMany(e => e.RequestUpgradeUsers)
-                .WithOne(e => e.User)
-                .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.AppointmentUsers)
-                .WithOne(e => e.User)
-                .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.RequestExpandUsers)
-                .WithOne(e => e.User)
-                .OnDelete(DeleteBehavior.ClientCascade);
-        });
-
-        builder.Entity<Role>(b =>
-        {
-            // Each Role can have many entries in the UserRole join table
-            b.HasMany(e => e.UserRoles)
-                .WithOne(e => e.Role)
-                .HasForeignKey(ur => ur.RoleId)
-                .IsRequired();
-        });
+        builder.ConfigModel();
 
         builder.Seed();
         builder.FilterSoftDeleted();
@@ -179,6 +56,9 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<CompanyType> CompanyTypes { get; set; }
     public DbSet<Component> Components { get; set; }
     public DbSet<Customer> Customers { get; set; }
+    public DbSet<IpAddress> IpAddresses { get; set; }
+    public DbSet<IpAssignment> IpAssignments { get; set; }
+    public DbSet<IpSubnet> IpSubnets { get; set; }
     public DbSet<Location> Locations { get; set; }
     public DbSet<LocationAssignment> LocationAssignments { get; set; }
     public DbSet<Rack> Racks { get; set; }
@@ -186,6 +66,10 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<RequestExpandAppointment> RequestExpandAppointments { get; set; }
     public DbSet<RequestExpandLocation> RequestExpandLocations { get; set; }
     public DbSet<RequestExpandUser> RequestExpandUsers { get; set; }
+    public DbSet<RequestHost> RequestHosts { get; set; }
+    public DbSet<RequestHostAppointment> RequestHostAppointments { get; set; }
+    public DbSet<RequestHostIp> RequestHostIps { get; set; }
+    public DbSet<RequestHostUser> RequestHostUsers { get; set; }
     public DbSet<RequestUpgrade> RequestUpgrades { get; set; }
     public DbSet<RequestUpgradeAppointment> RequestUpgradeAppointments { get; set; }
     public DbSet<RequestUpgradeUser> RequestUpgradeUsers { get; set; }
@@ -194,9 +78,4 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<ServerHardwareConfig> ServerHardwareConfigs { get; set; }
     public DbSet<User> User { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
-    //public DbSet<IpAddress> Ips { get; set; }
-    //public DbSet<IpAssignment> IpAssignments { get; set; }
-    //public DbSet<IpSubnet> Networks { get; set; }
-    //public DbSet<Request> Requests { get; set; }
-    //public DbSet<Service> Services { get; set; }
 }

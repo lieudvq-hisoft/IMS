@@ -1,4 +1,5 @@
 ﻿using Data.Entities;
+using Data.Entities.Pending;
 using Data.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -288,7 +289,7 @@ public static class ModelBuilderExtentions
         }
         #endregion
 
-        //#region Service
+        #region Service
         //builder.Entity<Service>().HasData(new Service
         //{
         //    Id = 1,
@@ -343,7 +344,7 @@ public static class ModelBuilderExtentions
         //    Name = "Appointment",
         //    Type = ServiceType.Appointment,
         //});
-        //#endregion
+        #endregion
     }
 
     public static void FilterSoftDeleted(this ModelBuilder builder)
@@ -354,6 +355,9 @@ public static class ModelBuilderExtentions
         builder.Entity<CompanyType>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Component>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Customer>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<IpAddress>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<IpAssignment>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<IpSubnet>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Location>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<LocationAssignment>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Rack>().HasQueryFilter(x => !x.IsDeleted);
@@ -361,6 +365,10 @@ public static class ModelBuilderExtentions
         builder.Entity<RequestExpandAppointment>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestExpandLocation>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestExpandUser>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<RequestHost>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<RequestHostAppointment>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<RequestHostIp>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<RequestHostUser>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestUpgrade>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestUpgradeAppointment>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestUpgradeUser>().HasQueryFilter(x => !x.IsDeleted);
@@ -368,10 +376,179 @@ public static class ModelBuilderExtentions
         builder.Entity<ServerAllocation>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<ServerHardwareConfig>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<User>().HasQueryFilter(x => !x.IsDeleted);
-        //builder.Entity<IpAddress>().HasQueryFilter(x => !x.IsDeleted);
-        //builder.Entity<IpAssignment>().HasQueryFilter(x => !x.IsDeleted);
-        //builder.Entity<IpSubnet>().HasQueryFilter(x => !x.IsDeleted);
-        //builder.Entity<Request>().HasQueryFilter(x => !x.IsDeleted);
-        //builder.Entity<Service>().HasQueryFilter(x => !x.IsDeleted);
+    }
+
+    public static void ConfigModel(this ModelBuilder builder)
+    {
+        builder.Entity<Appointment>(b =>
+        {
+            b.HasMany(e => e.RequestUpgradeAppointment)
+                .WithOne(e => e.Appointment)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.AppointmentUsers)
+                .WithOne(e => e.Appointment)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestExpandAppointments)
+               .WithOne(e => e.Appointment)
+               .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestHostAppointments)
+               .WithOne(e => e.Appointment)
+               .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<Area>(b =>
+        {
+            b.HasMany(e => e.Racks)
+                .WithOne(e => e.Area)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<Component>(b =>
+        {
+            b.HasMany(e => e.ServerHardwareConfigs)
+                .WithOne(e => e.Component)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestUpgrades)
+                .WithOne(e => e.Component)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<Customer>(b =>
+        {
+            b.HasIndex(e => e.TaxNumber).IsUnique();
+            b.HasMany(e => e.ServerAllocations)
+                .WithOne(e => e.Customer)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<IpAddress>(b =>
+        {
+            b.HasMany(e => e.IpAssignments)
+                .WithOne(e => e.IpAddress)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestHostIps)
+                .WithOne(e => e.IpAddress)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<IpSubnet>(b =>
+        {
+            b.HasMany(e => e.SubNets)
+                .WithOne(e => e.ParentNetwork)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.Ips)
+                .WithOne(e => e.IpSubnet)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<Location>(b =>
+        {
+            b.HasMany(e => e.LocationAssignments)
+                .WithOne(e => e.Location)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestExpandLocations)
+                .WithOne(e => e.Location)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<Rack>(b =>
+        {
+            b.HasMany(e => e.Locations)
+                .WithOne(e => e.Rack)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<RequestExpand>(b =>
+        {
+            b.HasMany(e => e.RequestExpandLocations)
+                .WithOne(e => e.RequestExpand)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestExpandUsers)
+                .WithOne(e => e.RequestExpand)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestExpandAppointments)
+                .WithOne(e => e.RequestExpand)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<RequestHost>(b =>
+        {
+            b.HasMany(e => e.RequestHostAppointments)
+                .WithOne(e => e.RequestHost)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestHostIps)
+                .WithOne(e => e.RequestHost)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestHostUsers)
+                .WithOne(e => e.RequestHost)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<RequestUpgrade>(b =>
+        {
+            b.HasMany(e => e.RequestUpgradeAppointments)
+                .WithOne(e => e.RequestUpgrade)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestUpgradeAppointments)
+                .WithOne(e => e.RequestUpgrade)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<ServerAllocation>(b =>
+        {
+            b.HasMany(e => e.ServerHardwareConfigs)
+                .WithOne(e => e.ServerAllocation)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestUpgrades)
+                .WithOne(e => e.ServerAllocation)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.LocationAssignments)
+                .WithOne(e => e.ServerAllocation)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.Appointments)
+                .WithOne(e => e.ServerAllocation)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestExpands)
+               .WithOne(e => e.ServerAllocation)
+               .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestHosts)
+               .WithOne(e => e.ServerAllocation)
+               .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.IpAssignments)
+               .WithOne(e => e.ServerAllocation)
+               .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<User>(b =>
+        {
+            // Each User can have many entries in the UserRole join table
+            b.HasMany(e => e.UserRoles)
+                .WithOne(e => e.User)
+                .HasForeignKey(ur => ur.UserId)
+                .IsRequired();
+            b.HasIndex(e => e.Email).IsUnique();
+            b.HasIndex(e => e.PhoneNumber).IsUnique();
+            b.HasMany(e => e.RequestUpgradeUsers)
+                .WithOne(e => e.User)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.AppointmentUsers)
+                .WithOne(e => e.User)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestExpandUsers)
+                .WithOne(e => e.User)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.RequestHostUsers)
+                .WithOne(e => e.User)
+                .OnDelete(DeleteBehavior.ClientCascade);
+        });
+
+        builder.Entity<Role>(b =>
+        {
+            // Each Role can have many entries in the UserRole join table
+            b.HasMany(e => e.UserRoles)
+                .WithOne(e => e.Role)
+                .HasForeignKey(ur => ur.RoleId)
+                .IsRequired();
+        });
     }
 }
