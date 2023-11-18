@@ -288,11 +288,16 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
-                var appoitment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId && x.Status == RequestStatus.Waiting);
+                var appoitment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
                 if (appoitment == null)
                 {
                     validPrecondition = false;
                     result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                }
+                else if (appoitment.Status != RequestStatus.Waiting)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = AppointmentErrorMessgae.NOT_WAITING;
                 }
                 else
                 {
