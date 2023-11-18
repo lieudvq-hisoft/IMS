@@ -22,10 +22,11 @@ public interface IRequestUpgradeService
     Task<ResultModel> Delete(int requestUpgradeId);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
     Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, UserAssignModel model);
-    Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateModel model, RequestStatus status);
+    Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status);
     Task<ResultModel> Reject(int requestUpgradeId);
     Task<ResultModel> CheckCompletability(int requestUpgradeId);
     Task<ResultModel> Complete(int requestUpgradeId);
+    Task<ResultModel> CompleteBulk(RequestUpgradeCompleteBulkModel model);
     Task<ResultModel> GetInspectionReport(int requestUpgradeId);
 }
 
@@ -388,12 +389,10 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateModel model, RequestStatus status)
+    public async Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status)
     {
         var result = new ResultModel();
         result.Succeed = false;
-        bool validPrecondition = true;
-
 
         try
         {
@@ -552,6 +551,42 @@ public class RequestUpgradeService : IRequestUpgradeService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> CompleteBulk(RequestUpgradeCompleteBulkModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            using var transaction = _transactionHelper.GetTransaction();
+            _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
+            var results = new List<ResultModel>();
+            foreach (var requestUpgradeId in model.RequestUpgradeIds)
+            {
+
+                results.Add(await Complete(requestUpgradeId));
+            }
+
+            if (results.Any(x => !x.Succeed))
+            {
+                result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                transaction.Rollback();
+            }
+            else
+            {
+                transaction.Commit();
+                result.Succeed = true;
+                result.Data = results.Select(x => x.Data);
             }
         }
         catch (Exception e)

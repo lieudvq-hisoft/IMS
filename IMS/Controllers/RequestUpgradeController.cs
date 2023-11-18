@@ -100,7 +100,7 @@ public class RequestUpgradeController : ControllerBase
 
     [HttpPut("Accept/Bulk")]
     [SwaggerOperation(Summary = "Accept many waiting request upgrade")]
-    public async Task<ActionResult> AcceptBulk(RequestUpgradeEvaluateModel model)
+    public async Task<ActionResult> AcceptBulk(RequestUpgradeEvaluateBulkModel model)
     {
         var result = await _requestUpgradeService.EvaluateBulk(model, RequestStatus.Accepted);
         if (result.Succeed) return Ok(result.Data);
@@ -118,7 +118,7 @@ public class RequestUpgradeController : ControllerBase
 
     [HttpPut("Deny/Bulk")]
     [SwaggerOperation(Summary = "Deny many waiting request upgrade")]
-    public async Task<ActionResult> DenyBulk(RequestUpgradeEvaluateModel model)
+    public async Task<ActionResult> DenyBulk(RequestUpgradeEvaluateBulkModel model)
     {
         var result = await _requestUpgradeService.EvaluateBulk(model, RequestStatus.Denied);
         if (result.Succeed) return Ok(result.Data);
@@ -148,6 +148,15 @@ public class RequestUpgradeController : ControllerBase
     public async Task<ActionResult> Complete(int id)
     {
         var result = await _requestUpgradeService.Complete(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("Complete/Bulk")]
+    [SwaggerOperation(Summary = "Complete many completable accepted request upgrade. Change serverHardwareconfig")]
+    public async Task<ActionResult> CompleteBulk(RequestUpgradeCompleteBulkModel model)
+    {
+        var result = await _requestUpgradeService.CompleteBulk(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
