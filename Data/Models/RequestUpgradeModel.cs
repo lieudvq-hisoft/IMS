@@ -22,7 +22,6 @@ public class RequestUpgradeCreateModel
     public string Description { get; set; }
 
     [Required]
-    [GreaterThanZero]
     public int Capacity { get; set; }
 
     [Required]

@@ -209,6 +209,8 @@ public class RequestUpgradeErrorMessage
     public const string NOT_WAITING = "Request upgrade not waiting";
     public const string NOT_COMPLETABLE = "Request upgrade is not completable";
     public const string APPOINTMENT_NOT_COMPLETE = "Request upgrade dont have complete appointment";
+    public const string INITIATE_NON_POSITIVE_CAPACITY = "Initial request upgrade must have positive capacity";
+    public const string CANNOT_DOWNGRADE = "Request upgrade cannot be downgrade";
 }
 
 

@@ -9,6 +9,7 @@ using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Services.Utilities;
+using System.ComponentModel;
 
 namespace Services.Core;
 public interface IRequestUpgradeService
@@ -117,7 +118,7 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
+            var component = _dbContext.Components.Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == model.ComponentId);
             if (component == null)
             {
                 result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
@@ -128,6 +129,24 @@ public class RequestUpgradeService : IRequestUpgradeService
             if (component == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+
+            if (component.Type == ComponentType.Change && model.Capacity <= 0)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
+                validPrecondition = false;
+            }
+
+            var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault();
+            if (serverHardwareConfig != null && (serverHardwareConfig.Capacity - model.Capacity <= 0))
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
+                validPrecondition = false;
+            }
+            else if (serverHardwareConfig == null &&  model.Capacity <= 0)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.INITIATE_NON_POSITIVE_CAPACITY;
                 validPrecondition = false;
             }
 
@@ -193,7 +212,7 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
+            var component = _dbContext.Components.Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == model.ComponentId);
             if (component == null)
             {
                 result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
@@ -204,6 +223,24 @@ public class RequestUpgradeService : IRequestUpgradeService
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+
+            if (component.Type == ComponentType.Change && model.Capacity <= 0)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
+                validPrecondition = false;
+            }
+
+            var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault();
+            if (serverHardwareConfig != null && (serverHardwareConfig.Capacity - model.Capacity <= 0))
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
+                validPrecondition = false;
+            }
+            else if (serverHardwareConfig == null && model.Capacity <= 0)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.INITIATE_NON_POSITIVE_CAPACITY;
                 validPrecondition = false;
             }
 
@@ -521,6 +558,23 @@ public class RequestUpgradeService : IRequestUpgradeService
             }
 
             ServerHardwareConfig serverHardwareConfig = requestUpgrade.ServerAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId);
+            if (requestUpgrade.Component.Type == ComponentType.Change && requestUpgrade.Capacity <= 0)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
+                validPrecondition = false;
+            }
+
+            if (serverHardwareConfig != null && (serverHardwareConfig.Capacity - requestUpgrade.Capacity <= 0))
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
+                validPrecondition = false;
+            }
+            else if (serverHardwareConfig == null && requestUpgrade.Capacity <= 0)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.INITIATE_NON_POSITIVE_CAPACITY;
+                validPrecondition = false;
+            }
+
 
             if (validPrecondition)
             {
