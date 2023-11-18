@@ -98,11 +98,29 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPut("Accept/Bulk")]
+    [SwaggerOperation(Summary = "Accept many waiting request upgrade")]
+    public async Task<ActionResult> AcceptBulk(RequestUpgradeEvaluateModel model)
+    {
+        var result = await _requestUpgradeService.EvaluateBulk(model, RequestStatus.Accepted);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut("{id}/Deny")]
     [SwaggerOperation(Summary = "Deny a waiting request upgrade")]
     public async Task<ActionResult> Deny(int id, [FromBody] UserAssignModel model)
     {
         var result = await _requestUpgradeService.Evaluate(id, RequestStatus.Denied, model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("Deny/Bulk")]
+    [SwaggerOperation(Summary = "Deny many waiting request upgrade")]
+    public async Task<ActionResult> DenyBulk(RequestUpgradeEvaluateModel model)
+    {
+        var result = await _requestUpgradeService.EvaluateBulk(model, RequestStatus.Denied);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

@@ -20,6 +20,7 @@ public class RequestUpgradeCreateModel
     public string Description { get; set; }
 
     [Required]
+    [GreaterThanZero]
     public int Capacity { get; set; }
 
     [Required]
@@ -35,6 +36,15 @@ public class RequestUpgradeCreateBulkModel
     public List<RequestUpgradeCreateModel> RequestUpgradeCreateModels { get; set; }
 }
 
+public class RequestUpgradeEvaluateModel
+{
+    [Required]
+    public List<int> RequestUpgradeIds { get; set; }
+
+    [Required]
+    public string UserId { get; set; }
+}
+
 public class RequestUpgradeUpdateModel
 {
     [Required]
@@ -44,6 +54,7 @@ public class RequestUpgradeUpdateModel
     public string Description { get; set; }
 
     [Required]
+    [GreaterThanZero]
     public int Capacity { get; set; }
 
     [Required]
