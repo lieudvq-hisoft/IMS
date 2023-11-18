@@ -11,7 +11,6 @@ public class RequestUpgradeAppointmentModel
 public class RequestUpgradeAppointmentCreateModel
 {
     [Required]
-    [GreaterThanZero]
     public List<int> RequestUpgradeIds { get; set; }
 }
 
