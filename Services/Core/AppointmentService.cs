@@ -216,7 +216,42 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateRequestUpgradeAppointment(int appointmentId ,RequestUpgradeAppointmentCreateModel model)
+    public async Task<ResultModel> CreateRequestUpgradeAppointment(int appointmentId, RequestUpgradeAppointmentCreateModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            using var transaction = _transactionHelper.GetTransaction();
+            _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
+            var results = new List<ResultModel>();
+            foreach (var requestUpgradeId in model.RequestUpgradeIds)
+            {
+                results.Add(await CreateOneRequestUpgradeAppointment(appointmentId, requestUpgradeId));
+            }
+
+            if (results.Any(x => !x.Succeed))
+            {
+                result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                transaction.Rollback();
+            }
+            else
+            {
+                transaction.Commit();
+                result.Succeed = true;
+                result.Data = results.Select(x => x.Data);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    private async Task<ResultModel> CreateOneRequestUpgradeAppointment(int appointmentId, int requestUpgradeId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -224,7 +259,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var existedRequestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == appointmentId && x.RequestUpgradeId == model.RequestUpgradeId && x.Appointment.Status == RequestStatus.Waiting);
+            var existedRequestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == appointmentId && x.RequestUpgradeId == requestUpgradeId && x.Appointment.Status == RequestStatus.Waiting);
             if (existedRequestUpgradeAppointment != null)
             {
                 validPrecondition = false;
@@ -240,7 +275,7 @@ public class AppointmentService : IAppointmentService
                 }
                 else
                 {
-                    var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == model.RequestUpgradeId);
+                    var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
                     if (requestUpgrade == null)
                     {
                         validPrecondition = false;
@@ -261,7 +296,11 @@ public class AppointmentService : IAppointmentService
 
             if (validPrecondition)
             {
-                var requestUpgradeAppointment = _mapper.Map<RequestUpgradeAppointment>(model);
+                var requestUpgradeAppointment = new RequestUpgradeAppointment
+                {
+                    RequestUpgradeId = requestUpgradeId,
+                    AppointmentId = appointmentId,
+                };
                 _dbContext.RequestUpgradeAppointments.Add(requestUpgradeAppointment);
                 _dbContext.SaveChanges();
 
