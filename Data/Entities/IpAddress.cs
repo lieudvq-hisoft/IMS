@@ -1,4 +1,6 @@
-﻿namespace Data.Entities;
+﻿using Data.Entities.Pending;
+
+namespace Data.Entities;
 
 public class IpAddress : BaseEntity
 {
@@ -10,4 +12,5 @@ public class IpAddress : BaseEntity
     public virtual IpSubnet IpSubnet { get; set; }
 
     public virtual ICollection<IpAssignment> IpAssignments { get; set; }
+    public virtual ICollection<RequestHostIp> RequestHostIps { get; set; }
 }
