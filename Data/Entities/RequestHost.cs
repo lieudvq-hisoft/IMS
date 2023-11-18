@@ -4,9 +4,7 @@ namespace Data.Entities.Pending;
 public class RequestHost : BaseEntity
 {
     public IpAssignmentTypes Type { get; set; }
-
     public RequestStatus Status { get; set; }
-
     public int ServerAllocationId { get; set; }
     public ServerAllocation ServerAllocation { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Host;

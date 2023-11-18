@@ -22,7 +22,7 @@ public interface IRequestHostService
     Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestStatus status);
 }
 
-public class RequestHostService
+public class RequestHostService: IRequestHostService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
