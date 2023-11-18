@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using Data.Entities.Pending;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -19,4 +20,5 @@ public class User : IdentityUser<Guid>
     public ICollection<RequestUpgradeUser> RequestUpgradeUsers { get; set; }
     public ICollection<AppointmentUser> AppointmentUsers { get; set; }
     public ICollection<RequestExpandUser> RequestExpandUsers { get; set; }
+    public ICollection<RequestHostUser> RequestHostUsers { get; set; }
 }

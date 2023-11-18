@@ -1,4 +1,5 @@
-﻿using Data.Enums;
+﻿using Data.Entities.Pending;
+using Data.Enums;
 
 namespace Data.Entities;
 public class ServerAllocation : BaseEntity
@@ -20,4 +21,6 @@ public class ServerAllocation : BaseEntity
     public ICollection<LocationAssignment> LocationAssignments { get; set; }
     public ICollection<Appointment> Appointments { get; set; }
     public ICollection<RequestExpand> RequestExpands { get; set; }
+    public ICollection<IpAssignment> IpAssignments { get; set; }
+    public ICollection<RequestHost> RequestHosts { get; set; }  
 }
