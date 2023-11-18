@@ -5,6 +5,8 @@ public class RequestHost : BaseEntity
 {
     public IpAssignmentTypes Type { get; set; }
 
+    public RequestStatus Status { get; set; }
+
     public int ServerAllocationId { get; set; }
     public virtual ServerAllocation ServerAllocation { get; set; }
 

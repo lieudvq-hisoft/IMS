@@ -39,6 +39,13 @@ public class RequestUpgradeUserErrorMessage
     public const string NOT_EXISTED = "Request Upgrade User " + ErrorMessage.NOT_EXISTED;
 }
 
+public class RequestHostErrorMessage
+{
+    public const string NOT_EXISTED = "Request Host " + ErrorMessage.NOT_EXISTED;
+    public const string NOT_ACCEPTED = "Request Host not accepted";
+    public const string NOT_WAITING = "Request Host not waiting";
+}
+
 public class RequestExpandUserErrorMessage
 {
     public const string NOT_EXISTED = "Request Expand User " + ErrorMessage.NOT_EXISTED;
