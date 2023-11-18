@@ -12,9 +12,6 @@ public class RequestUpgradeAppointmentCreateModel
 {
     [Required]
     [GreaterThanZero]
-    public int AppointmentId { get; set; }
-    [Required]
-    [GreaterThanZero]
     public int RequestUpgradeId { get; set; }
 }
 
