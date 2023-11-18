@@ -8,10 +8,16 @@ public class RequestUpgradeAppointmentModel
     public int RequestUpgradeId { get; set; }
 }
 
-public class RequestUpgradeAppointmentCreateModel
+public class RequestAppointmentCreateModel
 {
     [Required]
     public List<int> RequestUpgradeIds { get; set; }
+
+    [Required]
+    public List<int> RequestExpandIds { get; set; }
+
+    [Required]
+    public List<int> RequestHostIds { get; set; }
 }
 
 public class RequestUpgradeAppointmentUpdateModel

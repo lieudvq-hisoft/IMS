@@ -19,7 +19,7 @@ public interface IAppointmentService
     Task<ResultModel> GetRequestUpgradeAppointment(int id);
     Task<ResultModel> GetRequestUpgrade(int id);
     Task<ResultModel> Create(AppointmentCreateModel model);
-    Task<ResultModel> CreateRequestUpgradeAppointment(int appointmentId, RequestUpgradeAppointmentCreateModel model);
+    Task<ResultModel> CreateRequestUpgradeAppointment(int appointmentId, RequestAppointmentCreateModel model);
     Task<ResultModel> Update(AppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, UserAssignModel model);
@@ -237,7 +237,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateRequestUpgradeAppointment(int appointmentId, RequestUpgradeAppointmentCreateModel model)
+    public async Task<ResultModel> CreateRequestUpgradeAppointment(int appointmentId, RequestAppointmentCreateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;

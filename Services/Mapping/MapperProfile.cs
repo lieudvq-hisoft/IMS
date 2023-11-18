@@ -60,7 +60,7 @@ public class MapperProfile : Profile
 
         #region Appointment
         CreateMap<RequestUpgradeAppointmentUpdateModel, RequestUpgradeAppointment>();
-        CreateMap<RequestUpgradeAppointmentCreateModel, RequestUpgradeAppointment>();
+        CreateMap<RequestAppointmentCreateModel, RequestUpgradeAppointment>();
         CreateMap<RequestUpgradeAppointment, RequestUpgradeAppointmentModel>();
 
         CreateMap<Appointment, AppointmentModel>();
