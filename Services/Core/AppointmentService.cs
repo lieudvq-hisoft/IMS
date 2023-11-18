@@ -314,7 +314,7 @@ public class AppointmentService : IAppointmentService
                     }
                     else if (requestUpgrade.ServerAllocationId != appoitment.ServerAllocationId)
                     {
-                        result.ErrorMessage = "Wrong server allocation";
+                        result.ErrorMessage = "Request upgrade and appointment must belong to the same server allocation";
                         validPrecondition = false;
                     }
                 }
