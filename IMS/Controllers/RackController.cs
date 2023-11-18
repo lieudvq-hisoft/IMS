@@ -39,10 +39,37 @@ public class RackController : ControllerBase
     }
 
     [HttpGet("{id}/Location")]
-    [SwaggerOperation(Summary = "Get all Rack by area Id")]
+    [SwaggerOperation(Summary = "Get all rack location by rack id")]
     public async Task<ActionResult> Get(int id)
     {
         var result = await _RackService.GetLocation(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}/ServerAllocation")]
+    [SwaggerOperation(Summary = "Get all rack server allocation by rack id")]
+    public async Task<ActionResult> GetServerAllocation(int id)
+    {
+        var result = await _RackService.GetServerAllocation(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}/Map")]
+    [SwaggerOperation(Summary = "Get all rack location with server allocation id by rack id")]
+    public async Task<ActionResult> GetRackMap(int id)
+    {
+        var result = await _RackService.GetRackMap(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}/Power")]
+    [SwaggerOperation(Summary = "Get rack power")]
+    public async Task<ActionResult> GetPower(int id)
+    {
+        var result = await _RackService.GetPower(id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

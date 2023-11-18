@@ -17,6 +17,7 @@ public interface IRackService
     Task<ResultModel> GetLocation(int rackId);
     Task<ResultModel> GetServerAllocation(int rackId);
     Task<ResultModel> GetRackMap(int rackId);
+    Task<ResultModel> GetPower(int rackId);
     Task<ResultModel> Create(RackCreateModel model);
     Task<ResultModel> Delete(int rackId);
 }
