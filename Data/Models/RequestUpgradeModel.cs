@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Data.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models;
 public class RequestUpgradeModel
@@ -8,6 +9,7 @@ public class RequestUpgradeModel
     public int Capacity { get; set; }
     public string Status { get; set; }
     public string? InspectionReportFilePath { get; set; }
+    public RequestType RequestType { get; set; }
     public int ComponentId { get; set; }
     public int ServerAllocationId { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;

@@ -53,6 +53,13 @@ public enum RequestStatus
     Failed
 }
 
+public enum RequestType
+{
+    Upgrade,
+    Expand,
+    Host,
+}
+
 public enum LocationAssignmentSortingCriteria
 {
     Id,
