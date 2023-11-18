@@ -7,6 +7,7 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Services.Utilities;
 
 namespace Services.Core;
@@ -30,11 +31,13 @@ public class AppointmentService : IAppointmentService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly TransactionHelper _transactionHelper;
 
-    public AppointmentService(AppDbContext dbContext, IMapper mapper)
+    public AppointmentService(AppDbContext dbContext, IMapper mapper, TransactionHelper transactionHelper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _transactionHelper = transactionHelper;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel)

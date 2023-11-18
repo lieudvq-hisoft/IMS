@@ -35,6 +35,10 @@ public class AppointmentCreateModel
     [Required]
     [GreaterThanZero]
     public int ServerAllocationId { get; set; }
+
+    public List<int> RequestUpgradeIds { get; set; }
+
+    public List<int> RequestExpandIds { get; set; }
 }
 
 public class AppointmentUpdateModel
