@@ -39,6 +39,13 @@ public class RequestUpgradeUserErrorMessage
     public const string NOT_EXISTED = "Request Upgrade User " + ErrorMessage.NOT_EXISTED;
 }
 
+public class RequestHostErrorMessage
+{
+    public const string NOT_EXISTED = "Request Host " + ErrorMessage.NOT_EXISTED;
+    public const string NOT_ACCEPTED = "Request Host not accepted";
+    public const string NOT_WAITING = "Request Host not waiting";
+}
+
 public class RequestExpandUserErrorMessage
 {
     public const string NOT_EXISTED = "Request Expand User " + ErrorMessage.NOT_EXISTED;
@@ -49,6 +56,19 @@ public class AreaErrorMessage
     public const string NOT_EXISTED = "Area " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Area " + ErrorMessage.EXISTED;
 }
+
+public class IpAddressErrorMessage
+{
+    public const string NOT_EXISTED = "Ip Address " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Ip Address " + ErrorMessage.EXISTED;
+}
+
+public class IpSubnetErrorMessage
+{
+    public const string NOT_EXISTED = "Ip Subnet " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Ip Subnet " + ErrorMessage.EXISTED;
+}
+
 
 public class RequestExpandErrorMessage
 {
