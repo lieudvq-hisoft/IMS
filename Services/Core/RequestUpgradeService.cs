@@ -125,29 +125,17 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
             }
 
-            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
-            if (component == null)
+            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == model.ServerAllocationId);
+            if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
 
-            if (component.Type == ComponentType.Change && model.Capacity <= 0)
+            if (validPrecondition)
             {
-                result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
-                validPrecondition = false;
-            }
-
-            var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault();
-            if (serverHardwareConfig != null && (serverHardwareConfig.Capacity - model.Capacity <= 0))
-            {
-                result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
-                validPrecondition = false;
-            }
-            else if (serverHardwareConfig == null &&  model.Capacity <= 0)
-            {
-                result.ErrorMessage = RequestUpgradeErrorMessage.INITIATE_NON_POSITIVE_CAPACITY;
-                validPrecondition = false;
+                var serverHardwareConfig = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == component.Id);
+                CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
             }
 
             if (validPrecondition)
@@ -167,6 +155,29 @@ public class RequestUpgradeService : IRequestUpgradeService
         }
 
         return result;
+    }
+
+    private bool CheckValidCapacity(ResultModel result, Data.Entities.Component component, ServerHardwareConfig serverHardwareConfig, int capacity)
+    {
+        bool validCapacity = true;
+        if (component.Type == ComponentType.Change && capacity <= 0)
+        {
+            result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
+            validCapacity = false;
+        }
+
+        if (serverHardwareConfig != null && (serverHardwareConfig.Capacity + capacity <= 0))
+        {
+            result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
+            validCapacity = false;
+        }
+        else if (serverHardwareConfig == null && capacity <= 0)
+        {
+            result.ErrorMessage = RequestUpgradeErrorMessage.INITIATE_NON_POSITIVE_CAPACITY;
+            validCapacity = false;
+        }
+
+        return validCapacity;
     }
 
     public async Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model)
@@ -226,22 +237,10 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
             }
 
-            if (component.Type == ComponentType.Change && model.Capacity <= 0)
+            if (validPrecondition)
             {
-                result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
-                validPrecondition = false;
-            }
-
-            var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault();
-            if (serverHardwareConfig != null && (serverHardwareConfig.Capacity - model.Capacity <= 0))
-            {
-                result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
-                validPrecondition = false;
-            }
-            else if (serverHardwareConfig == null && model.Capacity <= 0)
-            {
-                result.ErrorMessage = RequestUpgradeErrorMessage.INITIATE_NON_POSITIVE_CAPACITY;
-                validPrecondition = false;
+                var serverHardwareConfig = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == component.Id);
+                CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
             }
 
             if (validPrecondition)
@@ -320,11 +319,17 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
             }
 
-            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
+            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == model.ServerAllocationId);
             if (component == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
+            }
+
+            if (validPrecondition)
+            {
+                var serverHardwareConfig = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == component.Id);
+                CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
             }
 
             if (validPrecondition)
@@ -557,22 +562,10 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
             }
 
-            ServerHardwareConfig serverHardwareConfig = requestUpgrade.ServerAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId);
-            if (requestUpgrade.Component.Type == ComponentType.Change && requestUpgrade.Capacity <= 0)
+            ServerHardwareConfig serverHardwareConfig = requestUpgrade.ServerAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId); ;
+            if (validPrecondition)
             {
-                result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
-                validPrecondition = false;
-            }
-
-            if (serverHardwareConfig != null && (serverHardwareConfig.Capacity - requestUpgrade.Capacity <= 0))
-            {
-                result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
-                validPrecondition = false;
-            }
-            else if (serverHardwareConfig == null && requestUpgrade.Capacity <= 0)
-            {
-                result.ErrorMessage = RequestUpgradeErrorMessage.INITIATE_NON_POSITIVE_CAPACITY;
-                validPrecondition = false;
+                CheckValidCapacity(result, requestUpgrade.Component, serverHardwareConfig, requestUpgrade.Capacity);
             }
 
 

@@ -197,6 +197,7 @@ public class ComponentErrorMessage
 
 public class ServerHardwareConfigErrorMessage
 {
+    public const string EXISTED = "Server hardware config " + ErrorMessage.EXISTED;
     public const string NOT_EXISTED = "Server hardware config " + ErrorMessage.NOT_EXISTED;
     public const string CONFIG_FOR_COMPONENT_EXISTED = "Config for component " + ErrorMessage.EXISTED;
     public const string DELETE_CURRENT = "Cannot delete current server hardware config";
