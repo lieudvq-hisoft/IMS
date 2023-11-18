@@ -84,5 +84,10 @@ public class MapperProfile : Profile
         #region CompanyType
         CreateMap<CompanyType, CompanyTypeModel>();
         #endregion
+
+        #region IP
+        CreateMap<IpAddress, IpAddressModel>();
+        CreateMap<IpSubnet, IpSubnetModel>();
+        #endregion
     }
 }

@@ -50,6 +50,19 @@ public class AreaErrorMessage
     public const string EXISTED = "Area " + ErrorMessage.EXISTED;
 }
 
+public class IpAddressErrorMessage
+{
+    public const string NOT_EXISTED = "Ip Address " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Ip Address " + ErrorMessage.EXISTED;
+}
+
+public class IpSubnetErrorMessage
+{
+    public const string NOT_EXISTED = "Ip Subnet " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Ip Subnet " + ErrorMessage.EXISTED;
+}
+
+
 public class RequestExpandErrorMessage
 {
     public const string NOT_EXISTED = "Request Expand " + ErrorMessage.NOT_EXISTED;
