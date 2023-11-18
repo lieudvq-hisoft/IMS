@@ -46,7 +46,7 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPost("Create/Bulk")]
+    [HttpPost("Bulk")]
     [SwaggerOperation(Summary = "Create many request upgrade for server, state is accepted")]
     public async Task<ActionResult> CreateBulk([FromBody] RequestUpgradeCreateBulkModel model)
     {
