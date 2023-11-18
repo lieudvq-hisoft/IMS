@@ -280,7 +280,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var existedRequestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == appointmentId && x.RequestUpgradeId == requestUpgradeId && x.Appointment.Status == RequestStatus.Waiting);
+            var existedRequestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == appointmentId && x.RequestUpgradeId == requestUpgradeId && x.Appointment.Status != RequestStatus.Denied);
             if (existedRequestUpgradeAppointment != null)
             {
                 validPrecondition = false;
@@ -294,10 +294,10 @@ public class AppointmentService : IAppointmentService
                     validPrecondition = false;
                     result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
                 }
-                else if (appoitment.Status != RequestStatus.Waiting)
+                else if (appoitment.Status != RequestStatus.Waiting && appoitment.Status != RequestStatus.Accepted)
                 {
                     validPrecondition = false;
-                    result.ErrorMessage = AppointmentErrorMessgae.NOT_WAITING;
+                    result.ErrorMessage = AppointmentErrorMessgae.NOT_WAITING + "/" + AppointmentErrorMessgae.NOT_ACCEPTED;
                 }
                 else
                 {
