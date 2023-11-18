@@ -29,6 +29,12 @@ public class RequestUpgradeCreateModel
     public int ServerAllocationId { get; set; }
 }
 
+public class RequestUpgradeCreateBulkModel
+{
+    [Required]
+    public List<RequestUpgradeCreateModel> RequestUpgradeCreateModels { get; set; }
+}
+
 public class RequestUpgradeUpdateModel
 {
     [Required]

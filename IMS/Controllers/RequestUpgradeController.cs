@@ -46,11 +46,29 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPost("Create/Bulk")]
+    [SwaggerOperation(Summary = "Create many request upgrade for server, state is accepted")]
+    public async Task<ActionResult> CreateBulk([FromBody] RequestUpgradeCreateBulkModel model)
+    {
+        var result = await _requestUpgradeService.InitiateBulk(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost("Initial")]
     [SwaggerOperation(Summary = "Create inital request upgrade for server, state is accepted")]
     public async Task<ActionResult> Initiate([FromBody] RequestUpgradeCreateModel model)
     {
         var result = await _requestUpgradeService.Initiate(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPost("Initial/Bulk")]
+    [SwaggerOperation(Summary = "Create many inital request upgrade for server, state is accepted")]
+    public async Task<ActionResult> InitiateBulk(RequestUpgradeCreateBulkModel model)
+    {
+        var result = await _requestUpgradeService.InitiateBulk(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

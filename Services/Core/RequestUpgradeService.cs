@@ -7,6 +7,7 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Services.Utilities;
 
 namespace Services.Core;
@@ -15,7 +16,9 @@ public interface IRequestUpgradeService
     Task<ResultModel> Get(PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
+    Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model);
     Task<ResultModel> Initiate(RequestUpgradeCreateModel model);
+    Task<ResultModel> InitiateBulk(RequestUpgradeCreateBulkModel model);
     Task<ResultModel> Delete(int requestUpgradeId);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
     Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, UserAssignModel model);
@@ -29,11 +32,13 @@ public class RequestUpgradeService : IRequestUpgradeService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly TransactionHelper _transactionHelper;
 
-    public RequestUpgradeService(AppDbContext dbContext, IMapper mapper)
+    public RequestUpgradeService(AppDbContext dbContext, IMapper mapper, TransactionHelper transactionHelper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _transactionHelper = transactionHelper;
     }
 
     public async Task<ResultModel> Get(PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel)
@@ -143,6 +148,40 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
+    public async Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            using var transaction = _transactionHelper.GetTransaction();
+            _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
+            var results = new List<ResultModel>();
+            foreach (var requestUpgradeRequestModel in model.RequestUpgradeCreateModels)
+            {
+                results.Add(await Create(requestUpgradeRequestModel));
+            }
+
+            if (results.Any(x => x.Succeed == false))
+            {
+                transaction.Rollback();
+            }
+            else
+            {
+                transaction.Commit();
+                result.Succeed = true;
+                result.Data = results.Select(x => x.Data);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
     public async Task<ResultModel> Initiate(RequestUpgradeCreateModel model)
     {
         var result = new ResultModel();
@@ -174,6 +213,40 @@ public class RequestUpgradeService : IRequestUpgradeService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> InitiateBulk(RequestUpgradeCreateBulkModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            using var transaction = _transactionHelper.GetTransaction();
+            _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
+            var results = new List<ResultModel>();
+            foreach (var requestUpgradeRequestModel in model.RequestUpgradeCreateModels)
+            {
+                results.Add(await Initiate(requestUpgradeRequestModel));
+            }
+
+            if (results.Any(x => x.Succeed == false))
+            {
+                transaction.Rollback();
+            }
+            else
+            {
+                transaction.Commit();
+                result.Succeed = true;
+                result.Data = results.Select(x => x.Data);
             }
         }
         catch (Exception e)
