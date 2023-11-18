@@ -193,6 +193,9 @@ public class AppointmentService : IAppointmentService
 
         try
         {
+            using var transaction = _transactionHelper.GetTransaction();
+            _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
+            var attachRequestUpgradeResults = new List<ResultModel>();
             var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
             if (serverAllocation == null)
             {
@@ -204,8 +207,26 @@ public class AppointmentService : IAppointmentService
                 _dbContext.Appointments.Add(appointment);
                 _dbContext.SaveChanges();
 
-                result.Succeed = true;
-                result.Data = _mapper.Map<AppointmentModel>(appointment);
+                foreach (var requestUpgradeId in model.RequestUpgradeIds)
+                {
+                    attachRequestUpgradeResults.Add(await CreateOneRequestUpgradeAppointment(appointment.Id, requestUpgradeId));
+                }
+
+                if (attachRequestUpgradeResults.Any(x => !x.Succeed))
+                {
+                    result.ErrorMessage = attachRequestUpgradeResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                    transaction.Rollback();
+                }
+                else
+                {
+                    transaction.Commit();
+                    result.Succeed = true;
+                    result.Data = new List<object>
+                    {
+                        attachRequestUpgradeResults.Select(x => x.Data),
+                        _mapper.Map<AppointmentModel>(appointment)
+                    };
+                }
             }
         }
         catch (Exception e)
