@@ -221,10 +221,10 @@ public class AppointmentService : IAppointmentService
                 {
                     transaction.Commit();
                     result.Succeed = true;
-                    result.Data = new List<object>
+                    result.Data = new AppointmentCreateResultModel
                     {
-                        attachRequestUpgradeResults.Select(x => x.Data),
-                        _mapper.Map<AppointmentModel>(appointment)
+                        RequestUpgradeAppointments = attachRequestUpgradeResults.Select(x => x.Data),
+                        Appointment = _mapper.Map<AppointmentModel>(appointment)
                     };
                 }
             }

@@ -41,6 +41,13 @@ public class AppointmentCreateModel
     public List<int> RequestExpandIds { get; set; }
 }
 
+public class AppointmentCreateResultModel
+{
+    public AppointmentModel Appointment { get; set; }
+
+    public IEnumerable<Object> RequestUpgradeAppointments { get; set; }
+}
+
 public class AppointmentUpdateModel
 {
     [Required]
