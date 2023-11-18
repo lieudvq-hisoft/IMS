@@ -101,4 +101,22 @@ public class RequestExpandController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpGet("{id}/Completability")]
+    [SwaggerOperation(Summary = "True if any appointment success and have inspection record")]
+    public async Task<ActionResult> GetCompletability(int id)
+    {
+        var result = await _requestExpandService.CheckCompletability(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("{id}/Complete")]
+    [SwaggerOperation(Summary = "Complete a completable accepted request expand")]
+    public async Task<ActionResult> Complete(int id)
+    {
+        var result = await _requestExpandService.Complete(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }

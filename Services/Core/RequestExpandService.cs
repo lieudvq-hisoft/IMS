@@ -21,6 +21,8 @@ public interface IRequestExpandService
     Task<ResultModel> Evaluate(int requestExpandId, RequestStatus status, UserAssignModel model);
     Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
     Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model);
+    Task<ResultModel> CheckCompletability(int requestExpandId);
+    Task<ResultModel> Complete(int requestExpandId)
 }
 
 public class RequestExpandService : IRequestExpandService
