@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Data.Utils.ValidationAttributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models;
 public class AreaModel

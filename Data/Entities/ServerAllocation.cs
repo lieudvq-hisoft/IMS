@@ -22,5 +22,5 @@ public class ServerAllocation : BaseEntity
     public ICollection<Appointment> Appointments { get; set; }
     public ICollection<RequestExpand> RequestExpands { get; set; }
     public ICollection<IpAssignment> IpAssignments { get; set; }
-    public ICollection<RequestHost> RequestHosts { get; set; }  
+    public ICollection<RequestHost> RequestHosts { get; set; }
 }

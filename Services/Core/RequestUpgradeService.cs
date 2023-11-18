@@ -9,7 +9,6 @@ using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Services.Utilities;
-using System.ComponentModel;
 
 namespace Services.Core;
 public interface IRequestUpgradeService
@@ -135,7 +134,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             if (validPrecondition)
             {
                 var serverHardwareConfig = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == component.Id);
-                CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
+                validPrecondition = CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
             }
 
             if (validPrecondition)
@@ -240,7 +239,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             if (validPrecondition)
             {
                 var serverHardwareConfig = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == component.Id);
-                CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
+                validPrecondition = CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
             }
 
             if (validPrecondition)
@@ -329,7 +328,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             if (validPrecondition)
             {
                 var serverHardwareConfig = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == component.Id);
-                CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
+                validPrecondition = CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
             }
 
             if (validPrecondition)
@@ -565,7 +564,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             ServerHardwareConfig serverHardwareConfig = requestUpgrade.ServerAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId); ;
             if (validPrecondition)
             {
-                CheckValidCapacity(result, requestUpgrade.Component, serverHardwareConfig, requestUpgrade.Capacity);
+                validPrecondition = CheckValidCapacity(result, requestUpgrade.Component, serverHardwareConfig, requestUpgrade.Capacity);
             }
 
 

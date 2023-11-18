@@ -1,6 +1,4 @@
-﻿using Data.Enums;
-
-namespace Data.Entities.Pending;
+﻿namespace Data.Entities.Pending;
 public class RequestHostAppointment : BaseEntity
 {
     public int RequestHostId { get; set; }

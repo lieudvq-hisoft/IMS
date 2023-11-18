@@ -1,5 +1,4 @@
-﻿using Data.Common.PaginationModel;
-using Data.Enums;
+﻿using Data.Enums;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

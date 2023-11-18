@@ -1,19 +1,12 @@
 ﻿using AutoMapper;
-using Data.Common.PaginationModel;
 using Data.DataAccess;
 using Data.DataAccess.Constant;
-using Data.Entities;
+using Data.Entities.Pending;
 using Data.Enums;
 using Data.Models;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Services.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Data.Entities.Pending;
 
 namespace Services.Core;
 public interface IRequestHostService
@@ -22,7 +15,7 @@ public interface IRequestHostService
     Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestStatus status);
 }
 
-public class RequestHostService: IRequestHostService
+public class RequestHostService : IRequestHostService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;

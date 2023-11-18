@@ -1,16 +1,11 @@
 ﻿using AutoMapper;
 using Data.Common.PaginationModel;
-using Data.DataAccess.Constant;
 using Data.DataAccess;
+using Data.DataAccess.Constant;
 using Data.Enums;
 using Data.Models;
-using Services.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Data.Utils.Paging;
+using Services.Utilities;
 
 namespace Services.Core;
 public interface IIpAddressService

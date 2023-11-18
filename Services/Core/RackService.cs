@@ -13,10 +13,12 @@ namespace Services.Core;
 public interface IRackService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RackSearchModel searchModel);
-    Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> GetLocation(int id);
+    Task<ResultModel> GetDetail(int rackId);
+    Task<ResultModel> GetLocation(int rackId);
+    Task<ResultModel> GetServerAllocation(int rackId);
+    Task<ResultModel> GetRackMap(int rackId);
     Task<ResultModel> Create(RackCreateModel model);
-    Task<ResultModel> Delete(int id);
+    Task<ResultModel> Delete(int rackId);
 }
 
 public class RackService : IRackService
@@ -58,7 +60,7 @@ public class RackService : IRackService
         return result;
     }
 
-    public async Task<ResultModel> GetDetail(int id)
+    public async Task<ResultModel> GetDetail(int rackId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -66,7 +68,7 @@ public class RackService : IRackService
         try
         {
             var rack = _dbContext.Racks
-                .FirstOrDefault(x => x.Id == id);
+                .FirstOrDefault(x => x.Id == rackId);
 
             if (rack != null)
             {
@@ -86,14 +88,14 @@ public class RackService : IRackService
         return result;
     }
 
-    public async Task<ResultModel> GetLocation(int id)
+    public async Task<ResultModel> GetLocation(int rackId)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var rack = _dbContext.Racks.Include(x => x.Locations).FirstOrDefault(x => x.Id == id);
+            var rack = _dbContext.Racks.Include(x => x.Locations).FirstOrDefault(x => x.Id == rackId);
             if (rack == null)
             {
                 result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
@@ -111,14 +113,14 @@ public class RackService : IRackService
         return result;
     }
 
-    public async Task<ResultModel> GetServerAllocation(int id)
+    public async Task<ResultModel> GetServerAllocation(int rackId)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var rack = _dbContext.Racks.Include(x => x.Locations).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).FirstOrDefault(x => x.Id == id);
+            var rack = _dbContext.Racks.Include(x => x.Locations).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).FirstOrDefault(x => x.Id == rackId);
             if (rack == null)
             {
                 result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
@@ -127,6 +129,69 @@ public class RackService : IRackService
             {
                 var serverAllocations = rack.Locations.Where(x => x.LocationAssignments.Any()).Select(x => x.LocationAssignments.FirstOrDefault()).Select(x => x.ServerAllocation);
                 result.Data = _mapper.Map<List<ServerAllocation>>(serverAllocations);
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetPower(int rackId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var rack = _dbContext.Racks.Include(x => x.Locations).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).FirstOrDefault(x => x.Id == rackId);
+            if (rack == null)
+            {
+                result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var serverAllocations = rack.Locations.Where(x => x.LocationAssignments.Any()).Select(x => x.LocationAssignments.FirstOrDefault()).Select(x => x.ServerAllocation);
+                result.Data = serverAllocations.Sum(x => x.Power);
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetRackMap(int rackId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var rack = _dbContext.Racks.Include(x => x.Locations).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).FirstOrDefault(x => x.Id == rackId);
+            if (rack == null)
+            {
+                result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var locationRackMap = new List<LocationRackMapModel>();
+                foreach (var location in rack.Locations)
+                {
+                    locationRackMap.Add(new LocationRackMapModel
+                    {
+                        Id = location.Id,
+                        Position = location.Position,
+                        RackId = location.RackId,
+                        ServerAllocationId = location.LocationAssignments.FirstOrDefault().ServerAllocationId
+                    });
+                }
+
+                result.Data = _mapper.Map<List<ServerAllocation>>(locationRackMap);
                 result.Succeed = true;
             }
         }

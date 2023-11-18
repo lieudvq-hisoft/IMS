@@ -2,7 +2,6 @@
 using Data.Common.PaginationModel;
 using Data.DataAccess;
 using Data.DataAccess.Constant;
-using Data.Entities;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;

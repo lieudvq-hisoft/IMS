@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Data.Utils.ValidationAttributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models;
 
@@ -20,45 +21,8 @@ public class LocationAssignmentCreateModel
     public int LocationId { get; set; }
 }
 
-public class LocationModel
-{
-    public int Id { get; set; }
-    public int Position { get; set; }
-    public int RackId { get; set; }
-}
-
-public class LocationSearchModel
-{
-    public int? LocationId { get; set; } = null;
-}
-
-public class LocationChoiceModel
-{
-    public int AreaId { get; set; }
-
-    [Required]
-    public int RackId { get; set; }
-
-    [Required]
-    public int Position { get; set; }
-}
-
 public class LocationAssignmentSearchModel
 {
     public int? ServerAllocationId { get; set; } = null;
-}
-
-[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Property)]
-public class GreaterThanZeroAttribute : ValidationAttribute
-{
-    protected override ValidationResult IsValid(object value, ValidationContext validationContext)
-    {
-        if (value is int intValue && intValue > 0)
-        {
-            return ValidationResult.Success;
-        }
-
-        return new ValidationResult("The value must be greater than 0.");
-    }
 }
 
