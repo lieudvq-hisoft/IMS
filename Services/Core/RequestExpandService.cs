@@ -325,46 +325,139 @@ public class RequestExpandService : IRequestExpandService
                 }
             }
 
-            var locations = new List<Location>();
+            List<Location> locations = null;
             if (validPrecondition)
             {
-                var chosenLocations = _dbContext.Locations
+                locations = _dbContext.Locations
                     .Include(x => x.LocationAssignments)
                     .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand)
-                    .Where(x => x.RackId == model.RackId && x.Position >= model.StartPosition && x.Position < model.StartPosition + model.Size);
-                foreach (var location in chosenLocations)
-                {
-                    if (location.LocationAssignments.Any())
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = LocationAssignmentErrorMessage.EXISTED;
-                    }
-                    else if (location.RequestExpandLocations.Select(x => x.RequestExpand).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = RequestExpandLocationErrorMessage.EXISTED;
-                    }
-                    else
-                    {
-                        locations.Add(location);
-                    }
-                }
+                    .Where(x => x.RackId == model.RackId && x.Position >= model.StartPosition && x.Position < model.StartPosition + model.Size).ToList();
+                validPrecondition = CheckValidLocation(locations, requestExpandId, result);
             }
 
             if (validPrecondition)
             {
-                var haveLocation = requestExpand.ServerAllocation.LocationAssignments.Any();
                 foreach (var location in locations)
                 {
                     _dbContext.RequestExpandLocations.Add(new RequestExpandLocation
                     {
                         LocationId = location.Id,
                         RequestExpandId = requestExpandId,
-                        IsServer = !haveLocation
                     });
                 }
                 _dbContext.SaveChanges();
                 result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    private bool CheckValidLocation(List<Location> locations, int requestExpandId, ResultModel result)
+    {
+        bool allValidLocation = true;
+        foreach (var location in locations)
+        {
+            if (location.LocationAssignments.Any())
+            {
+                allValidLocation = false;
+                result.ErrorMessage = LocationAssignmentErrorMessage.EXISTED;
+            }
+            else if (location.RequestExpandLocations.Select(x => x.RequestExpand).Any(x => (x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted) && x.Id != requestExpandId))
+            {
+                allValidLocation = false;
+                result.ErrorMessage = RequestExpandLocationErrorMessage.EXISTED;
+            }
+        }
+
+        return allValidLocation;
+    }
+
+    public async Task<ResultModel> CheckCompletability(int requestExpandId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            result.Data = IsCompletable(requestExpandId);
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    private bool IsCompletable(int requestExpandId)
+    {
+        var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment).FirstOrDefault(x => x.Id == requestExpandId);
+        if (requestExpand == null)
+        {
+            return false;
+        }
+
+        bool appointmentSucceeded = requestExpand.RequestExpandAppointments.Any(x => x.Appointment.Status == RequestStatus.Success);
+        bool haveInspectionFile = requestExpand.InspectionReportFilePath != null;
+        return appointmentSucceeded && haveInspectionFile;
+    }
+
+    public async Task<ResultModel> Complete(int requestExpandId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var requestExpand = _dbContext.RequestExpands
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Accepted);
+            if (requestExpand == null)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+
+            if (!IsCompletable(requestExpandId))
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_COMPLETABLE;
+                validPrecondition = false;
+            }
+
+            List<Location> locations = null;
+            if (validPrecondition)
+            {
+                locations = requestExpand.RequestExpandLocations.Select(x => x.Location).ToList();
+                validPrecondition = CheckValidLocation(locations, requestExpandId, result);
+            }
+
+            if (validPrecondition)
+            {
+                var serverAllocation = requestExpand.ServerAllocation;
+                bool haveLocation = serverAllocation.LocationAssignments.Any();
+                var locationAssignments = new List<LocationAssignment>();
+                foreach (var location in locations)
+                {
+                    locationAssignments.Add(new LocationAssignment
+                    {
+                        ServerAllocationId = requestExpand.ServerAllocationId,
+                        LocationId = location.Id,
+                        IsServer = !haveLocation
+                    });
+                }
+                _dbContext.LocationAssignments.AddRange(locationAssignments);
+                serverAllocation.Power += requestExpand.Power;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
             }
         }
         catch (Exception e)

@@ -72,9 +72,10 @@ public class IpSubnetErrorMessage
 
 public class RequestExpandErrorMessage
 {
-    public const string NOT_EXISTED = "Request Expand " + ErrorMessage.NOT_EXISTED;
-    public const string EXISTED = "Request Expand " + ErrorMessage.EXISTED;
-    public const string NOT_ACCEPTED = "Request Expand is not accepted";
+    public const string NOT_EXISTED = "Request expand " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Request expand " + ErrorMessage.EXISTED;
+    public const string NOT_ACCEPTED = "Request expand is not accepted";
+    public const string NOT_COMPLETABLE = "Request expand is not completable";
 }
 
 public class RequestExpandAppointmentErrorMessage

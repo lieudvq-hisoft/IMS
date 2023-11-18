@@ -18,10 +18,8 @@ public class RequestExpandModel
 public class RequestExpandCreateModel
 {
     [Required]
+    [NotNegative]
     public int Power { get; set; }
-
-    [Required]
-    public RequestStatus Status { get; set; }
 
     [Required]
     public string? Note { get; set; }
@@ -54,8 +52,11 @@ public class RequestExpandUpdateModel
     [Required]
     [GreaterThanZero]
     public int Id { get; set; }
+
     [Required]
+    [NotNegative]
     public int Power { get; set; }
+
     [Required]
     public string? Note { get; set; }
     [Required]
