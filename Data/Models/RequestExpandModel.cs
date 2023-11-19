@@ -24,7 +24,6 @@ public class RequestExpandCreateModel
     [Required]
     public string? Note { get; set; }
 
-    [Required]
     public string? TechNote { get; set; }
 
     [Required]
@@ -57,9 +56,8 @@ public class RequestExpandUpdateModel
     [NotNegative]
     public int Power { get; set; }
 
-    [Required]
     public string? Note { get; set; }
-    [Required]
+
     public string? TechNote { get; set; }
 }
 
