@@ -252,7 +252,7 @@ public class RequestExpandService : IRequestExpandService
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<RequestUpgradeModel>(requestExpand);
+                result.Data = _mapper.Map<RequestExpandModel>(requestExpand);
             }
         }
         catch (Exception e)
