@@ -19,7 +19,7 @@ public interface IAppointmentService
     Task<ResultModel> GetRequestUpgradeAppointment(int id);
     Task<ResultModel> GetRequestUpgrade(int id);
     Task<ResultModel> Create(AppointmentCreateModel model);
-    Task<ResultModel> CreateRequestUpgradeAppointment(int appointmentId, RequestAppointmentCreateModel model);
+    Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model);
     Task<ResultModel> Update(AppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, UserAssignModel model);
@@ -190,12 +190,12 @@ public class AppointmentService : IAppointmentService
     {
         var result = new ResultModel();
         result.Succeed = false;
+        bool validCondition = true;
 
         try
         {
             using var transaction = _transactionHelper.GetTransaction();
             _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
-            var attachRequestUpgradeResults = new List<ResultModel>();
             var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
             if (serverAllocation == null)
             {
@@ -207,24 +207,44 @@ public class AppointmentService : IAppointmentService
                 _dbContext.Appointments.Add(appointment);
                 _dbContext.SaveChanges();
 
+                var createRequestUpgradeAppointmentResults = new List<ResultModel>();
                 foreach (var requestUpgradeId in model.RequestUpgradeIds)
                 {
-                    attachRequestUpgradeResults.Add(await CreateOneRequestUpgradeAppointment(appointment.Id, requestUpgradeId));
+                    createRequestUpgradeAppointmentResults.Add(await CreateOneRequestUpgradeAppointment(appointment.Id, requestUpgradeId));
                 }
 
-                if (attachRequestUpgradeResults.Any(x => !x.Succeed))
+                if (createRequestUpgradeAppointmentResults.Any(x => !x.Succeed))
                 {
-                    result.ErrorMessage = attachRequestUpgradeResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                    result.ErrorMessage = createRequestUpgradeAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
                     transaction.Rollback();
+                    validCondition = false;
                 }
-                else
+
+                var createRequestExpandAppointmentResults = new List<ResultModel>();
+                if (validCondition)
+                {
+                    foreach (var requestExpandId in model.RequestExpandIds)
+                    {
+                        createRequestExpandAppointmentResults.Add(await CreateOneRequestExpandAppointment(appointment.Id, requestExpandId));
+                    }
+
+                    if (createRequestExpandAppointmentResults.Any(x => !x.Succeed))
+                    {
+                        result.ErrorMessage = createRequestExpandAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                        transaction.Rollback();
+                        validCondition = false;
+                    }
+                }
+
+                if (validCondition)
                 {
                     transaction.Commit();
                     result.Succeed = true;
                     result.Data = new AppointmentCreateResultModel
                     {
-                        RequestUpgradeAppointments = attachRequestUpgradeResults.Select(x => x.Data),
-                        Appointment = _mapper.Map<AppointmentModel>(appointment)
+                        RequestUpgradeAppointments = createRequestUpgradeAppointmentResults.Select(x => x.Data),
+                        RequestExpandAppointments = createRequestExpandAppointmentResults.Select(x => x.Data),
+                        Appointment = _mapper.Map<AppointmentModel>(appointment),
                     };
                 }
             }
@@ -237,31 +257,55 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateRequestUpgradeAppointment(int appointmentId, RequestAppointmentCreateModel model)
+    public async Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
+        bool validCondition = true;
 
         try
         {
             using var transaction = _transactionHelper.GetTransaction();
             _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
-            var results = new List<ResultModel>();
+            var createRequestUpgradeAppointmentResults = new List<ResultModel>();
             foreach (var requestUpgradeId in model.RequestUpgradeIds)
             {
-                results.Add(await CreateOneRequestUpgradeAppointment(appointmentId, requestUpgradeId));
+                createRequestUpgradeAppointmentResults.Add(await CreateOneRequestUpgradeAppointment(appointmentId, requestUpgradeId));
             }
 
-            if (results.Any(x => !x.Succeed))
+            if (createRequestUpgradeAppointmentResults.Any(x => !x.Succeed))
             {
-                result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                result.ErrorMessage = createRequestUpgradeAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
                 transaction.Rollback();
+                validCondition = false;
             }
-            else
+
+            var createRequestExpandAppointmentResults = new List<ResultModel>();
+            if (validCondition)
+            {
+                foreach (var requestExpandId in model.RequestExpandIds)
+                {
+                    createRequestExpandAppointmentResults.Add(await CreateOneRequestExpandAppointment(appointmentId, requestExpandId));
+                }
+
+                if (createRequestExpandAppointmentResults.Any(x => !x.Succeed))
+                {
+                    result.ErrorMessage = createRequestExpandAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                    transaction.Rollback();
+                    validCondition = false;
+                }
+            }
+
+            if (validCondition)
             {
                 transaction.Commit();
                 result.Succeed = true;
-                result.Data = results.Select(x => x.Data);
+                var data = new RequestAppointmentCreateResultModel
+                {
+                    RequestUpgrades = createRequestUpgradeAppointmentResults.Select(x => x.Data),
+                    RequestExpands = createRequestExpandAppointmentResults.Select(x => x.Data)
+                };
+                result.Data = data;
             }
         }
         catch (Exception e)
@@ -332,6 +376,76 @@ public class AppointmentService : IAppointmentService
 
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeAppointmentModel>(requestUpgradeAppointment);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    private async Task<ResultModel> CreateOneRequestExpandAppointment(int appointmentId, int requestExpandId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var existedRequestExpandAppointment = _dbContext.RequestExpandAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == appointmentId && x.RequestExpandId == requestExpandId && x.Appointment.Status != RequestStatus.Denied);
+            if (existedRequestExpandAppointment != null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = RequestExpandErrorMessage.EXISTED;
+            }
+            else
+            {
+                var appoitment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
+                if (appoitment == null)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                }
+                else if (appoitment.Status != RequestStatus.Waiting && appoitment.Status != RequestStatus.Accepted)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = AppointmentErrorMessgae.NOT_WAITING + "/" + AppointmentErrorMessgae.NOT_ACCEPTED;
+                }
+                else
+                {
+                    var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
+                    if (requestExpand == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+                    }
+                    else if (requestExpand.Status != RequestStatus.Accepted)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = RequestExpandErrorMessage.NOT_ACCEPTED;
+                    }
+                    else if (requestExpand.ServerAllocationId != appoitment.ServerAllocationId)
+                    {
+                        result.ErrorMessage = "Request expand and appointment must belong to the same server allocation";
+                        validPrecondition = false;
+                    }
+                }
+            }
+
+            if (validPrecondition)
+            {
+                var requestExpandAppointment = new RequestExpandAppointment
+                {
+                    RequestExpandId = requestExpandId,
+                    AppointmentId = appointmentId,
+                };
+                _dbContext.RequestExpandAppointments.Add(requestExpandAppointment);
+                _dbContext.SaveChanges();
+
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestExpandAppointment>(requestExpandAppointment);
             }
         }
         catch (Exception e)

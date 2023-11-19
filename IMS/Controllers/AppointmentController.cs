@@ -59,7 +59,7 @@ public class AppointmentController : ControllerBase
     [HttpPost("{id}/Request")]
     public async Task<ActionResult> CreateRequestUpgradeAppointment(int id, RequestAppointmentCreateModel model)
     {
-        var result = await _appointmentService.CreateRequestUpgradeAppointment(id, model);
+        var result = await _appointmentService.CreateRequestAppointment(id, model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

@@ -42,11 +42,33 @@ public class AppointmentCreateModel
     public List<int> RequestExpandIds { get; set; }
 }
 
+public class RequestAppointmentCreateModel
+{
+    public List<int> RequestUpgradeIds { get; set; }
+
+    public List<int> RequestExpandIds { get; set; }
+
+    public List<int> RequestHostIds { get; set; }
+}
+
+public class RequestAppointmentCreateResultModel
+{
+    public IEnumerable<object> RequestUpgradeAppointments { get; set; }
+
+    public IEnumerable<object> RequestExpandAppointments { get; set; }
+
+    public IEnumerable<object> RequestHostAppointments { get; set; }
+}
+
 public class AppointmentCreateResultModel
 {
     public AppointmentModel Appointment { get; set; }
 
-    public IEnumerable<Object> RequestUpgradeAppointments { get; set; }
+    public IEnumerable<object> RequestUpgradeAppointments { get; set; }
+
+    public IEnumerable<object> RequestExpandAppointments { get; set; }
+
+    public IEnumerable<object> RequestHostAppointments { get; set; }
 }
 
 public class AppointmentUpdateModel
