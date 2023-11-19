@@ -445,7 +445,7 @@ public class AppointmentService : IAppointmentService
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
-                result.Data = _mapper.Map<RequestExpandAppointment>(requestExpandAppointment);
+                result.Data = _mapper.Map<RequestExpandAppointmentModel>(requestExpandAppointment);
             }
         }
         catch (Exception e)
