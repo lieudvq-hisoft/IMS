@@ -188,11 +188,11 @@ public class RackService : IRackService
                         Id = location.Id,
                         Position = location.Position,
                         RackId = location.RackId,
-                        ServerAllocationId = location.LocationAssignments.FirstOrDefault().ServerAllocationId
+                        ServerAllocationId = location.LocationAssignments.FirstOrDefault()?.ServerAllocationId
                     });
                 }
 
-                result.Data = _mapper.Map<List<ServerAllocation>>(locationRackMap);
+                result.Data = _mapper.Map<List<LocationRackMapModel>>(locationRackMap);
                 result.Succeed = true;
             }
         }
