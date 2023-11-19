@@ -39,7 +39,7 @@ public class RequestExpandAssignLocationModel
     public int RackId { get; set; }
 
     [Required]
-    [GreaterThanZero]
+    [NotNegative]
     public int StartPosition { get; set; }
 
     [Required]

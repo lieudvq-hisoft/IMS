@@ -298,7 +298,7 @@ public class RequestExpandService : IRequestExpandService
     {
         var result = new ResultModel();
         result.Succeed = false;
-        bool validPrecondition = false;
+        bool validPrecondition = true;
 
         try
         {
@@ -334,7 +334,15 @@ public class RequestExpandService : IRequestExpandService
                     .Include(x => x.LocationAssignments)
                     .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand)
                     .Where(x => x.RackId == model.RackId && x.Position >= model.StartPosition && x.Position < model.StartPosition + model.Size).ToList();
-                validPrecondition = CheckValidLocation(locations, requestExpandId, result);
+                if (locations.Count != model.Size)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = RequestExpandLocationErrorMessage.INVALID_LOCATION;
+                }
+                else
+                {
+                    validPrecondition = CheckValidLocation(locations, requestExpandId, result);
+                }
             }
 
             if (validPrecondition)
