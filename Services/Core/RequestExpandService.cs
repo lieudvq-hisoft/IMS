@@ -284,6 +284,8 @@ public class RequestExpandService : IRequestExpandService
                 var requestExpandLocations = requestExpand.RequestExpandLocations;
                 _dbContext.RequestExpandLocations.RemoveRange(requestExpandLocations);
                 _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = requestExpandLocations.Select(x => x.Id);
             }
         }
         catch (Exception e)
