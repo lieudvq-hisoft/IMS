@@ -302,8 +302,8 @@ public class AppointmentService : IAppointmentService
                 result.Succeed = true;
                 var data = new RequestAppointmentCreateResultModel
                 {
-                    RequestUpgrades = createRequestUpgradeAppointmentResults.Select(x => x.Data),
-                    RequestExpands = createRequestExpandAppointmentResults.Select(x => x.Data)
+                    RequestUpgradeAppointments = createRequestUpgradeAppointmentResults.Select(x => x.Data),
+                    RequestExpandAppointments = createRequestExpandAppointmentResults.Select(x => x.Data)
                 };
                 result.Data = data;
             }
