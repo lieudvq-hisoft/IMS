@@ -15,7 +15,7 @@ public interface IRequestUpgradeService
 {
     Task<ResultModel> Get(PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> GetAppointment(int requestUpgradeId);
+    Task<ResultModel> GetAppointment(int requestUpgradeId, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
     Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model);
     Task<ResultModel> Initiate(RequestUpgradeCreateModel model);
