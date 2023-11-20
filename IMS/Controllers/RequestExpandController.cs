@@ -15,11 +15,13 @@ public class RequestExpandController : ControllerBase
 {
     private readonly IRequestExpandService _requestExpandService;
     private readonly IWebHostEnvironment _environment;
+    private readonly IFileService _fileService;
 
-    public RequestExpandController(IRequestExpandService requestExpandService, IWebHostEnvironment environment)
+    public RequestExpandController(IRequestExpandService requestExpandService, IWebHostEnvironment environment, IFileService fileService)
     {
         _requestExpandService = requestExpandService;
         _environment = environment;
+        _fileService = fileService;
     }
 
     [HttpGet]
@@ -130,7 +132,7 @@ public class RequestExpandController : ControllerBase
         if (result.Succeed)
         {
             string filePath = Path.Combine(folderPath, result.Data as string);
-            return File(System.IO.File.OpenRead(filePath), "application/pdf", "InspectionReport.pdf");
+            return File(System.IO.File.OpenRead(filePath), _fileService.GetMimeTypeForFileExtension(filePath), $"InspectionReport.{Path.GetExtension(filePath)}");
         }
         return BadRequest(result.ErrorMessage);
     }
@@ -152,7 +154,7 @@ public class RequestExpandController : ControllerBase
         if (result.Succeed)
         {
             string filePath = Path.Combine(folderPath, result.Data as string);
-            return File(System.IO.File.OpenRead(filePath), "application/pdf", "ReceiptOfRecipient.pdf");
+            return File(System.IO.File.OpenRead(filePath), _fileService.GetMimeTypeForFileExtension(filePath), $"ReceiptOfRecipient.{Path.GetExtension(filePath)}");
         }
         return BadRequest(result.ErrorMessage);
     }

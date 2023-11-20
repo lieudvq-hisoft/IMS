@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
 using Swashbuckle.AspNetCore.Annotations;
+using System.IO;
 
 namespace IMS.Controllers;
 [Route("api/[controller]")]
@@ -14,11 +15,13 @@ public class RequestUpgradeController : ControllerBase
 {
     private readonly IRequestUpgradeService _requestUpgradeService;
     private readonly IWebHostEnvironment _environment;
+    private readonly IFileService _fileService;
 
-    public RequestUpgradeController(IRequestUpgradeService requestUpgradeService, IWebHostEnvironment environment)
+    public RequestUpgradeController(IRequestUpgradeService requestUpgradeService, IWebHostEnvironment environment, IFileService fileService)
     {
         this._requestUpgradeService = requestUpgradeService;
         _environment = environment;
+        _fileService = fileService;
     }
 
     [HttpGet]
@@ -169,7 +172,7 @@ public class RequestUpgradeController : ControllerBase
         if (result.Succeed)
         {
             string filePath = Path.Combine(folderPath, result.Data as string);
-            return File(System.IO.File.OpenRead(filePath), "application/pdf", "InspectionReport.pdf");
+            return File(System.IO.File.OpenRead(filePath), _fileService.GetMimeTypeForFileExtension(filePath), $"InspectionReport.{Path.GetExtension(filePath)}");
         }
         return BadRequest(result.ErrorMessage);
     }
@@ -182,7 +185,7 @@ public class RequestUpgradeController : ControllerBase
         if (result.Succeed)
         {
             string filePath = Path.Combine(folderPath, result.Data as string);
-            return File(System.IO.File.OpenRead(filePath), "application/pdf", "ReceiptOfRecipient.pdf");
+            return File(System.IO.File.OpenRead(filePath), _fileService.GetMimeTypeForFileExtension(filePath), $"ReceiptOfRecipient.{Path.GetExtension(filePath)}");
         }
         return BadRequest(result.ErrorMessage);
     }
