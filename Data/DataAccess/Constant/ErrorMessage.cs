@@ -51,6 +51,13 @@ public class RequestExpandUserErrorMessage
     public const string NOT_EXISTED = "Request Expand User " + ErrorMessage.NOT_EXISTED;
 }
 
+public class IpAssignmentErrorMessage
+{
+    public const string NOT_EXISTED = "Ip Assignment " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Ip Assignment " + ErrorMessage.EXISTED;
+
+}
+
 public class AreaErrorMessage
 {
     public const string NOT_EXISTED = "Area " + ErrorMessage.NOT_EXISTED;

@@ -92,6 +92,14 @@ public class ServerAllocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/IpAssignment")]
+    public async Task<ActionResult> GetIpAssignment([FromRoute] int id)
+    {
+        var result = await _serverAllocationService.GetIpAssignment(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpGet("{id}/Location")]
     public async Task<ActionResult> GetLocation([FromRoute] int id)
     {

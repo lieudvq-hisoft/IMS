@@ -5,14 +5,32 @@ public class IpAssignmentModel
 {
     public int Id { get; set; }
     public DateTime DateAssign { get; set; }
-    public string IpAddress { get; set; }
-    public string Status { get; set; }
-    public string Content { get; set; }
-    //public string InspectionRecordFilePath { get; set; }
+    public DateTime? DateUnassign { get; set; }
+    public IpAssignmentTypes Type { get; set; }
+    public int IpAddressId { get; set; }
+    public int ServerAllocationId { get; set; }
 }
 
 public class IpAssignmentSearchModel
 {
-    public int? ServerId { get; set; } = null;
+    public int? Id { get; set; } = null;
+}
+
+public class IpAssignmentCreateModel
+{
+    public DateTime DateAssign { get; set; }
+    public DateTime? DateUnassign { get; set; }
     public IpAssignmentTypes Type { get; set; }
+    public int IpAddressId { get; set; }
+    public int ServerAllocationId { get; set; }
+}
+
+public class IpAssignmentUpdateModel
+{
+    public int Id { get; set; }
+    public DateTime DateAssign { get; set; }
+    public DateTime? DateUnassign { get; set; }
+    public IpAssignmentTypes Type { get; set; }
+    public int IpAddressId { get; set; }
+    public int ServerAllocationId { get; set; }
 }

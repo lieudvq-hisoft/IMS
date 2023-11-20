@@ -88,6 +88,10 @@ public class MapperProfile : Profile
         #region IP
         CreateMap<IpAddress, IpAddressModel>();
         CreateMap<IpSubnet, IpSubnetModel>();
+
+        CreateMap<IpAssignment, IpAssignmentModel>();
+        CreateMap<IpAssignmentCreateModel, IpAssignment>();
+        CreateMap<IpAssignmentUpdateModel, IpAssignment>();
         #endregion
     }
 }
