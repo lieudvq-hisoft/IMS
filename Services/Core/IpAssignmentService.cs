@@ -12,6 +12,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Data.Utils.Paging;
+using Microsoft.EntityFrameworkCore;
 
 namespace Services.Core;
 public interface IIpAssignmentService
@@ -23,7 +24,7 @@ public interface IIpAssignmentService
     Task<ResultModel> Delete(int id);
 }
 
-public class IpAssignmentService
+public class IpAssignmentService : IIpAssignmentService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
@@ -137,7 +138,7 @@ public class IpAssignmentService
 
         try
         {
-            var ipAssignment = _dbContext.IpAssignments.Include(x => x.Racks).ThenInclude(x => x.Locations).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == id);
+            var ipAssignment = _dbContext.IpAssignments.FirstOrDefault(x => x.Id == id);
             if (ipAssignment == null)
             {
                 result.ErrorMessage = IpAssignmentErrorMessage.NOT_EXISTED;
