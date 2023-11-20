@@ -9,7 +9,7 @@ namespace IMS.Controllers;
 [Authorize(AuthenticationSchemes = "Bearer")]
 public class RequestTypeController: ControllerBase
 {
-    [HttpGet("{id}")]
+    [HttpGet]
     public async Task<ActionResult> Get()
     {
         return Ok(Enum.GetNames(typeof(RequestType)).ToList());

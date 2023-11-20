@@ -112,23 +112,38 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> GetAppointment(int requestUpgradeId)
+    public async Task<ResultModel> GetAppointment(int requestUpgradeId, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
-        var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment).FirstOrDefault(x => x.Id == requestUpgradeId);
-        if (requestUpgrade == null)
-        {
-            result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
-        }
-        else
-        {
-            result.Data = _mapper.Map<List<AppointmentModel>>(requestUpgrade.RequestUpgradeAppointments?.Select(x => x.Appointment));
-            result.Succeed = true;
-        }
+        var appointments = _dbContext.Appointments.Include(x => x.RequestUpgradeAppointment)
+            .Where(x => x.RequestUpgradeAppointment.Any(x => x.RequestUpgradeId == requestUpgradeId))
+            .Where(delegate (Appointment x)
+            {
+                return FilterAppointment(x, searchModel);
+            }).AsQueryable();
+
+        var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, appointments.Count());
+
+        appointments = appointments.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+        appointments = appointments.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+        paging.Data = _mapper.ProjectTo<AppointmentModel>(appointments).ToList();
+
+        result.Data = paging;
+        result.Succeed = true;
 
         return result;
+    }
+
+    private bool FilterAppointment(Appointment x, AppointmentSearchModel model)
+    {
+        bool matchId = model.Id != null ? x.Id == model.Id : true;
+        bool matchStatus = model.Status != null ? x.Status == model.Status : true;
+        bool matchServerAllocationId = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
+
+        return matchId && matchStatus && matchServerAllocationId;
     }
 
     public async Task<ResultModel> Create(RequestUpgradeCreateModel model)
