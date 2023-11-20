@@ -15,6 +15,7 @@ public interface IRequestUpgradeService
 {
     Task<ResultModel> Get(PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
+    Task<ResultModel> GetAppointment(int requestUpgradeId);
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
     Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model);
     Task<ResultModel> Initiate(RequestUpgradeCreateModel model);
@@ -85,7 +86,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return matchId && matchComponentId && matchServerAllocationId;
     }
 
-    public async Task<ResultModel> GetDetail(int id)
+    public async Task<ResultModel> GetDetail(int requestUpgradeId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -93,7 +94,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         try
         {
             var requestUpgrade = _dbContext.RequestUpgrades
-                .FirstOrDefault(x => x.Id == id);
+                .FirstOrDefault(x => x.Id == requestUpgradeId);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
@@ -108,6 +109,25 @@ public class RequestUpgradeService : IRequestUpgradeService
         {
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
+        return result;
+    }
+
+    public async Task<ResultModel> GetAppointment(int requestUpgradeId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment).FirstOrDefault(x => x.Id == requestUpgradeId);
+        if (requestUpgrade == null)
+        {
+            result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+        }
+        else
+        {
+            result.Data = _mapper.Map<List<AppointmentModel>>(requestUpgrade.RequestUpgradeAppointments?.Select(x => x.Appointment));
+            result.Succeed = true;
+        }
+
         return result;
     }
 

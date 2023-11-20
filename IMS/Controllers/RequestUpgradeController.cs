@@ -40,6 +40,14 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/Appointment")]
+    public async Task<ActionResult> GetAppointment(int id)
+    {
+        var result = await _requestUpgradeService.GetAppointment(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost]
     [SwaggerOperation(Summary = "Create new request upgrade, state is waiting")]
     public async Task<ActionResult> Create([FromBody] RequestUpgradeCreateModel model)
