@@ -6,7 +6,7 @@ namespace Data.Models;
 public class RequestExpandModel
 {
     public int Id { get; set; }
-    public int Power { get; set; }
+    //public int Power { get; set; }
     public RequestStatus Status { get; set; }
     public string RequestType { get; set; }
     public string? Note { get; set; }
@@ -17,9 +17,9 @@ public class RequestExpandModel
 
 public class RequestExpandCreateModel
 {
-    [Required]
-    [NotNegative]
-    public int Power { get; set; }
+    //[Required]
+    //[NotNegative]
+    //public int Power { get; set; }
 
     [Required]
     public string? Note { get; set; }
@@ -52,9 +52,9 @@ public class RequestExpandUpdateModel
     [GreaterThanZero]
     public int Id { get; set; }
 
-    [Required]
-    [NotNegative]
-    public int Power { get; set; }
+    //[Required]
+    //[NotNegative]
+    //public int Power { get; set; }
 
     public string? Note { get; set; }
 
