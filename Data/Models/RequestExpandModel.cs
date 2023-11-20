@@ -61,6 +61,13 @@ public class RequestExpandUpdateModel
     public string? TechNote { get; set; }
 }
 
+public class RequestExpandSuggestLocationModel
+{
+    [Required]
+    [GreaterThanZero]
+    public int Size { get; set; }
+}
+
 public class RequestExpandSearchModel
 {
     public int? Id { get; set; } = null;

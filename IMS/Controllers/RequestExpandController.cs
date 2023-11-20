@@ -132,6 +132,14 @@ public class RequestExpandController : ControllerBase
             string filePath = Path.Combine(folderPath, result.Data as string);
             return File(System.IO.File.OpenRead(filePath), "application/pdf", "InspectionReport.pdf");
         }
+    }
+
+    [HttpPut("SuggestLocation")]
+    [SwaggerOperation(Summary = "Suggest location for request expand")]
+    public async Task<ActionResult> Suggest(RequestExpandSuggestLocationModel model)
+    {
+        var result = await _requestExpandService.GetRackChoiceSuggestionBySize(model);
+        if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 }

@@ -24,6 +24,8 @@ public interface IRequestExpandService
     Task<ResultModel> CheckCompletability(int requestExpandId);
     Task<ResultModel> Complete(int requestExpandId);
     Task<ResultModel> GetInspectionReport(int requestExpandId);
+    Task<ResultModel> GetRackChoiceSuggestionBySize(RequestExpandSuggestLocationModel model);
+
 }
 
 public class RequestExpandService : IRequestExpandService
@@ -504,11 +506,93 @@ public class RequestExpandService : IRequestExpandService
                 result.Data = requestExpand.InspectionReportFilePath;
             }
         }
+    }
+    public async Task<ResultModel> GetRackChoiceSuggestionBySize(RequestExpandSuggestLocationModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        LocationChoiceModel suggestedLocation = null;
+
+        try
+        {
+            var racks = _dbContext.Racks.OrderBy(x => x.Id).ToList();
+
+            int rackCount = 0;
+            while (rackCount < racks.Count && suggestedLocation == null)
+            {
+                var rack = racks[rackCount];
+                var suggestedStartingLocation = CheckRackAvailabilityLocation(rack, model.Size);
+                if (suggestedStartingLocation != null)
+                {
+                    suggestedLocation = new LocationChoiceModel
+                    {
+                        AreaId = rack.AreaId,
+                        RackId = rack.Id,
+                        Position = suggestedStartingLocation.Position
+                    };
+                }
+                rackCount++;
+            }
+
+            if (suggestedLocation == null)
+            {
+                result.ErrorMessage = LocationErrorMessgae.NO_AVAILABLE_FOUND;
+            }
+            else
+            {
+                result.Data = suggestedLocation;
+                result.Succeed = true;
+            }
+        }
         catch (Exception e)
         {
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 
         return result;
+    }
+
+    private Location CheckRackAvailabilityLocation(Rack rack, int size)
+    {
+        Location suggestedStartingLocation = null;
+        var spaces = new List<List<Location>>();
+        var availableLocations = _dbContext.Locations.Include(x => x.LocationAssignments).Where(x => x.RackId == rack.Id && !x.LocationAssignments.Any());
+
+        int count = 0;
+        var isEmpty = false;
+        for (int i = 0; i < rack.Size; i++)
+        {
+            var location = availableLocations.FirstOrDefault(x => x.Position == i);
+            if (location != null)
+            {
+                if (spaces.Count < count + 1)
+                {
+                    spaces.Add(new List<Location>());
+                }
+                spaces[count].Add(location);
+                isEmpty = false;
+            }
+            else
+            {
+                if (!isEmpty)
+                {
+                    count++;
+                    isEmpty = true;
+                }
+            }
+        }
+
+        int spaceCount = 0;
+        while (spaceCount < spaces.Count && suggestedStartingLocation == null)
+        {
+            var space = spaces[spaceCount];
+            if (space.Count >= size)
+            {
+                suggestedStartingLocation = space[0];
+            }
+            spaceCount++;
+        }
+
+        return suggestedStartingLocation;
     }
 }
