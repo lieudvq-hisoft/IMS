@@ -42,13 +42,13 @@ public class ServerHardwareConfigUpdateModel
     [Required]
     public int Capacity { get; set; }
 
-    //[Required]
-    //[GreaterThanZero]
-    //public int ServerAllocationId { get; set; }
+    [Required]
+    [GreaterThanZero]
+    public int ServerAllocationId { get; set; }
 
-    //[Required]
-    //[GreaterThanZero]
-    //public int ComponentId { get; set; }
+    [Required]
+    [GreaterThanZero]
+    public int ComponentId { get; set; }
 }
 
 public class ServerHardwareConfigSearchModel
