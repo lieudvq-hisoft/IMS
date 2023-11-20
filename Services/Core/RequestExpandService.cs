@@ -24,6 +24,7 @@ public interface IRequestExpandService
     Task<ResultModel> CheckCompletability(int requestExpandId);
     Task<ResultModel> Complete(int requestExpandId);
     Task<ResultModel> GetInspectionReport(int requestExpandId);
+    Task<ResultModel> GetReceiptOfRecipient(int requestExpandId);
     Task<ResultModel> GetRackChoiceSuggestionBySize(RequestExpandSuggestLocationModel model);
 
 }
@@ -507,7 +508,14 @@ public class RequestExpandService : IRequestExpandService
                 result.Data = requestExpand.InspectionReportFilePath;
             }
         }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
     }
+
     public async Task<ResultModel> GetRackChoiceSuggestionBySize(RequestExpandSuggestLocationModel model)
     {
         var result = new ResultModel();
@@ -595,5 +603,35 @@ public class RequestExpandService : IRequestExpandService
         }
 
         return suggestedStartingLocation;
+    }
+
+    public async Task<ResultModel> GetReceiptOfRecipient(int requestExpandId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
+            if (requestExpand == null)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+            }
+            else if (requestExpand.ReceiptOfRecipientFilePath == null)
+            {
+                result.ErrorMessage = ErrorMessage.FILE_NOT_EXISTED;
+            }
+            else
+            {
+                result.Succeed = true;
+                result.Data = requestExpand.ReceiptOfRecipientFilePath;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
     }
 }

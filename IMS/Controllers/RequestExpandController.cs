@@ -132,6 +132,7 @@ public class RequestExpandController : ControllerBase
             string filePath = Path.Combine(folderPath, result.Data as string);
             return File(System.IO.File.OpenRead(filePath), "application/pdf", "InspectionReport.pdf");
         }
+        return BadRequest(result.ErrorMessage);
     }
 
     [HttpPut("SuggestLocation")]
@@ -140,6 +141,19 @@ public class RequestExpandController : ControllerBase
     {
         var result = await _requestExpandService.GetRackChoiceSuggestionBySize(model);
         if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}/ReceiptOfRecipient")]
+    public async Task<ActionResult> DownloadReceiptOfRecipient(int id)
+    {
+        var result = await _requestExpandService.GetReceiptOfRecipient(id);
+        string folderPath = Path.Combine(_environment.WebRootPath, "ReceiptOfRecipient");
+        if (result.Succeed)
+        {
+            string filePath = Path.Combine(folderPath, result.Data as string);
+            return File(System.IO.File.OpenRead(filePath), "application/pdf", "ReceiptOfRecipient.pdf");
+        }
         return BadRequest(result.ErrorMessage);
     }
 }

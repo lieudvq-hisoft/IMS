@@ -173,4 +173,17 @@ public class RequestUpgradeController : ControllerBase
         }
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpGet("{id}/ReceiptOfRecipient")]
+    public async Task<ActionResult> DownloadReceiptOfRecipient(int id)
+    {
+        var result = await _requestUpgradeService.GetReceiptOfRecipient(id);
+        string folderPath = Path.Combine(_environment.WebRootPath, "ReceiptOfRecipient");
+        if (result.Succeed)
+        {
+            string filePath = Path.Combine(folderPath, result.Data as string);
+            return File(System.IO.File.OpenRead(filePath), "application/pdf", "ReceiptOfRecipient.pdf");
+        }
+        return BadRequest(result.ErrorMessage);
+    }
 }

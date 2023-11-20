@@ -28,6 +28,8 @@ public interface IRequestUpgradeService
     Task<ResultModel> Complete(int requestUpgradeId);
     Task<ResultModel> CompleteBulk(RequestUpgradeCompleteBulkModel model);
     Task<ResultModel> GetInspectionReport(int requestUpgradeId);
+    Task<ResultModel> GetReceiptOfRecipient(int requestUpgradeId);
+
 }
 
 public class RequestUpgradeService : IRequestUpgradeService
@@ -664,6 +666,36 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 result.Succeed = true;
                 result.Data = requestUpgrade.InspectionReportFilePath;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> GetReceiptOfRecipient(int requestUpgradeId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
+            if (requestUpgrade == null)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+            }
+            else if (requestUpgrade.ReceiptOfRecipientFilePath == null)
+            {
+                result.ErrorMessage = ErrorMessage.FILE_NOT_EXISTED;
+            }
+            else
+            {
+                result.Succeed = true;
+                result.Data = requestUpgrade.ReceiptOfRecipientFilePath;
             }
         }
         catch (Exception e)
