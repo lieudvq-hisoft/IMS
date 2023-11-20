@@ -27,6 +27,13 @@ public class DocumentFileUploadModel
     public string ReceiptOfRecipientFileName => ReceiptOfRecipient?.FileName;
 }
 
+public class DocumentFileResultModel
+{
+    public string InspectionReport { get; set; }
+
+    public string ReceiptOfRecipient { get; set; }
+}
+
 public class ExcelFileUploadModel
 {
     [Required]

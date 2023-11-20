@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Data.DataAccess;
 using Data.Entities;
+using EbookStore.Client.ExternalService.ImageHostService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -80,8 +81,8 @@ public static class StartupExtension
         //services.AddScoped<IIpService, IpService>();
 
 
-
-        services.AddScoped<IEmailService, EmailService>();
+        services.AddSingleton<ICloudinaryHelper, CloudinaryHelper>();
+        services.AddScoped<IEmailHelper, EmailHelper>();
         services.AddScoped<TransactionHelper>();
     }
 

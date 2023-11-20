@@ -37,13 +37,13 @@ public class CustomerService : ICustomerService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly IEmailService _emailService;
+    private readonly IEmailHelper _emailService;
     private readonly IConfiguration _config;
 
     public CustomerService(
         AppDbContext dbContext,
         IMapper mapper,
-        IEmailService emailService,
+        IEmailHelper emailService,
         IConfiguration config)
     {
         _dbContext = dbContext;

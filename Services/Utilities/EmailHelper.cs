@@ -3,18 +3,18 @@ using System.Net;
 using System.Net.Mail;
 
 namespace Services.Utilities;
-public interface IEmailService
+public interface IEmailHelper
 {
     SmtpClient GetClient();
     MailMessage GetActivationMessage(string username, string password, string email);
 }
 
-public class EmailService : IEmailService
+public class EmailHelper : IEmailHelper
 {
     private readonly IConfiguration _config;
     private readonly string _env;
 
-    public EmailService(IConfiguration config)
+    public EmailHelper(IConfiguration config)
     {
         _config = config;
         _env = SettingHelper.GetEnvironment();

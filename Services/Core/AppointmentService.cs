@@ -6,6 +6,7 @@ using Data.Entities;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
+using EbookStore.Client.ExternalService.ImageHostService;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using Services.Utilities;
@@ -26,7 +27,7 @@ public interface IAppointmentService
     Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, UserAssignModel model);
     Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model);
     Task<ResultModel> Fail(int appointmentId, string userId);
-    Task<ResultModel> AssignInspectionReport(int appointmentId, string inspectionReportFileName, string receiptOfRecipientFileName);
+    Task<ResultModel> AssignInspectionReport(int appointmentId, DocumentFileUploadModel model);
 }
 
 public class AppointmentService : IAppointmentService
@@ -34,12 +35,14 @@ public class AppointmentService : IAppointmentService
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly TransactionHelper _transactionHelper;
+    private readonly ICloudinaryHelper _cloudinaryHelper;
 
-    public AppointmentService(AppDbContext dbContext, IMapper mapper, TransactionHelper transactionHelper)
+    public AppointmentService(AppDbContext dbContext, IMapper mapper, TransactionHelper transactionHelper, ICloudinaryHelper cloudinaryHelper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _transactionHelper = transactionHelper;
+        _cloudinaryHelper = cloudinaryHelper;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel)
@@ -702,13 +705,16 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> AssignInspectionReport(int appointmentId, string inspectionReportFileName, string receiptOfRecipientFileName)
+    public async Task<ResultModel> AssignInspectionReport(int appointmentId, DocumentFileUploadModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
+            string inspectionReportFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
+
+            string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(model.ReceiptOfRecipient);
             var appointment = _dbContext.Appointments
                 .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade)
                 .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand)
@@ -737,6 +743,11 @@ public class AppointmentService : IAppointmentService
                 }
                 _dbContext.SaveChanges();
                 result.Succeed = true;
+                result.Data = new DocumentFileResultModel
+                {
+                    InspectionReport = inspectionReportFileName,
+                    ReceiptOfRecipient = receiptOfRecipientFileName,
+                };
             }
         }
         catch (Exception e)
