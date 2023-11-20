@@ -58,6 +58,7 @@ public enum RequestType
     Upgrade,
     Expand,
     Host,
+    Other
 }
 
 public enum LocationAssignmentSortingCriteria

@@ -471,7 +471,7 @@ public class RequestExpandService : IRequestExpandService
                     });
                 }
                 _dbContext.LocationAssignments.AddRange(locationAssignments);
-                serverAllocation.Power += requestExpand.Power;
+                //serverAllocation.Power += requestExpand.Power;
                 requestExpand.Status = RequestStatus.Success;
                 _dbContext.SaveChanges();
                 result.Succeed = true;

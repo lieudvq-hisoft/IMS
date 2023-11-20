@@ -3,7 +3,7 @@
 namespace Data.Entities;
 public class RequestExpand : BaseEntity
 {
-    public int Power { get; set; }
+    //public int Power { get; set; }
     public RequestStatus Status { get; set; }
     public string? Note { get; set; }
     public string? TechNote { get; set; }
