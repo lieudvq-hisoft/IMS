@@ -14,10 +14,12 @@ namespace IMS.Controllers;
 public class RequestExpandController : ControllerBase
 {
     private readonly IRequestExpandService _requestExpandService;
+    private readonly IWebHostEnvironment _environment;
 
-    public RequestExpandController(IRequestExpandService requestExpandService)
+    public RequestExpandController(IRequestExpandService requestExpandService, IWebHostEnvironment environment)
     {
         _requestExpandService = requestExpandService;
+        _environment = environment;
     }
 
     [HttpGet]
@@ -117,6 +119,19 @@ public class RequestExpandController : ControllerBase
     {
         var result = await _requestExpandService.Complete(id);
         if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}/InspectionReport")]
+    public async Task<ActionResult> DownloadInspectionReport(int id)
+    {
+        var result = await _requestExpandService.GetInspectionReport(id);
+        string folderPath = Path.Combine(_environment.WebRootPath, "InspectionReport");
+        if (result.Succeed)
+        {
+            string filePath = Path.Combine(folderPath, result.Data as string);
+            return File(System.IO.File.OpenRead(filePath), "application/pdf", "InspectionReport.pdf");
+        }
         return BadRequest(result.ErrorMessage);
     }
 }

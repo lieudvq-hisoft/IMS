@@ -16,6 +16,7 @@ public interface IAppointmentService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> GetAll();
     Task<ResultModel> GetDetail(int id);
+    Task<ResultModel> GetRequestExpand(int id);
     Task<ResultModel> GetRequestUpgradeAppointment(int id);
     Task<ResultModel> GetRequestUpgrade(int id);
     Task<ResultModel> Create(AppointmentCreateModel model);
@@ -113,6 +114,37 @@ public class AppointmentService : IAppointmentService
             {
                 result.Succeed = true;
                 result.Data = _mapper.Map<AppointmentModel>(appointment);
+            }
+            else
+            {
+                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                result.Succeed = false;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetRequestExpand(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var appointment = _dbContext.Appointments
+                .Include(x => x.RequestExpandAppointments)
+                .ThenInclude(x => x.RequestExpand)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (appointment != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<RequestExpandModel>>
+                    (appointment.RequestExpandAppointments.Select(x => x.RequestExpand));
             }
             else
             {

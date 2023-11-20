@@ -23,6 +23,7 @@ public interface IRequestExpandService
     Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model);
     Task<ResultModel> CheckCompletability(int requestExpandId);
     Task<ResultModel> Complete(int requestExpandId);
+    Task<ResultModel> GetInspectionReport(int requestExpandId);
 }
 
 public class RequestExpandService : IRequestExpandService
@@ -471,6 +472,36 @@ public class RequestExpandService : IRequestExpandService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> GetInspectionReport(int requestExpandId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
+            if (requestExpand == null)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+            }
+            else if (requestExpand.InspectionReportFilePath == null)
+            {
+                result.ErrorMessage = ErrorMessage.FILE_NOT_EXISTED;
+            }
+            else
+            {
+                result.Succeed = true;
+                result.Data = requestExpand.InspectionReportFilePath;
             }
         }
         catch (Exception e)

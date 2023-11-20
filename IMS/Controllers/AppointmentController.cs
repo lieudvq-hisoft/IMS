@@ -48,6 +48,14 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/RequestExpand")]
+    public async Task<ActionResult> GetRequestExpand(int id)
+    {
+        var result = await _appointmentService.GetRequestExpand(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpGet("{id}/RequestUpgradeAppointment")]
     public async Task<ActionResult> GetRequestUpgradeAppointment(int id)
     {
