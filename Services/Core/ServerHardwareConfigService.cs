@@ -188,7 +188,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
                 validPrecondition = false;
             }
 
-            if (serverAllocation.ServerHardwareConfigs.Any(x => x.Component.Name == component.Name))
+            if (serverAllocation.ServerHardwareConfigs.Any(x => x.Component.Name == component.Name && x.Id != serverHardwareConfig.Id))
             {
                 result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
                 validPrecondition = false;
