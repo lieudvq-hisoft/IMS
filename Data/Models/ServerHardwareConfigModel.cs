@@ -19,7 +19,6 @@ public class ServerHardwareConfigCreateModel
     public string Description { get; set; }
 
     [Required]
-    [GreaterThanZero]
     public int Capacity { get; set; }
 
     [Required]
@@ -41,16 +40,7 @@ public class ServerHardwareConfigUpdateModel
     public string Description { get; set; }
 
     [Required]
-    [GreaterThanZero]
     public int Capacity { get; set; }
-
-    [Required]
-    [GreaterThanZero]
-    public int ServerAllocationId { get; set; }
-
-    [Required]
-    [GreaterThanZero]
-    public int ComponentId { get; set; }
 }
 
 public class ServerHardwareConfigSearchModel
