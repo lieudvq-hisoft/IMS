@@ -6,6 +6,7 @@ using Data.Entities;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
+using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
 
 namespace Services.Core;
@@ -13,6 +14,8 @@ public interface IServerHardwareConfigService
 {
     Task<ResultModel> Get(PagingParam<ServerHardwareConfigSortCriteria> paginationModel, ServerHardwareConfigSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
+    Task<ResultModel> Create(ServerHardwareConfigCreateModel model);
+    Task<ResultModel> Update(ServerHardwareConfigUpdateModel model);
     Task<ResultModel> Delete(int serverHardwareConfigId);
 }
 
@@ -94,118 +97,118 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
         return result;
     }
 
-    //public async Task<ResultModel> Create(ServerHardwareConfigCreateModel model)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
-    //    bool validPrecondition = true;
+    public async Task<ResultModel> Create(ServerHardwareConfigCreateModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
 
-    //    try
-    //    {
-    //        var serverAllocation = _dbContext.ServerAllocations
-    //            .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
-    //            .FirstOrDefault(x => x.Id == model.ServerAllocationId);
-    //        if (serverAllocation == null)
-    //        {
-    //            result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-    //            validPrecondition = false;
-    //        }
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+                .FirstOrDefault(x => x.Id == model.ServerAllocationId);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
 
-    //        var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
-    //        if (component == null)
-    //        {
-    //            result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
-    //            validPrecondition = false;
-    //        }
+            var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
+            if (component == null)
+            {
+                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
 
-    //        if (serverAllocation.ServerHardwareConfigs.Any(x => x.Component.Name == component.Name))
-    //        {
-    //            result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
-    //            validPrecondition = false;
-    //        }
+            if (serverAllocation.ServerHardwareConfigs.Any(x => x.Component.Name == component.Name))
+            {
+                result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
+                validPrecondition = false;
+            }
 
-    //        if (validPrecondition)
-    //        {
-    //            var serverHardwareConfig = _mapper.Map<ServerHardwareConfig>(model);
+            if (validPrecondition)
+            {
+                var serverHardwareConfig = _mapper.Map<ServerHardwareConfig>(model);
 
-    //            _dbContext.ServerHardwareConfigs.Add(serverHardwareConfig);
-    //            _dbContext.SaveChanges();
+                _dbContext.ServerHardwareConfigs.Add(serverHardwareConfig);
+                _dbContext.SaveChanges();
 
-    //            if (component.Type == ComponentType.Change)
-    //            {
-    //                _dbContext.RequestUpgrades.Add(new RequestUpgrade
-    //                {
-    //                    Description = model.Description,
-    //                    Capacity = model.Capacity,
-    //                    ServerAllocationId = model.ServerAllocationId,
-    //                    ComponentId = model.ComponentId,
-    //                    Status = RequestStatus.Accepted
-    //                });
-    //                _dbContext.SaveChanges();
-    //            }
+                if (component.Type == ComponentType.Change)
+                {
+                    _dbContext.RequestUpgrades.Add(new RequestUpgrade
+                    {
+                        Description = model.Description,
+                        Capacity = model.Capacity,
+                        ServerAllocationId = model.ServerAllocationId,
+                        ComponentId = model.ComponentId,
+                        Status = RequestStatus.Accepted
+                    });
+                    _dbContext.SaveChanges();
+                }
 
-    //            result.Succeed = true;
-    //            result.Data = _mapper.Map<ServerHardwareConfigModel>(serverHardwareConfig);
-    //        }
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
+                result.Succeed = true;
+                result.Data = _mapper.Map<ServerHardwareConfigModel>(serverHardwareConfig);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
 
-    //    return result;
-    //}
+        return result;
+    }
 
-    //public async Task<ResultModel> Update(ServerHardwareConfigUpdateModel model)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
-    //    bool validPrecondition = true;
+    public async Task<ResultModel> Update(ServerHardwareConfigUpdateModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
 
-    //    try
-    //    {
-    //        var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
-    //        if (serverAllocation == null)
-    //        {
-    //            result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-    //            validPrecondition = false;
-    //        }
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
 
-    //        var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
-    //        if (component == null)
-    //        {
-    //            result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
-    //            validPrecondition = false;
-    //        }
+            var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
+            if (component == null)
+            {
+                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
 
-    //        var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault(x => x.Id == model.Id);
-    //        if (serverHardwareConfig == null)
-    //        {
-    //            result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
-    //            validPrecondition = false;
-    //        }
+            var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault(x => x.Id == model.Id);
+            if (serverHardwareConfig == null)
+            {
+                result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
 
-    //        if (serverAllocation.ServerHardwareConfigs.Any(x => x.Component.Name == component.Name))
-    //        {
-    //            result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
-    //            validPrecondition = false;
-    //        }
+            if (serverAllocation.ServerHardwareConfigs.Any(x => x.Component.Name == component.Name))
+            {
+                result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
+                validPrecondition = false;
+            }
 
-    //        if (validPrecondition)
-    //        {
-    //            _mapper.Map<ServerHardwareConfigUpdateModel, ServerHardwareConfig>(model, serverHardwareConfig);
-    //            _dbContext.SaveChanges();
-    //            result.Succeed = true;
-    //            result.Data = _mapper.Map<ServerHardwareConfigModel>(serverHardwareConfig);
-    //        }
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
+            if (validPrecondition)
+            {
+                _mapper.Map<ServerHardwareConfigUpdateModel, ServerHardwareConfig>(model, serverHardwareConfig);
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<ServerHardwareConfigModel>(serverHardwareConfig);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
 
-    //    return result;
-    //}
+        return result;
+    }
 
     public async Task<ResultModel> Delete(int serverHardwareConfigId)
     {
