@@ -12,6 +12,7 @@ public class RequestExpandModel
     public string? Note { get; set; }
     public string? TechNote { get; set; }
     public string? InspectionReportFilePath { get; set; }
+    public string? ReceiptOfRecipientFilePath { get; set; }
     public int ServerAllocationId { get; set; }
 }
 
