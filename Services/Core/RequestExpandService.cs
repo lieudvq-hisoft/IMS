@@ -418,7 +418,8 @@ public class RequestExpandService : IRequestExpandService
 
         bool appointmentSucceeded = requestExpand.RequestExpandAppointments.Any(x => x.Appointment.Status == RequestStatus.Success);
         bool haveInspectionFile = requestExpand.InspectionReportFilePath != null;
-        return appointmentSucceeded && haveInspectionFile;
+        bool haveReceiptFile = requestExpand.ReceiptOfRecipientFilePath != null;
+        return appointmentSucceeded && haveReceiptFile && haveInspectionFile;
     }
 
     public async Task<ResultModel> Complete(int requestExpandId)
