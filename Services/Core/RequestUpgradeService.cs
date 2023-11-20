@@ -535,7 +535,8 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         bool appointmentSucceeded = requestUpgrade.RequestUpgradeAppointments.Any(x => x.Appointment.Status == RequestStatus.Success);
         bool haveInspectionFile = requestUpgrade.InspectionReportFilePath != null;
-        return appointmentSucceeded && haveInspectionFile;
+        bool haveReceiptFile = requestUpgrade.ReceiptOfRecipientFilePath != null;
+        return appointmentSucceeded && haveInspectionFile && haveReceiptFile;
     }
 
     public async Task<ResultModel> Complete(int requestUpgradeId)

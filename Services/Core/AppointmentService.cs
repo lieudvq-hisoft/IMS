@@ -26,7 +26,7 @@ public interface IAppointmentService
     Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, UserAssignModel model);
     Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model);
     Task<ResultModel> Fail(int appointmentId, string userId);
-    Task<ResultModel> AssignInspectionReport(int appointmentId, string fileName);
+    Task<ResultModel> AssignInspectionReport(int appointmentId, string inspectionReportFileName, string receiptOfRecipientFileName);
 }
 
 public class AppointmentService : IAppointmentService
@@ -702,7 +702,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> AssignInspectionReport(int appointmentId, string fileName)
+    public async Task<ResultModel> AssignInspectionReport(int appointmentId, string inspectionReportFileName, string receiptOfRecipientFileName)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -727,15 +727,16 @@ public class AppointmentService : IAppointmentService
                 var requestExpands = appointment.RequestExpandAppointments.Select(x => x.RequestExpand);
                 foreach (var requestUpgrade in requestUpgrades)
                 {
-                    requestUpgrade.InspectionReportFilePath = fileName;
+                    requestUpgrade.InspectionReportFilePath = inspectionReportFileName;
+                    requestUpgrade.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
                 }
                 foreach (var requestExpand in requestExpands)
                 {
-                    requestExpand.InspectionReportFilePath = fileName;
+                    requestExpand.InspectionReportFilePath = inspectionReportFileName;
+                    requestExpand.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
                 }
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = fileName;
             }
         }
         catch (Exception e)

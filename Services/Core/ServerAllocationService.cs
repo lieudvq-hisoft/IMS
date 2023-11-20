@@ -271,7 +271,7 @@ public class ServerAllocationService : IServerAllocationService
 
             if (validPrecondition)
             {
-                serverAllocation.ExpectedSize = model.ExpectedSize;
+                //serverAllocation.ExpectedSize = model.ExpectedSize;
                 serverAllocation.Note = model.Note;
                 serverAllocation.TechNote = model.TechNote;
                 serverAllocation.DateCreated = DateTime.Now;

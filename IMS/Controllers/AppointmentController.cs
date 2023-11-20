@@ -141,15 +141,18 @@ public class AppointmentController : ControllerBase
     [HttpPost("{id}/Document")]
     public async Task<ActionResult> UploadInspectionReport(int id, [FromForm] DocumentFileUploadModel model)
     {
-        string folderPath = Path.Combine(_environment.WebRootPath, "InspectionReport");
-        string fileName = await _fileService.SaveFileWithGuidName(model.InspectionReport, folderPath);
-        var result = await _appointmentService.AssignInspectionReport(id, fileName);
+        string inspectionReportFolderPath = Path.Combine(_environment.WebRootPath, "InspectionReport");
+        string inspectionReportFileName = await _fileService.SaveFileWithGuidName(model.InspectionReport, inspectionReportFolderPath);
+
+        string receiptOfRecipientFolderPath = Path.Combine(_environment.WebRootPath, "ReceiptOfRecipient");
+        string receiptOfRecipientFileName = await _fileService.SaveFileWithGuidName(model.ReceiptOfRecipient, receiptOfRecipientFolderPath);
+        var result = await _appointmentService.AssignInspectionReport(id, inspectionReportFileName, receiptOfRecipientFileName);
         if (!result.Succeed)
         {
-            await _fileService.DeleteFile(fileName);
+            await _fileService.DeleteFile(inspectionReportFileName);
             return BadRequest(result.ErrorMessage);
         }
 
-        return Ok(fileName);
+        return Ok();
     }
 }
