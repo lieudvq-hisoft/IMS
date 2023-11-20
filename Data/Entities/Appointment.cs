@@ -1,5 +1,6 @@
 ﻿using Data.Entities.Pending;
 using Data.Enums;
+using Data.Models;
 
 namespace Data.Entities;
 public class Appointment : BaseEntity
@@ -22,4 +23,12 @@ public class Appointment : BaseEntity
     public ICollection<RequestExpandAppointment> RequestExpandAppointments { get; set; }
     public ICollection<RequestHostAppointment> RequestHostAppointments { get; set; }
 
+    public bool FilterAppointment(AppointmentSearchModel model)
+    {
+        bool matchId = model.Id != null ? this.Id == model.Id : true;
+        bool matchStatus = model.Status != null ? this.Status == model.Status : true;
+        bool matchServerAllocationId = model.ServerAllocationId != null ? this.ServerAllocationId == model.ServerAllocationId : true;
+
+        return matchId && matchStatus && matchServerAllocationId;
+    }
 }

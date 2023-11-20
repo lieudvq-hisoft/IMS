@@ -55,7 +55,7 @@ public class AppointmentService : IAppointmentService
             var appointments = _dbContext.Appointments
                 .Where(delegate (Appointment x)
                 {
-                    return FilterAppointment(x, searchModel);
+                    return x.FilterAppointment(searchModel);
                 })
                 .AsQueryable();
 
@@ -74,15 +74,6 @@ public class AppointmentService : IAppointmentService
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
         return result;
-    }
-
-    private bool FilterAppointment(Appointment x, AppointmentSearchModel model)
-    {
-        bool matchId = model.Id != null ? x.Id == model.Id : true;
-        bool matchStatus = model.Status != null ? x.Status == model.Status : true;
-        bool matchServerAllocationId = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
-
-        return matchId && matchStatus && matchServerAllocationId;
     }
 
     public async Task<ResultModel> GetAll()

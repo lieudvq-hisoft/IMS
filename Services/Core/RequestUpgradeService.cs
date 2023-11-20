@@ -121,7 +121,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             .Where(x => x.RequestUpgradeAppointment.Any(x => x.RequestUpgradeId == requestUpgradeId))
             .Where(delegate (Appointment x)
             {
-                return FilterAppointment(x, searchModel);
+                return x.FilterAppointment(searchModel);
             }).AsQueryable();
 
         var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, appointments.Count());
