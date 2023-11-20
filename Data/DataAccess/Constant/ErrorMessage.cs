@@ -163,6 +163,7 @@ public class LocationErrorMessgae
 {
     public const string NOT_EXISTED = "Location " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Location " + ErrorMessage.EXISTED;
+    public const string NO_AVAILABLE_FOUND = "No location available found";
 }
 
 public class ComponentErrorMessgae

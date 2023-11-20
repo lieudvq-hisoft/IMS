@@ -16,7 +16,7 @@ public class DocumentFileUploadModel
     public IFormFile File { get; set; }
 
 
-    [FileExtensions(Extensions = "pdf,docx")]
+    [FileExtensions(Extensions = "pdf,docx,doc,jpeg")]
     public string FileName => File?.FileName;
 }
 
