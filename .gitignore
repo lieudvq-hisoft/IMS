@@ -37,6 +37,10 @@ bld/
 msbuild.log
 msbuild.err
 msbuild.wrn
+wwwroot
+**/wwwroot/
+wwwroot/*
+**/wwwroot/*
 
 # Visual Studio 2015
 .vs/
