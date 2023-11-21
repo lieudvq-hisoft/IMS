@@ -26,6 +26,7 @@ public class MapperProfile : Profile
         CreateMap<ServerHardwareConfigUpdateModel, ServerHardwareConfig>();
 
         CreateMap<RequestUpgrade, RequestUpgradeModel>();
+        CreateMap<RequestUpgrade, RequestUpgradeDetailModel>();
         CreateMap<RequestUpgradeCreateModel, RequestUpgrade>();
         CreateMap<RequestUpgradeUpdateModel, RequestUpgrade>();
         #endregion'

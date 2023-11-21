@@ -94,6 +94,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         try
         {
             var requestUpgrade = _dbContext.RequestUpgrades
+                .Include(x => x.Component)
                 .FirstOrDefault(x => x.Id == requestUpgradeId);
             if (requestUpgrade == null)
             {
@@ -101,7 +102,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             }
             else
             {
-                result.Data = _mapper.Map<RequestUpgrade>(requestUpgrade);
+                result.Data = _mapper.Map<RequestUpgradeDetailModel>(requestUpgrade);
                 result.Succeed = true;
             }
         }
