@@ -14,6 +14,8 @@ public class RequestExpandModel
     public string? InspectionReportFilePath { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
     public int ServerAllocationId { get; set; }
+    public DateTime DateCreated { get; set; } = DateTime.Now;
+    public DateTime DateUpdated { get; set; } = DateTime.Now;
 }
 
 public class RequestExpandCreateModel
