@@ -50,7 +50,8 @@ public class CustomerController : ControllerBase
     [SwaggerOperation(Summary = "[Sale]: Create a customer and associate user")]
     public async Task<ActionResult> Create([FromBody] CustomerCreateModel model)
     {
-        var result = await _customerService.Create(model);
+        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+        var result = await _customerService.Create(model, new Guid(userId));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

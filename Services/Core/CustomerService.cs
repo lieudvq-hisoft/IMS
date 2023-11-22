@@ -25,8 +25,7 @@ public interface ICustomerService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetServerAllocation(int id);
-    //Task<ResultModel> Import(string filePath);
-    Task<ResultModel> Create(CustomerCreateModel model);
+    Task<ResultModel> Create(CustomerCreateModel model, Guid userId);
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Update(CustomerUpdateModel model);
     Task<ResultModel> SendActivationEmail(List<int> customerIds);
@@ -138,7 +137,7 @@ public class CustomerService : ICustomerService
         return result;
     }
 
-    public async Task<ResultModel> Create(CustomerCreateModel model)
+    public async Task<ResultModel> Create(CustomerCreateModel model, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -151,6 +150,13 @@ public class CustomerService : ICustomerService
             {
                 validPrecondition = false;
                 result.ErrorMessage = CompanyTypeErrorMessage.NOT_EXISTED;
+            }
+
+            var user = _dbContext.Users.FirstOrDefault(x => x.Id == userId);
+            if (user == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
 
             if (_dbContext.Customers.Any(x => (x.CompanyName == model.CompanyName && x.CompanyTypeId == model.CompanyTypeId) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber))
@@ -167,6 +173,12 @@ public class CustomerService : ICustomerService
                 customer.CustomerName = $"{companyType.Name} - {model.CompanyName}";
                 _dbContext.Customers.Add(customer);
                 _dbContext.SaveChanges();
+
+                _dbContext.UserCustomers.Add(new UserCustomer
+                {
+                    UserId = userId,
+                    CustomerId = customer.Id
+                });
 
                 result.Succeed = true;
                 result.Data = _mapper.Map<CustomerModel>(customer);

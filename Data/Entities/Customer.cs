@@ -15,4 +15,5 @@ public class Customer : BaseEntity
     public CompanyType CompanyType { get; set; }
 
     public ICollection<ServerAllocation> ServerAllocations { get; set; }
+    public ICollection<UserCustomer> UserCustomers { get; set; }
 }

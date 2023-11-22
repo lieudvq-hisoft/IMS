@@ -376,6 +376,7 @@ public static class ModelBuilderExtentions
         builder.Entity<ServerAllocation>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<ServerHardwareConfig>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<User>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<UserCustomer>().HasQueryFilter(x => !x.IsDeleted);
     }
 
     public static void ConfigModel(this ModelBuilder builder)
@@ -417,6 +418,9 @@ public static class ModelBuilderExtentions
         {
             b.HasIndex(e => e.TaxNumber).IsUnique();
             b.HasMany(e => e.ServerAllocations)
+                .WithOne(e => e.Customer)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.UserCustomers)
                 .WithOne(e => e.Customer)
                 .OnDelete(DeleteBehavior.ClientCascade);
         });
@@ -538,6 +542,9 @@ public static class ModelBuilderExtentions
                 .WithOne(e => e.User)
                 .OnDelete(DeleteBehavior.ClientCascade);
             b.HasMany(e => e.RequestHostUsers)
+                .WithOne(e => e.User)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.UserCustomers)
                 .WithOne(e => e.User)
                 .OnDelete(DeleteBehavior.ClientCascade);
         });

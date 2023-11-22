@@ -21,4 +21,5 @@ public class User : IdentityUser<Guid>
     public ICollection<AppointmentUser> AppointmentUsers { get; set; }
     public ICollection<RequestExpandUser> RequestExpandUsers { get; set; }
     public ICollection<RequestHostUser> RequestHostUsers { get; set; }
+    public ICollection<UserCustomer> UserCustomers { get; set; }
 }

@@ -83,5 +83,6 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<ServerAllocation> ServerAllocations { get; set; }
     public DbSet<ServerHardwareConfig> ServerHardwareConfigs { get; set; }
     public DbSet<User> User { get; set; }
+    public DbSet<UserCustomer> UserCustomers { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
 }

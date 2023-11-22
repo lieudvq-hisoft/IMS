@@ -7,8 +7,8 @@ public class ServerAllocationModel
     public int Id { get; set; }
     public ServerAllocationStatus Status { get; set; }
     //public int ExpectedSize { get; set; }
-    public string Name { get; set; }
     public int Power { get; set; }
+    public string Name { get; set; }
     public string SerialNumber { get; set; }
     public string? Note { get; set; }
     public string? TechNote { get; set; }
