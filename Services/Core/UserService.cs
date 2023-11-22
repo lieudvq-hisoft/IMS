@@ -399,4 +399,29 @@ public class UserService : IUserService
         }
         return result;
     }
+
+    public async Task<ResultModel> GetCustomer(Guid userId, PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        var customers = _dbContext.Customers.Include(x => x.UserCustomers)
+            .Where(x => x.UserCustomers.Any(x => x.UserId == userId))
+            .Where(delegate (Customer x)
+            {
+                return MyFunction.MatchString(searchModel.CustomerName, x.CustomerName);
+            }).AsQueryable();
+
+        var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, customers.Count());
+
+        customers = customers.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+        customers = customers.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+        paging.Data = _mapper.ProjectTo<CustomerModel>(customers).ToList();
+
+        result.Data = paging;
+        result.Succeed = true;
+
+        return result;
+    }
 }
