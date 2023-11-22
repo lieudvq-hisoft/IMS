@@ -164,7 +164,7 @@ public class CustomerService : ICustomerService
                 var customer = _mapper.Map<Customer>(model);
                 customer.Username = GenerateUsername(model.CompanyName);
                 customer.Password = MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")) + "@a123";
-                customer.CustomerName = $"{model.CompanyName} - {companyType.ToString()}";
+                customer.CustomerName = $"{companyType.Name} - {model.CompanyName}";
                 _dbContext.Customers.Add(customer);
                 _dbContext.SaveChanges();
 
