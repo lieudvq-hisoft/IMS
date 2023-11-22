@@ -5,7 +5,7 @@ namespace Data.Models;
 public class ServerHardwareConfigModel
 {
     public int Id { get; set; }
-    public string Description { get; set; }
+    public string Information { get; set; }
     public int Capacity { get; set; }
     public int ServerAllocationId { get; set; }
     public int ComponentId { get; set; }
@@ -16,7 +16,7 @@ public class ServerHardwareConfigModel
 public class ServerHardwareConfigCreateModel
 {
     [Required]
-    public string Description { get; set; }
+    public string Information { get; set; }
 
     [Required]
     public int Capacity { get; set; }
@@ -37,7 +37,7 @@ public class ServerHardwareConfigUpdateModel
     public int Id { get; set; }
 
     [Required]
-    public string Description { get; set; }
+    public string Information { get; set; }
 
     [Required]
     public int Capacity { get; set; }

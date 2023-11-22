@@ -6,7 +6,7 @@ namespace Data.Models;
 public class RequestUpgradeModel
 {
     public int Id { get; set; }
-    public string Description { get; set; }
+    public string Information { get; set; }
     public int Capacity { get; set; }
     public string Status { get; set; }
     public RequestType RequestType { get; set; }
@@ -19,7 +19,7 @@ public class RequestUpgradeModel
 public class RequestUpgradeDetailModel
 {
     public int Id { get; set; }
-    public string Description { get; set; }
+    public string Information { get; set; }
     public int Capacity { get; set; }
     public string Status { get; set; }
     public string? InspectionReportFilePath { get; set; }
@@ -35,7 +35,7 @@ public class RequestUpgradeDetailModel
 public class RequestUpgradeCreateModel
 {
     [Required]
-    public string Description { get; set; }
+    public string Information { get; set; }
 
     [Required]
     public int Capacity { get; set; }
@@ -77,7 +77,7 @@ public class RequestUpgradeUpdateModel
     public int Id { get; set; }
 
     [Required]
-    public string Description { get; set; }
+    public string Information { get; set; }
 
     [Required]
     [GreaterThanZero]

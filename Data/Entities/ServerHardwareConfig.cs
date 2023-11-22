@@ -1,7 +1,7 @@
 ﻿namespace Data.Entities;
 public class ServerHardwareConfig : BaseEntity
 {
-    public string Description { get; set; }
+    public string Information { get; set; }
     public int Capacity { get; set; }
 
     public int ServerAllocationId { get; set; }

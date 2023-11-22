@@ -138,7 +138,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
                 {
                     _dbContext.RequestUpgrades.Add(new RequestUpgrade
                     {
-                        Description = model.Description,
+                        Information = model.Information,
                         Capacity = model.Capacity,
                         ServerAllocationId = model.ServerAllocationId,
                         ComponentId = model.ComponentId,

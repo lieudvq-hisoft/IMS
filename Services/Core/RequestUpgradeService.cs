@@ -600,7 +600,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 {
                     _dbContext.ServerHardwareConfigs.Add(new ServerHardwareConfig
                     {
-                        Description = requestUpgrade.Description,
+                        Information = requestUpgrade.Information,
                         Capacity = requestUpgrade.Capacity,
                         ServerAllocationId = requestUpgrade.ServerAllocationId,
                         ComponentId = requestUpgrade.ComponentId,
@@ -610,7 +610,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 {
                     if (requestUpgrade.Component.Type == ComponentType.Change)
                     {
-                        serverHardwareConfig.Description = requestUpgrade.Description;
+                        serverHardwareConfig.Information = requestUpgrade.Information;
                         serverHardwareConfig.Capacity = requestUpgrade.Capacity;
                     }
                     else

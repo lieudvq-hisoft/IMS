@@ -62,14 +62,14 @@ public static class ModelBuilderExtentions
         {
             Id = 3,
             Name = "RAM",
-            Unit = "Gb",
+            Unit = "Cái",
             Type = ComponentType.Change
         });
         builder.Entity<Component>().HasData(new Component
         {
             Id = 6,
             Name = "RAM",
-            Unit = "Gb",
+            Unit = "Cái",
             Type = ComponentType.Upgrade
         });
         builder.Entity<Component>().HasData(new Component
