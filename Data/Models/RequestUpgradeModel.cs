@@ -9,8 +9,6 @@ public class RequestUpgradeModel
     public string Description { get; set; }
     public int Capacity { get; set; }
     public string Status { get; set; }
-    public string? InspectionReportFilePath { get; set; }
-    public string? ReceiptOfRecipientFilePath { get; set; }
     public RequestType RequestType { get; set; }
     public int ComponentId { get; set; }
     public int ServerAllocationId { get; set; }
