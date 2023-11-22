@@ -1,7 +1,7 @@
 ﻿namespace Data.Models;
 public class IpAddressModel
 {
-    public int Address { get; set; }
+    public string Address { get; set; }
     public bool Blocked { get; set; }
     public bool IsReserved { get; set; }
 
