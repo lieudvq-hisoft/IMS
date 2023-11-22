@@ -37,9 +37,6 @@ public class CustomerCreateModel
     public string PhoneNumber { get; set; }
 
     [Required]
-    public string CustomerName { get; set; }
-
-    [Required]
     public int CompanyTypeId { get; set; }
 }
 
@@ -64,9 +61,6 @@ public class CustomerUpdateModel
     [Phone]
     [Required]
     public string PhoneNumber { get; set; }
-
-    [Required]
-    public string CustomerName { get; set; }
 
     [Required]
     public int CompanyTypeId { get; set; }

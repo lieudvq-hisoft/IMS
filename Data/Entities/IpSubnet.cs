@@ -6,6 +6,7 @@ public class IpSubnet : BaseEntity
     public int ThirdOctet { get; set; }
     public int FourthOctet { get; set; }
     public int PrefixLength { get; set; }
+    public string? Note { get; set; }
 
     public int? ParentNetworkId { get; set; }
     public IpSubnet? ParentNetwork { get; set; }

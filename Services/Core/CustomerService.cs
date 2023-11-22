@@ -138,76 +138,6 @@ public class CustomerService : ICustomerService
         return result;
     }
 
-    public async Task<ResultModel> Import(string filePath)
-    {
-        using var package = new ExcelPackage(new FileInfo(filePath));
-        var worksheet = package.Workbook.Worksheets["Sheet1"];
-        int rowCount = worksheet.Dimension.End.Row;
-        int colCount = worksheet.Dimension.End.Column;
-        int successRow = 0;
-
-        for (int row = 2; row <= rowCount; row++)
-        {
-            var resultCell = worksheet.Cells[row, colCount];
-            resultCell.Style.WrapText = true;
-            resultCell.Style.VerticalAlignment = ExcelVerticalAlignment.Top;
-            string companyName = worksheet.Cells[row, 2].Value?.ToString().Trim();
-            var company = _dbContext.CompanyTypes.FirstOrDefault(x => x.Name == companyName);
-
-            if (company == null)
-            {
-                resultCell.Value = "Company " + ErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var model = new CustomerCreateModel()
-                {
-                    CompanyName = worksheet.Cells[row, 1].Value?.ToString().Trim(),
-                    CompanyTypeId = company.Id,
-                    CustomerName = worksheet.Cells[row, 3].Value?.ToString().Trim(),
-                    TaxNumber = worksheet.Cells[row, 4].Value?.ToString().Trim(),
-                    Address = worksheet.Cells[row, 5].Value?.ToString().Trim(),
-                    Email = worksheet.Cells[row, 6].Value?.ToString().Trim(),
-                    PhoneNumber = worksheet.Cells[row, 7].Value?.ToString().Trim(),
-                };
-
-                var context = new ValidationContext(model, serviceProvider: null, items: null);
-                var validationResults = new List<ValidationResult>();
-
-                bool isValid = Validator.TryValidateObject(model, context, validationResults, true);
-
-                if (!isValid)
-                {
-                    foreach (ValidationResult validationError in validationResults)
-                    {
-                        resultCell.Value = validationError.ErrorMessage + "\r\n";
-                    }
-                }
-                else
-                {
-                    var result = await Create(model);
-                    if (!result.Succeed)
-                    {
-                        resultCell.Value = result.ErrorMessage;
-                    }
-                    else
-                    {
-                        resultCell.Value = "Ok";
-                        successRow++;
-                    }
-                }
-            }
-        }
-
-        package.Save();
-
-        return new ResultModel
-        {
-            Succeed = true,
-            Data = successRow
-        };
-    }
-
     public async Task<ResultModel> Create(CustomerCreateModel model)
     {
         var result = new ResultModel();
@@ -234,6 +164,7 @@ public class CustomerService : ICustomerService
                 var customer = _mapper.Map<Customer>(model);
                 customer.Username = GenerateUsername(model.CompanyName);
                 customer.Password = MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")) + "@a123";
+                customer.CustomerName = $"{model.CompanyName} - {companyType.ToString()}";
                 _dbContext.Customers.Add(customer);
                 _dbContext.SaveChanges();
 

@@ -21,6 +21,13 @@ public enum ServerAllocationStatus
     Removed
 }
 
+public enum IpPurpose
+{
+    Host,
+    Network,
+    Broadcast
+}
+
 public enum ServiceType
 {
     Location,

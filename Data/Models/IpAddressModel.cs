@@ -4,6 +4,7 @@ public class IpAddressModel
     public string Address { get; set; }
     public bool Blocked { get; set; }
     public bool IsReserved { get; set; }
+    public string Purpose { get; set; }
 
     public int IpSubnetId { get; set; }
 }

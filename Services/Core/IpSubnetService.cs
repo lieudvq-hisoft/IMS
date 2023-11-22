@@ -8,6 +8,7 @@ using Data.Models;
 using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using Services.Utilities;
 using System;
 using System.Text.RegularExpressions;
@@ -114,6 +115,7 @@ public class IpSubnetService : IIpSubnetService
                     ThirdOctet = octets[2],
                     FourthOctet = octets[3],
                     PrefixLength = model.PrefixLength,
+                    Note = model.Note,
                     ParentNetworkId = null
                 };
                 _dbContext.IpSubnets.Add(ipRange);
@@ -128,10 +130,20 @@ public class IpSubnetService : IIpSubnetService
                     for (int t = 0; t < SUBNET_MAX_SIZE && ipCreated < rangeSize; t++)
                     {
                         ipCreated++;
+                        IpPurpose purpose = IpPurpose.Host;
+                        if (t == 0)
+                        {
+                            purpose = IpPurpose.Network;
+                        }
+                        if (t == 255)
+                        {
+                            purpose = IpPurpose.Broadcast;
+                        }
                         ips.Add(new IpAddress
                         {
                             Address = $"{ipRange.FirstOctet}.{ipRange.SecondOctet}.{ipRange.ThirdOctet + i}.{t}",
-                            IsReserved = (t == 0 || t == 255),
+                            IsReserved = purpose != IpPurpose.Host,
+                            Purpose = purpose,
                             IpSubnetId = ipRange.Id
                         });
                     }
@@ -235,7 +247,7 @@ public class IpSubnetService : IIpSubnetService
                     if (ips.Count != numberOfIps)
                     {
                         validPrecondition = false;
-                        result.ErrorMessage = IpAddressErrorMessage.NOT_EXISTED;
+                        result.ErrorMessage = IpSubnetErrorMessage.OVERLAPPED;
                     }
                     else
                     {
@@ -259,6 +271,7 @@ public class IpSubnetService : IIpSubnetService
                         ThirdOctet = octets[2],
                         FourthOctet = octets[3],
                         PrefixLength = model.PrefixLength,
+                        Note = model.Note,
                         ParentNetworkId = parentSubnet.Id
                     };
                     _dbContext.IpSubnets.Add(ipSubnet);
@@ -267,7 +280,17 @@ public class IpSubnetService : IIpSubnetService
                     foreach (var ip in ips)
                     {
                         int fourthOctet = GetIPv4Octets(ip.Address)[3];
-                        ip.IsReserved = fourthOctet == 0 || fourthOctet == 255 || fourthOctet == octets[3] || fourthOctet == octets[3] + numberOfIps - 1;
+                        IpPurpose purpose = IpPurpose.Host;
+                        if (fourthOctet == 0 || fourthOctet == octets[3])
+                        {
+                            purpose = IpPurpose.Network;
+                        }
+                        if (fourthOctet == 255 || fourthOctet == octets[3] + numberOfIps - 1)
+                        {
+                            purpose = IpPurpose.Broadcast;
+                        }
+                        ip.IsReserved =  purpose != IpPurpose.Host;
+                        ip.Purpose = purpose;
                         ip.IpSubnetId = ipSubnet.Id;
                     }
                     _dbContext.SaveChanges();
@@ -285,7 +308,7 @@ public class IpSubnetService : IIpSubnetService
 
     private bool IpSubnetBelongToParent(List<int> subnetOctet, IpSubnet parentSubnet)
     {
-        double parentSubnetIncremental = Math.Pow(2, PREFIX_LENGTH_MAX - parentSubnet.PrefixLength) / SUBNET_MAX_SIZE;   
+        double parentSubnetIncremental = Math.Pow(2, PREFIX_LENGTH_MAX - parentSubnet.PrefixLength) / SUBNET_MAX_SIZE;
         return subnetOctet[0] == parentSubnet.FirstOctet && subnetOctet[1] == parentSubnet.SecondOctet && subnetOctet[2] >= parentSubnet.ThirdOctet && subnetOctet[2] < parentSubnet.ThirdOctet + parentSubnetIncremental;
     }
 
