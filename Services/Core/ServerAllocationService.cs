@@ -260,10 +260,18 @@ public class ServerAllocationService : IServerAllocationService
                 validPrecondition = false;
                 result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
             }
-            else
+
+            var existingServerAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.SerialNumber == model.SerialNumber);
+            if (existingServerAllocation != null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = ServerAllocationErrorMessage.EXISTED;
+            }
+
+            if (validPrecondition)
             {
                 var serverAllocation = _mapper.Map<ServerAllocation>(model);
-                serverAllocation.Status = ServerAllocationStatus.Incomplete;
+                serverAllocation.Status = ServerAllocationStatus.Working;
 
                 _dbContext.ServerAllocations.Add(serverAllocation);
                 _dbContext.SaveChanges();
@@ -294,13 +302,9 @@ public class ServerAllocationService : IServerAllocationService
                 validPrecondition = false;
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
-
-            if (validPrecondition)
+            else
             {
-                //serverAllocation.ExpectedSize = model.ExpectedSize;
-                serverAllocation.Note = model.Note;
-                serverAllocation.TechNote = model.TechNote;
-                serverAllocation.DateCreated = DateTime.Now;
+                _mapper.Map<ServerAllocationUpdateModel, ServerAllocation>(model, serverAllocation);
 
                 _dbContext.SaveChanges();
                 result.Succeed = true;

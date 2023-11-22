@@ -16,12 +16,9 @@ public enum ComponentType
 
 public enum ServerAllocationStatus
 {
-    Incomplete,
-    Pending,
-    Accepted,
-    Denied,
-    Stopped,
-    Ended
+    Working,
+    Pausing,
+    Removed
 }
 
 public enum ServiceType

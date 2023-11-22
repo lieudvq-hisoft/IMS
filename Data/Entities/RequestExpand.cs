@@ -12,9 +12,9 @@ public class RequestExpand : BaseEntity
     public RequestType RequestType { get; set; } = RequestType.Expand;
 
     public int ServerAllocationId { get; set; }
-    public ServerAllocation ServerAllocation { get; set; }
+    public ServerAllocation? ServerAllocation { get; set; }
 
-    public ICollection<RequestExpandLocation> RequestExpandLocations { get; set; }
-    public ICollection<RequestExpandUser> RequestExpandUsers { get; set; }
-    public ICollection<RequestExpandAppointment> RequestExpandAppointments { get; set; }
+    public ICollection<RequestExpandLocation>? RequestExpandLocations { get; set; }
+    public ICollection<RequestExpandUser>? RequestExpandUsers { get; set; }
+    public ICollection<RequestExpandAppointment>? RequestExpandAppointments { get; set; }
 }

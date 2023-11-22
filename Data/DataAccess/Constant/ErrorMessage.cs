@@ -23,6 +23,7 @@ public class CustomerErrorMessage
 
 public class ServerAllocationErrorMessage
 {
+    public const string EXISTED = "Server allocation " + ErrorMessage.EXISTED;
     public const string NOT_EXISTED = "Server allocation " + ErrorMessage.NOT_EXISTED;
     public const string FILE_NOT_EXISTED = "Server allocation file " + ErrorMessage.NOT_EXISTED;
     public const string ASSIGN_FILE_TO_NON_ACCEPTED = "Can only assign file to accepted server allocation";

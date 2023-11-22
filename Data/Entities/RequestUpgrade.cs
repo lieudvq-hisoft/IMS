@@ -3,7 +3,7 @@
 namespace Data.Entities;
 public class RequestUpgrade : BaseEntity
 {
-    public string Description { get; set; }
+    public string? Description { get; set; }
     public int Capacity { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Upgrade;
     public RequestStatus Status { get; set; }
@@ -11,11 +11,11 @@ public class RequestUpgrade : BaseEntity
     //public string? ReceiptOfRecipientFilePath { get; set; }
 
     public int ComponentId { get; set; }
-    public Component Component { get; set; }
+    public Component? Component { get; set; }
 
     public int ServerAllocationId { get; set; }
-    public ServerAllocation ServerAllocation { get; set; }
+    public ServerAllocation? ServerAllocation { get; set; }
 
-    public ICollection<RequestUpgradeAppointment> RequestUpgradeAppointments { get; set; }
-    public ICollection<RequestUpgradeUser> RequestUpgradeUsers { get; set; }
+    public ICollection<RequestUpgradeAppointment>? RequestUpgradeAppointments { get; set; }
+    public ICollection<RequestUpgradeUser>? RequestUpgradeUsers { get; set; }
 }

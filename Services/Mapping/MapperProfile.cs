@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Data.Entities;
+using Data.Enums;
 using Data.Models;
 
 namespace Services.Mapping;
@@ -31,9 +32,11 @@ public class MapperProfile : Profile
         CreateMap<RequestUpgradeUpdateModel, RequestUpgrade>();
         #endregion'
 
-        #region ServerAllocationModel
-        CreateMap<ServerAllocation, ServerAllocationModel>();
+        #region ServerAllocation
+        CreateMap<ServerAllocation, ServerAllocationModel>()
+            .ForMember(dest => dest.MasterIp, opt => opt.MapFrom(src => src.IpAssignments.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master).IpAddress.Address));
         CreateMap<ServerAllocationCreateModel, ServerAllocation>();
+        CreateMap<ServerAllocationUpdateModel, ServerAllocation>();
         #endregion
 
         #region Location
