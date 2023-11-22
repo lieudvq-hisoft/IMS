@@ -34,4 +34,20 @@ public class IpSubnetController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPost]
+    public async Task<ActionResult> CreateIpRange([FromBody] IpRangeCreateModel model)
+    {
+        var result = await _ipSubnetService.CreateIpRange(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpDelete("{id}")]
+    public async Task<ActionResult> Delete(int id)
+    {
+        var result = await _ipSubnetService.Delete(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }

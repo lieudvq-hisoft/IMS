@@ -8,6 +8,7 @@ using Data.Models;
 using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
+using Microsoft.IdentityModel.Tokens;
 using Services.Utilities;
 
 namespace Services.Core;
@@ -28,8 +29,6 @@ public interface IRequestUpgradeService
     Task<ResultModel> CheckCompletability(int requestUpgradeId);
     Task<ResultModel> Complete(int requestUpgradeId);
     Task<ResultModel> CompleteBulk(RequestUpgradeCompleteBulkModel model);
-    Task<ResultModel> GetInspectionReport(int requestUpgradeId);
-    Task<ResultModel> GetReceiptOfRecipient(int requestUpgradeId);
 
 }
 
@@ -562,10 +561,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             return false;
         }
 
-        bool appointmentSucceeded = requestUpgrade.RequestUpgradeAppointments.Any(x => x.Appointment.Status == RequestStatus.Success);
-        bool haveInspectionFile = requestUpgrade.InspectionReportFilePath != null;
-        bool haveReceiptFile = requestUpgrade.ReceiptOfRecipientFilePath != null;
-        return appointmentSucceeded && haveInspectionFile && haveReceiptFile;
+        return requestUpgrade.RequestUpgradeAppointments.Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Success && !x.InspectionReportFilePath.IsNullOrEmpty() && !x.ReceiptOfRecipientFilePath.IsNullOrEmpty());
     }
 
     public async Task<ResultModel> Complete(int requestUpgradeId)
@@ -663,66 +659,6 @@ public class RequestUpgradeService : IRequestUpgradeService
                 transaction.Commit();
                 result.Succeed = true;
                 result.Data = results.Select(x => x.Data);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
-
-    public async Task<ResultModel> GetInspectionReport(int requestUpgradeId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
-            if (requestUpgrade == null)
-            {
-                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
-            }
-            else if (requestUpgrade.InspectionReportFilePath == null)
-            {
-                result.ErrorMessage = ErrorMessage.FILE_NOT_EXISTED;
-            }
-            else
-            {
-                result.Succeed = true;
-                result.Data = requestUpgrade.InspectionReportFilePath;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
-
-    public async Task<ResultModel> GetReceiptOfRecipient(int requestUpgradeId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
-            if (requestUpgrade == null)
-            {
-                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
-            }
-            else if (requestUpgrade.ReceiptOfRecipientFilePath == null)
-            {
-                result.ErrorMessage = ErrorMessage.FILE_NOT_EXISTED;
-            }
-            else
-            {
-                result.Succeed = true;
-                result.Data = requestUpgrade.ReceiptOfRecipientFilePath;
             }
         }
         catch (Exception e)

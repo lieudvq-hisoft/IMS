@@ -1,10 +1,15 @@
 ﻿using Data.Entities.Pending;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.ComponentModel.DataAnnotations;
 
 namespace Data.Entities;
 
-public class IpAddress : BaseEntity
+public class IpAddress
 {
-    public int Address { get; set; }
+    [Key, DatabaseGenerated(DatabaseGeneratedOption.Identity)]
+    public int Id { get; set; }
+    public bool IsDeleted { get; set; }
+    public string Address { get; set; }
     public bool Blocked { get; set; }
     public bool IsReserved { get; set; }
 

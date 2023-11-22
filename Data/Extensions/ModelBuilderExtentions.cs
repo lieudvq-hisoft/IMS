@@ -436,7 +436,7 @@ public static class ModelBuilderExtentions
             b.HasMany(e => e.SubNets)
                 .WithOne(e => e.ParentNetwork)
                 .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.Ips)
+            b.HasMany(e => e.IpAddresses)
                 .WithOne(e => e.IpSubnet)
                 .OnDelete(DeleteBehavior.ClientCascade);
         });

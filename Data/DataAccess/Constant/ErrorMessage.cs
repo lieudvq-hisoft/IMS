@@ -74,6 +74,8 @@ public class IpSubnetErrorMessage
 {
     public const string NOT_EXISTED = "Ip Subnet " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Ip Subnet " + ErrorMessage.EXISTED;
+    public const string IP_RANGE_FOURTH_OCTET = "Forth octet of a ip range must be 0";
+    public const string INVALID_RANGE = "Child subnet have invalid range";
 }
 
 

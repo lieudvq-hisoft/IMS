@@ -7,8 +7,8 @@ public class RequestUpgrade : BaseEntity
     public int Capacity { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Upgrade;
     public RequestStatus Status { get; set; }
-    public string? InspectionReportFilePath { get; set; }
-    public string? ReceiptOfRecipientFilePath { get; set; }
+    //public string? InspectionReportFilePath { get; set; }
+    //public string? ReceiptOfRecipientFilePath { get; set; }
 
     public int ComponentId { get; set; }
     public Component Component { get; set; }

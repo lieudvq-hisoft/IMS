@@ -720,18 +720,8 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
-                var requestUpgrades = appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade);
-                var requestExpands = appointment.RequestExpandAppointments.Select(x => x.RequestExpand);
-                foreach (var requestUpgrade in requestUpgrades)
-                {
-                    requestUpgrade.InspectionReportFilePath = inspectionReportFileName;
-                    requestUpgrade.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
-                }
-                foreach (var requestExpand in requestExpands)
-                {
-                    requestExpand.InspectionReportFilePath = inspectionReportFileName;
-                    requestExpand.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
-                }
+                appointment.InspectionReportFilePath = inspectionReportFileName;
+                appointment.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = new DocumentFileResultModel

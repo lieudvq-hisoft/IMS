@@ -171,30 +171,4 @@ public class RequestUpgradeController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
-
-    [HttpGet("{id}/InspectionReport")]
-    public async Task<ActionResult> DownloadInspectionReport(int id)
-    {
-        var result = await _requestUpgradeService.GetInspectionReport(id);
-        string folderPath = Path.Combine(_environment.WebRootPath, "InspectionReport");
-        if (result.Succeed)
-        {
-            string filePath = Path.Combine(folderPath, result.Data as string);
-            return File(System.IO.File.OpenRead(filePath), _fileService.GetMimeTypeForFileExtension(filePath), $"InspectionReport.{Path.GetExtension(filePath)}");
-        }
-        return BadRequest(result.ErrorMessage);
-    }
-
-    [HttpGet("{id}/ReceiptOfRecipient")]
-    public async Task<ActionResult> DownloadReceiptOfRecipient(int id)
-    {
-        var result = await _requestUpgradeService.GetReceiptOfRecipient(id);
-        string folderPath = Path.Combine(_environment.WebRootPath, "ReceiptOfRecipient");
-        if (result.Succeed)
-        {
-            string filePath = Path.Combine(folderPath, result.Data as string);
-            return File(System.IO.File.OpenRead(filePath), _fileService.GetMimeTypeForFileExtension(filePath), $"ReceiptOfRecipient.{Path.GetExtension(filePath)}");
-        }
-        return BadRequest(result.ErrorMessage);
-    }
 }
