@@ -9,7 +9,7 @@ public class IpSubnetModel
     public int SecondOctet { get; set; }
     public int ThirdOctet { get; set; }
     public int FourthOctet { get; set; }
-    public int SubnetMask { get; set; }
+    public int PrefixLength { get; set; }
 
     public int ParentNetworkId { get; set; }
 }

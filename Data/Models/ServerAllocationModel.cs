@@ -26,6 +26,9 @@ public class ServerAllocationCreateModel
     [Required]
     public string SerialNumber { get; set; }
 
+    [Required]
+    public int Power { get; set; }
+
     public string? Note { get; set; }
 
     public string? TechNote { get; set; }
@@ -43,6 +46,9 @@ public class ServerAllocationUpdateModel
 
     [Required]
     public string Name { get; set; }
+
+    [Required]
+    public int Power { get; set; }
 
     public string? Note { get; set; }
 
