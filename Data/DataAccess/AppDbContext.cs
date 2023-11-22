@@ -25,11 +25,17 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
         {
             if (entry.State == EntityState.Added)
             {
-                entry.Property("DateCreated").CurrentValue = DateTime.UtcNow;
+                if (entry.GetType().GetProperty("DateCreated") != null)
+                {
+                    entry.Property("DateCreated").CurrentValue = DateTime.UtcNow;
+                }
             }
             if (entry.State == EntityState.Modified)
             {
-                entry.Property("DateUpdated").CurrentValue = DateTime.UtcNow;
+                if (entry.GetType().GetProperty("DateUpdated") != null)
+                {
+                    entry.Property("DateUpdated").CurrentValue = DateTime.UtcNow;
+                }
             }
             if (entry.State == EntityState.Deleted)
             {

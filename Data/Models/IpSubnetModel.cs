@@ -22,7 +22,7 @@ public class IpRangeCreateModel
 
     [Required]
     [Range(16, 24)]
-    public int SubnetMask { get; set; }
+    public int PrefixLength { get; set; }
 
     public List<IpSubnetCreateModel?>? IpSubnets { get; set; }
 }
@@ -34,8 +34,8 @@ public class IpSubnetCreateModel
     public string IpAddresss { get; set; }
 
     [Required]
-    [Range(16, 32)]
-    public int SubnetMask { get; set; }
+    [Range(24, 32)]
+    public int PrefixLength { get; set; }
 }
 
 public class IpSubnetSearchModel
