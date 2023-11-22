@@ -53,8 +53,6 @@ public class ServerAllocationUpdateModel
     public string? Note { get; set; }
 
     public string? TechNote { get; set; }
-
-    public string? SaleNote { get; set; }
 }
 
 public class ServerAllocationSearchModel
