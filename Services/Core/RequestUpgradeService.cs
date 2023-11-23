@@ -190,7 +190,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    private bool CheckValidCapacity(ResultModel result, Data.Entities.Component component, ServerHardwareConfig serverHardwareConfig, int capacity)
+    private bool CheckValidCapacity(ResultModel result, Component component, ServerHardwareConfig serverHardwareConfig, int capacity)
     {
         bool validCapacity = true;
         if (component.Type == ComponentType.Change && capacity <= 0)
@@ -493,7 +493,6 @@ public class RequestUpgradeService : IRequestUpgradeService
             };
             foreach (var requestUpgradeId in model.RequestUpgradeIds)
             {
-
                 results.Add(await Evaluate(requestUpgradeId, status, userAssignModel));
             }
 
