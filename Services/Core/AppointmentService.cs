@@ -539,7 +539,10 @@ public class AppointmentService : IAppointmentService
                 throw new Exception(ErrorMessage.WRONG_PURPOSE);
             }
 
-            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
+            var appointment = _dbContext.Appointments
+                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade)
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand)
+                .FirstOrDefault(x => x.Id == appointmentId);
             if (appointment == null)
             {
                 result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
@@ -562,6 +565,26 @@ public class AppointmentService : IAppointmentService
             if (validPrecondition)
             {
                 appointment.Status = status;
+                foreach(var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
+                {
+                    requestUpgrade.Status = status;
+                    _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
+                    {
+                        Action = RequestUserAction.Evaluate,
+                        RequestUpgradeId = appointment.Id,
+                        UserId = new Guid(model.UserId)
+                    });
+                }
+                foreach (var requestExpand in appointment.RequestExpandAppointments.Select(x => x.RequestExpand))
+                {
+                    requestExpand.Status = status;
+                    _dbContext.RequestExpandUsers.Add(new RequestExpandUser
+                    {
+                        Action = RequestUserAction.Evaluate,
+                        RequestExpandId = appointment.Id,
+                        UserId = new Guid(model.UserId)
+                    });
+                }
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
                     Action = RequestUserAction.Evaluate,

@@ -1,6 +1,10 @@
-﻿namespace Data.Entities;
+﻿using Data.Enums;
+
+namespace Data.Entities;
 public class RequestExpandUser : BaseEntity
 {
+    public RequestUserAction Action { get; set; }
+
     public int RequestExpandId { get; set; }
     public RequestExpand RequestExpand { get; set; }
 
