@@ -16,6 +16,17 @@ public class RequestExpandModel
     public DateTime DateUpdated { get; set; } = DateTime.Now;
 }
 
+public class RequestExpandResultModel
+{
+    public int Id { get; set; }
+    //public int Power { get; set; }
+    public RequestStatus Status { get; set; }
+    public string RequestType { get; set; }
+    public string? Note { get; set; }
+    public string? TechNote { get; set; }
+    public int ServerAllocationId { get; set; }
+}
+
 public class RequestExpandCreateModel
 {
     //[Required]

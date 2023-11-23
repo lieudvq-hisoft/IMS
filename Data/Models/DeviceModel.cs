@@ -10,3 +10,13 @@ public class DeviceModel
     public int BaseSize { get; set; }
     public string Rack { get; set; }
 }
+
+public class DeviceResultModel
+{
+    public int Id { get; set; }
+    public string Type { get; set; }
+    public string Status { get; set; }
+    public int BasePower { get; set; }
+    public int BaseSize { get; set; }
+    public string Rack { get; set; }
+}

@@ -8,6 +8,13 @@ public class LocationModel
     public int RackId { get; set; }
 }
 
+public class LocationResultModel
+{
+    public int Id { get; set; }
+    public int Position { get; set; }
+    public int RackId { get; set; }
+}
+
 public class LocationRackMapModel
 {
     public int Id { get; set; }

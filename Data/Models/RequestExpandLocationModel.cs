@@ -9,6 +9,14 @@ public class RequestExpandLocationModel
     public int LocationId { get; set; }
 }
 
+public class RequestExpandLocationResultModel
+{
+    public int Id { get; set; }
+    public int RequestExpandId { get; set; }
+    public int LocationId { get; set; }
+}
+
+
 public class RequestExpandLocationCreateModel
 {
     [Required]

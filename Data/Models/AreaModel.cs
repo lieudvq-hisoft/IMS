@@ -10,6 +10,14 @@ public class AreaModel
     public int ColumnCount { get; set; }
 }
 
+public class AreaResultModel
+{
+    public int Id { get; set; }
+    public string Name { get; set; }
+    public int RowCount { get; set; }
+    public int ColumnCount { get; set; }
+}
+
 public class AreaCreateModel
 {
     [Required]
