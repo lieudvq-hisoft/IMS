@@ -16,13 +16,16 @@ public class MapperProfile : Profile
         CreateMap<User, UserModel>();
         #endregion
 
-        #region Server
+        #region ServerHardware
         CreateMap<Component, ComponentModel>()
             .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
         CreateMap<ComponentCreateModel, Component>();
         CreateMap<ComponentUpdateModel, Component>();
 
-        CreateMap<ServerHardwareConfig, ServerHardwareConfigModel>();
+        CreateMap<ServerHardwareConfig, ServerHardwareConfigModel>()
+            .ForMember(dest => dest.ComponentName, opt => opt.MapFrom(src => src.Component.Name))
+            .ForMember(dest => dest.ComponentType, opt => opt.MapFrom(src => src.Component.Type))
+            .ForMember(dest => dest.ComponentUnit, opt => opt.MapFrom(src => src.Component.Unit));
         CreateMap<ServerHardwareConfigCreateModel, ServerHardwareConfig>();
         CreateMap<ServerHardwareConfigUpdateModel, ServerHardwareConfig>();
 

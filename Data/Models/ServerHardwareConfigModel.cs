@@ -11,6 +11,10 @@ public class ServerHardwareConfigModel
     public int ComponentId { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
+
+    public string ComponentName { get; set; }
+    public string ComponentType { get; set; }
+    public string ComponentUnit { get; set; }
 }
 
 public class ServerHardwareConfigCreateModel

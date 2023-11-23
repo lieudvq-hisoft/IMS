@@ -37,7 +37,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
 
         try
         {
-            var serverHardwareConfigs = _dbContext.ServerHardwareConfigs
+            var serverHardwareConfigs = _dbContext.ServerHardwareConfigs.Include(x => x.Component)
                 .Where(delegate (ServerHardwareConfig x)
                 {
                     return FilterServerHardwareConfig(x, searchModel);

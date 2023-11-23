@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using CloudinaryDotNet.Actions;
 using Data.Common.PaginationModel;
 using Data.DataAccess;
 using Data.DataAccess.Constant;
@@ -6,12 +7,14 @@ using Data.Entities;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
+using Data.Utils.Tree;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using Services.Utilities;
 using System;
 using System.Text.RegularExpressions;
+using static Data.Utils.Tree.TreeExtensions;
 
 namespace Services.Core;
 public interface IIpSubnetService
@@ -20,6 +23,7 @@ public interface IIpSubnetService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> CreateIpRange(IpRangeCreateModel model);
     Task<ResultModel> Delete(int subnetId);
+    Task<ResultModel> GetIpAddress(int ipSubnetId, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
 }
 
 public class IpSubnetService : IIpSubnetService
@@ -88,6 +92,62 @@ public class IpSubnetService : IIpSubnetService
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
         return result;
+    }
+
+    public async Task<ResultModel> GetIpAddress(int subnetId, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var allSubnets = _dbContext.IpSubnets.Include(x => x.ParentNetwork).Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).Include(x => x.IpAddresses).ToList();
+
+            var rootSubnet = GetSubnetTree(subnetId, allSubnets);
+            var ipAddressesQuery = GetAllIpAddress(rootSubnet)
+                .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
+                .AsQueryable();
+
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddressesQuery.Count());
+
+            ipAddressesQuery = ipAddressesQuery.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            ipAddressesQuery = ipAddressesQuery.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            paging.Data = _mapper.ProjectTo<IpAddressModel>(ipAddressesQuery).ToList();
+
+            result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    private ITree<IpSubnet> GetSubnetTree(int subnetId, List<IpSubnet> subnets)
+    {
+        ITree<IpSubnet> virtualRootNode = subnets.ToTree((parent, child) => child.ParentNetworkId == parent.Id);
+        ITree<IpSubnet> rootLevelSubnetWithSubTree = virtualRootNode.GetAllChildren().FirstOrDefault(x => x.Data.Id == subnetId);
+
+        if (rootLevelSubnetWithSubTree == null)
+        {
+            throw new Exception(IpSubnetErrorMessage.NOT_EXISTED);
+        }
+
+        return rootLevelSubnetWithSubTree;
+    }
+
+    private List<IpAddress> GetAllIpAddress(ITree<IpSubnet> subnet)
+    {
+        List<ITree<IpSubnet>> childSubnets = subnet.GetAllChildren().ToList();
+        var ipAddresses = subnet.Data.IpAddresses.ToList();
+        foreach (var ipSubnet in childSubnets.Select(x => x.Data))
+        {
+            ipAddresses.AddRange(ipSubnet.IpAddresses);
+        }
+
+        return ipAddresses;
     }
 
     public async Task<ResultModel> CreateIpRange(IpRangeCreateModel model)
