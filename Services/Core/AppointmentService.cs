@@ -571,7 +571,7 @@ public class AppointmentService : IAppointmentService
                     _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
                     {
                         Action = RequestUserAction.Evaluate,
-                        RequestUpgradeId = appointment.Id,
+                        RequestUpgradeId = requestUpgrade.Id,
                         UserId = new Guid(model.UserId)
                     });
                 }
@@ -581,7 +581,7 @@ public class AppointmentService : IAppointmentService
                     _dbContext.RequestExpandUsers.Add(new RequestExpandUser
                     {
                         Action = RequestUserAction.Evaluate,
-                        RequestExpandId = appointment.Id,
+                        RequestExpandId = requestExpand.Id,
                         UserId = new Guid(model.UserId)
                     });
                 }

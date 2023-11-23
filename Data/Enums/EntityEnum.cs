@@ -31,7 +31,6 @@ public enum IpPurpose
 
 public enum RequestUserAction
 {
-    Create,
     Evaluate,
     Execute
 }
