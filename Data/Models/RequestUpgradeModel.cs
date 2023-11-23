@@ -47,9 +47,6 @@ public class RequestUpgradeCreateModel
 
     [Required]
     public int ServerAllocationId { get; set; }
-
-    [Required]
-    public string UserId { get; set; }
 }
 
 public class RequestUpgradeCreateBulkModel
