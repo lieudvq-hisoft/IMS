@@ -101,7 +101,7 @@ public class RequestAppointmentCreateResultModel
 
 public class AppointmentCreateResultModel
 {
-    public AppointmentModel Appointment { get; set; }
+    public AppointmentResultModel Appointment { get; set; }
 
     public IEnumerable<object> RequestUpgradeAppointments { get; set; }
 

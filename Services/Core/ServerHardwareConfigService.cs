@@ -167,7 +167,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
+            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component).FirstOrDefault(x => x.Id == model.ServerAllocationId);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
