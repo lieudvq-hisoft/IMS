@@ -30,6 +30,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPost("Register")]
+    [Authorize(Roles = nameof(RoleType.Admin))]
     [SwaggerOperation(Summary = "[Admin]: Register a new user, cannot register a customer")]
     public async Task<ActionResult> Register([FromBody] UserCreateModel model)
     {
@@ -39,6 +40,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("MyAccount")]
+    [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Get your information")]
     public async Task<ActionResult> GetAccountInfo()
     {
@@ -49,6 +51,7 @@ public class UserController : ControllerBase
     }
 
     [HttpPatch("MyAccount")]
+    [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Update your information")]
     public async Task<ActionResult> UpdateAccountInfo([FromBody] UserUpdateModel model)
     {
@@ -59,6 +62,7 @@ public class UserController : ControllerBase
 
     [HttpGet]
     [SwaggerOperation(Summary = "Get list of users")]
+    [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
     public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] UserSearchModel searchModel)
     {
         var result = await _userService.Get(paginationModel, searchModel);
@@ -67,6 +71,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
     public async Task<ActionResult> GetDetail(string id)
     {
         var result = await _userService.GetDetail(id);
