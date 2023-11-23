@@ -34,14 +34,12 @@ public class AppointmentService : IAppointmentService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly TransactionHelper _transactionHelper;
     private readonly ICloudinaryHelper _cloudinaryHelper;
 
-    public AppointmentService(AppDbContext dbContext, IMapper mapper, TransactionHelper transactionHelper, ICloudinaryHelper cloudinaryHelper)
+    public AppointmentService(AppDbContext dbContext, IMapper mapper, ICloudinaryHelper cloudinaryHelper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _transactionHelper = transactionHelper;
         _cloudinaryHelper = cloudinaryHelper;
     }
 
@@ -220,8 +218,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            using var transaction = _transactionHelper.GetTransaction();
-            _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
+            using var transaction = _dbContext.Database.BeginTransaction();
             var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
             if (serverAllocation == null)
             {
@@ -291,8 +288,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            using var transaction = _transactionHelper.GetTransaction();
-            _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
+            using var transaction = _dbContext.Database.BeginTransaction();
             var createRequestUpgradeAppointmentResults = new List<ResultModel>();
             foreach (var requestUpgradeId in model.RequestUpgradeIds)
             {

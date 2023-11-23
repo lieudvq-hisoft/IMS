@@ -39,7 +39,7 @@ public class IpSubnetCreateModel
     public string? Note { get; set; }
 
     [Required]
-    [Range(24, 32)]
+    [Range(16, 32)]
     public int PrefixLength { get; set; }
 }
 

@@ -16,20 +16,16 @@ public class ServerAllocationController : ControllerBase
     private readonly IWebHostEnvironment _environment;
     private readonly IServerAllocationService _serverAllocationService;
     private readonly IFileService _fileService;
-    private readonly TransactionHelper _transactionHelper;
 
     public ServerAllocationController(ICustomerService customerService,
         IWebHostEnvironment environment,
         IServerAllocationService serverAllocationService,
-        IFileService fileService,
-        TransactionHelper transactionHelper
-        )
+        IFileService fileService)
     {
         _customerService = customerService;
         _environment = environment;
         _serverAllocationService = serverAllocationService;
         _fileService = fileService;
-        _transactionHelper = transactionHelper;
     }
 
     [HttpGet]

@@ -83,7 +83,6 @@ public static class StartupExtension
 
         services.AddSingleton<ICloudinaryHelper, CloudinaryHelper>();
         services.AddScoped<IEmailHelper, EmailHelper>();
-        services.AddScoped<TransactionHelper>();
     }
 
     public static void ConfigIdentityService(this IServiceCollection services)

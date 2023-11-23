@@ -26,15 +26,13 @@ public class IpSubnetService : IIpSubnetService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly TransactionHelper _transactionHelper;
     private const int SUBNET_MAX_SIZE = 256;
     private const int PREFIX_LENGTH_MAX = 32;
 
-    public IpSubnetService(AppDbContext dbContext, IMapper mapper, TransactionHelper transactionHelper)
+    public IpSubnetService(AppDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _transactionHelper = transactionHelper;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel)
@@ -99,8 +97,7 @@ public class IpSubnetService : IIpSubnetService
 
         try
         {
-            using var transaction = _transactionHelper.GetTransaction();
-            _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
+            using var transaction = _dbContext.Database.BeginTransaction();
             var octets = GetIPv4Octets(model.IpAddresss);
             if (octets[3] != 0)
             {
@@ -224,7 +221,7 @@ public class IpSubnetService : IIpSubnetService
                 for (int i = 0; i < models.Count; i++)
                 {
                     var octets = GetIPv4Octets(models[i].IpAddresss);
-                    if (!IpSubnetBelongToParent(octets, parentSubnet))
+                    if (!IpSubnetBelongToParent(octets, parentSubnet) || !ValidPrefixLengthAndOctets(octets, models[i].PrefixLength))
                     {
                         result.ErrorMessage = IpSubnetErrorMessage.INVALID_RANGE;
                         validPrecondition = false;
@@ -289,7 +286,7 @@ public class IpSubnetService : IIpSubnetService
                         {
                             purpose = IpPurpose.Broadcast;
                         }
-                        ip.IsReserved =  purpose != IpPurpose.Host;
+                        ip.IsReserved = purpose != IpPurpose.Host;
                         ip.Purpose = purpose;
                         ip.IpSubnetId = ipSubnet.Id;
                     }
@@ -312,18 +309,51 @@ public class IpSubnetService : IIpSubnetService
         return subnetOctet[0] == parentSubnet.FirstOctet && subnetOctet[1] == parentSubnet.SecondOctet && subnetOctet[2] >= parentSubnet.ThirdOctet && subnetOctet[2] < parentSubnet.ThirdOctet + parentSubnetIncremental;
     }
 
+    private bool ValidPrefixLengthAndOctets(List<int> subnetOctet, int prefixLength)
+    {
+        bool validPrefixLengthAndOctets = true;
+        if (prefixLength <= 24 && subnetOctet[3] != 0)
+        {
+            validPrefixLengthAndOctets = false;
+        }
+
+        return validPrefixLengthAndOctets;
+    }
+
     private List<IpAddress> ExtractSubnetIpAddresses(double numberOfIps, List<int> octets, List<IpAddress> parentIps)
     {
+        double subnetIncremental = numberOfIps / SUBNET_MAX_SIZE;
+        double ipTaken = 0;
         var ips = new List<IpAddress>();
 
-        for (int t = octets[3]; t < octets[3] + numberOfIps; t++)
+        if (subnetIncremental == 0)
         {
-            var address = $"{octets[0]}.{octets[1]}.{octets[2]}.{t}";
-            var ip = parentIps.FirstOrDefault(x => x.Address.Trim() == address.Trim());
-            if (ip != null)
+            for (int t = octets[3]; t < octets[3] + numberOfIps; t++)
             {
-                ips.Add(ip);
-                parentIps.Remove(ip);
+                var address = $"{octets[0]}.{octets[1]}.{octets[2]}.{t}";
+                var ip = parentIps.FirstOrDefault(x => x.Address.Trim() == address.Trim());
+                if (ip != null)
+                {
+                    ips.Add(ip);
+                    parentIps.Remove(ip);
+                }
+            }
+        }
+        else
+        {
+            for (int i = 0; i < subnetIncremental; i++)
+            {
+                for (int t = 0; t < SUBNET_MAX_SIZE && ipTaken < numberOfIps; t++)
+                {
+                    ipTaken++;
+                    var address = $"{octets[0]}.{octets[1]}.{octets[2] + i}.{t}";
+                    var ip = parentIps.FirstOrDefault(x => x.Address.Trim() == address.Trim());
+                    if (ip != null)
+                    {
+                        ips.Add(ip);
+                        parentIps.Remove(ip);
+                    }
+                }
             }
         }
 

@@ -36,13 +36,11 @@ public class RequestUpgradeService : IRequestUpgradeService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly TransactionHelper _transactionHelper;
 
-    public RequestUpgradeService(AppDbContext dbContext, IMapper mapper, TransactionHelper transactionHelper)
+    public RequestUpgradeService(AppDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _transactionHelper = transactionHelper;
     }
 
     public async Task<ResultModel> Get(PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel)
@@ -214,8 +212,7 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            using var transaction = _transactionHelper.GetTransaction();
-            _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
+            using var transaction = _dbContext.Database.BeginTransaction();
             var results = new List<ResultModel>();
             foreach (var requestUpgradeRequestModel in model.RequestUpgradeCreateModels)
             {
@@ -296,8 +293,7 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            using var transaction = _transactionHelper.GetTransaction();
-            _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
+            using var transaction = _dbContext.Database.BeginTransaction();
             var results = new List<ResultModel>();
             foreach (var requestUpgradeRequestModel in model.RequestUpgradeCreateModels)
             {
@@ -465,8 +461,7 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            using var transaction = _transactionHelper.GetTransaction();
-            _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
+            using var transaction = _dbContext.Database.BeginTransaction();
             var results = new List<ResultModel>();
             var userAssignModel = new UserAssignModel
             {
@@ -640,8 +635,7 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            using var transaction = _transactionHelper.GetTransaction();
-            _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
+            using var transaction = _dbContext.Database.BeginTransaction();
             var results = new List<ResultModel>();
             foreach (var requestUpgradeId in model.RequestUpgradeIds)
             {

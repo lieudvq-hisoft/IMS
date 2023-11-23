@@ -19,13 +19,11 @@ public class RequestHostService : IRequestHostService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly TransactionHelper _transactionHelper;
 
-    public RequestHostService(AppDbContext dbContext, IMapper mapper, TransactionHelper transactionHelper)
+    public RequestHostService(AppDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _transactionHelper = transactionHelper;
     }
 
     public async Task<ResultModel> Evaluate(int requestHostId, RequestStatus status, UserAssignModel model)
@@ -89,8 +87,7 @@ public class RequestHostService : IRequestHostService
 
         try
         {
-            using var transaction = _transactionHelper.GetTransaction();
-            _dbContext.Database.UseTransaction(transaction.GetDbTransaction());
+            using var transaction = _dbContext.Database.BeginTransaction();
             var results = new List<ResultModel>();
             var userAssignModel = new UserAssignModel
             {
