@@ -227,7 +227,7 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.Appointments).ThenInclude(x => x.ServerAllocation).FirstOrDefault(x => x.Id == id);
+            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.Customer).Include(x => x.Appointments).FirstOrDefault(x => x.Id == id);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
