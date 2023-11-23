@@ -247,7 +247,7 @@ public class AppointmentService : IAppointmentService
                     {
                         RequestUpgradeAppointments = createRequestUpgradeAppointmentResults.Select(x => x.Data),
                         RequestExpandAppointments = createRequestExpandAppointmentResults.Select(x => x.Data),
-                        Appointment = _mapper.Map<AppointmentModel>(appointment),
+                        Appointment = _mapper.Map<AppointmentResultModel>(appointment),
                     };
                 }
             }
