@@ -21,6 +21,17 @@ public class RequestUpgradeModel
     public UserModel? Executor { get; set; }
 }
 
+public class RequestUpgradeResultModel
+{
+    public int Id { get; set; }
+    public string Information { get; set; }
+    public int Capacity { get; set; }
+    public string Status { get; set; }
+    public RequestType RequestType { get; set; }
+    public int ComponentId { get; set; }
+    public int ServerAllocationId { get; set; }
+}
+
 public class RequestUpgradeDetailModel
 {
     public int Id { get; set; }

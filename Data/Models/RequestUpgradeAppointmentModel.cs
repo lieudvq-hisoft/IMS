@@ -9,6 +9,13 @@ public class RequestUpgradeAppointmentModel
     public int RequestUpgradeId { get; set; }
 }
 
+public class RequestUpgradeAppointmentResultModel
+{
+    public int Id { get; set; }
+    public int AppointmentId { get; set; }
+    public int RequestUpgradeId { get; set; }
+}
+
 public class RequestUpgradeAppointmentUpdateModel
 {
     [Required]

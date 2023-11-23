@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Data.Entities;
+using Data.Entities.Pending;
 using Data.Enums;
 using Data.Models;
 
@@ -128,6 +129,29 @@ public class MapperProfile : Profile
         CreateMap<IpAssignment, IpAssignmentModel>();
         CreateMap<IpAssignmentCreateModel, IpAssignment>();
         CreateMap<IpAssignmentUpdateModel, IpAssignment>();
+        #endregion
+
+        #region ResultModel
+        CreateMap<ServerHardwareConfig, ServerHardwareConfigResultModel>();
+        CreateMap<ServerAllocation, ServerAllocationResultModel>();
+        CreateMap<RequestUpgrade, RequestUpgradeResultModel>();
+        CreateMap<RequestExpand, RequestExpandResultModel>();
+        CreateMap<RequestUpgradeUser, RequestUpgradeUserResultModel>();
+        CreateMap<RequestUpgradeAppointment, RequestUpgradeAppointmentResultModel>();
+        CreateMap<RequestHost, RequestHostResultModel>();
+        CreateMap<RequestExpandLocation, RequestExpandLocationResultModel>();
+        CreateMap<RequestExpandAppointment, RequestExpandAppointmentResultModel>();
+        CreateMap<Rack, RackResultModel>();
+        CreateMap<Location, LocationResultModel>();
+        CreateMap<LocationAssignment, LocationAssignmentResultModel>();
+        CreateMap<IpSubnet, IpSubnetResultModel>();
+        CreateMap<IpAddress, IpAddressResultModel>();
+        //CreateMap<Device, DeviceResultModel>();
+        CreateMap<Customer, CustomerResultModel>();
+        CreateMap<Component, ComponentResultModel>();
+        CreateMap<Area, AreaResultModel>();
+        CreateMap<AppointmentUser, AppointmentUserResultModel>();
+        CreateMap<Appointment, AppointmentResultModel>();
         #endregion
     }
 }

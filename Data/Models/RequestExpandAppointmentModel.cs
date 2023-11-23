@@ -8,6 +8,12 @@ public class RequestExpandAppointmentModel
     public int AppointmentId { get; set; }
 }
 
+public class RequestExpandAppointmentResultModel
+{
+    public int RequestExpandId { get; set; }
+    public int AppointmentId { get; set; }
+}
+
 public class RequestExpandAppointmentCreateModel
 {
     [Required]

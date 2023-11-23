@@ -6,6 +6,14 @@ public class RequestExpandUserModel
     public Guid UserId { get; set; }
 }
 
+public class RequestExpandUserResultModel
+{
+    public int Id { get; set; }
+    public int RequestExpandId { get; set; }
+    public Guid UserId { get; set; }
+}
+
+
 public class RequestExpandUserSearchModel
 {
     public int? Id { get; set; } = null;

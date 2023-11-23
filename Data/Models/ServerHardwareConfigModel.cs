@@ -15,6 +15,16 @@ public class ServerHardwareConfigModel
     public ComponentModel? Component { get; set; }
 }
 
+public class ServerHardwareConfigResultModel
+{
+    public int Id { get; set; }
+    public string Information { get; set; }
+    public int Capacity { get; set; }
+    public int ServerAllocationId { get; set; }
+    public int ComponentId { get; set; }
+}
+
+
 public class ServerHardwareConfigCreateModel
 {
     [Required]

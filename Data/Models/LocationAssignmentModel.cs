@@ -11,6 +11,14 @@ public class LocationAssignmentModel
     public int LocationId { get; set; }
 }
 
+public class LocationAssignmentResultModel
+{
+    public bool IsServer { get; set; }
+    public int Id { get; set; }
+    public int ServerAllocationId { get; set; }
+    public int LocationId { get; set; }
+}
+
 public class LocationAssignmentCreateModel
 {
     [Required]

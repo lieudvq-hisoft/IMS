@@ -17,6 +17,20 @@ public class IpSubnetModel
     public List<int> SubnetIds { get; set; }
 }
 
+public class IpSubnetResultModel
+{
+    public int Id { get; set; }
+    public int FirstOctet { get; set; }
+    public int SecondOctet { get; set; }
+    public int ThirdOctet { get; set; }
+    public int FourthOctet { get; set; }
+    public int PrefixLength { get; set; }
+    public string? Note { get; set; }
+
+    public int ParentNetworkId { get; set; }
+    public List<int> SubnetIds { get; set; }
+}
+
 public class IpRangeCreateModel
 {
     [IsIpV4]

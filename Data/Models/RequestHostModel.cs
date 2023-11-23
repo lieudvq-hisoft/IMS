@@ -9,6 +9,13 @@ public class RequestHostModel
     public int ServerAllocationId { get; set; }
 }
 
+public class RequestHostResultModel
+{
+    public IpAssignmentTypes Type { get; set; }
+    public RequestStatus Status { get; set; }
+    public int ServerAllocationId { get; set; }
+}
+
 public class RequestHostSearchModel
 {
     public IpAssignmentTypes Type { get; set; }

@@ -5,6 +5,12 @@ public class AppointmentUserModel
     public int AppointmentId { get; set; }
 }
 
+public class AppointmentUserResultModel
+{
+    public int Id { get; set; }
+    public int AppointmentId { get; set; }
+}
+
 public class AppointmentUserSearchModel
 {
     public int? Id { get; set; } = null;
