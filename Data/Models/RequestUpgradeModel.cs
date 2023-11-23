@@ -53,27 +53,18 @@ public class RequestUpgradeCreateBulkModel
 {
     [Required]
     public List<RequestUpgradeCreateModel> RequestUpgradeCreateModels { get; set; }
-
-    [Required]
-    public string UserId { get; set; }
 }
 
 public class RequestUpgradeEvaluateBulkModel
 {
     [Required]
     public List<int> RequestUpgradeIds { get; set; }
-
-    [Required]
-    public string UserId { get; set; }
 }
 
 public class RequestUpgradeCompleteBulkModel
 {
     [Required]
     public List<int> RequestUpgradeIds { get; set; }
-
-    [Required]
-    public string UserId { get; set; }
 }
 
 public class RequestUpgradeUpdateModel

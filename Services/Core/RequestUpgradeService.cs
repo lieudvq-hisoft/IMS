@@ -20,15 +20,15 @@ public interface IRequestUpgradeService
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
     Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model);
     Task<ResultModel> Initiate(RequestUpgradeCreateModel model, Guid userId);
-    Task<ResultModel> InitiateBulk(RequestUpgradeCreateBulkModel model);
+    Task<ResultModel> InitiateBulk(RequestUpgradeCreateBulkModel model, Guid userId);
     Task<ResultModel> Delete(int requestUpgradeId);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
-    Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, UserAssignModel model);
-    Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status);
+    Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, Guid userId);
+    Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status, Guid userId);
     Task<ResultModel> Reject(int requestUpgradeId);
     Task<ResultModel> CheckCompletability(int requestUpgradeId);
     Task<ResultModel> Complete(int requestUpgradeId, Guid userId);
-    Task<ResultModel> CompleteBulk(RequestUpgradeCompleteBulkModel model);
+    Task<ResultModel> CompleteBulk(RequestUpgradeCompleteBulkModel model, Guid userId);
 }
 
 public class RequestUpgradeService : IRequestUpgradeService
@@ -300,7 +300,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> InitiateBulk(RequestUpgradeCreateBulkModel model)
+    public async Task<ResultModel> InitiateBulk(RequestUpgradeCreateBulkModel model, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -311,7 +311,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             var results = new List<ResultModel>();
             foreach (var requestUpgradeRequestModel in model.RequestUpgradeCreateModels)
             {
-                results.Add(await Initiate(requestUpgradeRequestModel, new Guid(model.UserId)));
+                results.Add(await Initiate(requestUpgradeRequestModel, userId));
             }
 
             if (results.Any(x => !x.Succeed))
@@ -414,7 +414,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, UserAssignModel model)
+    public async Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -434,7 +434,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
             }
 
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
             if (user == null)
             {
                 validPrecondition = false;
@@ -454,7 +454,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 {
                     Action = RequestUserAction.Evaluate,
                     RequestUpgradeId = requestUpgrade.Id,
-                    UserId = new Guid(model.UserId)
+                    UserId = userId
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
@@ -469,7 +469,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status)
+    public async Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -478,13 +478,9 @@ public class RequestUpgradeService : IRequestUpgradeService
         {
             using var transaction = _dbContext.Database.BeginTransaction();
             var results = new List<ResultModel>();
-            var userAssignModel = new UserAssignModel
-            {
-                UserId = model.UserId
-            };
             foreach (var requestUpgradeId in model.RequestUpgradeIds)
             {
-                results.Add(await Evaluate(requestUpgradeId, status, userAssignModel));
+                results.Add(await Evaluate(requestUpgradeId, status, userId));
             }
 
             if (results.Any(x => !x.Succeed))
@@ -649,7 +645,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> CompleteBulk(RequestUpgradeCompleteBulkModel model)
+    public async Task<ResultModel> CompleteBulk(RequestUpgradeCompleteBulkModel model, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -660,7 +656,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             var results = new List<ResultModel>();
             foreach (var requestUpgradeId in model.RequestUpgradeIds)
             {
-                results.Add(await Complete(requestUpgradeId, new Guid(model.UserId)));
+                results.Add(await Complete(requestUpgradeId, userId));
             }
 
             if (results.Any(x => !x.Succeed))
