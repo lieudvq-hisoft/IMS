@@ -20,7 +20,9 @@ public class AppointmentModel
     public string? ReceiptOfRecipientFilePath { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
-    public ServerAllocationModel ServerAllocation { get; set; }
+    public ServerAllocationModel? ServerAllocation { get; set; }
+    public CustomerModel? Approver { get; set; }
+    public CustomerModel? Executor { get; set; }
 }
 
 public class AppointmentCreateModel

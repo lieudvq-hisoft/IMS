@@ -29,9 +29,10 @@ public enum IpPurpose
 }
 
 
-public enum AppointmentAction
+public enum RequestUserAction
 {
-    Approve,
+    Create,
+    Evaluate,
     Execute
 }
 

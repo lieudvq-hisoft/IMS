@@ -17,9 +17,9 @@ public interface IRequestUpgradeService
     Task<ResultModel> Get(PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetAppointment(int requestUpgradeId, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
-    Task<ResultModel> Create(RequestUpgradeCreateModel model);
+    Task<ResultModel> Create(RequestUpgradeCreateModel model, Guid userId);
     Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model);
-    Task<ResultModel> Initiate(RequestUpgradeCreateModel model);
+    Task<ResultModel> Initiate(RequestUpgradeCreateModel model, Guid userId);
     Task<ResultModel> InitiateBulk(RequestUpgradeCreateBulkModel model);
     Task<ResultModel> Delete(int requestUpgradeId);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
@@ -27,9 +27,8 @@ public interface IRequestUpgradeService
     Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status);
     Task<ResultModel> Reject(int requestUpgradeId);
     Task<ResultModel> CheckCompletability(int requestUpgradeId);
-    Task<ResultModel> Complete(int requestUpgradeId);
+    Task<ResultModel> Complete(int requestUpgradeId, Guid userId);
     Task<ResultModel> CompleteBulk(RequestUpgradeCompleteBulkModel model);
-
 }
 
 public class RequestUpgradeService : IRequestUpgradeService
@@ -135,7 +134,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> Create(RequestUpgradeCreateModel model)
+    public async Task<ResultModel> Create(RequestUpgradeCreateModel model, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -170,6 +169,15 @@ public class RequestUpgradeService : IRequestUpgradeService
 
                 _dbContext.RequestUpgrades.Add(requestUpgrade);
                 _dbContext.SaveChanges();
+
+                _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
+                {
+                    Action = RequestUserAction.Create,
+                    UserId = userId,
+                    RequestUpgradeId = requestUpgrade.Id,
+                });
+                _dbContext.SaveChanges();
+
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
             }
@@ -216,7 +224,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             var results = new List<ResultModel>();
             foreach (var requestUpgradeRequestModel in model.RequestUpgradeCreateModels)
             {
-                results.Add(await Create(requestUpgradeRequestModel));
+                results.Add(await Create(requestUpgradeRequestModel, new Guid(model.UserId)));
             }
 
             if (results.Any(x => !x.Succeed))
@@ -239,7 +247,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> Initiate(RequestUpgradeCreateModel model)
+    public async Task<ResultModel> Initiate(RequestUpgradeCreateModel model, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -274,6 +282,21 @@ public class RequestUpgradeService : IRequestUpgradeService
 
                 _dbContext.RequestUpgrades.Add(requestUpgrade);
                 _dbContext.SaveChanges();
+
+                _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
+                {
+                    Action = RequestUserAction.Create,
+                    UserId = userId,
+                    RequestUpgradeId = requestUpgrade.Id,
+                });
+                _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
+                {
+                    Action = RequestUserAction.Evaluate,
+                    UserId = userId,
+                    RequestUpgradeId = requestUpgrade.Id,
+                });
+                _dbContext.SaveChanges();
+
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
             }
@@ -297,7 +320,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             var results = new List<ResultModel>();
             foreach (var requestUpgradeRequestModel in model.RequestUpgradeCreateModels)
             {
-                results.Add(await Initiate(requestUpgradeRequestModel));
+                results.Add(await Initiate(requestUpgradeRequestModel, new Guid(model.UserId)));
             }
 
             if (results.Any(x => !x.Succeed))
@@ -438,6 +461,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 requestUpgrade.Status = status;
                 _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
                 {
+                    Action = RequestUserAction.Evaluate,
                     RequestUpgradeId = requestUpgrade.Id,
                     UserId = new Guid(model.UserId)
                 });
@@ -559,7 +583,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return requestUpgrade.RequestUpgradeAppointments.Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Success && !x.InspectionReportFilePath.IsNullOrEmpty() && !x.ReceiptOfRecipientFilePath.IsNullOrEmpty());
     }
 
-    public async Task<ResultModel> Complete(int requestUpgradeId)
+    public async Task<ResultModel> Complete(int requestUpgradeId, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -614,8 +638,15 @@ public class RequestUpgradeService : IRequestUpgradeService
                     }
                 }
                 requestUpgrade.Status = RequestStatus.Success;
-
+                _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
+                {
+                    Action = RequestUserAction.Execute,
+                    RequestUpgradeId = requestUpgrade.Id,
+                    UserId = userId
+                });
                 _dbContext.SaveChanges();
+
+
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
             }
@@ -639,8 +670,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             var results = new List<ResultModel>();
             foreach (var requestUpgradeId in model.RequestUpgradeIds)
             {
-
-                results.Add(await Complete(requestUpgradeId));
+                results.Add(await Complete(requestUpgradeId, new Guid(model.UserId)));
             }
 
             if (results.Any(x => !x.Succeed))

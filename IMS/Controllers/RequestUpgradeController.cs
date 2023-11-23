@@ -52,7 +52,7 @@ public class RequestUpgradeController : ControllerBase
     [SwaggerOperation(Summary = "Create new request upgrade, state is waiting")]
     public async Task<ActionResult> Create([FromBody] RequestUpgradeCreateModel model)
     {
-        var result = await _requestUpgradeService.Create(model);
+        var result = await _requestUpgradeService.Create(model, new Guid(model.UserId));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -70,7 +70,7 @@ public class RequestUpgradeController : ControllerBase
     [SwaggerOperation(Summary = "Create inital request upgrade for server, state is accepted")]
     public async Task<ActionResult> Initiate([FromBody] RequestUpgradeCreateModel model)
     {
-        var result = await _requestUpgradeService.Initiate(model);
+        var result = await _requestUpgradeService.Initiate(model, new Guid(model.UserId));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -156,9 +156,9 @@ public class RequestUpgradeController : ControllerBase
 
     [HttpPut("{id}/Complete")]
     [SwaggerOperation(Summary = "Complete a completable accepted request upgrade. Change serverHardwareconfig")]
-    public async Task<ActionResult> Complete(int id)
+    public async Task<ActionResult> Complete(int id, [FromBody] UserAssignModel model)
     {
-        var result = await _requestUpgradeService.Complete(id);
+        var result = await _requestUpgradeService.Complete(id, new Guid(model.UserId));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

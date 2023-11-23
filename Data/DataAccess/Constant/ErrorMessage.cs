@@ -86,6 +86,7 @@ public class RequestExpandErrorMessage
     public const string NOT_EXISTED = "Request expand " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Request expand " + ErrorMessage.EXISTED;
     public const string NOT_ACCEPTED = "Request expand is not accepted";
+    public const string NOT_WAITING = "Request expand is not waiting";
     public const string NOT_COMPLETABLE = "Request expand is not completable";
 }
 

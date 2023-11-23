@@ -353,10 +353,10 @@ public class AppointmentService : IAppointmentService
                         validPrecondition = false;
                         result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
                     }
-                    else if (requestUpgrade.Status != RequestStatus.Accepted)
+                    else if (requestUpgrade.Status != RequestStatus.Accepted && requestUpgrade.Status != RequestStatus.Waiting)
                     {
                         validPrecondition = false;
-                        result.ErrorMessage = RequestUpgradeErrorMessage.NOT_ACCEPTED;
+                        result.ErrorMessage = RequestUpgradeErrorMessage.NOT_ACCEPTED + ". " + RequestUpgradeErrorMessage.NOT_WAITING;
                     }
                     else if (requestUpgrade.ServerAllocationId != appoitment.ServerAllocationId)
                     {
@@ -423,10 +423,10 @@ public class AppointmentService : IAppointmentService
                         validPrecondition = false;
                         result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
                     }
-                    else if (requestExpand.Status != RequestStatus.Accepted)
+                    else if (requestExpand.Status != RequestStatus.Accepted && requestExpand.Status != RequestStatus.Waiting)
                     {
                         validPrecondition = false;
-                        result.ErrorMessage = RequestExpandErrorMessage.NOT_ACCEPTED;
+                        result.ErrorMessage = RequestExpandErrorMessage.NOT_ACCEPTED + ". " + RequestExpandErrorMessage.NOT_WAITING;
                     }
                     else if (requestExpand.ServerAllocationId != appoitment.ServerAllocationId)
                     {
@@ -564,7 +564,7 @@ public class AppointmentService : IAppointmentService
                 appointment.Status = status;
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
-                    Action = AppointmentAction.Approve,
+                    Action = RequestUserAction.Evaluate,
                     AppointmentId = appointment.Id,
                     UserId = new Guid(model.UserId)
                 });
@@ -614,7 +614,7 @@ public class AppointmentService : IAppointmentService
                 appointment.Status = RequestStatus.Success;
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
-                    Action = AppointmentAction.Execute,
+                    Action = RequestUserAction.Execute,
                     AppointmentId = appointmentId,
                     UserId = new Guid(model.UserId)
                 });
