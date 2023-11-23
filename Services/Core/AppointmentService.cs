@@ -15,7 +15,6 @@ namespace Services.Core;
 public interface IAppointmentService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
-    Task<ResultModel> GetAll();
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetRequestExpand(int id);
     Task<ResultModel> GetRequestUpgradeAppointment(int id);
@@ -65,25 +64,6 @@ public class AppointmentService : IAppointmentService
             paging.Data = _mapper.Map<List<AppointmentModel>>(appointments);
 
             result.Data = paging;
-            result.Succeed = true;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
-
-    public async Task<ResultModel> GetAll()
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            var appointments = _dbContext.Appointments.Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress).AsQueryable();
-
-            result.Data = _mapper.Map<List<AppointmentModel>>(appointments);
             result.Succeed = true;
         }
         catch (Exception e)
