@@ -34,14 +34,6 @@ public class MapperProfile : Profile
                 dest.Component = context.Mapper.Map<Component, ComponentModel>(src.Component))
             .AfterMap((src, dest, context) =>
             {
-                var creator = src.RequestUpgradeUsers.FirstOrDefault(x => x.Action == RequestUserAction.Create);
-                if (creator != null)
-                {
-                    dest.Creator = context.Mapper.Map<User, UserModel>(creator.User);
-                }
-            })
-            .AfterMap((src, dest, context) =>
-            {
                 var evaluator = src.RequestUpgradeUsers.FirstOrDefault(x => x.Action == RequestUserAction.Evaluate);
                 if (evaluator != null)
                 {

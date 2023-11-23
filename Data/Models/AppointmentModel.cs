@@ -40,25 +40,6 @@ public class AppointmentResultModel
     public string? ReceiptOfRecipientFilePath { get; set; }
 }
 
-public class AppointmentResultModel
-{
-    public int Id { get; set; }
-    public string AppointedCustomer { get; set; }
-    public DateTime DateAppointed { get; set; }
-    public DateTime DateCheckedIn { get; set; }
-    public DateTime DateCheckedOut { get; set; }
-    public string Reason { get; set; }
-    public string? Note { get; set; }
-    public string? TechNote { get; set; }
-    public bool IsCorrectPerson { get; set; }
-    public RequestStatus Status { get; set; }
-    public int ServerAllocationId { get; set; }
-    public string? InspectionReportFilePath { get; set; }
-    public string? ReceiptOfRecipientFilePath { get; set; }
-    public DateTime DateCreated { get; set; } = DateTime.Now;
-    public DateTime DateUpdated { get; set; } = DateTime.Now;
-}
-
 public class AppointmentCreateModel
 {
     [Required]
