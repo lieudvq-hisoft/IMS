@@ -66,25 +66,25 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPost("Initial")]
-    [SwaggerOperation(Summary = "Create inital request upgrade for server, state is accepted")]
-    public async Task<ActionResult> Initiate([FromBody] RequestUpgradeCreateModel model)
-    {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestUpgradeService.Initiate(model, new Guid(userId));
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPost("Initial")]
+    //[SwaggerOperation(Summary = "Create inital request upgrade for server, state is accepted")]
+    //public async Task<ActionResult> Initiate([FromBody] RequestUpgradeCreateModel model)
+    //{
+    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+    //    var result = await _requestUpgradeService.Initiate(model, new Guid(userId));
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpPost("Initial/Bulk")]
-    [SwaggerOperation(Summary = "Create many inital request upgrade for server, state is accepted")]
-    public async Task<ActionResult> InitiateBulk(RequestUpgradeCreateBulkModel model)
-    {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestUpgradeService.InitiateBulk(model, new Guid(userId));
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPost("Initial/Bulk")]
+    //[SwaggerOperation(Summary = "Create many inital request upgrade for server, state is accepted")]
+    //public async Task<ActionResult> InitiateBulk(RequestUpgradeCreateBulkModel model)
+    //{
+    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+    //    var result = await _requestUpgradeService.InitiateBulk(model, new Guid(userId));
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPut]
     public async Task<ActionResult> Update([FromBody] RequestUpgradeUpdateModel model)

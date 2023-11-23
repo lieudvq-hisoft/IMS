@@ -11,7 +11,9 @@ public class MapperProfile : Profile
     public MapperProfile()
     {
         #region Customer
-        CreateMap<Customer, CustomerModel>();
+        CreateMap<Customer, CustomerModel>()
+            .AfterMap((src, dest, context) =>
+                dest.CompanyType = context.Mapper.Map<CompanyType, CompanyTypeModel>(src.CompanyType));
         CreateMap<CustomerCreateModel, Customer>();
         CreateMap<CustomerUpdateModel, Customer>();
         CreateMap<User, UserModel>();
@@ -138,7 +140,6 @@ public class MapperProfile : Profile
         CreateMap<LocationAssignment, LocationAssignmentResultModel>();
         CreateMap<IpSubnet, IpSubnetResultModel>();
         CreateMap<IpAddress, IpAddressResultModel>();
-        //CreateMap<Device, DeviceResultModel>();
         CreateMap<Customer, CustomerResultModel>();
         CreateMap<Component, ComponentResultModel>();
         CreateMap<Area, AreaResultModel>();

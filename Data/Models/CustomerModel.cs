@@ -15,6 +15,8 @@ public class CustomerModel
     public int? CompanyTypeId { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
+
+    public CompanyTypeModel CompanyType { get; set; }
 }
 
 public class CustomerResultModel

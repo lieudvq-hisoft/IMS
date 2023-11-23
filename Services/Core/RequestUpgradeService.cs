@@ -19,8 +19,8 @@ public interface IRequestUpgradeService
     Task<ResultModel> GetAppointment(int requestUpgradeId, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
     Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model);
-    Task<ResultModel> Initiate(RequestUpgradeCreateModel model, Guid userId);
-    Task<ResultModel> InitiateBulk(RequestUpgradeCreateBulkModel model, Guid userId);
+    //Task<ResultModel> Initiate(RequestUpgradeCreateModel model, Guid userId);
+    //Task<ResultModel> InitiateBulk(RequestUpgradeCreateBulkModel model, Guid userId);
     Task<ResultModel> Delete(int requestUpgradeId);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
     Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, Guid userId);
@@ -176,7 +176,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
-                result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
+                result.Data = _mapper.Map<RequestUpgradeResultModel>(requestUpgrade);
             }
         }
         catch (Exception e)
@@ -222,96 +222,6 @@ public class RequestUpgradeService : IRequestUpgradeService
             foreach (var requestUpgradeRequestModel in model.RequestUpgradeCreateModels)
             {
                 results.Add(await Create(requestUpgradeRequestModel));
-            }
-
-            if (results.Any(x => !x.Succeed))
-            {
-                result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-                transaction.Rollback();
-            }
-            else
-            {
-                transaction.Commit();
-                result.Succeed = true;
-                result.Data = results.Select(x => x.Data);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
-
-    public async Task<ResultModel> Initiate(RequestUpgradeCreateModel model, Guid userId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-        bool validPrecondition = true;
-
-        try
-        {
-            var component = _dbContext.Components.Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == model.ComponentId);
-            if (component == null)
-            {
-                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
-                validPrecondition = false;
-            }
-
-            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
-            if (serverAllocation == null)
-            {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-                validPrecondition = false;
-            }
-
-            if (validPrecondition)
-            {
-                var serverHardwareConfig = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == component.Id);
-                validPrecondition = CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
-            }
-
-            if (validPrecondition)
-            {
-                var requestUpgrade = _mapper.Map<RequestUpgrade>(model);
-                requestUpgrade.Status = RequestStatus.Accepted;
-
-                _dbContext.RequestUpgrades.Add(requestUpgrade);
-                _dbContext.SaveChanges();
-
-                _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
-                {
-                    Action = RequestUserAction.Evaluate,
-                    UserId = userId,
-                    RequestUpgradeId = requestUpgrade.Id,
-                });
-                _dbContext.SaveChanges();
-
-                result.Succeed = true;
-                result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
-
-    public async Task<ResultModel> InitiateBulk(RequestUpgradeCreateBulkModel model, Guid userId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            using var transaction = _dbContext.Database.BeginTransaction();
-            var results = new List<ResultModel>();
-            foreach (var requestUpgradeRequestModel in model.RequestUpgradeCreateModels)
-            {
-                results.Add(await Initiate(requestUpgradeRequestModel, userId));
             }
 
             if (results.Any(x => !x.Succeed))
@@ -678,4 +588,94 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         return result;
     }
+
+    //public async Task<ResultModel> Initiate(RequestUpgradeCreateModel model, Guid userId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+    //    bool validPrecondition = true;
+
+    //    try
+    //    {
+    //        var component = _dbContext.Components.Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == model.ComponentId);
+    //        if (component == null)
+    //        {
+    //            result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
+    //            validPrecondition = false;
+    //        }
+
+    //        var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
+    //        if (serverAllocation == null)
+    //        {
+    //            result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+    //            validPrecondition = false;
+    //        }
+
+    //        if (validPrecondition)
+    //        {
+    //            var serverHardwareConfig = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == component.Id);
+    //            validPrecondition = CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
+    //        }
+
+    //        if (validPrecondition)
+    //        {
+    //            var requestUpgrade = _mapper.Map<RequestUpgrade>(model);
+    //            requestUpgrade.Status = RequestStatus.Accepted;
+
+    //            _dbContext.RequestUpgrades.Add(requestUpgrade);
+    //            _dbContext.SaveChanges();
+
+    //            _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
+    //            {
+    //                Action = RequestUserAction.Evaluate,
+    //                UserId = userId,
+    //                RequestUpgradeId = requestUpgrade.Id,
+    //            });
+    //            _dbContext.SaveChanges();
+
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<RequestUpgradeResultModel>(requestUpgrade);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+
+    //    return result;
+    //}
+
+    //public async Task<ResultModel> InitiateBulk(RequestUpgradeCreateBulkModel model, Guid userId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+
+    //    try
+    //    {
+    //        using var transaction = _dbContext.Database.BeginTransaction();
+    //        var results = new List<ResultModel>();
+    //        foreach (var requestUpgradeRequestModel in model.RequestUpgradeCreateModels)
+    //        {
+    //            results.Add(await Initiate(requestUpgradeRequestModel, userId));
+    //        }
+
+    //        if (results.Any(x => !x.Succeed))
+    //        {
+    //            result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+    //            transaction.Rollback();
+    //        }
+    //        else
+    //        {
+    //            transaction.Commit();
+    //            result.Succeed = true;
+    //            result.Data = results.Select(x => x.Data);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+
+    //    return result;
+    //}
 }

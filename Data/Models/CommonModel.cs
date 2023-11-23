@@ -42,5 +42,3 @@ public class ExcelFileUploadModel
     [FileExtensions(Extensions = "xlsx")]
     public string FileName => File?.FileName;
 }
-
-
