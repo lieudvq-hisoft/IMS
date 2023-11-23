@@ -71,10 +71,7 @@ public class MapperProfile : Profile
         CreateMap<RequestAppointmentCreateModel, RequestUpgradeAppointment>();
         CreateMap<RequestUpgradeAppointment, RequestUpgradeAppointmentModel>();
 
-        CreateMap<Appointment, AppointmentModel>()
-            //.AfterMap((src, dest, context) =>
-            //    dest.ServerAllocation = context.Mapper.Map<ServerAllocation, ServerAllocationModel>(src.ServerAllocation))
-            ;
+        CreateMap<Appointment, AppointmentModel>();
         CreateMap<AppointmentCreateModel, Appointment>();
         CreateMap<AppointmentUpdateModel, Appointment>();
         CreateMap<AppointmentCompleteModel, Appointment>();
@@ -98,7 +95,8 @@ public class MapperProfile : Profile
 
         #region IP
         CreateMap<IpAddress, IpAddressModel>();
-        CreateMap<IpSubnet, IpSubnetModel>();
+        CreateMap<IpSubnet, IpSubnetModel>()
+            .ForMember(dest => dest.SubnetIds, opt => opt.MapFrom(src => src.SubNets.Select(x => x.Id)));
 
         CreateMap<IpAssignment, IpAssignmentModel>();
         CreateMap<IpAssignmentCreateModel, IpAssignment>();

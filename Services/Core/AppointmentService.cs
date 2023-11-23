@@ -50,7 +50,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var appointments = _dbContext.Appointments.Include(x => x.ServerAllocation)
+            var appointments = _dbContext.Appointments.Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                 .Where(delegate (Appointment x)
                 {
                     return x.FilterAppointment(searchModel);
@@ -62,7 +62,7 @@ public class AppointmentService : IAppointmentService
             appointments = appointments.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             appointments = appointments.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<AppointmentModel>(appointments).ToList();
+            paging.Data = _mapper.Map<List<AppointmentModel>>(appointments);
 
             result.Data = paging;
             result.Succeed = true;
@@ -81,9 +81,9 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var appointments = _dbContext.Appointments.AsQueryable();
+            var appointments = _dbContext.Appointments.Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress).AsQueryable();
 
-            result.Data = _mapper.ProjectTo<AppointmentModel>(appointments).ToList();
+            result.Data = _mapper.Map<List<AppointmentModel>>(appointments);
             result.Succeed = true;
         }
         catch (Exception e)

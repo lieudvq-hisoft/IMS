@@ -5,6 +5,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Data.Models;
 public class IpSubnetModel
 {
+    public int Id { get; set; }
     public int FirstOctet { get; set; }
     public int SecondOctet { get; set; }
     public int ThirdOctet { get; set; }
@@ -13,6 +14,7 @@ public class IpSubnetModel
     public string? Note { get; set; }
 
     public int ParentNetworkId { get; set; }
+    public List<int> SubnetIds { get; set; }
 }
 
 public class IpRangeCreateModel

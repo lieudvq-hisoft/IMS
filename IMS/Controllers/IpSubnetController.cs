@@ -27,10 +27,26 @@ public class IpSubnetController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("IpRange")]
+    public async Task<ActionResult> GetIpRange([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] IpSubnetSearchModel searchModel)
+    {
+        var result = await _ipSubnetService.GetIpRange(pagingParam, searchModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult> GetDetail(int id)
     {
         var result = await _ipSubnetService.GetDetail(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}/IpSubnet")]
+    public async Task<ActionResult> GetSubnet(int id)
+    {
+        var result = await _ipSubnetService.GetIpSubnet(id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

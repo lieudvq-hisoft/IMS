@@ -20,8 +20,10 @@ namespace Services.Core;
 public interface IIpSubnetService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
+    Task<ResultModel> GetIpRange(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> CreateIpRange(IpRangeCreateModel model);
+    Task<ResultModel> GetIpSubnet(int subnetId);
     Task<ResultModel> Delete(int subnetId);
     Task<ResultModel> GetIpAddress(int ipSubnetId, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
 }
@@ -46,8 +48,36 @@ public class IpSubnetService : IIpSubnetService
 
         try
         {
-            var IpSubnets = _dbContext.IpSubnets
+            var IpSubnets = _dbContext.IpSubnets.Include(x => x.SubNets)
                 .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
+                .AsQueryable();
+
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, IpSubnets.Count());
+
+            IpSubnets = IpSubnets.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            IpSubnets = IpSubnets.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            paging.Data = _mapper.ProjectTo<IpSubnetModel>(IpSubnets).ToList();
+
+            result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetIpRange(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var IpSubnets = _dbContext.IpSubnets.Include(x => x.SubNets)
+                .Where(x => x.ParentNetworkId == 0 && searchModel.Id != null ? x.Id == searchModel.Id : true)
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, IpSubnets.Count());
@@ -148,6 +178,31 @@ public class IpSubnetService : IIpSubnetService
         }
 
         return ipAddresses;
+    }
+
+    public async Task<ResultModel> GetIpSubnet(int subnetId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var subnet = _dbContext.IpSubnets.Include(x => x.ParentNetwork).Include(x => x.SubNets).ThenInclude(x => x.SubNets).FirstOrDefault(x => x.Id == subnetId);
+            if (subnet == null)
+            {
+                result.ErrorMessage = IpSubnetErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                result.Data = _mapper.Map<List<IpSubnetModel>>(subnet.SubNets);
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
     }
 
     public async Task<ResultModel> CreateIpRange(IpRangeCreateModel model)
