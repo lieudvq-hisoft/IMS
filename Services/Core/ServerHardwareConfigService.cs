@@ -77,7 +77,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
 
         try
         {
-            var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault(x => x.Id == id);
+            var serverHardwareConfig = _dbContext.ServerHardwareConfigs.Include(x => x.Component).FirstOrDefault(x => x.Id == id);
 
             if (serverHardwareConfig != null)
             {

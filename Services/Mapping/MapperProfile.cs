@@ -69,7 +69,9 @@ public class MapperProfile : Profile
         CreateMap<RequestAppointmentCreateModel, RequestUpgradeAppointment>();
         CreateMap<RequestUpgradeAppointment, RequestUpgradeAppointmentModel>();
 
-        CreateMap<Appointment, AppointmentModel>();
+        CreateMap<Appointment, AppointmentModel>()
+            .AfterMap((src, dest, context) =>
+                dest.ServerAllocation = context.Mapper.Map<ServerAllocation, ServerAllocationModel>(src.ServerAllocation));
         CreateMap<AppointmentCreateModel, Appointment>();
         CreateMap<AppointmentUpdateModel, Appointment>();
         CreateMap<AppointmentCompleteModel, Appointment>();
