@@ -23,9 +23,8 @@ public class MapperProfile : Profile
         CreateMap<ComponentUpdateModel, Component>();
 
         CreateMap<ServerHardwareConfig, ServerHardwareConfigModel>()
-            .ForMember(dest => dest.ComponentName, opt => opt.MapFrom(src => src.Component.Name))
-            .ForMember(dest => dest.ComponentType, opt => opt.MapFrom(src => src.Component.Type))
-            .ForMember(dest => dest.ComponentUnit, opt => opt.MapFrom(src => src.Component.Unit));
+            .AfterMap((src, dest, context) =>
+                dest.Component = context.Mapper.Map<Component, ComponentModel>(src.Component));
         CreateMap<ServerHardwareConfigCreateModel, ServerHardwareConfig>();
         CreateMap<ServerHardwareConfigUpdateModel, ServerHardwareConfig>();
 
