@@ -50,7 +50,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var appointments = _dbContext.Appointments
+            var appointments = _dbContext.Appointments.Include(x => x.ServerAllocation)
                 .Where(delegate (Appointment x)
                 {
                     return x.FilterAppointment(searchModel);
@@ -100,7 +100,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == id);
+            var appointment = _dbContext.Appointments.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == id);
 
             if (appointment != null)
             {
@@ -189,7 +189,7 @@ public class AppointmentService : IAppointmentService
         {
             var appointment = _dbContext.Appointments
                 .Include(x => x.RequestUpgradeAppointment)
-                .ThenInclude(x => x.RequestUpgrade)
+                .ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.Component)
                 .FirstOrDefault(x => x.Id == id);
 
             if (appointment != null)

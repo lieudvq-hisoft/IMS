@@ -14,6 +14,7 @@ public class RequestUpgradeModel
     public int ServerAllocationId { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
+    public ComponentModel Component { get; set; }
 }
 
 public class RequestUpgradeDetailModel

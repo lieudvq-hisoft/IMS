@@ -50,7 +50,7 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var requestUpgrades = _dbContext.RequestUpgrades
+            var requestUpgrades = _dbContext.RequestUpgrades.Include(x => x.Component)
                 .Where(delegate (RequestUpgrade x)
                 {
                     return FilterServerHardwareConfig(x, searchModel);
@@ -115,7 +115,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         var result = new ResultModel();
         result.Succeed = false;
 
-        var appointments = _dbContext.Appointments.Include(x => x.RequestUpgradeAppointment)
+        var appointments = _dbContext.Appointments.Include(x => x.ServerAllocation).Include(x => x.RequestUpgradeAppointment)
             .Where(x => x.RequestUpgradeAppointment.Any(x => x.RequestUpgradeId == requestUpgradeId))
             .Where(delegate (Appointment x)
             {

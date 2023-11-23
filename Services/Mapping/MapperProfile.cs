@@ -28,7 +28,9 @@ public class MapperProfile : Profile
         CreateMap<ServerHardwareConfigCreateModel, ServerHardwareConfig>();
         CreateMap<ServerHardwareConfigUpdateModel, ServerHardwareConfig>();
 
-        CreateMap<RequestUpgrade, RequestUpgradeModel>();
+        CreateMap<RequestUpgrade, RequestUpgradeModel>()
+            .AfterMap((src, dest, context) =>
+                dest.Component = context.Mapper.Map<Component, ComponentModel>(src.Component));
         CreateMap<RequestUpgrade, RequestUpgradeDetailModel>();
         CreateMap<RequestUpgradeCreateModel, RequestUpgrade>();
         CreateMap<RequestUpgradeUpdateModel, RequestUpgrade>();

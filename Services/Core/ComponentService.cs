@@ -238,7 +238,7 @@ public class ComponentService : IComponentService
         try
         {
             var component = _dbContext.Components
-                .Include(x => x.RequestUpgrades)
+                .Include(x => x.RequestUpgrades).ThenInclude(x => x.Component)
                 .FirstOrDefault(x => x.Id == id);
 
             if (component != null)
