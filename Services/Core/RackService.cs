@@ -49,7 +49,7 @@ public class RackService : IRackService
             racks = racks.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             racks = racks.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<RackModel>(racks).ToList();
+            paging.Data = _mapper.Map<List<RackModel>>(racks.ToList());
 
             result.Data = paging;
             result.Succeed = true;
@@ -121,7 +121,9 @@ public class RackService : IRackService
 
         try
         {
-            var rack = _dbContext.Racks.Include(x => x.Locations).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == rackId);
+            var rack = _dbContext.Racks.Include(x => x.Locations).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .Include(x => x.Locations).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .FirstOrDefault(x => x.Id == rackId);
             if (rack == null)
             {
                 result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
@@ -129,7 +131,7 @@ public class RackService : IRackService
             else
             {
                 var serverAllocations = rack.Locations.Where(x => x.LocationAssignments.Any()).Select(x => x.LocationAssignments.FirstOrDefault()).Select(x => x.ServerAllocation);
-                result.Data = _mapper.Map<List<ServerAllocation>>(serverAllocations);
+                result.Data = _mapper.Map<List<ServerAllocationModel>>(serverAllocations);
                 result.Succeed = true;
             }
         }

@@ -355,7 +355,7 @@ public class UserService : IUserService
             users = users.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             users = users.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<UserModel>(users).ToList();
+            paging.Data = _mapper.Map<List<UserModel>>(users.ToList());
 
             result.Data = paging;
             result.Succeed = true;
@@ -417,7 +417,7 @@ public class UserService : IUserService
         customers = customers.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
         customers = customers.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-        paging.Data = _mapper.ProjectTo<CustomerModel>(customers).ToList();
+        paging.Data = _mapper.Map<List<CustomerModel>>(customers.ToList());
 
         result.Data = paging;
         result.Succeed = true;

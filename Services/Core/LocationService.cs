@@ -44,7 +44,7 @@ public class LocationService : ILocationService
             Locations = Locations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             Locations = Locations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<LocationModel>(Locations).ToList();
+            paging.Data = _mapper.Map<List<LocationModel>>(Locations.ToList());
 
             result.Data = paging;
             result.Succeed = true;

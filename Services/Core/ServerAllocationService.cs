@@ -43,7 +43,7 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-            var serverAllocations = _dbContext.ServerAllocations.Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+            var serverAllocations = _dbContext.ServerAllocations.Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress).Include(x => x.Customer)
                 .Where(delegate (ServerAllocation x)
                 {
                     var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(x.Status) : true;
@@ -76,7 +76,7 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress).Include(x => x.Customer)
                 .FirstOrDefault(x => x.Id == id);
             if (serverAllocation == null)
             {

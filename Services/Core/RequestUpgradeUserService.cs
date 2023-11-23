@@ -41,7 +41,7 @@ public class RequestUpgradeUserService : IRequestUpgradeUserService
             requestUpgradeUsers = requestUpgradeUsers.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             requestUpgradeUsers = requestUpgradeUsers.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<RequestUpgradeUserModel>(requestUpgradeUsers).ToList();
+            paging.Data = _mapper.Map<List<RequestUpgradeUserModel>>(requestUpgradeUsers.ToList());
 
             result.Data = paging;
             result.Succeed = true;

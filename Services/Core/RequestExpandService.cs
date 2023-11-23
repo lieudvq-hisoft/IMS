@@ -55,7 +55,7 @@ public class RequestExpandService : IRequestExpandService
             requestExpands = requestExpands.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             requestExpands = requestExpands.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<RequestExpandModel>(requestExpands).ToList();
+            paging.Data = _mapper.Map<List<RequestExpandModel>>(requestExpands.ToList());
 
             result.Data = paging;
             result.Succeed = true;

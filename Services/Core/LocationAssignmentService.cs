@@ -32,16 +32,16 @@ public class LocationAssignmentService : ILocationAssignmentService
 
         try
         {
-            var locationAssignment = _dbContext.LocationAssignments
+            var locationAssignments = _dbContext.LocationAssignments
                 .Where(x => searchModel.ServerAllocationId != null ? x.Id == searchModel.ServerAllocationId : true)
                 .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, locationAssignment.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, locationAssignments.Count());
 
-            locationAssignment = locationAssignment.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            locationAssignment = locationAssignment.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            locationAssignments = locationAssignments.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            locationAssignments = locationAssignments.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<LocationAssignmentModel>(locationAssignment).ToList();
+            paging.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments.ToList());
 
             result.Data = paging;
             result.Succeed = true;

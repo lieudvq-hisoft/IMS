@@ -43,7 +43,7 @@ public class RequestUpgradeAppointmentService : IRequestUpgradeAppointmentServic
             requestUpgradeAppointments = requestUpgradeAppointments.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             requestUpgradeAppointments = requestUpgradeAppointments.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<RequestUpgradeAppointmentModel>(requestUpgradeAppointments).ToList();
+            paging.Data = _mapper.Map<List<RequestUpgradeAppointmentModel>>(requestUpgradeAppointments.ToList());
 
             result.Data = paging;
             result.Succeed = true;

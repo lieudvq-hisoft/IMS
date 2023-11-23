@@ -47,7 +47,7 @@ public class AreaService : IAreaService
             areas = areas.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             areas = areas.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<AreaModel>(areas).ToList();
+            paging.Data = _mapper.Map<List<AreaModel>>(areas.ToList());
 
             result.Data = paging;
             result.Succeed = true;

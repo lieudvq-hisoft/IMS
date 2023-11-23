@@ -47,7 +47,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPost]
-    [SwaggerOperation(Summary = "[Sale]: Create a customer and associate user")]
+    [SwaggerOperation(Summary = "Create a customer and associate user")]
     public async Task<ActionResult> Create([FromBody] CustomerCreateModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;

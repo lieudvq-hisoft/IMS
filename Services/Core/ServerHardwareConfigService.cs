@@ -49,7 +49,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
             serverHardwareConfigs = serverHardwareConfigs.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             serverHardwareConfigs = serverHardwareConfigs.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<ServerHardwareConfigModel>(serverHardwareConfigs).ToList();
+            paging.Data = _mapper.Map<List<ServerHardwareConfigModel>>(serverHardwareConfigs.ToList());
 
             result.Data = paging;
             result.Succeed = true;

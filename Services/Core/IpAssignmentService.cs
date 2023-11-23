@@ -51,7 +51,7 @@ public class IpAssignmentService : IIpAssignmentService
             ipAssignments = ipAssignments.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             ipAssignments = ipAssignments.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<IpAssignmentModel>(ipAssignments).ToList();
+            paging.Data = _mapper.Map<List<IpAssignmentModel>>(ipAssignments.ToList());
 
             result.Data = paging;
             result.Succeed = true;

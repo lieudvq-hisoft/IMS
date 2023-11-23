@@ -57,7 +57,7 @@ public class IpSubnetService : IIpSubnetService
             IpSubnets = IpSubnets.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             IpSubnets = IpSubnets.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<IpSubnetModel>(IpSubnets).ToList();
+            paging.Data = _mapper.Map<List<IpSubnetModel>>(IpSubnets.ToList());
 
             result.Data = paging;
             result.Succeed = true;
@@ -85,7 +85,7 @@ public class IpSubnetService : IIpSubnetService
             IpSubnets = IpSubnets.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             IpSubnets = IpSubnets.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<IpSubnetModel>(IpSubnets).ToList();
+            paging.Data = _mapper.Map<List<IpSubnetModel>>(IpSubnets.ToList());
 
             result.Data = paging;
             result.Succeed = true;
@@ -143,7 +143,7 @@ public class IpSubnetService : IIpSubnetService
             ipAddressesQuery = ipAddressesQuery.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             ipAddressesQuery = ipAddressesQuery.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<IpAddressModel>(ipAddressesQuery).ToList();
+            paging.Data = _mapper.Map<List<IpAddressModel>>(ipAddressesQuery.ToList());
 
             result.Data = paging;
             result.Succeed = true;

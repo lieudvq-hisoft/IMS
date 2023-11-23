@@ -41,7 +41,7 @@ public class RequestExpandUserService : IRequestExpandUserService
             requestExpandUsers = requestExpandUsers.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             requestExpandUsers = requestExpandUsers.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<RequestExpandUserModel>(requestExpandUsers).ToList();
+            paging.Data = _mapper.Map<List<RequestExpandUserModel>>(requestExpandUsers.ToList());
 
             result.Data = paging;
             result.Succeed = true;

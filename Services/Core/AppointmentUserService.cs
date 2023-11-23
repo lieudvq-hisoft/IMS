@@ -41,7 +41,7 @@ public class AppointmentUserService : IAppointmentUserService
             appointmentUsers = appointmentUsers.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             appointmentUsers = appointmentUsers.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<AppointmentUserModel>(appointmentUsers).ToList();
+            paging.Data = _mapper.Map<List<AppointmentUserModel>>(appointmentUsers.ToList());
 
             result.Data = paging;
             result.Succeed = true;

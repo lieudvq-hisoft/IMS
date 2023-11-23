@@ -38,7 +38,9 @@ public class MapperProfile : Profile
 
         #region ServerAllocation
         CreateMap<ServerAllocation, ServerAllocationModel>()
-            .ForMember(dest => dest.MasterIp, opt => opt.MapFrom(src => src.IpAssignments.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master).IpAddress.Address));
+            .ForMember(dest => dest.MasterIp, opt => opt.MapFrom(src => src.IpAssignments.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master).IpAddress.Address))
+            .AfterMap((src, dest, context) =>
+                dest.Customer = context.Mapper.Map<Customer, CustomerModel>(src.Customer));
         CreateMap<ServerAllocationCreateModel, ServerAllocation>();
         CreateMap<ServerAllocationUpdateModel, ServerAllocation>();
         #endregion

@@ -32,16 +32,16 @@ public class IpAddressService : IIpAddressService
 
         try
         {
-            var IpAddresss = _dbContext.IpAddresses
+            var IpAddresses = _dbContext.IpAddresses
                 .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
                 .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, IpAddresss.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, IpAddresses.Count());
 
-            IpAddresss = IpAddresss.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            IpAddresss = IpAddresss.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            IpAddresses = IpAddresses.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            IpAddresses = IpAddresses.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<IpAddressModel>(IpAddresss).ToList();
+            paging.Data = _mapper.Map<List<IpAddressModel>>(IpAddresses.ToList());
 
             result.Data = paging;
             result.Succeed = true;

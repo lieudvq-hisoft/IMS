@@ -71,7 +71,7 @@ public class CustomerService : ICustomerService
             customers = customers.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             customers = customers.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<CustomerModel>(customers).ToList();
+            paging.Data = _mapper.Map<List<CustomerModel>>(customers.ToList());
 
             result.Data = paging;
             result.Succeed = true;

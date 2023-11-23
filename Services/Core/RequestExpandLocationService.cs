@@ -31,16 +31,16 @@ public class RequestExpandLocationService : IRequestExpandLocationService
 
         try
         {
-            var requestExpandLocationn = _dbContext.RequestExpandLocations
+            var requestExpandLocations = _dbContext.RequestExpandLocations
                 .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
                 .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpandLocationn.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpandLocations.Count());
 
-            requestExpandLocationn = requestExpandLocationn.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            requestExpandLocationn = requestExpandLocationn.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            requestExpandLocations = requestExpandLocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            requestExpandLocations = requestExpandLocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<RequestExpandLocationModel>(requestExpandLocationn).ToList();
+            paging.Data = _mapper.Map<List<RequestExpandLocationModel>>(requestExpandLocations.ToList());
 
             result.Data = paging;
             result.Succeed = true;

@@ -52,7 +52,7 @@ public class ComponentService : IComponentService
             components = components.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             components = components.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<ComponentModel>(components).ToList();
+            paging.Data = _mapper.Map<List<ComponentModel>>(components.ToList());
 
             result.Data = paging;
             result.Succeed = true;
@@ -73,7 +73,7 @@ public class ComponentService : IComponentService
         {
             var components = _dbContext.Components.AsQueryable();
 
-            result.Data = _mapper.ProjectTo<ComponentModel>(components).ToList();
+            result.Data = _mapper.Map<List<ComponentModel>>(components.ToList());
             result.Succeed = true;
         }
         catch (Exception e)

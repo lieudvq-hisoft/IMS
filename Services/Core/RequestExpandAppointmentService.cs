@@ -35,16 +35,16 @@ public class RequestExpandAppointmentService : IRequestExpandAppointmentService
 
         try
         {
-            var requestExpandAppointmentn = _dbContext.RequestExpandAppointments
+            var requestExpandAppointments = _dbContext.RequestExpandAppointments
                 .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
                 .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpandAppointmentn.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpandAppointments.Count());
 
-            requestExpandAppointmentn = requestExpandAppointmentn.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            requestExpandAppointmentn = requestExpandAppointmentn.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            requestExpandAppointments = requestExpandAppointments.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            requestExpandAppointments = requestExpandAppointments.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.ProjectTo<RequestExpandAppointmentModel>(requestExpandAppointmentn).ToList();
+            paging.Data = _mapper.Map<List<RequestExpandAppointmentModel>>(requestExpandAppointments.ToList());
 
             result.Data = paging;
             result.Succeed = true;
