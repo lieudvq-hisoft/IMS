@@ -9,6 +9,8 @@ public class RequestUpgradeModel
     public string Information { get; set; }
     public int Capacity { get; set; }
     public string Status { get; set; }
+    public string? InspectionReportFilePath { get; set; }
+    public string? ReceiptOfRecipientFilePath { get; set; }
     public RequestType RequestType { get; set; }
     public int ComponentId { get; set; }
     public int ServerAllocationId { get; set; }
@@ -16,6 +18,7 @@ public class RequestUpgradeModel
     public DateTime DateUpdated { get; set; } = DateTime.Now;
     public ComponentModel Component { get; set; }
 
+    public CustomerModel? Customer { get; set; }
     public UserModel? Evaluator { get; set; }
     public UserModel? Executor { get; set; }
 }
@@ -29,22 +32,6 @@ public class RequestUpgradeResultModel
     public RequestType RequestType { get; set; }
     public int ComponentId { get; set; }
     public int ServerAllocationId { get; set; }
-}
-
-public class RequestUpgradeDetailModel
-{
-    public int Id { get; set; }
-    public string Information { get; set; }
-    public int Capacity { get; set; }
-    public string Status { get; set; }
-    public string? InspectionReportFilePath { get; set; }
-    public string? ReceiptOfRecipientFilePath { get; set; }
-    public RequestType RequestType { get; set; }
-    public int ComponentId { get; set; }
-    public int ServerAllocationId { get; set; }
-    public DateTime DateCreated { get; set; } = DateTime.Now;
-    public DateTime DateUpdated { get; set; } = DateTime.Now;
-    public ComponentModel Component { get; set; }
 }
 
 public class RequestUpgradeCreateModel

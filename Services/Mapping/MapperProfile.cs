@@ -32,6 +32,7 @@ public class MapperProfile : Profile
         CreateMap<RequestUpgrade, RequestUpgradeModel>()
             .AfterMap((src, dest, context) =>
                 dest.Component = context.Mapper.Map<Component, ComponentModel>(src.Component))
+            .AfterMap((src, dest, context) => dest.Customer = context.Mapper.Map<Customer, CustomerModel>(src.ServerAllocation.Customer))
             .AfterMap((src, dest, context) =>
             {
                 var evaluator = src.RequestUpgradeUsers.FirstOrDefault(x => x.Action == RequestUserAction.Evaluate);
@@ -48,7 +49,6 @@ public class MapperProfile : Profile
                     dest.Executor = context.Mapper.Map<User, UserModel>(executor.User);
                 }
             });
-        CreateMap<RequestUpgrade, RequestUpgradeDetailModel>();
         CreateMap<RequestUpgradeCreateModel, RequestUpgrade>();
         CreateMap<RequestUpgradeUpdateModel, RequestUpgrade>();
         #endregion'

@@ -328,7 +328,7 @@ public class RequestExpandService : IRequestExpandService
                 if (!appointmentAccepted)
                 {
                     validPrecondition = false;
-                    result.ErrorMessage = AppointmentErrorMessgae.NOT_ACCEPTED;
+                    result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
                 }
             }
 

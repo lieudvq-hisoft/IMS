@@ -106,7 +106,7 @@ public class RequestExpandAppointmentService : IRequestExpandAppointmentService
             }
             else if (appointment == null)
             {
-                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
             else if (requestExpand.Status != RequestStatus.Accepted)
             {

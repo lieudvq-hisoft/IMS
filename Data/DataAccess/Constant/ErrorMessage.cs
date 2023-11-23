@@ -162,13 +162,14 @@ public class ServerErrorMessgae
     public const string EXISTED = "Server " + ErrorMessage.EXISTED;
 }
 
-public class AppointmentErrorMessgae
+public class AppointmentErrorMessage
 {
     public const string NOT_EXISTED = "Appointment " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Appointment " + ErrorMessage.EXISTED;
     public const string NOT_ACCEPTED = "Appointment not accepted";
     public const string NOT_SUCCESS = "Appointment not success";
     public const string NOT_WAITING = "Appointment not waiting";
+    public const string NOT_COMPLETABLE = "Appointment with request must have document to be completable";
 }
 
 public class LocationErrorMessgae

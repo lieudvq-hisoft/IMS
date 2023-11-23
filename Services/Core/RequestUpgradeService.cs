@@ -49,7 +49,10 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var requestUpgrades = _dbContext.RequestUpgrades.Include(x => x.Component).Include(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
+            var requestUpgrades = _dbContext.RequestUpgrades
+                .Include(x => x.Component)
+                .Include(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Where(delegate (RequestUpgrade x)
                 {
                     return FilterServerHardwareConfig(x, searchModel);
@@ -91,6 +94,8 @@ public class RequestUpgradeService : IRequestUpgradeService
         {
             var requestUpgrade = _dbContext.RequestUpgrades
                 .Include(x => x.Component)
+                .Include(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .FirstOrDefault(x => x.Id == requestUpgradeId);
             if (requestUpgrade == null)
             {
@@ -98,7 +103,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             }
             else
             {
-                result.Data = _mapper.Map<RequestUpgradeDetailModel>(requestUpgrade);
+                result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
                 result.Succeed = true;
             }
         }

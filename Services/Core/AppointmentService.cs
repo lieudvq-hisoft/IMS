@@ -89,7 +89,7 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
-                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
                 result.Succeed = false;
             }
         }
@@ -120,7 +120,7 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
-                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
                 result.Succeed = false;
             }
         }
@@ -149,7 +149,7 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
-                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
                 result.Succeed = false;
             }
         }
@@ -170,6 +170,7 @@ public class AppointmentService : IAppointmentService
             var appointment = _dbContext.Appointments
                 .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.Component)
                 .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
+                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .FirstOrDefault(x => x.Id == id);
 
             if (appointment != null)
@@ -179,7 +180,7 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
-                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
                 result.Succeed = false;
             }
         }
@@ -269,17 +270,27 @@ public class AppointmentService : IAppointmentService
         try
         {
             using var transaction = _dbContext.Database.BeginTransaction();
-            var createRequestUpgradeAppointmentResults = new List<ResultModel>();
-            foreach (var requestUpgradeId in model.RequestUpgradeIds)
+            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
+            if (appointment.Status != RequestStatus.Waiting)
             {
-                createRequestUpgradeAppointmentResults.Add(await CreateOneRequestUpgradeAppointment(appointmentId, requestUpgradeId));
+                validCondition = false;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING;
             }
 
-            if (createRequestUpgradeAppointmentResults.Any(x => !x.Succeed))
+            var createRequestUpgradeAppointmentResults = new List<ResultModel>();
+            if (validCondition)
             {
-                result.ErrorMessage = createRequestUpgradeAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-                transaction.Rollback();
-                validCondition = false;
+                foreach (var requestUpgradeId in model.RequestUpgradeIds)
+                {
+                    createRequestUpgradeAppointmentResults.Add(await CreateOneRequestUpgradeAppointment(appointmentId, requestUpgradeId));
+                }
+
+                if (createRequestUpgradeAppointmentResults.Any(x => !x.Succeed))
+                {
+                    result.ErrorMessage = createRequestUpgradeAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                    transaction.Rollback();
+                    validCondition = false;
+                }
             }
 
             var createRequestExpandAppointmentResults = new List<ResultModel>();
@@ -302,12 +313,11 @@ public class AppointmentService : IAppointmentService
             {
                 transaction.Commit();
                 result.Succeed = true;
-                var data = new RequestAppointmentCreateResultModel
+                result.Data = new RequestAppointmentCreateResultModel
                 {
                     RequestUpgradeAppointments = createRequestUpgradeAppointmentResults.Select(x => x.Data),
                     RequestExpandAppointments = createRequestExpandAppointmentResults.Select(x => x.Data)
-                };
-                result.Data = data;
+                }; ;
             }
         }
         catch (Exception e)
@@ -338,12 +348,12 @@ public class AppointmentService : IAppointmentService
                 if (appoitment == null)
                 {
                     validPrecondition = false;
-                    result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                    result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
                 }
                 else if (appoitment.Status != RequestStatus.Waiting && appoitment.Status != RequestStatus.Accepted)
                 {
                     validPrecondition = false;
-                    result.ErrorMessage = AppointmentErrorMessgae.NOT_WAITING + "/" + AppointmentErrorMessgae.NOT_ACCEPTED;
+                    result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING + "/" + AppointmentErrorMessage.NOT_ACCEPTED;
                 }
                 else
                 {
@@ -408,12 +418,12 @@ public class AppointmentService : IAppointmentService
                 if (appoitment == null)
                 {
                     validPrecondition = false;
-                    result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                    result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
                 }
                 else if (appoitment.Status != RequestStatus.Waiting && appoitment.Status != RequestStatus.Accepted)
                 {
                     validPrecondition = false;
-                    result.ErrorMessage = AppointmentErrorMessgae.NOT_WAITING + "/" + AppointmentErrorMessgae.NOT_ACCEPTED;
+                    result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING + "/" + AppointmentErrorMessage.NOT_ACCEPTED;
                 }
                 else
                 {
@@ -470,7 +480,7 @@ public class AppointmentService : IAppointmentService
             if (appointment == null)
             {
                 validPrecondition = false;
-                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
             else
             {
@@ -508,7 +518,7 @@ public class AppointmentService : IAppointmentService
             var appointment = _dbContext.Appointments.Include(x => x.RequestUpgradeAppointment).FirstOrDefault(x => x.Id == id);
             if (appointment == null)
             {
-                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
             else
             {
@@ -545,7 +555,7 @@ public class AppointmentService : IAppointmentService
                 .FirstOrDefault(x => x.Id == appointmentId);
             if (appointment == null)
             {
-                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
 
@@ -558,14 +568,14 @@ public class AppointmentService : IAppointmentService
 
             if (validPrecondition && appointment.Status != RequestStatus.Waiting)
             {
-                result.ErrorMessage = AppointmentErrorMessgae.NOT_WAITING;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING;
                 validPrecondition = false;
             }
 
             if (validPrecondition)
             {
                 appointment.Status = status;
-                foreach(var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
+                foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
                 {
                     requestUpgrade.Status = status;
                     _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
@@ -612,16 +622,26 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
+            var appointment = _dbContext.Appointments.Include(x => x.RequestExpandAppointments).Include(x => x.RequestUpgradeAppointment).Include(x => x.RequestHostAppointments).FirstOrDefault(x => x.Id == appointmentId);
             if (appointment == null)
             {
                 validPrecondition = false;
-                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
+
             if (appointment.Status != RequestStatus.Accepted)
             {
                 validPrecondition = false;
-                result.ErrorMessage = AppointmentErrorMessgae.NOT_ACCEPTED;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
+            }
+
+            if (appointment.InspectionReportFilePath == null || appointment.ReceiptOfRecipientFilePath == null)
+            {
+                if (appointment.RequestExpandAppointments.Any() || appointment.RequestUpgradeAppointment.Any() || appointment.RequestHostAppointments.Any())
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = AppointmentErrorMessage.NOT_COMPLETABLE;
+                }
             }
 
             var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
@@ -666,7 +686,7 @@ public class AppointmentService : IAppointmentService
             if (appointment == null)
             {
                 validPrecondition = false;
-                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
 
             var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(userId));
@@ -713,11 +733,11 @@ public class AppointmentService : IAppointmentService
                 .FirstOrDefault(x => x.Id == appointmentId);
             if (appointment == null)
             {
-                result.ErrorMessage = AppointmentErrorMessgae.NOT_EXISTED;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
-            else if (appointment.Status != RequestStatus.Success)
+            else if (appointment.Status != RequestStatus.Accepted)
             {
-                result.ErrorMessage = AppointmentErrorMessgae.NOT_SUCCESS;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
             }
             else
             {
