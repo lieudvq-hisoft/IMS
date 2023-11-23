@@ -209,8 +209,7 @@ public class ComponentService : IComponentService
         try
         {
             var component = _dbContext.Components
-                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
-                .FirstOrDefault(x => x.Id == id);
+                .Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == id);
 
             if (component != null)
             {
