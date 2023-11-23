@@ -52,7 +52,7 @@ public class RequestUpgradeController : ControllerBase
     [SwaggerOperation(Summary = "Create new request upgrade, state is waiting")]
     public async Task<ActionResult> Create([FromBody] RequestUpgradeCreateModel model)
     {
-        var result = await _requestUpgradeService.Create(model, new Guid(model.UserId));
+        var result = await _requestUpgradeService.Create(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
