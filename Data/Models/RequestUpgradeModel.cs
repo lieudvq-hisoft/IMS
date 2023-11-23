@@ -15,6 +15,10 @@ public class RequestUpgradeModel
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
     public ComponentModel Component { get; set; }
+
+    public UserModel? Creator { get; set; }
+    public UserModel? Evaluator { get; set; }
+    public UserModel? Executor { get; set; }
 }
 
 public class RequestUpgradeDetailModel

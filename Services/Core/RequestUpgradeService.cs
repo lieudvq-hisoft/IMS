@@ -49,7 +49,7 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var requestUpgrades = _dbContext.RequestUpgrades.Include(x => x.Component)
+            var requestUpgrades = _dbContext.RequestUpgrades.Include(x => x.Component).Include(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
                 .Where(delegate (RequestUpgrade x)
                 {
                     return FilterServerHardwareConfig(x, searchModel);

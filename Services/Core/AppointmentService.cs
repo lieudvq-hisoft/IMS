@@ -168,8 +168,8 @@ public class AppointmentService : IAppointmentService
         try
         {
             var appointment = _dbContext.Appointments
-                .Include(x => x.RequestUpgradeAppointment)
-                .ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.Component)
+                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.Component)
+                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
                 .FirstOrDefault(x => x.Id == id);
 
             if (appointment != null)

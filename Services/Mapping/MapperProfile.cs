@@ -30,7 +30,31 @@ public class MapperProfile : Profile
 
         CreateMap<RequestUpgrade, RequestUpgradeModel>()
             .AfterMap((src, dest, context) =>
-                dest.Component = context.Mapper.Map<Component, ComponentModel>(src.Component));
+                dest.Component = context.Mapper.Map<Component, ComponentModel>(src.Component))
+            .AfterMap((src, dest, context) =>
+            {
+                var creator = src.RequestUpgradeUsers.FirstOrDefault(x => x.Action == RequestUserAction.Create);
+                if (creator != null)
+                {
+                    dest.Creator = context.Mapper.Map<User, UserModel>(creator.User);
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                var evaluator = src.RequestUpgradeUsers.FirstOrDefault(x => x.Action == RequestUserAction.Evaluate);
+                if (evaluator != null)
+                {
+                    dest.Evaluator = context.Mapper.Map<User, UserModel>(evaluator.User);
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                var executor = src.RequestUpgradeUsers.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
+                if (executor != null)
+                {
+                    dest.Executor = context.Mapper.Map<User, UserModel>(executor.User);
+                }
+            });
         CreateMap<RequestUpgrade, RequestUpgradeDetailModel>();
         CreateMap<RequestUpgradeCreateModel, RequestUpgrade>();
         CreateMap<RequestUpgradeUpdateModel, RequestUpgrade>();
@@ -74,6 +98,7 @@ public class MapperProfile : Profile
         CreateMap<RequestUpgradeAppointment, RequestUpgradeAppointmentModel>();
 
         CreateMap<Appointment, AppointmentModel>();
+        CreateMap<Appointment, AppointmentResultModel>();
         CreateMap<AppointmentCreateModel, Appointment>();
         CreateMap<AppointmentUpdateModel, Appointment>();
         CreateMap<AppointmentCompleteModel, Appointment>();

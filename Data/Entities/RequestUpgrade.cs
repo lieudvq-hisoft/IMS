@@ -1,4 +1,5 @@
 ﻿using Data.Enums;
+using Data.Models;
 
 namespace Data.Entities;
 public class RequestUpgrade : BaseEntity
@@ -7,8 +8,6 @@ public class RequestUpgrade : BaseEntity
     public int Capacity { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Upgrade;
     public RequestStatus Status { get; set; }
-    //public string? InspectionReportFilePath { get; set; }
-    //public string? ReceiptOfRecipientFilePath { get; set; }
 
     public int ComponentId { get; set; }
     public Component? Component { get; set; }
