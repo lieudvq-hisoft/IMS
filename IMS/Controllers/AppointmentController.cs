@@ -31,14 +31,6 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("All")]
-    public async Task<ActionResult> Get()
-    {
-        var result = await _appointmentService.GetAll();
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
     [HttpGet("{id}")]
     public async Task<ActionResult> GetDetail(int id)
     {
