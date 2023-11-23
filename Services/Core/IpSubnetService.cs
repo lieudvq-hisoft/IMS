@@ -48,16 +48,16 @@ public class IpSubnetService : IIpSubnetService
 
         try
         {
-            var IpSubnets = _dbContext.IpSubnets.Include(x => x.SubNets)
+            var ipSubnets = _dbContext.IpSubnets.Include(x => x.SubNets)
                 .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
                 .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, IpSubnets.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipSubnets.Count());
 
-            IpSubnets = IpSubnets.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            IpSubnets = IpSubnets.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            ipSubnets = ipSubnets.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            ipSubnets = ipSubnets.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.Map<List<IpSubnetModel>>(IpSubnets.ToList());
+            paging.Data = _mapper.Map<List<IpSubnetModel>>(ipSubnets.ToList());
 
             result.Data = paging;
             result.Succeed = true;
@@ -76,16 +76,17 @@ public class IpSubnetService : IIpSubnetService
 
         try
         {
-            var IpSubnets = _dbContext.IpSubnets.Include(x => x.SubNets)
-                .Where(x => x.ParentNetworkId == 0 && searchModel.Id != null ? x.Id == searchModel.Id : true)
+            var ipSubnets = _dbContext.IpSubnets.Include(x => x.SubNets).Include(x => x.ParentNetwork)
+                .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
                 .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, IpSubnets.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipSubnets.Count());
 
-            IpSubnets = IpSubnets.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            IpSubnets = IpSubnets.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            ipSubnets = ipSubnets.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            ipSubnets = ipSubnets.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.Map<List<IpSubnetModel>>(IpSubnets.ToList());
+
+            paging.Data = _mapper.Map<List<IpSubnetModel>>(ipSubnets.Where(x => x.ParentNetworkId == null).ToList());
 
             result.Data = paging;
             result.Succeed = true;

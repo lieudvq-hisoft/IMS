@@ -564,6 +564,7 @@ public class AppointmentService : IAppointmentService
                 appointment.Status = status;
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
+                    Action = AppointmentAction.Approve,
                     AppointmentId = appointment.Id,
                     UserId = new Guid(model.UserId)
                 });
@@ -613,6 +614,7 @@ public class AppointmentService : IAppointmentService
                 appointment.Status = RequestStatus.Success;
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
+                    Action = AppointmentAction.Execute,
                     AppointmentId = appointmentId,
                     UserId = new Guid(model.UserId)
                 });

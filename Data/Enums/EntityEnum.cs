@@ -28,17 +28,11 @@ public enum IpPurpose
     Broadcast
 }
 
-public enum ServiceType
+
+public enum AppointmentAction
 {
-    Location,
-    Expand,
-    Ip,
-    MasterIp,
-    Port,
-    PortPower,
-    Power,
-    Component,
-    Appointment
+    Approve,
+    Execute
 }
 
 public enum IpAssignmentTypes
