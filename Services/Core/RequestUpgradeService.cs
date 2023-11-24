@@ -51,6 +51,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         {
             var requestUpgrades = _dbContext.RequestUpgrades
                 .Include(x => x.Component)
+                .Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Where(delegate (RequestUpgrade x)
@@ -85,6 +86,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         {
             var requestUpgrade = _dbContext.RequestUpgrades
                 .Include(x => x.Component)
+                .Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .FirstOrDefault(x => x.Id == requestUpgradeId);

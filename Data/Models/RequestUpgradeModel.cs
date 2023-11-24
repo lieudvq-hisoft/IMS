@@ -17,7 +17,8 @@ public class RequestUpgradeModel
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
 
-    public ComponentResultModel Component { get; set; }
+    public AppointmentResultModel? SucceededAppointment { get; set; }
+    public ComponentResultModel? Component { get; set; }
     public CustomerResultModel? Customer { get; set; }
     public UserModel? Evaluator { get; set; }
     public UserModel? Executor { get; set; }
