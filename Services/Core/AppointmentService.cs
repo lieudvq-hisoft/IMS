@@ -48,7 +48,10 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var appointments = _dbContext.Appointments.Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+            var appointments = _dbContext.Appointments
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.AppointmentUsers).ThenInclude(x => x.User)
                 .Where(delegate (Appointment x)
                 {
                     return x.FilterAppointment(searchModel);
@@ -79,7 +82,11 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var appointment = _dbContext.Appointments.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == id);
+            var appointment = _dbContext.Appointments
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.AppointmentUsers).ThenInclude(x => x.User)
+                .FirstOrDefault(x => x.Id == id);
 
             if (appointment != null)
             {

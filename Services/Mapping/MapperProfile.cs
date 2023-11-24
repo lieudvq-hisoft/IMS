@@ -33,8 +33,8 @@ public class MapperProfile : Profile
 
         CreateMap<RequestUpgrade, RequestUpgradeModel>()
             .AfterMap((src, dest, context) =>
-                dest.Component = context.Mapper.Map<Component, ComponentModel>(src.Component))
-            .AfterMap((src, dest, context) => dest.Customer = context.Mapper.Map<Customer, CustomerModel>(src.ServerAllocation.Customer))
+                dest.Component = context.Mapper.Map<Component, ComponentResultModel>(src.Component))
+            .AfterMap((src, dest, context) => dest.Customer = context.Mapper.Map<Customer, CustomerResultModel>(src.ServerAllocation.Customer))
             .AfterMap((src, dest, context) =>
             {
                 var evaluator = src.RequestUpgradeUsers.FirstOrDefault(x => x.Action == RequestUserAction.Evaluate);
@@ -92,7 +92,24 @@ public class MapperProfile : Profile
         CreateMap<RequestAppointmentCreateModel, RequestUpgradeAppointment>();
         CreateMap<RequestUpgradeAppointment, RequestUpgradeAppointmentModel>();
 
-        CreateMap<Appointment, AppointmentModel>();
+        CreateMap<Appointment, AppointmentModel>()
+            .AfterMap((src, dest, context) => dest.Customer = context.Mapper.Map<Customer, CustomerResultModel>(src.ServerAllocation.Customer))
+            .AfterMap((src, dest, context) =>
+            {
+                var evaluator = src.AppointmentUsers.FirstOrDefault(x => x.Action == RequestUserAction.Evaluate);
+                if (evaluator != null)
+                {
+                    dest.Evaluator = context.Mapper.Map<User, UserModel>(evaluator.User);
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                var executor = src.AppointmentUsers.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
+                if (executor != null)
+                {
+                    dest.Executor = context.Mapper.Map<User, UserModel>(executor.User);
+                }
+            });
         CreateMap<Appointment, AppointmentResultModel>();
         CreateMap<AppointmentCreateModel, Appointment>();
         CreateMap<AppointmentUpdateModel, Appointment>();

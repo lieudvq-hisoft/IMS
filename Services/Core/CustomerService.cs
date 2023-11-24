@@ -38,6 +38,7 @@ public class CustomerService : ICustomerService
     private readonly IMapper _mapper;
     private readonly IEmailHelper _emailService;
     private readonly IConfiguration _config;
+    private readonly PasswordHasher<Customer> _passwordHasher;
 
     public CustomerService(
         AppDbContext dbContext,
@@ -49,6 +50,7 @@ public class CustomerService : ICustomerService
         _mapper = mapper;
         _emailService = emailService;
         _config = config;
+        _passwordHasher = new PasswordHasher<Customer>();
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel)
@@ -173,9 +175,10 @@ public class CustomerService : ICustomerService
             if (validPrecondition)
             {
                 var customer = _mapper.Map<Customer>(model);
+                var password = MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")) + "@a123";
                 customer.Username = GenerateUsername(model.CompanyName);
-                customer.Password = MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")) + "@a123";
                 customer.CustomerName = $"{companyType.Name} - {model.CompanyName}";
+                customer.Password = _passwordHasher.HashPassword(customer, password);
                 _dbContext.Customers.Add(customer);
                 _dbContext.SaveChanges();
 
@@ -300,15 +303,23 @@ public class CustomerService : ICustomerService
     public async Task<ResultModel> Login(CustomerLoginModel model)
     {
         var result = new ResultModel();
+        result.Succeed = false;
 
         var customer = _dbContext.Customers.FirstOrDefault(x => x.Username == model.Username);
 
         if (customer != null)
         {
-
-            var token = await GetAccessToken(customer);
-            result.Succeed = true;
-            result.Data = token;
+            var passwordVerifyResult = _passwordHasher.VerifyHashedPassword(customer, customer.Password, model.Password);
+            if (passwordVerifyResult != PasswordVerificationResult.Success && passwordVerifyResult != PasswordVerificationResult.SuccessRehashNeeded)
+            {
+                result.ErrorMessage = UserErrorMessage.LOGIN_ERROR;
+            }
+            else
+            {
+                var token = await GetAccessToken(customer);
+                result.Succeed = true;
+                result.Data = token;
+            }
         }
         else
         {
