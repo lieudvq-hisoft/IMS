@@ -104,7 +104,7 @@ public class MapperProfile : Profile
             .AfterMap((src, dest, context) => dest.Customer = context.Mapper.Map<Customer, CustomerResultModel>(src.ServerAllocation.Customer))
             .AfterMap((src, dest, context) =>
             {
-                var evaluator = src.AppointmentUsers.FirstOrDefault(x => x.Action == RequestUserAction.Evaluate);
+                var evaluator = src.AppointmentUsers?.FirstOrDefault(x => x.Action == RequestUserAction.Evaluate);
                 if (evaluator != null)
                 {
                     dest.Evaluator = context.Mapper.Map<User, UserModel>(evaluator.User);
@@ -112,7 +112,7 @@ public class MapperProfile : Profile
             })
             .AfterMap((src, dest, context) =>
             {
-                var executor = src.AppointmentUsers.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
+                var executor = src.AppointmentUsers?.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
                 if (executor != null)
                 {
                     dest.Executor = context.Mapper.Map<User, UserModel>(executor.User);

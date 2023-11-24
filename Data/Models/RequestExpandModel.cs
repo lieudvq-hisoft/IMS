@@ -14,6 +14,7 @@ public class RequestExpandModel
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
 
+    public AppointmentResultModel? SucceededAppointment { get; set; }
     public CustomerResultModel? Customer { get; set; }
     public UserModel? Evaluator { get; set; }
     public UserModel? Executor { get; set; }
@@ -32,10 +33,6 @@ public class RequestExpandResultModel
 
 public class RequestExpandCreateModel
 {
-    //[Required]
-    //[NotNegative]
-    //public int Power { get; set; }
-
     [Required]
     public string? Note { get; set; }
 
