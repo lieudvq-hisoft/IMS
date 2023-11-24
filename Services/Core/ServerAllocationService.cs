@@ -135,8 +135,8 @@ public class ServerAllocationService : IServerAllocationService
         try
         {
             var requestUpgrades = _dbContext.ServerAllocations
+                .Include(x => x.Customer)
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.Component)
-                .Include(x => x.RequestUpgrades).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
                 .FirstOrDefault(x => x.Id == id).RequestUpgrades.AsQueryable();
             if (requestUpgrades == null)
