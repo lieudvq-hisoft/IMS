@@ -59,6 +59,13 @@ public class UserCreateModel
     public List<string> Roles { get; set; }
 }
 
+public class UserChangePasswordModel
+{
+    [Required]
+    [DataType(DataType.Password)]
+    public string Password { get; set; }
+}
+
 public class UserUpdateModel
 {
     [Required]

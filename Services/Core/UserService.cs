@@ -154,6 +154,34 @@ public class UserService : IUserService
         return result;
     }
 
+    public async Task<ResultModel> ChangePassword(UserChangePasswordModel model, Guid userId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var user = await _userManager.FindByIdAsync(userId.ToString());
+            if (user == null)
+            {
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                await _userManager.ResetPasswordAsync(user, token, model.Password);
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+
+    }
+
     public async Task<ResultModel> Register(UserCreateModel model)
     {
         var result = new ResultModel();
