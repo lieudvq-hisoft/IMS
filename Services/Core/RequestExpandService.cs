@@ -15,6 +15,7 @@ public interface IRequestExpandService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
+    Task<ResultModel> GetAppointment(int requestExpandId, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> GetRequestExpandLocation(int id);
     Task<ResultModel> Create(RequestExpandCreateModel model);
     Task<ResultModel> Update(RequestExpandUpdateModel model);
@@ -92,6 +93,34 @@ public class RequestExpandService : IRequestExpandService
         {
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
+        return result;
+    }
+
+    public async Task<ResultModel> GetAppointment(int requestExpandId, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        var appointments = _dbContext.Appointments
+            .Include(x => x.ServerAllocation)
+            .Include(x => x.RequestExpandAppointments)
+            .Include(x => x.AppointmentUsers)
+            .Where(x => x.RequestExpandAppointments.Any(x => x.RequestExpandId == requestExpandId))
+            .Where(delegate (Appointment x)
+            {
+                return x.FilterAppointment(searchModel);
+            }).AsQueryable();
+
+        var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, appointments.Count());
+
+        appointments = appointments.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+        appointments = appointments.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+        paging.Data = _mapper.Map<List<AppointmentModel>>(appointments.ToList());
+
+        result.Data = paging;
+        result.Succeed = true;
+
         return result;
     }
 
@@ -241,7 +270,7 @@ public class RequestExpandService : IRequestExpandService
 
             if (validPrecondition && requestExpand.Status != RequestStatus.Waiting)
             {
-                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING;
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_WAITING;
                 validPrecondition = false;
             }
 

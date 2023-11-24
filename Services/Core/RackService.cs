@@ -13,6 +13,7 @@ namespace Services.Core;
 public interface IRackService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RackSearchModel searchModel);
+    Task<ResultModel> GetAll();
     Task<ResultModel> GetDetail(int rackId);
     Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int rackId);
     Task<ResultModel> GetServerAllocation(PagingParam<BaseSortCriteria> paginationModel, int rackId);
@@ -52,6 +53,25 @@ public class RackService : IRackService
             paging.Data = _mapper.Map<List<RackModel>>(racks.ToList());
 
             result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetAll()
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var racks = _dbContext.Racks.AsQueryable();
+
+            result.Data = _mapper.Map<List<RackModel>>(racks.ToList()); 
             result.Succeed = true;
         }
         catch (Exception e)
