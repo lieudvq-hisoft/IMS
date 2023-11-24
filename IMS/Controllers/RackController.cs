@@ -29,6 +29,15 @@ public class RackController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("All")]
+    [SwaggerOperation(Summary = "Get all Rack no paging")]
+    public async Task<ActionResult> GetAll()
+    {
+        var result = await _RackService.GetAll();
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpGet("{id}")]
     [SwaggerOperation(Summary = "Get detail information of an Rack")]
     public async Task<ActionResult> GetDetail(int id)

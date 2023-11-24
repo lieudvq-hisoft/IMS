@@ -39,6 +39,13 @@ public class RequestExpandController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+    [HttpGet("{id}/Appointment")]
+    public async Task<ActionResult> GetAppointment(int id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] AppointmentSearchModel searchModel)
+    {
+        var result = await _requestExpandService.GetAppointment(id, pagingParam, searchModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 
     [HttpGet("{id}/RequestExpandLocation")]
     public async Task<ActionResult> GetRequestExpandLocation(int id)

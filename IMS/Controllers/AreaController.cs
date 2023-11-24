@@ -27,6 +27,15 @@ public class AreaController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+
+    [HttpGet("All")]
+    public async Task<ActionResult> GetALL()
+    {
+        var result = await _areaService.GetAll();
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult> GetDetail(int id)
     {
@@ -42,6 +51,15 @@ public class AreaController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpGet("{id}/RackAll")]
+    public async Task<ActionResult> GetRackAll(int id)
+    {
+        var result = await _areaService.GetRackAll(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
 
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] AreaCreateModel model)

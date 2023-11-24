@@ -13,8 +13,10 @@ namespace Services.Core;
 public interface IAreaService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AreaSearchModel searchModel);
+    Task<ResultModel> GetAll();
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetRack(PagingParam<BaseSortCriteria> paginationModel, int id);
+    Task<ResultModel> GetRackAll(int id);
     Task<ResultModel> Create(AreaCreateModel model);
     Task<ResultModel> Update(AreaUpdateModel model);
     Task<ResultModel> Delete(int id);
@@ -50,6 +52,26 @@ public class AreaService : IAreaService
             paging.Data = _mapper.Map<List<AreaModel>>(areas.ToList());
 
             result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetAll()
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var areas = _dbContext.Areas
+                .AsQueryable();
+
+            result.Data = _mapper.Map<List<AreaModel>>(areas.ToList()); 
             result.Succeed = true;
         }
         catch (Exception e)
@@ -106,6 +128,35 @@ public class AreaService : IAreaService
                 paging.Data = _mapper.Map<List<RackModel>>(racks.ToList());
 
                 result.Data = paging;
+                result.Succeed = true;
+            }
+            else
+            {
+                result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
+                result.Succeed = false;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetRackAll(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var area = _dbContext.Areas
+                .Include(x => x.Racks)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (area != null)
+            {
+                result.Data = _mapper.Map<List<RackModel>>(area.Racks.ToList()); ;
                 result.Succeed = true;
             }
             else
