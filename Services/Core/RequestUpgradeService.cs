@@ -113,6 +113,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         result.Succeed = false;
 
         var appointments = _dbContext.Appointments.Include(x => x.ServerAllocation).Include(x => x.RequestUpgradeAppointment)
+            .Include(x => x.AppointmentUsers)
             .Where(x => x.RequestUpgradeAppointment.Any(x => x.RequestUpgradeId == requestUpgradeId))
             .Where(delegate (Appointment x)
             {
