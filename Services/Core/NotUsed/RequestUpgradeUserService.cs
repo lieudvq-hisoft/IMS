@@ -7,41 +7,41 @@ using Data.Models;
 using Data.Utils.Paging;
 using Services.Utilities;
 
-namespace Services.Core;
-public interface IRequestExpandUserService
+namespace Services.Core.NotUsed;
+public interface IRequestUpgradeUserService
 {
-    Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestExpandUserSearchModel searchModel);
+    Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestUpgradeUserSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
 }
 
-public class RequestExpandUserService : IRequestExpandUserService
+public class RequestUpgradeUserService : IRequestUpgradeUserService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
 
-    public RequestExpandUserService(AppDbContext dbContext, IMapper mapper)
+    public RequestUpgradeUserService(AppDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
     }
 
-    public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestExpandUserSearchModel searchModel)
+    public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestUpgradeUserSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var requestExpandUsers = _dbContext.RequestExpandUsers
+            var requestUpgradeUsers = _dbContext.RequestUpgradeUsers
                 .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
                 .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpandUsers.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestUpgradeUsers.Count());
 
-            requestExpandUsers = requestExpandUsers.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            requestExpandUsers = requestExpandUsers.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            requestUpgradeUsers = requestUpgradeUsers.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            requestUpgradeUsers = requestUpgradeUsers.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.Map<List<RequestExpandUserModel>>(requestExpandUsers.ToList());
+            paging.Data = _mapper.Map<List<RequestUpgradeUserModel>>(requestUpgradeUsers.ToList());
 
             result.Data = paging;
             result.Succeed = true;
@@ -60,17 +60,17 @@ public class RequestExpandUserService : IRequestExpandUserService
 
         try
         {
-            var requestExpandUser = _dbContext.RequestExpandUsers
+            var requestUpgradeUser = _dbContext.RequestUpgradeUsers
                 .FirstOrDefault(x => x.Id == id);
 
-            if (requestExpandUser != null)
+            if (requestUpgradeUser != null)
             {
                 result.Succeed = true;
-                result.Data = _mapper.Map<RequestExpandUserModel>(requestExpandUser);
+                result.Data = _mapper.Map<RequestUpgradeUserModel>(requestUpgradeUser);
             }
             else
             {
-                result.ErrorMessage = RequestExpandUserErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = RequestUpgradeUserErrorMessage.NOT_EXISTED;
                 result.Succeed = false;
             }
         }

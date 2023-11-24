@@ -66,11 +66,7 @@ public static class StartupExtension
         services.AddScoped<IServerHardwareConfigService, ServerHardwareConfigService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<IAppointmentService, AppointmentService>();
-        services.AddScoped<IRequestUpgradeAppointmentService, RequestUpgradeAppointmentService>();
-        services.AddScoped<IRequestUpgradeUserService, RequestUpgradeUserService>();
         services.AddScoped<IRequestExpandService, RequestExpandService>();
-        services.AddScoped<IRequestExpandLocationService, RequestExpandLocationService>();
-        services.AddScoped<IRequestExpandUserService, RequestExpandUserService>();
         services.AddScoped<IIpAddressService, IpAddressService>();
         services.AddScoped<IIpSubnetService, IpSubnetService>();
         services.AddScoped<IRequestHostService, RequestHostService>();
@@ -80,6 +76,10 @@ public static class StartupExtension
         //services.AddScoped<IAppointmentUserService, AppointmentUserService>();
         //services.AddScoped<ILocationAssignmentService, LocationAssignmentService>();
         //services.AddScoped<IRequestExpandAppointmentService, RequestExpandAppointmentService>();
+        //services.AddScoped<IRequestExpandLocationService, RequestExpandLocationService>();
+        //services.AddScoped<IRequestExpandUserService, RequestExpandUserService>();
+        //services.AddScoped<IRequestUpgradeAppointmentService, RequestUpgradeAppointmentService>();
+        //services.AddScoped<IRequestUpgradeUserService, RequestUpgradeUserService>();
 
         services.AddSingleton<ICloudinaryHelper, CloudinaryHelper>();
         services.AddScoped<IEmailHelper, EmailHelper>();

@@ -8,7 +8,7 @@ using Data.Models;
 using Data.Utils.Paging;
 using Services.Utilities;
 
-namespace Services.Core;
+namespace Services.Core.NotUsed;
 public interface IRequestUpgradeAppointmentService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestUpgradeAppointmentSearchModel searchModel);
