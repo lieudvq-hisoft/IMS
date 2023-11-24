@@ -481,7 +481,7 @@ public class AppointmentService : IAppointmentService
                 _mapper.Map<AppointmentUpdateModel, Appointment>(model, appointment);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<AppointmentModel>(appointment);
+                result.Data = _mapper.Map<AppointmentResultModel>(appointment);
             }
         }
         catch (Exception e)
@@ -587,7 +587,7 @@ public class AppointmentService : IAppointmentService
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<AppointmentModel>(appointment);
+                result.Data = _mapper.Map<AppointmentResultModel>(appointment);
             }
         }
         catch (Exception e)
@@ -647,7 +647,7 @@ public class AppointmentService : IAppointmentService
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<AreaModel>(appointment);
+                result.Data = _mapper.Map<AppointmentResultModel>(appointment);
             }
         }
         catch (Exception e)
@@ -690,7 +690,7 @@ public class AppointmentService : IAppointmentService
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<AreaModel>(appointment);
+                result.Data = _mapper.Map<AppointmentResultModel>(appointment);
             }
         }
         catch (Exception e)
