@@ -570,32 +570,37 @@ public class AppointmentService : IAppointmentService
             if (validPrecondition)
             {
                 appointment.Status = status;
-                foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
-                {
-                    requestUpgrade.Status = status;
-                    _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
-                    {
-                        Action = RequestUserAction.Evaluate,
-                        RequestUpgradeId = requestUpgrade.Id,
-                        UserId = userId
-                    });
-                }
-                foreach (var requestExpand in appointment.RequestExpandAppointments.Select(x => x.RequestExpand))
-                {
-                    requestExpand.Status = status;
-                    _dbContext.RequestExpandUsers.Add(new RequestExpandUser
-                    {
-                        Action = RequestUserAction.Evaluate,
-                        RequestExpandId = requestExpand.Id,
-                        UserId = userId
-                    });
-                }
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
                     Action = RequestUserAction.Evaluate,
                     AppointmentId = appointment.Id,
                     UserId = userId
                 });
+
+                if (status == RequestStatus.Accepted)
+                {
+                    foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
+                    {
+                        requestUpgrade.Status = status;
+                        _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
+                        {
+                            Action = RequestUserAction.Evaluate,
+                            RequestUpgradeId = requestUpgrade.Id,
+                            UserId = userId
+                        });
+                    }
+                    foreach (var requestExpand in appointment.RequestExpandAppointments.Select(x => x.RequestExpand))
+                    {
+                        requestExpand.Status = status;
+                        _dbContext.RequestExpandUsers.Add(new RequestExpandUser
+                        {
+                            Action = RequestUserAction.Evaluate,
+                            RequestExpandId = requestExpand.Id,
+                            UserId = userId
+                        });
+                    }
+                }
+
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<AppointmentResultModel>(appointment);
