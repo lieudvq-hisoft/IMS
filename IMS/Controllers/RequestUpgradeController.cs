@@ -124,7 +124,7 @@ public class RequestUpgradeController : ControllerBase
 
     [HttpPut("{id}/Deny")]
     [SwaggerOperation(Summary = "Deny a waiting request upgrade")]
-    public async Task<ActionResult> Deny(int id, [FromBody] UserAssignModel model)
+    public async Task<ActionResult> Deny(int id)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
         var result = await _requestUpgradeService.Evaluate(id, RequestStatus.Denied, new Guid(userId));
@@ -162,9 +162,10 @@ public class RequestUpgradeController : ControllerBase
 
     [HttpPut("{id}/Complete")]
     [SwaggerOperation(Summary = "Complete a completable accepted request upgrade. Change serverHardwareconfig")]
-    public async Task<ActionResult> Complete(int id, [FromBody] UserAssignModel model)
+    public async Task<ActionResult> Complete(int id)
     {
-        var result = await _requestUpgradeService.Complete(id, new Guid(model.UserId));
+        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+        var result = await _requestUpgradeService.Complete(id, new Guid(userId));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

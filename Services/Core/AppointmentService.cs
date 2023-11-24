@@ -22,8 +22,8 @@ public interface IAppointmentService
     Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model);
     Task<ResultModel> Update(AppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
-    Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, UserAssignModel model);
-    Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model);
+    Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, Guid userId);
+    Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model, Guid userId);
     Task<ResultModel> Fail(int appointmentId, string userId);
     Task<ResultModel> AssignInspectionReport(int appointmentId, DocumentFileUploadModel model);
 }
@@ -485,7 +485,7 @@ public class AppointmentService : IAppointmentService
                 _mapper.Map<AppointmentUpdateModel, Appointment>(model, appointment);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<AppointmentModel>(appointment);
+                result.Data = _mapper.Map<AppointmentResultModel>(appointment);
             }
         }
         catch (Exception e)
@@ -524,7 +524,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, UserAssignModel model)
+    public async Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -547,7 +547,7 @@ public class AppointmentService : IAppointmentService
                 validPrecondition = false;
             }
 
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
             if (user == null)
             {
                 validPrecondition = false;
@@ -570,7 +570,7 @@ public class AppointmentService : IAppointmentService
                     {
                         Action = RequestUserAction.Evaluate,
                         RequestUpgradeId = requestUpgrade.Id,
-                        UserId = new Guid(model.UserId)
+                        UserId = userId
                     });
                 }
                 foreach (var requestExpand in appointment.RequestExpandAppointments.Select(x => x.RequestExpand))
@@ -580,18 +580,18 @@ public class AppointmentService : IAppointmentService
                     {
                         Action = RequestUserAction.Evaluate,
                         RequestExpandId = requestExpand.Id,
-                        UserId = new Guid(model.UserId)
+                        UserId = userId
                     });
                 }
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
                     Action = RequestUserAction.Evaluate,
                     AppointmentId = appointment.Id,
-                    UserId = new Guid(model.UserId)
+                    UserId = userId
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<AppointmentModel>(appointment);
+                result.Data = _mapper.Map<AppointmentResultModel>(appointment);
             }
         }
         catch (Exception e)
@@ -602,7 +602,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model)
+    public async Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -632,7 +632,7 @@ public class AppointmentService : IAppointmentService
                 }
             }
 
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
             if (user == null)
             {
                 validPrecondition = false;
@@ -647,11 +647,11 @@ public class AppointmentService : IAppointmentService
                 {
                     Action = RequestUserAction.Execute,
                     AppointmentId = appointmentId,
-                    UserId = new Guid(model.UserId)
+                    UserId = userId
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<AreaModel>(appointment);
+                result.Data = _mapper.Map<AppointmentResultModel>(appointment);
             }
         }
         catch (Exception e)
@@ -694,7 +694,7 @@ public class AppointmentService : IAppointmentService
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<AreaModel>(appointment);
+                result.Data = _mapper.Map<AppointmentResultModel>(appointment);
             }
         }
         catch (Exception e)
