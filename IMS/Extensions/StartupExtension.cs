@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using Services.Core;
+using Services.Core.NotUsed;
 using Services.Mapping;
 using Services.Utilities;
 using System.Reflection;
@@ -58,7 +59,6 @@ public static class StartupExtension
         services.AddScoped<IComponentService, ComponentService>();
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<IFileService, FileService>();
-        services.AddScoped<ILocationAssignmentService, LocationAssignmentService>();
         services.AddScoped<ILocationService, LocationService>();
         services.AddScoped<IRackService, RackService>();
         services.AddScoped<IRequestUpgradeService, RequestUpgradeService>();
@@ -68,18 +68,18 @@ public static class StartupExtension
         services.AddScoped<IAppointmentService, AppointmentService>();
         services.AddScoped<IRequestUpgradeAppointmentService, RequestUpgradeAppointmentService>();
         services.AddScoped<IRequestUpgradeUserService, RequestUpgradeUserService>();
-        services.AddScoped<IAppointmentUserService, AppointmentUserService>();
         services.AddScoped<IRequestExpandService, RequestExpandService>();
         services.AddScoped<IRequestExpandLocationService, RequestExpandLocationService>();
         services.AddScoped<IRequestExpandUserService, RequestExpandUserService>();
-        services.AddScoped<IRequestExpandAppointmentService, RequestExpandAppointmentService>();
         services.AddScoped<IIpAddressService, IpAddressService>();
         services.AddScoped<IIpSubnetService, IpSubnetService>();
         services.AddScoped<IRequestHostService, RequestHostService>();
         services.AddScoped<IIpAssignmentService, IpAssignmentService>();
 
         //services.AddScoped<IIpService, IpService>();
-
+        //services.AddScoped<IAppointmentUserService, AppointmentUserService>();
+        //services.AddScoped<ILocationAssignmentService, LocationAssignmentService>();
+        //services.AddScoped<IRequestExpandAppointmentService, RequestExpandAppointmentService>();
 
         services.AddSingleton<ICloudinaryHelper, CloudinaryHelper>();
         services.AddScoped<IEmailHelper, EmailHelper>();

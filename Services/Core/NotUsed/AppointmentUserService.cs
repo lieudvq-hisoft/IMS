@@ -7,7 +7,7 @@ using Data.Models;
 using Data.Utils.Paging;
 using Services.Utilities;
 
-namespace Services.Core;
+namespace Services.Core.NotUsed;
 public interface IAppointmentUserService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AppointmentUserSearchModel searchModel);

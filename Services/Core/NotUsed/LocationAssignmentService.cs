@@ -7,7 +7,7 @@ using Data.Models;
 using Data.Utils.Paging;
 using Services.Utilities;
 
-namespace Services.Core;
+namespace Services.Core.NotUsed;
 public interface ILocationAssignmentService
 {
     Task<ResultModel> Get(PagingParam<LocationAssignmentSortingCriteria> paginationModel, LocationAssignmentSearchModel searchModel);
