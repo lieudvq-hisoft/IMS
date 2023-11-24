@@ -6,7 +6,6 @@ namespace Data.Models;
 public class RequestExpandModel
 {
     public int Id { get; set; }
-    //public int Power { get; set; }
     public RequestStatus Status { get; set; }
     public string RequestType { get; set; }
     public string? Note { get; set; }
@@ -14,6 +13,10 @@ public class RequestExpandModel
     public int ServerAllocationId { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
+
+    public CustomerResultModel? Customer { get; set; }
+    public UserModel? Evaluator { get; set; }
+    public UserModel? Executor { get; set; }
 }
 
 public class RequestExpandResultModel

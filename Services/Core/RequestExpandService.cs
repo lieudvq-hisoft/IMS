@@ -19,11 +19,11 @@ public interface IRequestExpandService
     Task<ResultModel> Create(RequestExpandCreateModel model);
     Task<ResultModel> Update(RequestExpandUpdateModel model);
     Task<ResultModel> Delete(int id);
-    Task<ResultModel> Evaluate(int requestExpandId, RequestStatus status, UserAssignModel model);
+    Task<ResultModel> Evaluate(int requestExpandId, RequestStatus status, Guid userId);
     Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
     Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model);
     Task<ResultModel> CheckCompletability(int requestExpandId);
-    Task<ResultModel> Complete(int requestExpandId);
+    Task<ResultModel> Complete(int requestExpandId, Guid userId);
     Task<ResultModel> GetRackChoiceSuggestionBySize(RequestExpandSuggestLocationModel model);
 
 }
@@ -115,7 +115,7 @@ public class RequestExpandService : IRequestExpandService
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
-                result.Data = _mapper.Map<RequestExpandModel>(requestExpand);
+                result.Data = _mapper.Map<RequestExpandResultModel>(requestExpand);
             }
         }
         catch (Exception e)
@@ -144,7 +144,7 @@ public class RequestExpandService : IRequestExpandService
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
-                result.Data = _mapper.Map<RequestExpandModel>(requestExpand);
+                result.Data = _mapper.Map<RequestExpandResultModel>(requestExpand);
             }
         }
         catch (Exception e)
@@ -212,7 +212,7 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
-    public async Task<ResultModel> Evaluate(int requestExpandId, RequestStatus status, UserAssignModel model)
+    public async Task<ResultModel> Evaluate(int requestExpandId, RequestStatus status, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -232,7 +232,7 @@ public class RequestExpandService : IRequestExpandService
                 validPrecondition = false;
             }
 
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
             if (user == null)
             {
                 validPrecondition = false;
@@ -250,12 +250,13 @@ public class RequestExpandService : IRequestExpandService
                 requestExpand.Status = status;
                 _dbContext.RequestExpandUsers.Add(new RequestExpandUser
                 {
+                    Action = RequestUserAction.Evaluate,
                     RequestExpandId = requestExpand.Id,
-                    UserId = new Guid(model.UserId)
+                    UserId = userId
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<RequestExpandModel>(requestExpand);
+                result.Data = _mapper.Map<RequestExpandResultModel>(requestExpand);
             }
         }
         catch (Exception e)
@@ -421,7 +422,7 @@ public class RequestExpandService : IRequestExpandService
         return requestExpand.RequestExpandAppointments.Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Success && !x.InspectionReportFilePath.IsNullOrEmpty() && !x.ReceiptOfRecipientFilePath.IsNullOrEmpty());
     }
 
-    public async Task<ResultModel> Complete(int requestExpandId)
+    public async Task<ResultModel> Complete(int requestExpandId, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -467,8 +468,13 @@ public class RequestExpandService : IRequestExpandService
                     });
                 }
                 _dbContext.LocationAssignments.AddRange(locationAssignments);
-                //serverAllocation.Power += requestExpand.Power;
                 requestExpand.Status = RequestStatus.Success;
+                _dbContext.RequestExpandUsers.Add(new RequestExpandUser
+                {
+                    Action = RequestUserAction.Execute,
+                    RequestExpandId = requestExpand.Id,
+                    UserId = userId
+                });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
