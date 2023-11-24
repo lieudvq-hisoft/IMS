@@ -17,7 +17,6 @@ public interface IAppointmentService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetRequestExpand(int id);
-    Task<ResultModel> GetRequestUpgradeAppointment(int id);
     Task<ResultModel> GetRequestUpgrade(int id, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
     Task<ResultModel> Create(AppointmentCreateModel model);
     Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model);
@@ -131,35 +130,6 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> GetRequestUpgradeAppointment(int id)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            var appointment = _dbContext.Appointments
-                .Include(x => x.RequestUpgradeAppointment)
-                .FirstOrDefault(x => x.Id == id);
-
-            if (appointment != null)
-            {
-                result.Succeed = true;
-                result.Data = _mapper.Map<List<RequestUpgradeAppointmentModel>>(appointment.RequestUpgradeAppointment);
-            }
-            else
-            {
-                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
-                result.Succeed = false;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
-
     public async Task<ResultModel> GetRequestUpgrade(int id, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel)
     {
         var result = new ResultModel();
@@ -173,7 +143,12 @@ public class AppointmentService : IAppointmentService
                 .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .FirstOrDefault(x => x.Id == id);
 
-            if (appointment != null)
+            if (appointment == null)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+                result.Succeed = false;
+            }
+            else
             {
                 var requestUpgrades = appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade)
                  .Where(delegate (RequestUpgrade x)
@@ -191,11 +166,6 @@ public class AppointmentService : IAppointmentService
 
                 result.Data = paging;
                 result.Succeed = true;
-            }
-            else
-            {
-                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
-                result.Succeed = false;
             }
         }
         catch (Exception e)
