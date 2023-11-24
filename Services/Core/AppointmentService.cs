@@ -18,7 +18,7 @@ public interface IAppointmentService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetRequestExpand(int id);
     Task<ResultModel> GetRequestUpgradeAppointment(int id);
-    Task<ResultModel> GetRequestUpgrade(int id);
+    Task<ResultModel> GetRequestUpgrade(int id, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
     Task<ResultModel> Create(AppointmentCreateModel model);
     Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model);
     Task<ResultModel> Update(AppointmentUpdateModel model);
@@ -160,7 +160,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> GetRequestUpgrade(int id)
+    public async Task<ResultModel> GetRequestUpgrade(int id, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -175,8 +175,22 @@ public class AppointmentService : IAppointmentService
 
             if (appointment != null)
             {
+                var requestUpgrades = appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade)
+                 .Where(delegate (RequestUpgrade x)
+                 {
+                     return x.FilterRequestUpgrade(searchModel);
+                 })
+                 .AsQueryable();
+
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestUpgrades.Count());
+
+                requestUpgrades = requestUpgrades.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                requestUpgrades = requestUpgrades.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+                paging.Data = _mapper.Map<List<RequestUpgradeModel>>(requestUpgrades.ToList());
+
+                result.Data = paging;
                 result.Succeed = true;
-                result.Data = _mapper.Map<List<RequestUpgradeModel>>(appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade));
             }
             else
             {

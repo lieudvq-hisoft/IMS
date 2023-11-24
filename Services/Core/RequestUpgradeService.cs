@@ -55,7 +55,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Where(delegate (RequestUpgrade x)
                 {
-                    return FilterServerHardwareConfig(x, searchModel);
+                    return x.FilterRequestUpgrade(searchModel);
                 })
                 .AsQueryable();
 
@@ -74,15 +74,6 @@ public class RequestUpgradeService : IRequestUpgradeService
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
         return result;
-    }
-
-    private bool FilterServerHardwareConfig(RequestUpgrade x, RequestUpgradeSearchModel model)
-    {
-        bool matchId = model.Id != null ? x.Id == model.Id : true;
-        bool matchComponentId = model.ComponentId != null ? x.ComponentId == model.ComponentId : true;
-        bool matchServerAllocationId = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
-
-        return matchId && matchComponentId && matchServerAllocationId;
     }
 
     public async Task<ResultModel> GetDetail(int requestUpgradeId)

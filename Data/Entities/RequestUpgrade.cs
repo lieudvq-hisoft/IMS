@@ -17,4 +17,13 @@ public class RequestUpgrade : BaseEntity
 
     public ICollection<RequestUpgradeAppointment>? RequestUpgradeAppointments { get; set; }
     public ICollection<RequestUpgradeUser>? RequestUpgradeUsers { get; set; }
+
+    public bool FilterRequestUpgrade(RequestUpgradeSearchModel model)
+    {
+        bool matchId = model.Id != null ? this.Id == model.Id : true;
+        bool matchComponentId = model.ComponentId != null ? this.ComponentId == model.ComponentId : true;
+        bool matchServerAllocationId = model.ServerAllocationId != null ? this.ServerAllocationId == model.ServerAllocationId : true;
+
+        return matchId && matchComponentId && matchServerAllocationId;
+    }
 }

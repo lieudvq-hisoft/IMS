@@ -64,9 +64,9 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpGet("{id}/RequestUpgrade")]
-    public async Task<ActionResult> GetRequestUpgrade(int id)
+    public async Task<ActionResult> GetRequestUpgrade(int id, [FromQuery] PagingParam<RequestUpgradeSortCriteria> paginationModel, [FromQuery] RequestUpgradeSearchModel searchModel)
     {
-        var result = await _appointmentService.GetRequestUpgrade(id);
+        var result = await _appointmentService.GetRequestUpgrade(id, paginationModel, searchModel);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
