@@ -99,7 +99,7 @@ public class AppointmentController : ControllerBase
 
     [HttpPut("{id}/Deny")]
     [SwaggerOperation(Summary = "Deny a waiting appointment")]
-    public async Task<ActionResult> Deny(int id, [FromBody] UserAssignModel model)
+    public async Task<ActionResult> Deny(int id)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
         var result = await _appointmentService.Evaluate(id, RequestStatus.Denied, new Guid(userId));
