@@ -36,9 +36,9 @@ public class AreaController : ControllerBase
     }
 
     [HttpGet("{id}/Rack")]
-    public async Task<ActionResult> GetRack(int id)
+    public async Task<ActionResult> GetRack([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
     {
-        var result = await _areaService.GetRack(id);
+        var result = await _areaService.GetRack(pagingParam, id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

@@ -16,7 +16,7 @@ public interface IAppointmentService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> GetRequestExpand(int id);
+    Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestUpgrade(int id, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
     Task<ResultModel> Create(AppointmentCreateModel model);
     Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model);
@@ -99,23 +99,27 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> GetRequestExpand(int id)
+    public async Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var appointment = _dbContext.Appointments
+            var requestExpands = _dbContext.Appointments
                 .Include(x => x.RequestExpandAppointments)
                 .ThenInclude(x => x.RequestExpand)
-                .FirstOrDefault(x => x.Id == id);
+                .FirstOrDefault(x => x.Id == id).RequestExpandAppointments.Select(x => x.RequestExpand).AsQueryable();
 
-            if (appointment != null)
+            if (requestExpands != null)
             {
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpands.Count());
+                requestExpands = requestExpands.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                requestExpands = requestExpands.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+                paging.Data = _mapper.Map<List<RequestExpandModel>>(requestExpands.ToList());
+
+                result.Data = paging;
                 result.Succeed = true;
-                result.Data = _mapper.Map<List<RequestExpandModel>>
-                    (appointment.RequestExpandAppointments.Select(x => x.RequestExpand));
             }
             else
             {

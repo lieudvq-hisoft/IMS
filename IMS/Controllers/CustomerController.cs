@@ -39,9 +39,9 @@ public class CustomerController : ControllerBase
     }
 
     [HttpGet("{id}/ServerAllocation")]
-    public async Task<ActionResult> GetServerAllocation(int id)
+    public async Task<ActionResult> GetServerAllocation([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
     {
-        var result = await _customerService.GetServerAllocation(id);
+        var result = await _customerService.GetServerAllocation(pagingParam, id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

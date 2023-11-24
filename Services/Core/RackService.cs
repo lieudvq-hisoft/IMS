@@ -14,8 +14,8 @@ public interface IRackService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RackSearchModel searchModel);
     Task<ResultModel> GetDetail(int rackId);
-    Task<ResultModel> GetLocation(int rackId);
-    Task<ResultModel> GetServerAllocation(int rackId);
+    Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int rackId);
+    Task<ResultModel> GetServerAllocation(PagingParam<BaseSortCriteria> paginationModel, int rackId);
     Task<ResultModel> GetRackMap(int rackId);
     Task<ResultModel> GetPower(int rackId);
     Task<ResultModel> Create(RackCreateModel model);
@@ -89,21 +89,26 @@ public class RackService : IRackService
         return result;
     }
 
-    public async Task<ResultModel> GetLocation(int rackId)
+    public async Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int rackId)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var rack = _dbContext.Racks.Include(x => x.Locations).FirstOrDefault(x => x.Id == rackId);
-            if (rack == null)
+            var locations = _dbContext.Racks.Include(x => x.Locations).FirstOrDefault(x => x.Id == rackId).Locations.AsQueryable();
+            if (locations == null)
             {
                 result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
             }
             else
             {
-                result.Data = _mapper.Map<List<LocationModel>>(rack.Locations);
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, locations.Count());
+                locations = locations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                locations = locations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+                paging.Data = _mapper.Map<List<LocationModel>>(locations.ToList());
+
+                result.Data = paging;
                 result.Succeed = true;
             }
         }
@@ -114,7 +119,7 @@ public class RackService : IRackService
         return result;
     }
 
-    public async Task<ResultModel> GetServerAllocation(int rackId)
+    public async Task<ResultModel> GetServerAllocation(PagingParam<BaseSortCriteria> paginationModel, int rackId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -130,8 +135,14 @@ public class RackService : IRackService
             }
             else
             {
-                var serverAllocations = rack.Locations.Where(x => x.LocationAssignments.Any()).Select(x => x.LocationAssignments.FirstOrDefault()).Select(x => x.ServerAllocation);
-                result.Data = _mapper.Map<List<ServerAllocationModel>>(serverAllocations);
+                var serverAllocations = rack.Locations.Where(x => x.LocationAssignments.Any()).Select(x => x.LocationAssignments.FirstOrDefault()).Select(x => x.ServerAllocation).AsQueryable();
+
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, serverAllocations.Count());
+                serverAllocations = serverAllocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                serverAllocations = serverAllocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+                paging.Data = _mapper.Map<List<ServerAllocationModel>>(serverAllocations.ToList());
+
+                result.Data = paging;
                 result.Succeed = true;
             }
         }

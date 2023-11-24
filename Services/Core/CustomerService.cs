@@ -24,7 +24,7 @@ public interface ICustomerService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> GetServerAllocation(int id);
+    Task<ResultModel> GetServerAllocation(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> Create(CustomerCreateModel model, Guid userId);
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Update(CustomerUpdateModel model);
@@ -110,24 +110,29 @@ public class CustomerService : ICustomerService
         return result;
     }
 
-    public async Task<ResultModel> GetServerAllocation(int id)
+    public async Task<ResultModel> GetServerAllocation(PagingParam<BaseSortCriteria> paginationModel, int id)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var customer = _dbContext.Customers.Include(x => x.ServerAllocations).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == id);
+            var serverAllocation = _dbContext.Customers.Include(x => x.ServerAllocations).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == id).ServerAllocations.AsQueryable();
 
-            if (customer == null)
+            if (serverAllocation == null)
             {
                 result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
                 result.Succeed = false;
             }
             else
             {
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, serverAllocation.Count());
+                serverAllocation = serverAllocation.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                serverAllocation = serverAllocation.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+                paging.Data = _mapper.Map<List<ServerAllocationModel>>(serverAllocation.ToList());
+
+                result.Data = paging;
                 result.Succeed = true;
-                result.Data = _mapper.Map<List<ServerAllocationModel>>(customer.ServerAllocations);
             }
         }
         catch (Exception e)

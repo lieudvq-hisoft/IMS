@@ -14,7 +14,7 @@ public interface IAreaService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AreaSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> GetRack(int id);
+    Task<ResultModel> GetRack(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> Create(AreaCreateModel model);
     Task<ResultModel> Update(AreaUpdateModel model);
     Task<ResultModel> Delete(int id);
@@ -87,21 +87,26 @@ public class AreaService : IAreaService
         return result;
     }
 
-    public async Task<ResultModel> GetRack(int id)
+    public async Task<ResultModel> GetRack(PagingParam<BaseSortCriteria> paginationModel, int id)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var area = _dbContext.Areas
+            var racks = _dbContext.Areas
                 .Include(x => x.Racks)
-                .FirstOrDefault(x => x.Id == id);
+                .FirstOrDefault(x => x.Id == id).Racks.AsQueryable();
 
-            if (area != null)
+            if (racks != null)
             {
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, racks.Count());
+                racks = racks.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                racks = racks.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+                paging.Data = _mapper.Map<List<RackModel>>(racks.ToList());
+
+                result.Data = paging;
                 result.Succeed = true;
-                result.Data = _mapper.Map<List<RackModel>>(area.Racks);
             }
             else
             {

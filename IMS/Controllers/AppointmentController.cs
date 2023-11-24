@@ -40,9 +40,9 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpGet("{id}/RequestExpand")]
-    public async Task<ActionResult> GetRequestExpand(int id)
+    public async Task<ActionResult> GetRequestExpand([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
     {
-        var result = await _appointmentService.GetRequestExpand(id);
+        var result = await _appointmentService.GetRequestExpand(pagingParam, id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

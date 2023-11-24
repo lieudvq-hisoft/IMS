@@ -14,12 +14,12 @@ public interface IServerAllocationService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> GetHardwareConfig(int id);
-    Task<ResultModel> GetRequestUpgrade(int id);
+    Task<ResultModel> GetHardwareConfig(PagingParam<BaseSortCriteria> paginationModel,int id);
+    Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetLocationAssignment(int id);
     Task<ResultModel> GetIpAssignment(int id);
     Task<ResultModel> GetLocation(int id);
-    Task<ResultModel> GetAppointment(int id);
+    Task<ResultModel> GetAppointment(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> Create(ServerAllocationCreateModel model);
     Task<ResultModel> Update(ServerAllocationUpdateModel model);
     Task<ResultModel> Delete(int serverAllocationId);
@@ -95,21 +95,28 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> GetHardwareConfig(int id)
+    public async Task<ResultModel> GetHardwareConfig(PagingParam<BaseSortCriteria> paginationModel, int id)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == id);
-            if (serverAllocation == null)
+            var serverHardwareConfigs = _dbContext.ServerAllocations
+                .Include(x => x.ServerHardwareConfigs)
+                .FirstOrDefault(x => x.Id == id).ServerHardwareConfigs.AsQueryable();
+            if (serverHardwareConfigs == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
             {
-                result.Data = _mapper.Map<List<ServerHardwareConfigModel>>(serverAllocation.ServerHardwareConfigs);
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, serverHardwareConfigs.Count());
+                serverHardwareConfigs = serverHardwareConfigs.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                serverHardwareConfigs = serverHardwareConfigs.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+                paging.Data = _mapper.Map<List<ServerHardwareConfigModel>>(serverHardwareConfigs.ToList());
+
+                result.Data = paging;
                 result.Succeed = true;
             }
         }
@@ -120,25 +127,30 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> GetRequestUpgrade(int id)
+    public async Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations
+            var requestUpgrades = _dbContext.ServerAllocations
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.Component)
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
-                .FirstOrDefault(x => x.Id == id);
-            if (serverAllocation == null)
+                .FirstOrDefault(x => x.Id == id).RequestUpgrades.AsQueryable();
+            if (requestUpgrades == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
             {
-                result.Data = _mapper.Map<List<RequestUpgradeModel>>(serverAllocation.RequestUpgrades);
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestUpgrades.Count());
+                requestUpgrades = requestUpgrades.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                requestUpgrades = requestUpgrades.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+                paging.Data = _mapper.Map<List<RequestUpgradeModel>>(requestUpgrades.ToList());
+
+                result.Data = paging;
                 result.Succeed = true;
             }
         }
@@ -224,21 +236,26 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> GetAppointment(int id)
+    public async Task<ResultModel> GetAppointment(PagingParam<BaseSortCriteria> paginationModel, int id)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.Customer).Include(x => x.Appointments).FirstOrDefault(x => x.Id == id);
-            if (serverAllocation == null)
+            var appointments = _dbContext.ServerAllocations.Include(x => x.Customer).Include(x => x.Appointments).FirstOrDefault(x => x.Id == id).Appointments.AsQueryable();
+            if (appointments == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
             {
-                result.Data = _mapper.Map<List<AppointmentModel>>(serverAllocation.Appointments);
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, appointments.Count());
+                appointments = appointments.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                appointments = appointments.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+                paging.Data = _mapper.Map<List<AppointmentModel>>(appointments.ToList());
+
+                result.Data = paging;
                 result.Succeed = true;
             }
         }

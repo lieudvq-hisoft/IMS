@@ -64,17 +64,17 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpGet("{id}/HardwareConfig")]
-    public async Task<ActionResult> GetHardwareConfig([FromRoute] int id)
+    public async Task<ActionResult> GetHardwareConfig([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromRoute] int id)
     {
-        var result = await _serverAllocationService.GetHardwareConfig(id);
+        var result = await _serverAllocationService.GetHardwareConfig(pagingParam, id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpGet("{id}/RequestUpgrade")]
-    public async Task<ActionResult> GetRequestUpgrade([FromRoute] int id)
+    public async Task<ActionResult> GetRequestUpgrade([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromRoute] int id)
     {
-        var result = await _serverAllocationService.GetRequestUpgrade(id);
+        var result = await _serverAllocationService.GetRequestUpgrade(pagingParam, id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -99,15 +99,15 @@ public class ServerAllocationController : ControllerBase
     [HttpGet("{id}/Location")]
     public async Task<ActionResult> GetLocation([FromRoute] int id)
     {
-        var result = await _serverAllocationService.GetLocation(id);
+        var result = await _serverAllocationService.GetLocation( id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpGet("{id}/Appointment")]
-    public async Task<ActionResult> GetAppointment([FromRoute] int id)
+    public async Task<ActionResult> GetAppointment([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromRoute] int id)
     {
-        var result = await _serverAllocationService.GetAppointment(id);
+        var result = await _serverAllocationService.GetAppointment(pagingParam, id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
