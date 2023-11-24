@@ -24,7 +24,7 @@ public interface IAppointmentService
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, Guid userId);
     Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model, Guid userId);
-    Task<ResultModel> Fail(int appointmentId, string userId);
+    Task<ResultModel> Fail(int appointmentId, Guid userId);
     Task<ResultModel> AssignInspectionReport(int appointmentId, DocumentFileUploadModel model);
 }
 
@@ -674,7 +674,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> Fail(int appointmentId, string userId)
+    public async Task<ResultModel> Fail(int appointmentId, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -689,7 +689,7 @@ public class AppointmentService : IAppointmentService
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
 
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(userId));
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
             if (user == null)
             {
                 validPrecondition = false;
@@ -702,7 +702,7 @@ public class AppointmentService : IAppointmentService
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
                     AppointmentId = appointmentId,
-                    UserId = new Guid(userId)
+                    UserId = userId
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
