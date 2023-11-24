@@ -18,7 +18,7 @@ public interface IServerAllocationService
     Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetLocationAssignment(int id);
     Task<ResultModel> GetIpAssignment(int id);
-    Task<ResultModel> GetLocation(int id);
+    Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetAppointment(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> Create(ServerAllocationCreateModel model);
     Task<ResultModel> Update(ServerAllocationUpdateModel model);
@@ -211,21 +211,29 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> GetLocation(int id)
+    public async Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int id)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.LocationAssignments).ThenInclude(x => x.Location).FirstOrDefault(x => x.Id == id);
-            if (serverAllocation == null)
+            var locations = _dbContext.ServerAllocations
+                .Include(x => x.LocationAssignments)
+                .ThenInclude(x => x.Location)
+                .FirstOrDefault(x => x.Id == id).LocationAssignments.Select(x => x.Location).AsQueryable();
+            if (locations == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
             {
-                result.Data = _mapper.Map<List<LocationModel>>(serverAllocation.LocationAssignments.Select(x => x.Location));
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, locations.Count());
+                locations = locations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                locations = locations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+                paging.Data = _mapper.Map<List<LocationModel>>(locations.ToList());
+
+                result.Data = paging;
                 result.Succeed = true;
             }
         }

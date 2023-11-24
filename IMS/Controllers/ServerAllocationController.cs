@@ -97,9 +97,9 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpGet("{id}/Location")]
-    public async Task<ActionResult> GetLocation([FromRoute] int id)
+    public async Task<ActionResult> GetLocation([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromRoute] int id)
     {
-        var result = await _serverAllocationService.GetLocation( id);
+        var result = await _serverAllocationService.GetLocation(pagingParam, id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
