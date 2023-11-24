@@ -28,6 +28,7 @@ public interface ICustomerService
     Task<ResultModel> Create(CustomerCreateModel model, Guid userId);
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Update(CustomerUpdateModel model);
+    Task<ResultModel> ChangePassword(CustomerChangePasswordModel model, int customerId);
     Task<ResultModel> SendActivationEmail(List<int> customerIds);
     Task<ResultModel> Login(CustomerLoginModel model);
 }
@@ -267,6 +268,34 @@ public class CustomerService : ICustomerService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<CustomerModel>(customer);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> ChangePassword(CustomerChangePasswordModel model, int customerId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == customerId);
+            if (customer == null)
+            {
+                result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                customer.Password = _passwordHasher.HashPassword(customer, model.Password);
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<CustomerResultModel>(customer);
             }
         }
         catch (Exception e)

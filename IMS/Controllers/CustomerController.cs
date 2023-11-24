@@ -65,6 +65,16 @@ public class CustomerController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPut("Password")]
+    [Authorize(Roles = "Customer")]
+    public async Task<ActionResult> ChangePassword([FromBody] CustomerChangePasswordModel model)
+    {
+        var customerId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+        var result = await _customerService.ChangePassword(model, int.Parse(customerId));
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpDelete("{id}")]
     [SwaggerOperation(Summary = "[Sale]: Delete a customer")]
     public async Task<ActionResult> Delete(int id)

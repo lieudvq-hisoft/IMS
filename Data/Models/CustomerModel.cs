@@ -82,6 +82,13 @@ public class CustomerUpdateModel
     public int CompanyTypeId { get; set; }
 }
 
+public class CustomerChangePasswordModel
+{
+    [Required]
+    [DataType(DataType.Password)]
+    public string Password { get; set; }
+}
+
 public class CustomerSearchModel
 {
     public string? CustomerName { get; set; } = "";
