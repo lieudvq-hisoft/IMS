@@ -543,7 +543,7 @@ public class AppointmentService : IAppointmentService
                         validPrecondition = false;
                         result.ErrorMessage = RequestExpandErrorMessage.NOT_SUCCESS;
                     }
-                    else if (requestExpand.RemovalStatus != null)
+                    else if (requestExpand.RemovalStatus != null && requestExpand.RemovalStatus != RemovalStatus.Failed)
                     {
                         validPrecondition = false;
                         result.ErrorMessage = "Request expand removal started";
