@@ -198,7 +198,7 @@ public class RequestExpandService : IRequestExpandService
 
         try
         {
-            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == id);
+            var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandLocations).FirstOrDefault(x => x.Id == id);
             if (requestExpand == null)
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
@@ -209,7 +209,8 @@ public class RequestExpandService : IRequestExpandService
             }
             else
             {
-                _dbContext.RequestExpands.Remove(requestExpand);
+                requestExpand.Status = RequestStatus.Failed;
+                _dbContext.RequestExpandLocations.RemoveRange(requestExpand.RequestExpandLocations);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = requestExpand.Id;
