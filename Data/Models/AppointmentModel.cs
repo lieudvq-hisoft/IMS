@@ -61,18 +61,19 @@ public class AppointmentCreateModel
     [GreaterThanZero]
     public int ServerAllocationId { get; set; }
 
-    public List<int> RequestUpgradeIds { get; set; }
+    public List<int>? RequestUpgradeIds { get; set; }
 
-    public List<int> RequestExpandIds { get; set; }
+    public List<int>? RequestExpandIds { get; set; }
+    public List<int>? RequestRemovalIds { get; set; }
 }
 
 public class RequestAppointmentCreateModel
 {
-    public List<int> RequestUpgradeIds { get; set; }
+    public List<int>? RequestUpgradeIds { get; set; }
 
-    public List<int> RequestExpandIds { get; set; }
+    public List<int>? RequestExpandIds { get; set; }
 
-    public List<int> RequestHostIds { get; set; }
+    public List<int>? RequestRemovalIds { get; set; }
 }
 
 public class RequestAppointmentCreateResultModel
