@@ -14,7 +14,7 @@ public interface IServerAllocationService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> GetHardwareConfig(PagingParam<BaseSortCriteria> paginationModel,int id);
+    Task<ResultModel> GetHardwareConfig(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetLocationAssignment(int id);
     Task<ResultModel> GetIpAssignment(int id);
@@ -357,14 +357,18 @@ public class ServerAllocationService : IServerAllocationService
 
     public async Task<ResultModel> Delete(int serverAllocationId)
     {
-
         var result = new ResultModel();
         result.Succeed = false;
         bool validPrecondition = true;
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == serverAllocationId);
+            var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.RequestExpands)
+                .Include(x => x.LocationAssignments)
+                .Include(x => x.RequestHosts)
+                .Include(x => x.IpAssignments)
+                .FirstOrDefault(x => x.Id == serverAllocationId);
             if (serverAllocation == null)
             {
                 validPrecondition = false;
@@ -372,7 +376,17 @@ public class ServerAllocationService : IServerAllocationService
             }
             else
             {
-                _dbContext.ServerAllocations.Remove(serverAllocation);
+                serverAllocation.Status = ServerAllocationStatus.Removed;
+                foreach(var requestExpand in serverAllocation.RequestExpands.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                {
+                    requestExpand.Status = RequestStatus.Failed;
+                }
+                foreach (var requestHost in serverAllocation.RequestHosts.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                {
+                    requestHost.Status = RequestStatus.Failed;
+                }
+                _dbContext.IpAssignments.RemoveRange(serverAllocation.IpAssignments);
+                _dbContext.LocationAssignments.RemoveRange(serverAllocation.LocationAssignments);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
             }

@@ -20,6 +20,10 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
         var objectContext = (DbContext)sender;
         var modifiedEntities =
             objectContext.ChangeTracker.Entries().Where(c => c.State is EntityState.Added or EntityState.Modified or EntityState.Deleted);
+        TimeZoneInfo vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+
+        // Get the current time in the specified time zone
+        DateTime vietnamTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
 
         foreach (var entry in modifiedEntities)
         {
@@ -27,14 +31,14 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
             {
                 if (entry.GetType().GetProperty("DateCreated") != null)
                 {
-                    entry.Property("DateCreated").CurrentValue = DateTime.UtcNow.AddHours(7);
+                    entry.Property("DateCreated").CurrentValue = vietnamTime;
                 }
             }
             if (entry.State == EntityState.Modified)
             {
                 if (entry.GetType().GetProperty("DateUpdated") != null)
                 {
-                    entry.Property("DateUpdated").CurrentValue = DateTime.UtcNow.AddHours(7);
+                    entry.Property("DateUpdated").CurrentValue = vietnamTime;
                 }
             }
             if (entry.State == EntityState.Deleted)
