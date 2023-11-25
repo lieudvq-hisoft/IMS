@@ -245,7 +245,6 @@ public class ComponentService : IComponentService
         {
             var component = _dbContext.Components
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
-                .Include(x => x.RequestUpgrades).ThenInclude(x => x.Component)
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .FirstOrDefault(x => x.Id == id);
