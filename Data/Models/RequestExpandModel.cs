@@ -13,6 +13,7 @@ public class RequestExpandModel
     public int ServerAllocationId { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
+    public int? Capacity { get; set; }
 
     public AppointmentResultModel? SucceededAppointment { get; set; }
     public CustomerResultModel? Customer { get; set; }

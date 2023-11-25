@@ -125,7 +125,33 @@ public class MapperProfile : Profile
         #endregion
 
         #region RequestExpand
-        CreateMap<RequestExpand, RequestExpandModel>();
+        CreateMap<RequestExpand, RequestExpandModel>()
+            .ForMember(dest => dest.Capacity, opt => opt.MapFrom(src => src.RequestExpandLocations.Count()))
+            .AfterMap((src, dest, context) =>
+            {
+                var completeAppointment = src.RequestExpandAppointments?.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success);
+                if (completeAppointment != null)
+                {
+                    dest.SucceededAppointment = context.Mapper.Map<Appointment, AppointmentResultModel>(completeAppointment);
+                }
+            })
+            .AfterMap((src, dest, context) => dest.Customer = context.Mapper.Map<Customer, CustomerResultModel>(src.ServerAllocation.Customer))
+            .AfterMap((src, dest, context) =>
+            {
+                var evaluator = src.RequestExpandUsers?.FirstOrDefault(x => x.Action == RequestUserAction.Evaluate);
+                if (evaluator != null)
+                {
+                    dest.Evaluator = context.Mapper.Map<User, UserModel>(evaluator.User);
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                var executor = src.RequestExpandUsers?.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
+                if (executor != null)
+                {
+                    dest.Executor = context.Mapper.Map<User, UserModel>(executor.User);
+                }
+            });
         CreateMap<RequestExpandCreateModel, RequestExpand>();
         CreateMap<RequestExpandUpdateModel, RequestExpand>();
 

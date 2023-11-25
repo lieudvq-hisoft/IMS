@@ -114,14 +114,19 @@ public class AppointmentService : IAppointmentService
         try
         {
             var appointment = _dbContext.Appointments
-                .Include(x => x.RequestExpandAppointments)
-                .ThenInclude(x => x.RequestExpand)
-                .FirstOrDefault(x => x.Id == id).RequestExpandAppointments;
-                
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandUsers).ThenInclude(x => x.User)
+                .FirstOrDefault(x => x.Id == id);
 
-            if (appointment != null)
+            if (appointment == null)
             {
-                var requestExpands = appointment.Select(x => x.RequestExpand).AsQueryable();
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+                result.Succeed = false;
+            }
+            else
+            {
+                var requestExpands = appointment.RequestExpandAppointments.Select(x => x.RequestExpand).AsQueryable();
+
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpands.Count());
                 requestExpands = requestExpands.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
                 requestExpands = requestExpands.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
@@ -129,11 +134,6 @@ public class AppointmentService : IAppointmentService
 
                 result.Data = paging;
                 result.Succeed = true;
-            }
-            else
-            {
-                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
-                result.Succeed = false;
             }
         }
         catch (Exception e)
