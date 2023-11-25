@@ -23,7 +23,6 @@ public interface IRequestUpgradeService
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
     Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, Guid userId);
     Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status, Guid userId);
-    Task<ResultModel> Reject(int requestUpgradeId);
     Task<ResultModel> CheckCompletability(int requestUpgradeId);
     Task<ResultModel> Complete(int requestUpgradeId, Guid userId);
     Task<ResultModel> CompleteBulk(RequestUpgradeCompleteBulkModel model, Guid userId);
@@ -146,7 +145,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
             }
 
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == model.ServerAllocationId);
+            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
@@ -266,7 +265,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
             }
 
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == model.ServerAllocationId);
+            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
             if (component == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
@@ -407,43 +406,6 @@ public class RequestUpgradeService : IRequestUpgradeService
                 transaction.Commit();
                 result.Succeed = true;
                 result.Data = results.Select(x => x.Data);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
-
-    public async Task<ResultModel> Reject(int requestUpgradeId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-        bool validPrecondition = true;
-
-        try
-        {
-            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
-            if (requestUpgrade == null)
-            {
-                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
-                validPrecondition = false;
-            }
-
-            if (validPrecondition && requestUpgrade.Status != RequestStatus.Accepted)
-            {
-                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_ACCEPTED;
-                validPrecondition = false;
-            }
-
-            if (validPrecondition)
-            {
-                requestUpgrade.Status = RequestStatus.Failed;
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
             }
         }
         catch (Exception e)

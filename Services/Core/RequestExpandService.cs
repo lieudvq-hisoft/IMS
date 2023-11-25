@@ -138,7 +138,7 @@ public class RequestExpandService : IRequestExpandService
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
@@ -169,7 +169,7 @@ public class RequestExpandService : IRequestExpandService
 
         try
         {
-            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == model.Id);
+            var requestExpand = _dbContext.RequestExpands.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == model.Id && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
             if (requestExpand == null)
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;

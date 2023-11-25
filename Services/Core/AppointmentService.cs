@@ -198,7 +198,7 @@ public class AppointmentService : IAppointmentService
         try
         {
             using var transaction = _dbContext.Database.BeginTransaction();
-            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
@@ -246,7 +246,7 @@ public class AppointmentService : IAppointmentService
                     {
                         RequestUpgradeAppointments = createRequestUpgradeAppointmentResults.Select(x => x.Data),
                         RequestExpandAppointments = createRequestExpandAppointmentResults.Select(x => x.Data),
-                        Appointment = _mapper.Map<AppointmentResultModel>(appointment),
+                        Appointment = _mapper.Map<AppointmentResultModel>(appointment)
                     };
                 }
             }
@@ -268,8 +268,13 @@ public class AppointmentService : IAppointmentService
         try
         {
             using var transaction = _dbContext.Database.BeginTransaction();
-            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
-            if (appointment.Status != RequestStatus.Waiting)
+            var appointment = _dbContext.Appointments.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == appointmentId && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
+            if (appointment == null)
+            {
+                validCondition = false;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+            }
+            else if (appointment.Status != RequestStatus.Waiting)
             {
                 validCondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING;
@@ -474,7 +479,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == model.Id);
+            var appointment = _dbContext.Appointments.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == model.Id && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
             if (appointment == null)
             {
                 validPrecondition = false;

@@ -33,7 +33,19 @@ public class MapperProfile : Profile
 
         CreateMap<RequestUpgrade, RequestUpgradeModel>()
             .AfterMap((src, dest, context) =>
-                dest.Component = context.Mapper.Map<Component, ComponentResultModel>(src.Component))
+            {
+                if (src.Component != null)
+                {
+                    dest.Component = context.Mapper.Map<Component, ComponentResultModel>(src.Component);
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                if (src.ServerAllocation != null)
+                {
+                    dest.ServerAllocation = context.Mapper.Map<ServerAllocation, ServerAllocationResultModel>(src.ServerAllocation);
+                }
+            })
             .AfterMap((src, dest, context) =>
             {
                 var completeAppointment = src.RequestUpgradeAppointments?.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success);
@@ -42,7 +54,13 @@ public class MapperProfile : Profile
                     dest.SucceededAppointment = context.Mapper.Map<Appointment, AppointmentResultModel>(completeAppointment);
                 }
             })
-            .AfterMap((src, dest, context) => dest.Customer = context.Mapper.Map<Customer, CustomerResultModel>(src.ServerAllocation.Customer))
+            .AfterMap((src, dest, context) =>
+            {
+                if (src.ServerAllocation?.Customer != null)
+                {
+                    dest.Customer = context.Mapper.Map<Customer, CustomerResultModel>(src.ServerAllocation.Customer);
+                }
+            })
             .AfterMap((src, dest, context) =>
             {
                 var evaluator = src.RequestUpgradeUsers?.FirstOrDefault(x => x.Action == RequestUserAction.Evaluate);
@@ -101,7 +119,20 @@ public class MapperProfile : Profile
         CreateMap<RequestUpgradeAppointment, RequestUpgradeAppointmentModel>();
 
         CreateMap<Appointment, AppointmentModel>()
-            .AfterMap((src, dest, context) => dest.Customer = context.Mapper.Map<Customer, CustomerResultModel>(src.ServerAllocation.Customer))
+            .AfterMap((src, dest, context) =>
+            {
+                if (src.ServerAllocation != null)
+                {
+                    dest.ServerAllocation = context.Mapper.Map<ServerAllocation, ServerAllocationResultModel>(src.ServerAllocation);
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                if (src.ServerAllocation?.Customer != null)
+                {
+                    dest.Customer = context.Mapper.Map<Customer, CustomerResultModel>(src.ServerAllocation.Customer);
+                }
+            })
             .AfterMap((src, dest, context) =>
             {
                 var evaluator = src.AppointmentUsers?.FirstOrDefault(x => x.Action == RequestUserAction.Evaluate);
@@ -135,7 +166,20 @@ public class MapperProfile : Profile
                     dest.SucceededAppointment = context.Mapper.Map<Appointment, AppointmentResultModel>(completeAppointment);
                 }
             })
-            .AfterMap((src, dest, context) => dest.Customer = context.Mapper.Map<Customer, CustomerResultModel>(src.ServerAllocation.Customer))
+            .AfterMap((src, dest, context) =>
+            {
+                if (src.ServerAllocation?.Customer != null)
+                {
+                    dest.Customer = context.Mapper.Map<Customer, CustomerResultModel>(src.ServerAllocation.Customer);
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                if (src.ServerAllocation != null)
+                {
+                    dest.ServerAllocation = context.Mapper.Map<ServerAllocation, ServerAllocationResultModel>(src.ServerAllocation);
+                }
+            })
             .AfterMap((src, dest, context) =>
             {
                 var evaluator = src.RequestExpandUsers?.FirstOrDefault(x => x.Action == RequestUserAction.Evaluate);
@@ -158,12 +202,15 @@ public class MapperProfile : Profile
                 if (requestExpandLocations?.Any() == true)
                 {
                     var startLocation = requestExpandLocations?.Select(x => x.Location).MinBy(x => x.Position);
-                    dest.RequestedLocation = new RequestExpandAssignLocationModel
+                    if (startLocation != null)
                     {
-                        RackId = startLocation.RackId,
-                        StartPosition = startLocation.Position,
-                        Size = requestExpandLocations.Count(),
-                    };
+                        dest.RequestedLocation = new RequestExpandAssignLocationModel
+                        {
+                            RackId = startLocation.RackId,
+                            StartPosition = startLocation.Position,
+                            Size = requestExpandLocations.Count(),
+                        };
+                    }
                 }
             });
         CreateMap<RequestExpandCreateModel, RequestExpand>();
