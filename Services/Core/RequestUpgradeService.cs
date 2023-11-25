@@ -310,9 +310,13 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
             }
+            else if (requestUpgrade.Status != RequestStatus.Waiting)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING;
+            }
             else
             {
-                _dbContext.RequestUpgrades.Remove(requestUpgrade);
+                requestUpgrade.Status = RequestStatus.Failed;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = requestUpgradeId;

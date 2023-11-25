@@ -203,6 +203,10 @@ public class RequestExpandService : IRequestExpandService
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
             }
+            else if (requestExpand.Status != RequestStatus.Waiting)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_WAITING;
+            }
             else
             {
                 _dbContext.RequestExpands.Remove(requestExpand);
