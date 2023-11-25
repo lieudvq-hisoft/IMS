@@ -116,6 +116,7 @@ public class AppointmentService : IAppointmentService
             var appointment = _dbContext.Appointments
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandUsers).ThenInclude(x => x.User)
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandLocations).ThenInclude(x => x.Location)
                 .FirstOrDefault(x => x.Id == id);
 
             if (appointment == null)

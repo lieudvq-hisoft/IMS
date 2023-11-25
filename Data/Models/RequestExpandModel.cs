@@ -19,6 +19,7 @@ public class RequestExpandModel
     public CustomerResultModel? Customer { get; set; }
     public UserModel? Evaluator { get; set; }
     public UserModel? Executor { get; set; }
+    public RequestExpandAssignLocationModel? RequestedLocation { get; set; }
 }
 
 public class RequestExpandResultModel

@@ -151,6 +151,20 @@ public class MapperProfile : Profile
                 {
                     dest.Executor = context.Mapper.Map<User, UserModel>(executor.User);
                 }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                var requestExpandLocations = src.RequestExpandLocations;
+                if (requestExpandLocations?.Any() == true)
+                {
+                    var startLocation = requestExpandLocations?.Select(x => x.Location).MinBy(x => x.Position);
+                    dest.RequestedLocation = new RequestExpandAssignLocationModel
+                    {
+                        RackId = startLocation.RackId,
+                        StartPosition = startLocation.Position,
+                        Size = requestExpandLocations.Count(),
+                    };
+                }
             });
         CreateMap<RequestExpandCreateModel, RequestExpand>();
         CreateMap<RequestExpandUpdateModel, RequestExpand>();

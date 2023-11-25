@@ -16,7 +16,6 @@ public interface IRequestExpandService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetAppointment(int requestExpandId, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
-    Task<ResultModel> GetRequestExpandLocation(int id);
     Task<ResultModel> Create(RequestExpandCreateModel model);
     Task<ResultModel> Update(RequestExpandUpdateModel model);
     Task<ResultModel> Delete(int id);
@@ -48,7 +47,7 @@ public class RequestExpandService : IRequestExpandService
         try
         {
             var requestExpands = _dbContext.RequestExpands
-                .Include(x => x.RequestExpandLocations)
+                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location)
                 .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.RequestExpandUsers).ThenInclude(x => x.User)
@@ -80,7 +79,7 @@ public class RequestExpandService : IRequestExpandService
         try
         {
             var requestExpand = _dbContext.RequestExpands
-                .Include(x => x.RequestExpandLocations)
+                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location)
                 .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.RequestExpandUsers).ThenInclude(x => x.User)
@@ -220,34 +219,29 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
-    public async Task<ResultModel> GetRequestExpandLocation(int id)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //private RequestExpandAssignLocationModel GetRequestExpandLocation(int requestExpandId)
+    //{
+    //    var requestExpand = _dbContext.RequestExpands
+    //        .Include(x => x.RequestExpandLocations)
+    //        .FirstOrDefault(x => x.Id == requestExpandId);
 
-        try
-        {
-            var requestExpand = _dbContext.RequestExpands
-                .Include(x => x.RequestExpandLocations)
-                .FirstOrDefault(x => x.Id == id);
-
-            if (requestExpand != null)
-            {
-                result.Succeed = true;
-                result.Data = _mapper.Map<List<RequestExpandLocationModel>>(requestExpand.RequestExpandLocations);
-            }
-            else
-            {
-                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
-                result.Succeed = false;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //    if (requestExpand == null)
+    //    {
+    //        throw new Exception()
+    //    }
+    //    else
+    //    {
+    //        result.Succeed = true;
+    //        var requestExpandLocations = requestExpand.RequestExpandLocations;
+    //        var startLocation = requestExpandLocations.Select(x => x.Location).MinBy(x => x.Position);
+    //        result.Data = new RequestExpandAssignLocationModel
+    //        {
+    //            RackId = startLocation.RackId,
+    //            StartPosition = startLocation.Position,
+    //            Size = requestExpandLocations.Count(),
+    //        };
+    //    }
+    //}
 
     public async Task<ResultModel> Evaluate(int requestExpandId, RequestStatus status, Guid userId)
     {
