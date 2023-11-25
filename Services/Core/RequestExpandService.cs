@@ -23,6 +23,7 @@ public interface IRequestExpandService
     Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
     Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model);
     Task<ResultModel> Complete(int requestExpandId, Guid userId);
+    Task<ResultModel> CompleteRemoval(int requestExpandId, Guid userId);
     Task<ResultModel> GetRackChoiceSuggestionBySize(int requestExpandId);
 
 }
@@ -457,7 +458,7 @@ public class RequestExpandService : IRequestExpandService
         return allValidLocation;
     }
 
-    private bool IsCompletable(int requestExpandId)
+    private bool IsCompletable(int requestExpandId, bool forRemoval)
     {
         var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment).FirstOrDefault(x => x.Id == requestExpandId);
         if (requestExpand == null)
@@ -465,7 +466,7 @@ public class RequestExpandService : IRequestExpandService
             return false;
         }
 
-        return requestExpand.RequestExpandAppointments.Where(x => !x.ForRemoval).Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Success);
+        return requestExpand.RequestExpandAppointments.Where(x => x.ForRemoval == forRemoval).Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Success);
     }
 
     public async Task<ResultModel> Complete(int requestExpandId, Guid userId)
@@ -486,7 +487,7 @@ public class RequestExpandService : IRequestExpandService
                 validPrecondition = false;
             }
 
-            if (!IsCompletable(requestExpandId))
+            if (!IsCompletable(requestExpandId, false))
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_COMPLETABLE;
                 validPrecondition = false;
@@ -542,79 +543,86 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
-    //public async Task<ResultModel> CompleteRemoval(int requestExpandId, Guid userId)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
-    //    bool validPrecondition = true;
+    public async Task<ResultModel> CompleteRemoval(int requestExpandId, Guid userId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
 
-    //    try
-    //    {
-    //        var requestExpand = _dbContext.RequestExpands
-    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
-    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
-    //            .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Success && x.RemovalStatus == RemovalStatus.Accepted);
-    //        if (requestExpand == null)
-    //        {
-    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
-    //            validPrecondition = false;
-    //        }
+        try
+        {
+            var requestExpand = _dbContext.RequestExpands
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Success);
+            if (requestExpand == null)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+            else if (requestExpand.RemovalStatus == RemovalStatus.Accepted)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = RequestExpandErrorMessage.REMOVAL_NOT_ACCEPTED;
+            }
 
-    //        if (!IsCompletable(requestExpandId))
-    //        {
-    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_COMPLETABLE;
-    //            validPrecondition = false;
-    //        }
+            if (!IsCompletable(requestExpandId, true))
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_COMPLETABLE;
+                validPrecondition = false;
+            }
 
-    //        List<Location> locations = null;
-    //        if (validPrecondition)
-    //        {
-    //            locations = requestExpand.RequestExpandLocations.Select(x => x.Location).ToList();
-    //            if (!locations.Any())
-    //            {
-    //                validPrecondition = false;
-    //                result.ErrorMessage = "Request dont have target location";
-    //            }
-    //            else
-    //            {
-    //                validPrecondition = CheckValidLocation(locations, requestExpandId, result);
-    //            }
-    //        }
+            List<Location> locations = null;
+            if (validPrecondition)
+            {
+                locations = requestExpand.RequestExpandLocations.Select(x => x.Location).ToList();
+                if (!locations.Any())
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Request dont have target location";
+                }
+            }
 
-    //        if (validPrecondition)
-    //        {
-    //            var serverAllocation = requestExpand.ServerAllocation;
-    //            bool haveLocation = serverAllocation.LocationAssignments.Any();
-    //            var locationAssignments = new List<LocationAssignment>();
-    //            foreach (var location in locations)
-    //            {
-    //                locationAssignments.Add(new LocationAssignment
-    //                {
-    //                    ServerAllocationId = requestExpand.ServerAllocationId,
-    //                    LocationId = location.Id,
-    //                    IsServer = !haveLocation
-    //                });
-    //            }
-    //            _dbContext.LocationAssignments.AddRange(locationAssignments);
-    //            requestExpand.Status = RequestStatus.Success;
-    //            _dbContext.RequestExpandUsers.Add(new RequestExpandUser
-    //            {
-    //                Action = RequestUserAction.Execute,
-    //                RequestExpandId = requestExpand.Id,
-    //                UserId = userId
-    //            });
-    //            _dbContext.SaveChanges();
-    //            result.Succeed = true;
-    //            result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
-    //        }
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
+            var locationAssignments = new List<LocationAssignment>();
+            if (validPrecondition)
+            {
+                foreach (var location in locations)
+                {
+                    var locationAssignment = _dbContext.LocationAssignments.FirstOrDefault(x => x.LocationId == location.Id);
+                    if (locationAssignment == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+                    }
+                    else
+                    {
+                        locationAssignments.Add(locationAssignment);
+                    }
+                }
+            }
 
-    //    return result;
-    //}
+            if (validPrecondition)
+            {
+                _dbContext.LocationAssignments.RemoveRange(locationAssignments);
+                requestExpand.RemovalStatus = RemovalStatus.Success;
+                _dbContext.RequestExpandUsers.Add(new RequestExpandUser
+                {
+                    Action = RequestUserAction.Execute,
+                    RequestExpandId = requestExpand.Id,
+                    UserId = userId
+                });
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
 
     public async Task<ResultModel> GetRackChoiceSuggestionBySize(int requestExpandId)
     {

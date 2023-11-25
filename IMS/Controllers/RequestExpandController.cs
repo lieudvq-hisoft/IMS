@@ -125,6 +125,15 @@ public class RequestExpandController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPut("Removal/{id}/Complete")]
+    public async Task<ActionResult> CompleteRemoval(int id)
+    {
+        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+        var result = await _requestExpandService.CompleteRemoval(id, new Guid(userId));
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut("{id}/SuggestLocation")]
     [SwaggerOperation(Summary = "Suggest location for request expand")]
     public async Task<ActionResult> Suggest(int id)
