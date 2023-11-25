@@ -157,7 +157,6 @@ public class MapperProfile : Profile
 
         #region RequestExpand
         CreateMap<RequestExpand, RequestExpandModel>()
-            .ForMember(dest => dest.Capacity, opt => opt.MapFrom(src => src.RequestExpandLocations.Count()))
             .AfterMap((src, dest, context) =>
             {
                 var completeAppointment = src.RequestExpandAppointments?.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success);
@@ -208,7 +207,6 @@ public class MapperProfile : Profile
                         {
                             RackId = startLocation.RackId,
                             StartPosition = startLocation.Position,
-                            Size = requestExpandLocations.Count(),
                         };
                     }
                 }

@@ -22,9 +22,8 @@ public interface IRequestExpandService
     Task<ResultModel> Evaluate(int requestExpandId, RequestStatus status, Guid userId);
     Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
     Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model);
-    Task<ResultModel> CheckCompletability(int requestExpandId);
     Task<ResultModel> Complete(int requestExpandId, Guid userId);
-    Task<ResultModel> GetRackChoiceSuggestionBySize(RequestExpandSuggestLocationModel model);
+    Task<ResultModel> GetRackChoiceSuggestionBySize(int requestExpandId);
 
 }
 
@@ -176,6 +175,10 @@ public class RequestExpandService : IRequestExpandService
             }
             else
             {
+                if (requestExpand.Status != RequestStatus.Accepted)
+                {
+                    model.Size = 0;
+                }
                 _mapper.Map<RequestExpandUpdateModel, RequestExpand>(model, requestExpand);
                 _dbContext.SaveChanges();
 
@@ -339,11 +342,17 @@ public class RequestExpandService : IRequestExpandService
                     validPrecondition = false;
                     result.ErrorMessage = RequestExpandErrorMessage.NOT_ACCEPTED;
                 }
+
+                if (requestExpand.Size == null)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Cannot suggest without size";
+                }
             }
 
             if (validPrecondition)
             {
-                var appointmentAccepted = requestExpand.RequestExpandAppointments.Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Accepted);
+                var appointmentAccepted = requestExpand.RequestExpandAppointments.Where(x => !x.ForRemoval).Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Accepted);
                 if (!appointmentAccepted)
                 {
                     validPrecondition = false;
@@ -357,8 +366,8 @@ public class RequestExpandService : IRequestExpandService
                 locations = _dbContext.Locations
                     .Include(x => x.LocationAssignments)
                     .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand)
-                    .Where(x => x.RackId == model.RackId && x.Position >= model.StartPosition && x.Position < model.StartPosition + model.Size).ToList();
-                if (locations.Count != model.Size)
+                    .Where(x => x.RackId == model.RackId && x.Position >= model.StartPosition && x.Position < model.StartPosition + requestExpand.Size.Value).ToList();
+                if (locations.Count != requestExpand.Size.Value)
                 {
                     validPrecondition = false;
                     result.ErrorMessage = RequestExpandLocationErrorMessage.INVALID_LOCATION;
@@ -411,24 +420,6 @@ public class RequestExpandService : IRequestExpandService
         return allValidLocation;
     }
 
-    public async Task<ResultModel> CheckCompletability(int requestExpandId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            result.Data = IsCompletable(requestExpandId);
-            result.Succeed = true;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
-
     private bool IsCompletable(int requestExpandId)
     {
         var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment).FirstOrDefault(x => x.Id == requestExpandId);
@@ -437,7 +428,7 @@ public class RequestExpandService : IRequestExpandService
             return false;
         }
 
-        return requestExpand.RequestExpandAppointments.Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Success && !x.InspectionReportFilePath.IsNullOrEmpty() && !x.ReceiptOfRecipientFilePath.IsNullOrEmpty());
+        return requestExpand.RequestExpandAppointments.Where(x => !x.ForRemoval).Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Success);
     }
 
     public async Task<ResultModel> Complete(int requestExpandId, Guid userId)
@@ -514,7 +505,7 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
-    public async Task<ResultModel> GetRackChoiceSuggestionBySize(RequestExpandSuggestLocationModel model)
+    public async Task<ResultModel> GetRackChoiceSuggestionBySize(int requestExpandId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -522,33 +513,45 @@ public class RequestExpandService : IRequestExpandService
 
         try
         {
-            var racks = _dbContext.Racks.OrderBy(x => x.Id).ToList();
-
-            int rackCount = 0;
-            while (rackCount < racks.Count && suggestedLocation == null)
+            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
+            if (requestExpand == null)
             {
-                var rack = racks[rackCount];
-                var suggestedStartingLocation = CheckRackAvailabilityLocation(rack, model.Size);
-                if (suggestedStartingLocation != null)
-                {
-                    suggestedLocation = new LocationChoiceModel
-                    {
-                        AreaId = rack.AreaId,
-                        RackId = rack.Id,
-                        Position = suggestedStartingLocation.Position
-                    };
-                }
-                rackCount++;
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
             }
-
-            if (suggestedLocation == null)
+            else if (requestExpand.Size == null)
             {
-                result.ErrorMessage = LocationErrorMessgae.NO_AVAILABLE_FOUND;
+                result.ErrorMessage = "Cannot suggest without size";
             }
             else
             {
-                result.Data = suggestedLocation;
-                result.Succeed = true;
+                var racks = _dbContext.Racks.OrderBy(x => x.Id).ToList();
+
+                int rackCount = 0;
+                while (rackCount < racks.Count && suggestedLocation == null)
+                {
+                    var rack = racks[rackCount];
+                    var suggestedStartingLocation = CheckRackAvailabilityLocation(rack, requestExpand.Size.Value);
+                    if (suggestedStartingLocation != null)
+                    {
+                        suggestedLocation = new LocationChoiceModel
+                        {
+                            AreaId = rack.AreaId,
+                            RackId = rack.Id,
+                            Position = suggestedStartingLocation.Position
+                        };
+                    }
+                    rackCount++;
+                }
+
+                if (suggestedLocation == null)
+                {
+                    result.ErrorMessage = LocationErrorMessgae.NO_AVAILABLE_FOUND;
+                }
+                else
+                {
+                    result.Data = suggestedLocation;
+                    result.Succeed = true;
+                }
             }
         }
         catch (Exception e)

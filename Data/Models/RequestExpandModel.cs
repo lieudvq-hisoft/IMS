@@ -7,13 +7,14 @@ public class RequestExpandModel
 {
     public int Id { get; set; }
     public RequestStatus Status { get; set; }
+    public RemovalStatus? RemovalStatus { get; set; }
     public string RequestType { get; set; }
     public string? Note { get; set; }
     public string? TechNote { get; set; }
     public int ServerAllocationId { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
-    public int? Capacity { get; set; }
+    public int? Size { get; set; }
 
     public ServerAllocationResultModel? ServerAllocation { get; set; }
     public AppointmentResultModel? SucceededAppointment { get; set; }
@@ -26,8 +27,9 @@ public class RequestExpandModel
 public class RequestExpandResultModel
 {
     public int Id { get; set; }
-    //public int Power { get; set; }
     public RequestStatus Status { get; set; }
+    public int? Size { get; set; }
+    public RemovalStatus? RemovalStatus { get; set; }
     public string RequestType { get; set; }
     public string? Note { get; set; }
     public string? TechNote { get; set; }
@@ -55,10 +57,6 @@ public class RequestExpandAssignLocationModel
     [Required]
     [NotNegative]
     public int StartPosition { get; set; }
-
-    [Required]
-    [GreaterThanZero]
-    public int Size { get; set; }
 }
 
 public class RequestExpandUpdateModel
@@ -67,9 +65,8 @@ public class RequestExpandUpdateModel
     [GreaterThanZero]
     public int Id { get; set; }
 
-    //[Required]
-    //[NotNegative]
-    //public int Power { get; set; }
+    [GreaterThanZero]
+    public int? Size { get; set; }
 
     public string? Note { get; set; }
 

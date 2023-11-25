@@ -28,7 +28,6 @@ public enum IpPurpose
     Broadcast
 }
 
-
 public enum RequestUserAction
 {
     Evaluate,
@@ -47,6 +46,13 @@ public enum RequestStatus
     Waiting,
     Accepted,
     Denied,
+    Success,
+    Failed
+}
+
+public enum RemovalStatus
+{
+    Accepted,
     Success,
     Failed
 }

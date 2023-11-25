@@ -4,12 +4,14 @@ using System.ComponentModel.DataAnnotations;
 namespace Data.Models;
 public class RequestExpandAppointmentModel
 {
+    public bool ForRemoval { get; set; }
     public int RequestExpandId { get; set; }
     public int AppointmentId { get; set; }
 }
 
 public class RequestExpandAppointmentResultModel
 {
+    public bool ForRemoval { get; set; }
     public int RequestExpandId { get; set; }
     public int AppointmentId { get; set; }
 }

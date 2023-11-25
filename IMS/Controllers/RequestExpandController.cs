@@ -107,15 +107,6 @@ public class RequestExpandController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("{id}/Completability")]
-    [SwaggerOperation(Summary = "True if any appointment success and have inspection record")]
-    public async Task<ActionResult> GetCompletability(int id)
-    {
-        var result = await _requestExpandService.CheckCompletability(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
     [HttpPut("{id}/Complete")]
     [SwaggerOperation(Summary = "Complete a completable accepted request expand")]
     public async Task<ActionResult> Complete(int id)
@@ -126,11 +117,11 @@ public class RequestExpandController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPut("SuggestLocation")]
+    [HttpPut("{id}/SuggestLocation")]
     [SwaggerOperation(Summary = "Suggest location for request expand")]
-    public async Task<ActionResult> Suggest(RequestExpandSuggestLocationModel model)
+    public async Task<ActionResult> Suggest(int id)
     {
-        var result = await _requestExpandService.GetRackChoiceSuggestionBySize(model);
+        var result = await _requestExpandService.GetRackChoiceSuggestionBySize(id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
