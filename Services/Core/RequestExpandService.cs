@@ -7,7 +7,6 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using Services.Utilities;
 
 namespace Services.Core;
@@ -18,7 +17,8 @@ public interface IRequestExpandService
     Task<ResultModel> GetAppointment(int requestExpandId, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> Create(RequestExpandCreateModel model);
     Task<ResultModel> Update(RequestExpandUpdateModel model);
-    Task<ResultModel> Delete(int id);
+    Task<ResultModel> Delete(int requestExpandId);
+    Task<ResultModel> FailRemoval(int requestExpandId);
     Task<ResultModel> Evaluate(int requestExpandId, RequestStatus status, Guid userId);
     Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
     Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model);
@@ -194,14 +194,14 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
-    public async Task<ResultModel> Delete(int id)
+    public async Task<ResultModel> Delete(int requestExpandId)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandLocations).FirstOrDefault(x => x.Id == id);
+            var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandLocations).FirstOrDefault(x => x.Id == requestExpandId);
             if (requestExpand == null)
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
@@ -214,6 +214,43 @@ public class RequestExpandService : IRequestExpandService
             {
                 requestExpand.Status = RequestStatus.Failed;
                 _dbContext.RequestExpandLocations.RemoveRange(requestExpand.RequestExpandLocations);
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = requestExpand.Id;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> FailRemoval(int requestExpandId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandAppointments).FirstOrDefault(x => x.Id == requestExpandId);
+            if (requestExpand == null)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+            }
+            else if (requestExpand.Status != RequestStatus.Success)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_SUCCESS;
+            }
+            else if (requestExpand.RemovalStatus != RemovalStatus.Accepted)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.REMOVAL_NOT_ACCEPTED;
+            }
+            else
+            {
+                requestExpand.RemovalStatus = RemovalStatus.Failed;
+                _dbContext.RequestExpandAppointments.RemoveRange(requestExpand.RequestExpandAppointments);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = requestExpand.Id;

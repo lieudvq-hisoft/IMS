@@ -99,6 +99,14 @@ public class RequestExpandController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpDelete("Removal/{id}")]
+    public async Task<ActionResult> FailRequestRemoval(int id)
+    {
+        var result = await _requestExpandService.FailRemoval(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost("{id}/RequestExpandLocation")]
     public async Task<ActionResult> AssignRequestExpandLocation(int id, RequestExpandAssignLocationModel model)
     {

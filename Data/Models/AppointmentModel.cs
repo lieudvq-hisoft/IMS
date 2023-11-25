@@ -93,6 +93,8 @@ public class AppointmentCreateResultModel
 
     public IEnumerable<object> RequestExpandAppointments { get; set; }
 
+    public IEnumerable<object> RequestRemovalAppointments { get; set; }
+
     public IEnumerable<object> RequestHostAppointments { get; set; }
 }
 
