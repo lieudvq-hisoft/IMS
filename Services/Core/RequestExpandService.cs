@@ -575,7 +575,7 @@ public class RequestExpandService : IRequestExpandService
     private Location CheckRackAvailabilityLocation(Rack rack, int size)
     {
         Location suggestedStartingLocation = null;
-        var spaces = new List<List<Location>>();
+        var spaces = new List<List<Location>>(1);
         var availableLocations = _dbContext.Locations.Include(x => x.LocationAssignments).Where(x => x.RackId == rack.Id && !x.LocationAssignments.Any());
 
         int count = 0;
@@ -596,6 +596,7 @@ public class RequestExpandService : IRequestExpandService
             {
                 if (!isEmpty)
                 {
+                    spaces.Add(new List<Location>());
                     count++;
                     isEmpty = true;
                 }
