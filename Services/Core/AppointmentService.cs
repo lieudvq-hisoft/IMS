@@ -113,13 +113,15 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var requestExpands = _dbContext.Appointments
+            var appointment = _dbContext.Appointments
                 .Include(x => x.RequestExpandAppointments)
                 .ThenInclude(x => x.RequestExpand)
-                .FirstOrDefault(x => x.Id == id).RequestExpandAppointments.Select(x => x.RequestExpand).AsQueryable();
+                .FirstOrDefault(x => x.Id == id).RequestExpandAppointments;
+                
 
-            if (requestExpands != null)
+            if (appointment != null)
             {
+                var requestExpands = appointment.Select(x => x.RequestExpand).AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpands.Count());
                 requestExpands = requestExpands.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
                 requestExpands = requestExpands.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);

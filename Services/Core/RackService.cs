@@ -116,13 +116,16 @@ public class RackService : IRackService
 
         try
         {
-            var locations = _dbContext.Racks.Include(x => x.Locations).FirstOrDefault(x => x.Id == rackId).Locations.AsQueryable();
-            if (locations == null)
+            var rack = _dbContext.Racks
+                .Include(x => x.Locations)
+                .FirstOrDefault(x => x.Id == rackId);
+            if (rack == null)
             {
                 result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
             }
             else
             {
+                var locations = rack.Locations.AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, locations.Count());
                 locations = locations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
                 locations = locations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);

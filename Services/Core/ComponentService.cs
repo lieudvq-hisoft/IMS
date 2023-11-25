@@ -208,23 +208,25 @@ public class ComponentService : IComponentService
 
         try
         {
-            var hardwareConfig = _dbContext.Components
-                .Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == id).ServerHardwareConfigs.AsQueryable();
+            var component = _dbContext.Components
+                .Include(x => x.ServerHardwareConfigs)
+                .FirstOrDefault(x => x.Id == id);
 
-            if (hardwareConfig != null)
-            {
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, hardwareConfig.Count());
-                hardwareConfig = hardwareConfig.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                hardwareConfig = hardwareConfig.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-                paging.Data = _mapper.Map<List<ServerHardwareConfigModel>>(hardwareConfig.ToList());
-
-                result.Data = paging;
-                result.Succeed = true;
-            }
-            else
+            if (component == null)
             {
                 result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
                 result.Succeed = false;
+            }
+            else
+            {
+                var hardwareConfigs = component.ServerHardwareConfigs.AsQueryable();
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, hardwareConfigs.Count());
+                hardwareConfigs = hardwareConfigs.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                hardwareConfigs = hardwareConfigs.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+                paging.Data = _mapper.Map<List<ServerHardwareConfigModel>>(hardwareConfigs.ToList());
+
+                result.Data = paging;
+                result.Succeed = true;
             }
         }
         catch (Exception e)
@@ -241,26 +243,28 @@ public class ComponentService : IComponentService
 
         try
         {
-            var requestUpgrade = _dbContext.Components
+            var component = _dbContext.Components
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.Component)
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .FirstOrDefault(x => x.Id == id).RequestUpgrades.AsQueryable();
+                .FirstOrDefault(x => x.Id == id);
 
-            if (requestUpgrade != null)
-            {
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestUpgrade.Count());
-                requestUpgrade = requestUpgrade.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                requestUpgrade = requestUpgrade.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-                paging.Data = _mapper.Map<List<RequestUpgradeModel>>(requestUpgrade.ToList());
-
-                result.Data = paging;
-                result.Succeed = true;            }
-            else
+            if (component == null)
             {
                 result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
                 result.Succeed = false;
+            }
+            else
+            {
+                var requestUpgrades = component.RequestUpgrades.AsQueryable();
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestUpgrades.Count());
+                requestUpgrades = requestUpgrades.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                requestUpgrades = requestUpgrades.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+                paging.Data = _mapper.Map<List<RequestUpgradeModel>>(requestUpgrades.ToList());
+
+                result.Data = paging;
+                result.Succeed = true;
             }
         }
         catch (Exception e)

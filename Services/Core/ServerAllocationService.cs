@@ -102,15 +102,16 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-            var serverHardwareConfigs = _dbContext.ServerAllocations
+            var serverAllocation = _dbContext.ServerAllocations
                 .Include(x => x.ServerHardwareConfigs)
-                .FirstOrDefault(x => x.Id == id).ServerHardwareConfigs.AsQueryable();
-            if (serverHardwareConfigs == null)
+                .FirstOrDefault(x => x.Id == id);
+            if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
             {
+                var serverHardwareConfigs = serverAllocation.ServerHardwareConfigs.AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, serverHardwareConfigs.Count());
                 serverHardwareConfigs = serverHardwareConfigs.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
                 serverHardwareConfigs = serverHardwareConfigs.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
@@ -134,19 +135,20 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-            var requestUpgrades = _dbContext.ServerAllocations
+            var serverAllocation = _dbContext.ServerAllocations
                 .Include(x => x.Customer)
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.Component)
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
                 .Include(x => x.Customer)
-                .FirstOrDefault(x => x.Id == id).RequestUpgrades.AsQueryable();
-            if (requestUpgrades == null)
+                .FirstOrDefault(x => x.Id == id);
+            if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
             {
+                var requestUpgrades = serverAllocation.RequestUpgrades.AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestUpgrades.Count());
                 requestUpgrades = requestUpgrades.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
                 requestUpgrades = requestUpgrades.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
@@ -220,16 +222,17 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-            var locations = _dbContext.ServerAllocations
+            var serverAllocation = _dbContext.ServerAllocations
                 .Include(x => x.LocationAssignments)
                 .ThenInclude(x => x.Location)
-                .FirstOrDefault(x => x.Id == id).LocationAssignments.Select(x => x.Location).AsQueryable();
-            if (locations == null)
+                .FirstOrDefault(x => x.Id == id);
+            if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
             {
+                var locations = serverAllocation.LocationAssignments.Select(x => x.Location).AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, locations.Count());
                 locations = locations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
                 locations = locations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
@@ -253,13 +256,16 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-            var appointments = _dbContext.ServerAllocations.Include(x => x.Customer).Include(x => x.Appointments).FirstOrDefault(x => x.Id == id).Appointments.AsQueryable();
-            if (appointments == null)
+            var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.Customer).Include(x => x.Appointments)
+                .FirstOrDefault(x => x.Id == id);
+            if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
             {
+                var appointments = serverAllocation.Appointments.AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, appointments.Count());
                 appointments = appointments.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
                 appointments = appointments.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);

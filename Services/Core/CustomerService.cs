@@ -120,19 +120,24 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var serverAllocation = _dbContext.Customers.Include(x => x.ServerAllocations).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == id).ServerAllocations.AsQueryable();
+            var customer = _dbContext.Customers
+                .Include(x => x.ServerAllocations)
+                .ThenInclude(x => x.IpAssignments)
+                .ThenInclude(x => x.IpAddress)
+                .FirstOrDefault(x => x.Id == id);
 
-            if (serverAllocation == null)
+            if (customer == null)
             {
                 result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
                 result.Succeed = false;
             }
             else
             {
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, serverAllocation.Count());
-                serverAllocation = serverAllocation.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                serverAllocation = serverAllocation.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-                paging.Data = _mapper.Map<List<ServerAllocationModel>>(serverAllocation.ToList());
+                var serverAllocations = customer.ServerAllocations.AsQueryable();
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, serverAllocations.Count());
+                serverAllocations = serverAllocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                serverAllocations = serverAllocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+                paging.Data = _mapper.Map<List<ServerAllocationModel>>(serverAllocations.ToList());
 
                 result.Data = paging;
                 result.Succeed = true;
