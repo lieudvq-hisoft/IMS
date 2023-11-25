@@ -20,7 +20,7 @@ public class LocationRackMapModel
     public int Id { get; set; }
     public int Position { get; set; }
     public int RackId { get; set; }
-    public int? ServerAllocationId { get; set; }
+    public ServerAllocationResultModel? ServerAllocation { get; set; }
 }
 
 public class LocationSearchModel

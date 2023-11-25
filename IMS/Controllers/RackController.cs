@@ -47,14 +47,14 @@ public class RackController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("{id}/Location")]
-    [SwaggerOperation(Summary = "Get all rack location by rack id")]
-    public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
-    {
-        var result = await _RackService.GetLocation(pagingParam, id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/Location")]
+    //[SwaggerOperation(Summary = "Get all rack location by rack id")]
+    //public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
+    //{
+    //    var result = await _RackService.GetLocation(pagingParam, id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpGet("{id}/ServerAllocation")]
     [SwaggerOperation(Summary = "Get all rack server allocation by rack id")]

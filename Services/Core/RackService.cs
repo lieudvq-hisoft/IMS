@@ -15,7 +15,7 @@ public interface IRackService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RackSearchModel searchModel);
     Task<ResultModel> GetAll();
     Task<ResultModel> GetDetail(int rackId);
-    Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int rackId);
+    //Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int rackId);
     Task<ResultModel> GetServerAllocation(PagingParam<BaseSortCriteria> paginationModel, int rackId);
     Task<ResultModel> GetRackMap(int rackId);
     Task<ResultModel> GetPower(int rackId);
@@ -71,7 +71,7 @@ public class RackService : IRackService
         {
             var racks = _dbContext.Racks.AsQueryable();
 
-            result.Data = _mapper.Map<List<RackModel>>(racks.ToList()); 
+            result.Data = _mapper.Map<List<RackModel>>(racks.ToList());
             result.Succeed = true;
         }
         catch (Exception e)
@@ -109,38 +109,38 @@ public class RackService : IRackService
         return result;
     }
 
-    public async Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int rackId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int rackId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var rack = _dbContext.Racks
-                .Include(x => x.Locations)
-                .FirstOrDefault(x => x.Id == rackId);
-            if (rack == null)
-            {
-                result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var locations = rack.Locations.AsQueryable();
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, locations.Count());
-                locations = locations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                locations = locations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-                paging.Data = _mapper.Map<List<LocationModel>>(locations.ToList());
+    //    try
+    //    {
+    //        var rack = _dbContext.Racks
+    //            .Include(x => x.Locations)
+    //            .FirstOrDefault(x => x.Id == rackId);
+    //        if (rack == null)
+    //        {
+    //            result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
+    //        }
+    //        else
+    //        {
+    //            var locations = rack.Locations.AsQueryable();
+    //            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, locations.Count());
+    //            locations = locations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //            locations = locations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //            paging.Data = _mapper.Map<List<LocationModel>>(locations.ToList());
 
-                result.Data = paging;
-                result.Succeed = true;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //            result.Data = paging;
+    //            result.Succeed = true;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> GetServerAllocation(PagingParam<BaseSortCriteria> paginationModel, int rackId)
     {
@@ -224,7 +224,7 @@ public class RackService : IRackService
                         Id = location.Id,
                         Position = location.Position,
                         RackId = location.RackId,
-                        ServerAllocationId = location.LocationAssignments.FirstOrDefault()?.ServerAllocationId
+                        ServerAllocation = _mapper.Map<ServerAllocationResultModel>(location.LocationAssignments.FirstOrDefault()?.ServerAllocation)
                     });
                 }
 
