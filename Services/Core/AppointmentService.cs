@@ -559,7 +559,6 @@ public class AppointmentService : IAppointmentService
 
             if (validPrecondition)
             {
-                requestExpand.RemovalStatus = RemovalStatus.Accepted;
                 var requestRemovalAppointment = new RequestExpandAppointment
                 {
                     ForRemoval = true,
@@ -714,7 +713,14 @@ public class AppointmentService : IAppointmentService
                     }
                     foreach (var requestExpand in appointment.RequestExpandAppointments.Select(x => x.RequestExpand))
                     {
-                        requestExpand.Status = status;
+                        if (requestExpand.Status != RequestStatus.Success)
+                        {
+                            requestExpand.Status = status;
+                        }
+                        else
+                        {
+                            requestExpand.RemovalStatus = RemovalStatus.Accepted;
+                        }
                         _dbContext.RequestExpandUsers.Add(new RequestExpandUser
                         {
                             Action = RequestUserAction.Evaluate,

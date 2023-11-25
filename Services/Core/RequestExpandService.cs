@@ -542,6 +542,80 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
+    //public async Task<ResultModel> CompleteRemoval(int requestExpandId, Guid userId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+    //    bool validPrecondition = true;
+
+    //    try
+    //    {
+    //        var requestExpand = _dbContext.RequestExpands
+    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
+    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+    //            .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Success && x.RemovalStatus == RemovalStatus.Accepted);
+    //        if (requestExpand == null)
+    //        {
+    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+    //            validPrecondition = false;
+    //        }
+
+    //        if (!IsCompletable(requestExpandId))
+    //        {
+    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_COMPLETABLE;
+    //            validPrecondition = false;
+    //        }
+
+    //        List<Location> locations = null;
+    //        if (validPrecondition)
+    //        {
+    //            locations = requestExpand.RequestExpandLocations.Select(x => x.Location).ToList();
+    //            if (!locations.Any())
+    //            {
+    //                validPrecondition = false;
+    //                result.ErrorMessage = "Request dont have target location";
+    //            }
+    //            else
+    //            {
+    //                validPrecondition = CheckValidLocation(locations, requestExpandId, result);
+    //            }
+    //        }
+
+    //        if (validPrecondition)
+    //        {
+    //            var serverAllocation = requestExpand.ServerAllocation;
+    //            bool haveLocation = serverAllocation.LocationAssignments.Any();
+    //            var locationAssignments = new List<LocationAssignment>();
+    //            foreach (var location in locations)
+    //            {
+    //                locationAssignments.Add(new LocationAssignment
+    //                {
+    //                    ServerAllocationId = requestExpand.ServerAllocationId,
+    //                    LocationId = location.Id,
+    //                    IsServer = !haveLocation
+    //                });
+    //            }
+    //            _dbContext.LocationAssignments.AddRange(locationAssignments);
+    //            requestExpand.Status = RequestStatus.Success;
+    //            _dbContext.RequestExpandUsers.Add(new RequestExpandUser
+    //            {
+    //                Action = RequestUserAction.Execute,
+    //                RequestExpandId = requestExpand.Id,
+    //                UserId = userId
+    //            });
+    //            _dbContext.SaveChanges();
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+
+    //    return result;
+    //}
+
     public async Task<ResultModel> GetRackChoiceSuggestionBySize(int requestExpandId)
     {
         var result = new ResultModel();
