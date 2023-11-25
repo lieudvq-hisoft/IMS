@@ -224,30 +224,6 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
-    //private RequestExpandAssignLocationModel GetRequestExpandLocation(int requestExpandId)
-    //{
-    //    var requestExpand = _dbContext.RequestExpands
-    //        .Include(x => x.RequestExpandLocations)
-    //        .FirstOrDefault(x => x.Id == requestExpandId);
-
-    //    if (requestExpand == null)
-    //    {
-    //        throw new Exception()
-    //    }
-    //    else
-    //    {
-    //        result.Succeed = true;
-    //        var requestExpandLocations = requestExpand.RequestExpandLocations;
-    //        var startLocation = requestExpandLocations.Select(x => x.Location).MinBy(x => x.Position);
-    //        result.Data = new RequestExpandAssignLocationModel
-    //        {
-    //            RackId = startLocation.RackId,
-    //            StartPosition = startLocation.Position,
-    //            Size = requestExpandLocations.Count(),
-    //        };
-    //    }
-    //}
-
     public async Task<ResultModel> Evaluate(int requestExpandId, RequestStatus status, Guid userId)
     {
         var result = new ResultModel();

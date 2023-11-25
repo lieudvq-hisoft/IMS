@@ -364,9 +364,10 @@ public class ServerAllocationService : IServerAllocationService
         try
         {
             var serverAllocation = _dbContext.ServerAllocations
-                .Include(x => x.RequestExpands).ThenInclude(x => x.RequestExpandLocations)
+                .Include(x => x.RequestExpands)
+                .Include(x => x.RequestUpgrades)
                 .Include(x => x.LocationAssignments)
-                .Include(x => x.RequestHosts).ThenInclude(x => x.RequestHostIps)
+                .Include(x => x.RequestHosts)
                 .Include(x => x.IpAssignments)
                 .FirstOrDefault(x => x.Id == serverAllocationId);
             if (serverAllocation == null)
@@ -380,12 +381,14 @@ public class ServerAllocationService : IServerAllocationService
                 foreach(var requestExpand in serverAllocation.RequestExpands.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
                 {
                     requestExpand.Status = RequestStatus.Failed;
-                    _dbContext.RequestExpandLocations.RemoveRange(requestExpand.RequestExpandLocations);
                 }
                 foreach (var requestHost in serverAllocation.RequestHosts.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
                 {
                     requestHost.Status = RequestStatus.Failed;
-                    _dbContext.RequestHostIps.RemoveRange(requestHost.RequestHostIps);
+                }
+                foreach (var requestUpgrade in serverAllocation.RequestUpgrades.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                {
+                    requestUpgrade.Status = RequestStatus.Failed;
                 }
                 _dbContext.IpAssignments.RemoveRange(serverAllocation.IpAssignments);
                 _dbContext.LocationAssignments.RemoveRange(serverAllocation.LocationAssignments);
