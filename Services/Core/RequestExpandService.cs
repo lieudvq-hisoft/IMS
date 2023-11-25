@@ -560,7 +560,7 @@ public class RequestExpandService : IRequestExpandService
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
-            else if (requestExpand.RemovalStatus == RemovalStatus.Accepted)
+            else if (requestExpand.RemovalStatus != RemovalStatus.Accepted)
             {
                 validPrecondition = false;
                 result.ErrorMessage = RequestExpandErrorMessage.REMOVAL_NOT_ACCEPTED;
