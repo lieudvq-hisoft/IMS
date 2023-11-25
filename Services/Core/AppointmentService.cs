@@ -334,7 +334,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var existedRequestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == appointmentId && x.RequestUpgradeId == requestUpgradeId && x.Appointment.Status != RequestStatus.Denied);
+            var existedRequestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == appointmentId && x.RequestUpgradeId == requestUpgradeId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
             if (existedRequestUpgradeAppointment != null)
             {
                 validPrecondition = false;
@@ -404,7 +404,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var existedRequestExpandAppointment = _dbContext.RequestExpandAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == appointmentId && x.RequestExpandId == requestExpandId && x.Appointment.Status != RequestStatus.Denied);
+            var existedRequestExpandAppointment = _dbContext.RequestExpandAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == appointmentId && x.RequestExpandId == requestExpandId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
             if (existedRequestExpandAppointment != null)
             {
                 validPrecondition = false;
@@ -518,9 +518,14 @@ public class AppointmentService : IAppointmentService
             {
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
+            else if (appointment.Status != RequestStatus.Waiting)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING;
+            }
             else
             {
-                _dbContext.Appointments.Remove(appointment);
+                appointment.Status = RequestStatus.Failed;
+                appointment.Note = "Khách hàng xóa";
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = appointment.Id;
