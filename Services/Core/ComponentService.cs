@@ -180,10 +180,14 @@ public class ComponentService : IComponentService
 
         try
         {
-            var component = _dbContext.Components.FirstOrDefault(x => x.Id == componentId);
+            var component = _dbContext.Components.Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.ServerAllocation).FirstOrDefault(x => x.Id == componentId);
             if (component == null)
             {
                 result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
+            }
+            else if (component.ServerHardwareConfigs.Any(x => x.ServerAllocation.Status != ServerAllocationStatus.Removed))
+            {
+                result.ErrorMessage = "Have config of unremoved server";
             }
             else
             {
