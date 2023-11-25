@@ -367,6 +367,7 @@ public class ServerAllocationService : IServerAllocationService
                 .Include(x => x.RequestExpands)
                 .Include(x => x.RequestUpgrades)
                 .Include(x => x.LocationAssignments)
+                .Include(x => x.Appointments)
                 .Include(x => x.RequestHosts)
                 .Include(x => x.IpAssignments)
                 .FirstOrDefault(x => x.Id == serverAllocationId);
@@ -378,6 +379,10 @@ public class ServerAllocationService : IServerAllocationService
             else
             {
                 serverAllocation.Status = ServerAllocationStatus.Removed;
+                foreach(var appointment in serverAllocation.Appointments.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                {
+                    appointment.Status = RequestStatus.Failed;
+                }
                 foreach(var requestExpand in serverAllocation.RequestExpands.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
                 {
                     requestExpand.Status = RequestStatus.Failed;
