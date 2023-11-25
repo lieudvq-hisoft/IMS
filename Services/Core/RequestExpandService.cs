@@ -48,6 +48,10 @@ public class RequestExpandService : IRequestExpandService
         try
         {
             var requestExpands = _dbContext.RequestExpands
+                .Include(x => x.RequestExpandLocations)
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.RequestExpandUsers).ThenInclude(x => x.User)
                 .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
                 .AsQueryable();
 
@@ -76,6 +80,10 @@ public class RequestExpandService : IRequestExpandService
         try
         {
             var requestExpand = _dbContext.RequestExpands
+                .Include(x => x.RequestExpandLocations)
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.RequestExpandUsers).ThenInclude(x => x.User)
                 .FirstOrDefault(x => x.Id == id);
 
             if (requestExpand != null)
@@ -479,7 +487,15 @@ public class RequestExpandService : IRequestExpandService
             if (validPrecondition)
             {
                 locations = requestExpand.RequestExpandLocations.Select(x => x.Location).ToList();
-                validPrecondition = CheckValidLocation(locations, requestExpandId, result);
+                if (!locations.Any())
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Request dont have target location";
+                }
+                else
+                {
+                    validPrecondition = CheckValidLocation(locations, requestExpandId, result);
+                }
             }
 
             if (validPrecondition)

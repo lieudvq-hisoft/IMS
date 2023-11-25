@@ -154,6 +154,14 @@ public class RequestUpgradeService : IRequestUpgradeService
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
+            else
+            {
+                if (serverAllocation.ServerHardwareConfigs.Select(x => x.Component).Any(x => x.Name == component.Name && x.Type == component.Type))
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Server have config for different type of component";
+                }
+            }
 
             if (validPrecondition)
             {
