@@ -23,7 +23,9 @@ public interface IRequestExpandService
     Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
     Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model);
     Task<ResultModel> Complete(int requestExpandId, Guid userId);
+    Task<ResultModel> CompleteBulk(RequestExpandCompleteBulkModel model, Guid userId);
     Task<ResultModel> CompleteRemoval(int requestExpandId, Guid userId);
+    Task<ResultModel> CompleteRemovalBulk(RequestExpandCompleteBulkModel model, Guid userId);
     Task<ResultModel> GetRackChoiceSuggestionBySize(int requestExpandId);
 
 }
@@ -458,17 +460,6 @@ public class RequestExpandService : IRequestExpandService
         return allValidLocation;
     }
 
-    private bool IsCompletable(int requestExpandId, bool forRemoval)
-    {
-        var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment).FirstOrDefault(x => x.Id == requestExpandId);
-        if (requestExpand == null)
-        {
-            return false;
-        }
-
-        return requestExpand.RequestExpandAppointments.Where(x => x.ForRemoval == forRemoval).Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Success);
-    }
-
     public async Task<ResultModel> Complete(int requestExpandId, Guid userId)
     {
         var result = new ResultModel();
@@ -533,6 +524,51 @@ public class RequestExpandService : IRequestExpandService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    private bool IsCompletable(int requestExpandId, bool forRemoval)
+    {
+        var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment).FirstOrDefault(x => x.Id == requestExpandId);
+        if (requestExpand == null)
+        {
+            return false;
+        }
+
+        return requestExpand.RequestExpandAppointments.Where(x => x.ForRemoval == forRemoval).Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Success);
+    }
+
+    public async Task<ResultModel> CompleteBulk(RequestExpandCompleteBulkModel model, Guid userId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            using var transaction = _dbContext.Database.BeginTransaction();
+            var results = new List<ResultModel>();
+            foreach (var requestExpandId in model.RequestExpandIds)
+            {
+                results.Add(await Complete(requestExpandId, userId));
+            }
+
+            if (results.Any(x => !x.Succeed))
+            {
+                result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                transaction.Rollback();
+            }
+            else
+            {
+                transaction.Commit();
+                result.Succeed = true;
+                result.Data = results.Select(x => x.Data);
             }
         }
         catch (Exception e)
@@ -614,6 +650,40 @@ public class RequestExpandService : IRequestExpandService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> CompleteRemovalBulk(RequestExpandCompleteBulkModel model, Guid userId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            using var transaction = _dbContext.Database.BeginTransaction();
+            var results = new List<ResultModel>();
+            foreach (var requestRemovalId in model.RequestExpandIds)
+            {
+                results.Add(await CompleteRemoval(requestRemovalId, userId));
+            }
+
+            if (results.Any(x => !x.Succeed))
+            {
+                result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                transaction.Rollback();
+            }
+            else
+            {
+                transaction.Commit();
+                result.Succeed = true;
+                result.Data = results.Select(x => x.Data);
             }
         }
         catch (Exception e)

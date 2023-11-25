@@ -36,6 +36,12 @@ public class RequestExpandResultModel
     public int ServerAllocationId { get; set; }
 }
 
+public class RequestExpandCompleteBulkModel
+{
+    [Required]
+    public List<int> RequestExpandIds { get; set; }
+}
+
 public class RequestExpandCreateModel
 {
     [Required]
