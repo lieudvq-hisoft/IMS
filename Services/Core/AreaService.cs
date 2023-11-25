@@ -116,12 +116,19 @@ public class AreaService : IAreaService
 
         try
         {
-            var racks = _dbContext.Areas
+            var area = _dbContext.Areas
                 .Include(x => x.Racks)
-                .FirstOrDefault(x => x.Id == id).Racks.AsQueryable();
+                .FirstOrDefault(x => x.Id == id);
 
-            if (racks != null)
+            if (area == null)
             {
+                result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
+                result.Succeed = false;
+            }
+
+            else
+            {
+                var racks = area.Racks.AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, racks.Count());
                 racks = racks.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
                 racks = racks.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
@@ -129,11 +136,6 @@ public class AreaService : IAreaService
 
                 result.Data = paging;
                 result.Succeed = true;
-            }
-            else
-            {
-                result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
-                result.Succeed = false;
             }
         }
         catch (Exception e)
