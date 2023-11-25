@@ -333,6 +333,12 @@ public class RequestExpandService : IRequestExpandService
                     validPrecondition = false;
                     result.ErrorMessage = RequestExpandLocationErrorMessage.EXISTED;
                 }
+
+                if (requestExpand.Status != RequestStatus.Accepted)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = RequestExpandErrorMessage.NOT_ACCEPTED;
+                }
             }
 
             if (validPrecondition)
