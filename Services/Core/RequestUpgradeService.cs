@@ -155,10 +155,16 @@ public class RequestUpgradeService : IRequestUpgradeService
                 }
                 else
                 {
-                    if (serverAllocation.ServerHardwareConfigs.Select(x => x.Component).Any(x => x.Name == component.Name && x.Type == component.Type))
+                    if (serverAllocation.ServerHardwareConfigs.Select(x => x.Component).Any(x => x.Name == component.Name && x.Type != component.Type))
                     {
                         validPrecondition = false;
                         result.ErrorMessage = "Server have config for different type of component";
+                    }
+
+                    if (serverAllocation.ServerHardwareConfigs.Select(x => x.Component).Any(x => x.Name == component.Name && x.Type == component.Type))
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
                     }
                 }
             }
@@ -266,22 +272,27 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == model.Id);
+            var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.Component).Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == model.Id);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
+            else if (requestUpgrade.Status != RequestStatus.Waiting)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING;
+            }
 
-            var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
+            var component = requestUpgrade?.Component;
             if (component == null)
             {
                 result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
 
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
-            if (component == null)
+            var serverAllocation = requestUpgrade?.ServerAllocation;
+            if (serverAllocation == null || serverAllocation.Status == ServerAllocationStatus.Removed)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
@@ -289,7 +300,7 @@ public class RequestUpgradeService : IRequestUpgradeService
 
             if (validPrecondition)
             {
-                var serverHardwareConfig = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == component.Id);
+                var serverHardwareConfig = serverAllocation?.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == component.Id);
                 validPrecondition = CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
             }
 

@@ -78,14 +78,13 @@ public class RequestUpgradeUpdateModel
     public string Information { get; set; }
 
     [Required]
-    [GreaterThanZero]
     public int Capacity { get; set; }
 
-    [Required]
-    public int ComponentId { get; set; }
+    //[Required]
+    //public int ComponentId { get; set; }
 
-    [Required]
-    public int ServerAllocationId { get; set; }
+    //[Required]
+    //public int ServerAllocationId { get; set; }
 }
 
 public class RequestUpgradeSearchModel
