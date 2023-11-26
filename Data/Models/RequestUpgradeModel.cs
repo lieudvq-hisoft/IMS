@@ -14,8 +14,8 @@ public class RequestUpgradeModel
     public RequestType RequestType { get; set; }
     public int ComponentId { get; set; }
     public int ServerAllocationId { get; set; }
-    public DateTime DateCreated { get; set; } = DateTime.Now;
-    public DateTime DateUpdated { get; set; } = DateTime.Now;
+    public DateTime DateCreated { get; set; }
+    public DateTime DateUpdated { get; set; }
 
     public ServerAllocationResultModel? ServerAllocation { get; set; }
     public AppointmentResultModel? SucceededAppointment { get; set; }

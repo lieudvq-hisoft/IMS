@@ -757,20 +757,9 @@ public class AppointmentService : IAppointmentService
                 validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
-
-            if (appointment.Status != RequestStatus.Accepted)
+            else
             {
-                validPrecondition = false;
-                result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
-            }
-
-            if (appointment.InspectionReportFilePath == null || appointment.ReceiptOfRecipientFilePath == null)
-            {
-                if (appointment.RequestExpandAppointments.Any() || appointment.RequestUpgradeAppointment.Any() || appointment.RequestHostAppointments.Any())
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = AppointmentErrorMessage.NOT_COMPLETABLE;
-                }
+                validPrecondition = IsCompletable(appointmentId, result);
             }
 
             var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
@@ -801,6 +790,43 @@ public class AppointmentService : IAppointmentService
         }
 
         return result;
+    }
+
+    private bool IsCompletable(int appointmentId, ResultModel result)
+    {
+        bool validPrecondition = true;
+        var appointment = _dbContext.Appointments
+            .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandLocations)
+            .Include(x => x.RequestUpgradeAppointment)
+            .Include(x => x.RequestHostAppointments).FirstOrDefault(x => x.Id == appointmentId);
+        if (appointment == null)
+        {
+            validPrecondition = false;
+            result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+        }
+
+        if (appointment.Status != RequestStatus.Accepted)
+        {
+            validPrecondition = false;
+            result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
+        }
+
+        if (appointment.InspectionReportFilePath == null || appointment.ReceiptOfRecipientFilePath == null)
+        {
+            if (appointment.RequestExpandAppointments.Any() || appointment.RequestUpgradeAppointment.Any() || appointment.RequestHostAppointments.Any())
+            {
+                validPrecondition = false;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_COMPLETABLE;
+            }
+        }
+
+        if (appointment.RequestExpandAppointments.Select(x => x.RequestExpand).Any(x => !x.RequestExpandLocations.Any()))
+        {
+            validPrecondition = false;
+            result.ErrorMessage = "Please assign location to all request expand to complete the appointment";
+        }
+
+        return validPrecondition;
     }
 
     public async Task<ResultModel> Fail(int appointmentId, Guid userId)

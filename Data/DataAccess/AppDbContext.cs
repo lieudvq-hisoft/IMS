@@ -23,7 +23,7 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
         TimeZoneInfo vietnamTimeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
 
         // Get the current time in the specified time zone
-        DateTime vietnamTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.UtcNow, vietnamTimeZone);
+        DateTime vietnamTime = TimeZoneInfo.ConvertTimeFromUtc(DateTime.Now, vietnamTimeZone);
 
         foreach (var entry in modifiedEntities)
         {
