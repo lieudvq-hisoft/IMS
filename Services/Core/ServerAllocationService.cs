@@ -445,4 +445,25 @@ public class ServerAllocationService : IServerAllocationService
 
         return result;
     }
+
+    public async Task<ResultModel> AssignMasterIp(int serverAllocationId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == serverAllocationId && x.Status != ServerAllocationStatus.Removed);
+            if (serverAllocation == null)
+            {
+
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
 }

@@ -8,6 +8,9 @@ public class RequestUpgrade : BaseEntity
     public int Capacity { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Upgrade;
     public RequestStatus Status { get; set; }
+    public string? Note { get; set; }
+    public string? TechNote { get; set; }
+    public string? SaleNote { get; set; }
 
     public int ComponentId { get; set; }
     public Component? Component { get; set; }

@@ -9,8 +9,9 @@ public class RequestUpgradeModel
     public string Information { get; set; }
     public int Capacity { get; set; }
     public string Status { get; set; }
-    public string? InspectionReportFilePath { get; set; }
-    public string? ReceiptOfRecipientFilePath { get; set; }
+    public string? Note { get; set; }
+    public string? TechNote { get; set; }
+    public string? SaleNote { get; set; }
     public RequestType RequestType { get; set; }
     public int ComponentId { get; set; }
     public int ServerAllocationId { get; set; }
@@ -32,6 +33,9 @@ public class RequestUpgradeResultModel
     public int Capacity { get; set; }
     public string Status { get; set; }
     public RequestType RequestType { get; set; }
+    public string? Note { get; set; }
+    public string? TechNote { get; set; }
+    public string? SaleNote { get; set; }
     public int ComponentId { get; set; }
     public int ServerAllocationId { get; set; }
 }
@@ -40,6 +44,9 @@ public class RequestUpgradeCreateModel
 {
     [Required]
     public string Information { get; set; }
+
+    [Required]
+    public string? Note { get; set; }
 
     [Required]
     public int Capacity { get; set; }
@@ -80,11 +87,11 @@ public class RequestUpgradeUpdateModel
     [Required]
     public int Capacity { get; set; }
 
-    //[Required]
-    //public int ComponentId { get; set; }
+    public string? Note { get; set; }
 
-    //[Required]
-    //public int ServerAllocationId { get; set; }
+    public string? TechNote { get; set; }
+
+    public string? SaleNote { get; set; }
 }
 
 public class RequestUpgradeSearchModel
