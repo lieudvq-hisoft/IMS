@@ -145,18 +145,21 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
             }
 
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
-            if (serverAllocation == null)
+            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component).FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
+            if (validPrecondition)
             {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-                validPrecondition = false;
-            }
-            else
-            {
-                if (serverAllocation.ServerHardwareConfigs.Select(x => x.Component).Any(x => x.Name == component.Name && x.Type == component.Type))
+                if (serverAllocation == null)
                 {
+                    result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
                     validPrecondition = false;
-                    result.ErrorMessage = "Server have config for different type of component";
+                }
+                else
+                {
+                    if (serverAllocation.ServerHardwareConfigs.Select(x => x.Component).Any(x => x.Name == component.Name && x.Type == component.Type))
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "Server have config for different type of component";
+                    }
                 }
             }
 
