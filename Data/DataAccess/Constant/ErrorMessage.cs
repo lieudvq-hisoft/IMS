@@ -25,6 +25,7 @@ public class ServerAllocationErrorMessage
 {
     public const string EXISTED = "Server allocation " + ErrorMessage.EXISTED;
     public const string NOT_EXISTED = "Server allocation " + ErrorMessage.NOT_EXISTED;
+    public const string HAVE_IP_MASTER_ALREADY = "Server allocation have master ip already";
     public const string FILE_NOT_EXISTED = "Server allocation file " + ErrorMessage.NOT_EXISTED;
     public const string ASSIGN_FILE_TO_NON_ACCEPTED = "Can only assign file to accepted server allocation";
     public const string DOWNLOAD_FILE_FROM_NON_ACCEPTED = "Only accepted server allocation have file";
@@ -69,6 +70,8 @@ public class IpAddressErrorMessage
 {
     public const string NOT_EXISTED = "Ip Address " + ErrorMessage.NOT_EXISTED;
     public const string NO_AVAILABLE = "No available ip address";
+    public const string UNASSIGNABLE = "Ip address cannot be ipassigned";
+    public const string UNAVAILABLE = "Ip address not available for assignment";
     public const string EXISTED = "Ip Address " + ErrorMessage.EXISTED;
 }
 

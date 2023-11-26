@@ -416,11 +416,11 @@ public class ServerAllocationService : IServerAllocationService
             else
             {
                 serverAllocation.Status = ServerAllocationStatus.Removed;
-                foreach(var appointment in serverAllocation.Appointments.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                foreach (var appointment in serverAllocation.Appointments.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
                 {
                     appointment.Status = RequestStatus.Failed;
                 }
-                foreach(var requestExpand in serverAllocation.RequestExpands.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                foreach (var requestExpand in serverAllocation.RequestExpands.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
                 {
                     requestExpand.Status = RequestStatus.Failed;
                 }
@@ -446,17 +446,61 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> AssignMasterIp(int serverAllocationId)
+    public async Task<ResultModel> AssignMasterIp(int serverAllocationId, int ipAddressId)
     {
         var result = new ResultModel();
         result.Succeed = false;
+        bool validPrecondition = true;
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == serverAllocationId && x.Status != ServerAllocationStatus.Removed);
+            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.IpAssignments).FirstOrDefault(x => x.Id == serverAllocationId && x.Status != ServerAllocationStatus.Removed);
             if (serverAllocation == null)
             {
+                validPrecondition = false;
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (serverAllocation.IpAssignments.Any(x => x.Type == IpAssignmentTypes.Master))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = ServerAllocationErrorMessage.HAVE_IP_MASTER_ALREADY;
+            }
 
+            var ipAddress = _dbContext.IpAddresses.Include(x => x.IpAssignments)
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+                .FirstOrDefault(x => x.Id == ipAddressId);
+            if (ipAddress == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = IpAddressErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                if (ipAddress.IsReserved || ipAddress.Blocked)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = IpAddressErrorMessage.UNASSIGNABLE;
+                }
+
+                if (ipAddress.IpAssignments.Any() || ipAddress.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = IpAddressErrorMessage.UNAVAILABLE;
+                }
+            }
+
+            if (validPrecondition)
+            {
+                var ipAssignment = new IpAssignment
+                {
+                    Type = IpAssignmentTypes.Master,
+                    ServerAllocationId = serverAllocation.Id,
+                    IpAddressId = ipAddress.Id,
+                };
+                _dbContext.IpAssignments.Add(ipAssignment);
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<IpAssignmentResultModel>(ipAssignment);
             }
         }
         catch (Exception e)

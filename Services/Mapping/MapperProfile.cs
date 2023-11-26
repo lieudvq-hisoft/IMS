@@ -249,6 +249,7 @@ public class MapperProfile : Profile
         CreateMap<Location, LocationResultModel>();
         CreateMap<LocationAssignment, LocationAssignmentResultModel>();
         CreateMap<IpSubnet, IpSubnetResultModel>();
+        CreateMap<IpAssignment, IpAssignmentResultModel>();
         CreateMap<IpAddress, IpAddressResultModel>();
         CreateMap<Customer, CustomerResultModel>();
         CreateMap<Component, ComponentResultModel>();

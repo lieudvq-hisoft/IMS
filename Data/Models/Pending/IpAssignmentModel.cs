@@ -11,6 +11,17 @@ public class IpAssignmentModel
     public int ServerAllocationId { get; set; }
 }
 
+public class IpAssignmentResultModel
+{
+    public int Id { get; set; }
+    public DateTime DateAssign { get; set; }
+    public DateTime? DateUnassign { get; set; }
+    public IpAssignmentTypes Type { get; set; }
+    public int IpAddressId { get; set; }
+    public int ServerAllocationId { get; set; }
+}
+
+
 public class IpAssignmentSearchModel
 {
     public int? Id { get; set; } = null;
