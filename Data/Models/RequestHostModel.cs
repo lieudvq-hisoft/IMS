@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 namespace Data.Models;
 public class RequestHostModel
 {
+    public int Id { get; set; }
     public IpAssignmentTypes Type { get; set; }
     public RequestStatus Status { get; set; }
     public int ServerAllocationId { get; set; }
@@ -15,12 +16,27 @@ public class RequestHostResultModel
     public RequestStatus Status { get; set; }
     public int ServerAllocationId { get; set; }
 }
-
-public class RequestHostSearchModel
+public class RequestHostCreateModel
 {
     public IpAssignmentTypes Type { get; set; }
     public RequestStatus Status { get; set; }
     public int ServerAllocationId { get; set; }
+}
+
+public class RequestHostUpdateModel
+{
+    public int Id { get; set; }
+    public IpAssignmentTypes Type { get; set; }
+    public RequestStatus Status { get; set; }
+    public int ServerAllocationId { get; set; }
+}
+
+
+public class RequestHostSearchModel
+{
+    public IpAssignmentTypes? Type { get; set; } = null;
+    public RequestStatus? Status { get; set; } = null;
+    public int? ServerAllocationId { get; set; } = null;
 }
 
 public class RequestHostEvaluateBulkModel

@@ -235,6 +235,12 @@ public class MapperProfile : Profile
         CreateMap<IpAssignmentUpdateModel, IpAssignment>();
         #endregion
 
+        #region RequestHost
+        CreateMap<RequestHost, RequestHostModel>();
+        CreateMap<RequestHostCreateModel, RequestHost>();
+        CreateMap<RequestHostUpdateModel, RequestHost>();
+        #endregion
+
         #region ResultModel
         CreateMap<ServerHardwareConfig, ServerHardwareConfigResultModel>();
         CreateMap<ServerAllocation, ServerAllocationResultModel>();
