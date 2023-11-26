@@ -340,6 +340,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             else
             {
                 requestUpgrade.Status = RequestStatus.Failed;
+                requestUpgrade.Note = "Customer deleted";
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = requestUpgradeId;
