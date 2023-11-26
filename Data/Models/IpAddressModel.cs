@@ -1,6 +1,7 @@
 ﻿namespace Data.Models;
 public class IpAddressModel
 {
+    public int Id { get; set; }
     public string Address { get; set; }
     public bool Blocked { get; set; }
     public bool IsReserved { get; set; }
@@ -11,6 +12,7 @@ public class IpAddressModel
 
 public class IpAddressResultModel
 {
+    public int Id { get; set; }
     public string Address { get; set; }
     public bool Blocked { get; set; }
     public bool IsReserved { get; set; }
