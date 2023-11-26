@@ -547,7 +547,7 @@ public class IpSubnetService : IIpSubnetService
                     
                     if (additionalIps.Count() == model.Quantity)
                     {
-                        var subnets = additionalIps.Select(x => x.IpSubnet).GroupBy(x => x.Id);
+                        var subnets = additionalIps.Select(x => x.IpSubnet).DistinctBy(x => x.Id);
                         result.Succeed = true;
                         result.Data = new SuggestAdditionalIpResultModel
                         {
