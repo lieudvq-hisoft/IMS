@@ -522,7 +522,11 @@ public class IpSubnetService : IIpSubnetService
                     if (additionalIps.Count() < model.Quantity)
                     {
                         var numberOfRequired = model.Quantity - additionalIps.Count();
-                        var ipAddresses = GetAllIpAddress(rootSubnet).Where(x => IsAvailableIpAddress(x.Id) && !additionalIps.Select(x => x.Id).Contains(x.Id));
+                        var ipAddresses = _dbContext.IpAddresses
+                            .Where(delegate (IpAddress x)
+                        {
+                            return IsAvailableIpAddress(x.Id) && !additionalIps.Select(x => x.Id).Contains(x.Id);
+                        });
                         if (ipAddresses.Count() >= numberOfRequired)
                         {
                             additionalIps.AddRange(ipAddresses.Take(model.Quantity));
