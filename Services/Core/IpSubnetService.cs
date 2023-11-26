@@ -170,11 +170,16 @@ public class IpSubnetService : IIpSubnetService
     private List<IpAddress> GetAllIpAddress(ITree<IpSubnet> subnet)
     {
         List<ITree<IpSubnet>> childSubnets = subnet.GetAllChildren().ToList();
-        var ipAddresses = subnet.Data.IpAddresses.ToList();
-        foreach (var ipSubnet in childSubnets.Select(x => x.Data))
+        var ipAddresses = new List<IpAddress>();
+        if (subnet.Data != null)
         {
-            ipAddresses.AddRange(ipSubnet.IpAddresses);
+            ipAddresses.AddRange(subnet.Data.IpAddresses.ToList());
+            foreach (var ipSubnet in childSubnets.Select(x => x.Data))
+            {
+                ipAddresses.AddRange(ipSubnet.IpAddresses);
+            }
         }
+
 
         return ipAddresses;
     }
@@ -501,16 +506,6 @@ public class IpSubnetService : IIpSubnetService
                     var additionalIps = new List<IpAddress>();
                     while (rootSubnet.Parent != null && additionalIps.Count() < model.Quantity)
                     {
-                        //var ipAddresses = GetAllIpAddress(rootSubnet).Where(x => IsAvailableIpAddress(x.Id));
-                        //if (ipAddresses.Count() >= model.Quantity)
-                        //{
-                        //    additionalIps.AddRange(ipAddresses.Take(model.Quantity));
-                        //}
-                        //else
-                        //{
-                        //    rootSubnet = rootSubnet.Parent;
-                        //}
-
                         var numberOfRequired = model.Quantity - additionalIps.Count();
                         var ipAddresses = GetAllIpAddress(rootSubnet).Where(x => IsAvailableIpAddress(x.Id) && !additionalIps.Select(x => x.Id).Contains(x.Id));
                         if (ipAddresses.Count() >= numberOfRequired)
@@ -526,7 +521,16 @@ public class IpSubnetService : IIpSubnetService
 
                     if (additionalIps.Count() < model.Quantity)
                     {
-                        result.ErrorMessage = IpAddressErrorMessage.NO_AVAILABLE;
+                        var numberOfRequired = model.Quantity - additionalIps.Count();
+                        var ipAddresses = GetAllIpAddress(rootSubnet).Where(x => IsAvailableIpAddress(x.Id) && !additionalIps.Select(x => x.Id).Contains(x.Id));
+                        if (ipAddresses.Count() >= numberOfRequired)
+                        {
+                            additionalIps.AddRange(ipAddresses.Take(model.Quantity));
+                        }
+                        else
+                        {
+                            result.ErrorMessage = IpAddressErrorMessage.NO_AVAILABLE;
+                        }
                     }
                     else
                     {
