@@ -59,6 +59,22 @@ public class IpSubnetCreateModel
     public int PrefixLength { get; set; }
 }
 
+public class SuggestAdditionalIpModel
+{
+    [Required]
+    public int ServerAllocationId { get; set; }
+
+    [Required]
+    public int Quantity { get; set; }
+}
+
+public class SuggestAdditionalIpResultModel
+{
+    public IpSubnetResultModel IpSubnet { get; set; }
+
+    public List<IpAddressResultModel> IpAddresses { get; set; }
+}
+
 public class IpSubnetSearchModel
 {
     public int? Id { get; set; } = null;

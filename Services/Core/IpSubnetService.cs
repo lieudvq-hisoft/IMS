@@ -9,10 +9,7 @@ using Data.Models;
 using Data.Utils.Paging;
 using Data.Utils.Tree;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
-using OfficeOpenXml.FormulaParsing.Excel.Functions.Text;
 using Services.Utilities;
-using System;
 using System.Text.RegularExpressions;
 using static Data.Utils.Tree.TreeExtensions;
 
@@ -26,6 +23,7 @@ public interface IIpSubnetService
     Task<ResultModel> GetIpSubnet(int subnetId);
     Task<ResultModel> Delete(int subnetId);
     Task<ResultModel> GetIpAddress(int ipSubnetId, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
+    Task<ResultModel> SuggestAdditionalIps(SuggestAdditionalIpModel model);
 }
 
 public class IpSubnetService : IIpSubnetService
@@ -476,29 +474,70 @@ public class IpSubnetService : IIpSubnetService
         return ips;
     }
 
-    public async Task<ResultModel> SuggestAdditionalIps(int requestHostId, int quantity)
+    public async Task<ResultModel> SuggestAdditionalIps(SuggestAdditionalIpModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var requestHost = _dbContext.RequestHosts?.Include(x => x.ServerAllocation)?.ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress).ThenInclude(x => x.IpSubnet).FirstOrDefault(x => x.Id == requestHostId && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
-            if (requestHost == null)
+            var serverAllocation = _dbContext.ServerAllocations?.Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress).ThenInclude(x => x.IpSubnet).FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
+            if (serverAllocation == null)
             {
                 result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
             }
-
-            var masterSubnet = requestHost?.ServerAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet;
-            if (masterSubnet == null)
-            {
-                result.ErrorMessage = "Server allocation must have master ip before assign more";
-            }
             else
             {
-                var allSubnets = _dbContext.IpSubnets.Include(x => x.ParentNetwork).Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).Include(x => x.IpAddresses).ToList();
+                var masterSubnet = serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet;
+                if (masterSubnet == null)
+                {
+                    result.ErrorMessage = "Server allocation must have master ip before assign more";
+                }
+                else
+                {
+                    var allSubnets = _dbContext.IpSubnets.Include(x => x.ParentNetwork).Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).Include(x => x.IpAddresses).ToList();
 
-                var rootSubnet = GetSubnetTree(masterSubnet.Id, allSubnets);
+                    var rootSubnet = GetSubnetTree(masterSubnet.Id, allSubnets);
+                    var additionalIps = new List<IpAddress>();
+                    while (rootSubnet.Parent != null && additionalIps.Count() < model.Quantity)
+                    {
+                        //var ipAddresses = GetAllIpAddress(rootSubnet).Where(x => IsAvailableIpAddress(x.Id));
+                        //if (ipAddresses.Count() >= model.Quantity)
+                        //{
+                        //    additionalIps.AddRange(ipAddresses.Take(model.Quantity));
+                        //}
+                        //else
+                        //{
+                        //    rootSubnet = rootSubnet.Parent;
+                        //}
+
+                        var numberOfRequired = model.Quantity - additionalIps.Count();
+                        var ipAddresses = GetAllIpAddress(rootSubnet).Where(x => IsAvailableIpAddress(x.Id) && !additionalIps.Select(x => x.Id).Contains(x.Id));
+                        if (ipAddresses.Count() >= numberOfRequired)
+                        {
+                            additionalIps.AddRange(ipAddresses.Take(model.Quantity));
+                        }
+                        else
+                        {
+                            additionalIps.AddRange(ipAddresses);
+                            rootSubnet = rootSubnet.Parent;
+                        }
+                    }
+
+                    if (additionalIps.Count() < model.Quantity)
+                    {
+                        result.ErrorMessage = IpAddressErrorMessage.NO_AVAILABLE;
+                    }
+                    else
+                    {
+                        result.Succeed = true;
+                        result.Data = new SuggestAdditionalIpResultModel
+                        {
+                            IpSubnet = _mapper.Map<IpSubnetResultModel>(rootSubnet.Data),
+                            IpAddresses = _mapper.Map<List<IpAddressResultModel>>(additionalIps)
+                        };
+                    }
+                }
             }
         }
         catch (Exception e)
@@ -509,7 +548,7 @@ public class IpSubnetService : IIpSubnetService
         return result;
     }
 
-    private bool IsAvailableIpAddress(int ipAddressId, ResultModel result)
+    private bool IsAvailableIpAddress(int ipAddressId)
     {
         bool isAvailableIpAddress = true;
         var ipAddress = _dbContext.IpAddresses.Include(x => x.IpAssignments)
@@ -518,20 +557,17 @@ public class IpSubnetService : IIpSubnetService
         if (ipAddress == null)
         {
             isAvailableIpAddress = false;
-            result.ErrorMessage = IpAddressErrorMessage.NOT_EXISTED;
         }
         else
         {
             if (ipAddress.IsReserved || ipAddress.Blocked)
             {
                 isAvailableIpAddress = false;
-                result.ErrorMessage = IpAddressErrorMessage.UNASSIGNABLE;
             }
 
             if (ipAddress.IpAssignments.Any() || ipAddress.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
             {
                 isAvailableIpAddress = false;
-                result.ErrorMessage = IpAddressErrorMessage.UNAVAILABLE;
             }
         }
 

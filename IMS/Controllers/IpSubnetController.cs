@@ -67,6 +67,14 @@ public class IpSubnetController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("SuggestAdditional")]
+    public async Task<ActionResult> SuggestAdditional([FromQuery] SuggestAdditionalIpModel model)
+    {
+        var result = await _ipSubnetService.SuggestAdditionalIps(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
