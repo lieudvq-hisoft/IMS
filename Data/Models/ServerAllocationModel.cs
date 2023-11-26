@@ -72,6 +72,12 @@ public class ServerAllocationUpdateModel
     public string? TechNote { get; set; }
 }
 
+public class ServerAllocationMasterIpAssignmentModel
+{
+    [Required]
+    public int IpAddressId { get; set; }
+}
+
 public class ServerAllocationSearchModel
 {
     public int? CustomerId { get; set; }

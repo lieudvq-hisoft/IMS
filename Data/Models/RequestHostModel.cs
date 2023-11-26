@@ -23,6 +23,13 @@ public class RequestHostSearchModel
     public int ServerAllocationId { get; set; }
 }
 
+public class RequestHostIpAssignmentModel
+{
+    [Required]
+    public List<int> IpAddressIds { get; set; }
+}
+
+
 public class RequestHostEvaluateBulkModel
 {
     [Required]

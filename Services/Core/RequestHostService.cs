@@ -118,4 +118,38 @@ public class RequestHostService : IRequestHostService
 
         return result;
     }
+
+    public async Task<ResultModel> AssignIp(int serverAllocationId, RequestHostIpAssignmentModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    private async Task<ResultModel> AssignOneIp(int serverAllocationId, int ipAddressId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
 }

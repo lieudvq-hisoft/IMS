@@ -23,6 +23,7 @@ public interface IServerAllocationService
     Task<ResultModel> Create(ServerAllocationCreateModel model);
     Task<ResultModel> Update(ServerAllocationUpdateModel model);
     Task<ResultModel> Delete(int serverAllocationId);
+    Task<ResultModel> AssignMasterIp(int serverAllocationId, ServerAllocationMasterIpAssignmentModel model);
 }
 
 public class ServerAllocationService : IServerAllocationService
@@ -446,7 +447,7 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> AssignMasterIp(int serverAllocationId, int ipAddressId)
+    public async Task<ResultModel> AssignMasterIp(int serverAllocationId, ServerAllocationMasterIpAssignmentModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -468,7 +469,7 @@ public class ServerAllocationService : IServerAllocationService
 
             var ipAddress = _dbContext.IpAddresses.Include(x => x.IpAssignments)
                 .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
-                .FirstOrDefault(x => x.Id == ipAddressId);
+                .FirstOrDefault(x => x.Id == model.IpAddressId);
             if (ipAddress == null)
             {
                 validPrecondition = false;

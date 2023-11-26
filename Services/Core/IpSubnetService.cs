@@ -77,7 +77,7 @@ public class IpSubnetService : IIpSubnetService
         try
         {
             var ipSubnets = _dbContext.IpSubnets.Include(x => x.SubNets).Include(x => x.ParentNetwork)
-                .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
+                .Where(x => x.ParentNetworkId == null && searchModel.Id != null ? x.Id == searchModel.Id : true)
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipSubnets.Count());
@@ -474,6 +474,68 @@ public class IpSubnetService : IIpSubnetService
         }
 
         return ips;
+    }
+
+    public async Task<ResultModel> SuggestAdditionalIps(int requestHostId, int quantity)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestHost = _dbContext.RequestHosts?.Include(x => x.ServerAllocation)?.ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress).ThenInclude(x => x.IpSubnet).FirstOrDefault(x => x.Id == requestHostId && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
+            if (requestHost == null)
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
+            }
+
+            var masterSubnet = requestHost?.ServerAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet;
+            if (masterSubnet == null)
+            {
+                result.ErrorMessage = "Server allocation must have master ip before assign more";
+            }
+            else
+            {
+                var allSubnets = _dbContext.IpSubnets.Include(x => x.ParentNetwork).Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).Include(x => x.IpAddresses).ToList();
+
+                var rootSubnet = GetSubnetTree(masterSubnet.Id, allSubnets);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    private bool IsAvailableIpAddress(int ipAddressId, ResultModel result)
+    {
+        bool isAvailableIpAddress = true;
+        var ipAddress = _dbContext.IpAddresses.Include(x => x.IpAssignments)
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+                .FirstOrDefault(x => x.Id == ipAddressId);
+        if (ipAddress == null)
+        {
+            isAvailableIpAddress = false;
+            result.ErrorMessage = IpAddressErrorMessage.NOT_EXISTED;
+        }
+        else
+        {
+            if (ipAddress.IsReserved || ipAddress.Blocked)
+            {
+                isAvailableIpAddress = false;
+                result.ErrorMessage = IpAddressErrorMessage.UNASSIGNABLE;
+            }
+
+            if (ipAddress.IpAssignments.Any() || ipAddress.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+            {
+                isAvailableIpAddress = false;
+                result.ErrorMessage = IpAddressErrorMessage.UNAVAILABLE;
+            }
+        }
+
+        return isAvailableIpAddress;
     }
 
     public async Task<ResultModel> Delete(int subnetId)
