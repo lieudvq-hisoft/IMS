@@ -223,6 +223,7 @@ public class ServerHardwareConfigErrorMessage
 public class RequestUpgradeErrorMessage
 {
     public const string NOT_EXISTED = "Request upgrade " + ErrorMessage.NOT_EXISTED;
+    public const string EXISTED = "Request upgrade " + ErrorMessage.EXISTED;
     public const string NOT_ACCEPTED = "Request upgrade not accepted";
     public const string NOT_WAITING = "Request upgrade not waiting";
     public const string NOT_COMPLETABLE = "Request upgrade is not completable";

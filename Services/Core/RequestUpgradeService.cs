@@ -165,6 +165,18 @@ public class RequestUpgradeService : IRequestUpgradeService
 
             if (validPrecondition)
             {
+                var existedRequestUpgrade = _dbContext.RequestUpgrades
+                    .Include(x => x.ServerAllocation).Include(x => x.Component)
+                    .Any(x => x.ServerAllocationId == model.ServerAllocationId && x.ServerAllocation.Status != ServerAllocationStatus.Removed && x.ComponentId == model.ComponentId && x.Status == RequestStatus.Accepted || x.Status == RequestStatus.Waiting);
+                if (existedRequestUpgrade)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = RequestUpgradeErrorMessage.EXISTED;
+                }
+            }
+
+            if (validPrecondition)
+            {
                 var serverHardwareConfig = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == component.Id);
                 validPrecondition = CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
             }
