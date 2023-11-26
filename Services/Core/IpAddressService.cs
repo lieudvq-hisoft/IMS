@@ -5,6 +5,7 @@ using Data.DataAccess.Constant;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
+using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
 
 namespace Services.Core;
@@ -12,6 +13,7 @@ public interface IIpAddressService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
+    Task<ResultModel> SuggestMasterIp();
 }
 
 public class IpAddressService : IIpAddressService
@@ -77,6 +79,37 @@ public class IpAddressService : IIpAddressService
         {
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
+        return result;
+    }
+
+    public async Task<ResultModel> SuggestMasterIp()
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var suggestedMasterIp = _dbContext.IpAddresses
+                .Include(x => x.IpAssignments)
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+                .Where(x => !x.IsReserved && !x.Blocked && !x.IpAssignments.Any())
+                .FirstOrDefault(x => !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted));
+
+            if (suggestedMasterIp == null)
+            {
+                result.ErrorMessage = IpAddressErrorMessage.NO_AVAILABLE;
+            }
+            else
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<IpAddressResultModel>(suggestedMasterIp);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
         return result;
     }
 }

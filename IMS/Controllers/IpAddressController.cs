@@ -34,4 +34,12 @@ public class IpAddressController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpGet("SuggestMaster")]
+    public async Task<ActionResult> GetSuggestion()
+    {
+        var result = await _ipAddressService.SuggestMasterIp();
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }

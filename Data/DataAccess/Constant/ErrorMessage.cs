@@ -68,6 +68,7 @@ public class AreaErrorMessage
 public class IpAddressErrorMessage
 {
     public const string NOT_EXISTED = "Ip Address " + ErrorMessage.NOT_EXISTED;
+    public const string NO_AVAILABLE = "No available ip address";
     public const string EXISTED = "Ip Address " + ErrorMessage.EXISTED;
 }
 
