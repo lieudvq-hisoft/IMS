@@ -502,6 +502,8 @@ public class IpSubnetService : IIpSubnetService
                 {
                     var allSubnets = _dbContext.IpSubnets
                         .Include(x => x.ParentNetwork)
+                        .Include(x => x.IpAddresses).ThenInclude(x => x.IpAssignments)
+                        .Include(x => x.IpAddresses).ThenInclude(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
                         .Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).ThenInclude(x => x.IpAssignments)
                         .Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).ThenInclude(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
                         .ToList();
@@ -533,23 +535,20 @@ public class IpSubnetService : IIpSubnetService
                             .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
                             .Where(x => !x.Blocked && !x.IsReserved && !x.IpAssignments.Any() && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
                             .Where(x => !additionalIps.Select(x => x.Id).Contains(x.Id));
-                        if (ipAddresses.Count() >= numberOfRequired)
-                        {
-                            additionalIps.AddRange(ipAddresses.Take(numberOfRequired));
-                        }
-                        else
+                        if (ipAddresses.Count() < numberOfRequired)
                         {
                             result.ErrorMessage = IpAddressErrorMessage.NO_AVAILABLE;
                         }
-                    }
-                    else
-                    {
-                        result.Succeed = true;
-                        result.Data = new SuggestAdditionalIpResultModel
+                        else
                         {
-                            IpSubnet = _mapper.Map<IpSubnetResultModel>(rootSubnet.Data),
-                            IpAddresses = _mapper.Map<List<IpAddressResultModel>>(additionalIps)
-                        };
+                            additionalIps.AddRange(ipAddresses.Take(numberOfRequired));
+                            result.Succeed = true;
+                            result.Data = new SuggestAdditionalIpResultModel
+                            {
+                                IpSubnet = _mapper.Map<IpSubnetResultModel>(rootSubnet.Data),
+                                IpAddresses = _mapper.Map<List<IpAddressResultModel>>(additionalIps)
+                            };
+                        }
                     }
                 }
             }
