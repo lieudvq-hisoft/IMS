@@ -173,7 +173,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 var existedRequestUpgrade = _dbContext.RequestUpgrades
                     .Include(x => x.ServerAllocation).Include(x => x.Component)
-                    .Any(x => x.ServerAllocationId == model.ServerAllocationId && x.ServerAllocation.Status != ServerAllocationStatus.Removed && x.ComponentId == model.ComponentId && x.Status == RequestStatus.Accepted || x.Status == RequestStatus.Waiting);
+                    .Any(x => x.ServerAllocationId == model.ServerAllocationId && x.ServerAllocation.Status != ServerAllocationStatus.Removed && x.ComponentId == model.ComponentId && (x.Status == RequestStatus.Accepted || x.Status == RequestStatus.Waiting));
                 if (existedRequestUpgrade)
                 {
                     validPrecondition = false;
