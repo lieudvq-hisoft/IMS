@@ -83,7 +83,14 @@ public class MapperProfile : Profile
 
         #region ServerAllocation
         CreateMap<ServerAllocation, ServerAllocationModel>()
-            .ForMember(dest => dest.MasterIp, opt => opt.MapFrom(src => src.IpAssignments.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master).IpAddress.Address))
+            .AfterMap((src, dest, context) =>
+            {
+                var masterIp = src.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress;
+                if (masterIp != null)
+                {
+                    dest.MasterIp = context.Mapper.Map<IpAddress, IpAddressResultModel>(masterIp);
+                }
+            })
             .AfterMap((src, dest, context) =>
                 dest.Customer = context.Mapper.Map<Customer, CustomerModel>(src.Customer));
         CreateMap<ServerAllocationCreateModel, ServerAllocation>();
