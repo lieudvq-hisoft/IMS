@@ -500,17 +500,23 @@ public class IpSubnetService : IIpSubnetService
                 }
                 else
                 {
-                    var allSubnets = _dbContext.IpSubnets.Include(x => x.ParentNetwork).Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).Include(x => x.IpAddresses).ToList();
+                    var allSubnets = _dbContext.IpSubnets
+                        .Include(x => x.ParentNetwork)
+                        .Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).ThenInclude(x => x.IpAssignments)
+                        .Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).ThenInclude(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+                        .ToList();
 
                     var rootSubnet = GetSubnetTree(masterSubnet.Id, allSubnets);
                     var additionalIps = new List<IpAddress>();
                     while (rootSubnet.Parent != null && additionalIps.Count() < model.Quantity)
                     {
                         var numberOfRequired = model.Quantity - additionalIps.Count();
-                        var ipAddresses = GetAllIpAddress(rootSubnet).Where(x => IsAvailableIpAddress(x.Id) && !additionalIps.Select(x => x.Id).Contains(x.Id));
+                        var ipAddresses = GetAllIpAddress(rootSubnet)
+                            .Where(x => !x.Blocked && !x.IsReserved && !x.IpAssignments.Any() && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                            .Where(x => !additionalIps.Select(x => x.Id).Contains(x.Id));
                         if (ipAddresses.Count() >= numberOfRequired)
                         {
-                            additionalIps.AddRange(ipAddresses.Take(model.Quantity));
+                            additionalIps.AddRange(ipAddresses.Take(numberOfRequired));
                         }
                         else
                         {
@@ -523,13 +529,13 @@ public class IpSubnetService : IIpSubnetService
                     {
                         var numberOfRequired = model.Quantity - additionalIps.Count();
                         var ipAddresses = _dbContext.IpAddresses
-                            .Where(delegate (IpAddress x)
-                        {
-                            return IsAvailableIpAddress(x.Id) && !additionalIps.Select(x => x.Id).Contains(x.Id);
-                        });
+                            .Include(x => x.IpAssignments)
+                            .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+                            .Where(x => !x.Blocked && !x.IsReserved && !x.IpAssignments.Any() && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                            .Where(x => !additionalIps.Select(x => x.Id).Contains(x.Id));
                         if (ipAddresses.Count() >= numberOfRequired)
                         {
-                            additionalIps.AddRange(ipAddresses.Take(model.Quantity));
+                            additionalIps.AddRange(ipAddresses.Take(numberOfRequired));
                         }
                         else
                         {
