@@ -70,7 +70,7 @@ public class SuggestAdditionalIpModel
 
 public class SuggestAdditionalIpResultModel
 {
-    public IpSubnetResultModel IpSubnet { get; set; }
+    public List<IpSubnetResultModel> IpSubnets { get; set; }
 
     public List<IpAddressResultModel> IpAddresses { get; set; }
 }

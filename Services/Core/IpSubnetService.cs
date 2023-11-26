@@ -542,13 +542,18 @@ public class IpSubnetService : IIpSubnetService
                         else
                         {
                             additionalIps.AddRange(ipAddresses.Take(numberOfRequired));
-                            result.Succeed = true;
-                            result.Data = new SuggestAdditionalIpResultModel
-                            {
-                                IpSubnet = _mapper.Map<IpSubnetResultModel>(rootSubnet.Data),
-                                IpAddresses = _mapper.Map<List<IpAddressResultModel>>(additionalIps)
-                            };
                         }
+                    }
+                    
+                    if (additionalIps.Count() == model.Quantity)
+                    {
+                        var subnets = additionalIps.Select(x => x.IpSubnet);
+                        result.Succeed = true;
+                        result.Data = new SuggestAdditionalIpResultModel
+                        {
+                            IpSubnets = _mapper.Map<List<IpSubnetResultModel>>(subnets),
+                            IpAddresses = _mapper.Map<List<IpAddressResultModel>>(additionalIps)
+                        };
                     }
                 }
             }
