@@ -1,4 +1,5 @@
 ﻿using Data.Enums;
+using Data.Models;
 
 namespace Data.Entities.Pending;
 public class RequestHost : BaseEntity
@@ -14,4 +15,13 @@ public class RequestHost : BaseEntity
     public ICollection<RequestHostIp> RequestHostIps { get; set; }
 
     public ICollection<RequestHostUser> RequestHostUsers { get; set; }
+
+    public bool FilterRequestHost(RequestHostSearchModel model)
+    {
+        bool matchIpAssignmentTypes = model.Type != null ? this.Type == model.Type : true;
+        bool matchStatus = model.Status != null ? this.Status == model.Status : true;
+        bool matchServerAllocationId = model.ServerAllocationId != null ? this.ServerAllocationId == model.ServerAllocationId : true;
+
+        return matchIpAssignmentTypes && matchStatus && matchServerAllocationId;
+    }
 }
