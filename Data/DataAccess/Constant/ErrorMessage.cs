@@ -46,6 +46,7 @@ public class RequestHostErrorMessage
     public const string NOT_EXISTED = "Request Host " + ErrorMessage.NOT_EXISTED;
     public const string NOT_ACCEPTED = "Request Host not accepted";
     public const string NOT_WAITING = "Request Host not waiting";
+    public const string NO_MASTER_IP = "Server allocation must have master ip";
 }
 
 public class RequestExpandUserErrorMessage

@@ -35,7 +35,6 @@ public class RequestHostIpAssignmentModel
     public List<int> IpAddressIds { get; set; }
 }
 
-
 public class RequestHostUpdateModel
 {
     public int Id { get; set; }
@@ -43,7 +42,6 @@ public class RequestHostUpdateModel
     public RequestStatus Status { get; set; }
     public int ServerAllocationId { get; set; }
 }
-
 
 public class RequestHostSearchModel
 {

@@ -110,6 +110,10 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
+            else if (!serverAllocation.IpAssignments.Any(x => x.Type == IpAssignmentTypes.Master))
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NO_MASTER_IP;
+            }
             else
             {
                 var requestHost = _mapper.Map<RequestHost>(model);

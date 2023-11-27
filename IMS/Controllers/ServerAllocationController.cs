@@ -30,7 +30,7 @@ public class ServerAllocationController : ControllerBase
 
     [HttpGet]
     [SwaggerOperation(Summary = "Get requests, excluding ongoing or stopped requests, and those with unsuccessful additional services")]
-    public async Task<ActionResult> GetRequest([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] ServerAllocationSearchModel searchModel)
+    public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] ServerAllocationSearchModel searchModel)
     {
         var result = await _serverAllocationService.Get(pagingParam, searchModel);
         if (result.Succeed) return Ok(result.Data);
@@ -38,7 +38,7 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> GetRequestDetail([FromRoute] int id)
+    public async Task<ActionResult> GetDetail([FromRoute] int id)
     {
         var result = await _serverAllocationService.GetDetail(id);
         if (result.Succeed) return Ok(result.Data);
@@ -57,6 +57,14 @@ public class ServerAllocationController : ControllerBase
     public async Task<ActionResult> GetRequestUpgrade([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromRoute] int id)
     {
         var result = await _serverAllocationService.GetRequestUpgrade(pagingParam, id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}/RequestExpand")]
+    public async Task<ActionResult> GetRequestExpand([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromRoute] int id)
+    {
+        var result = await _serverAllocationService.GetRequestExpand(pagingParam, id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

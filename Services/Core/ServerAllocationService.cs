@@ -16,6 +16,7 @@ public interface IServerAllocationService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetHardwareConfig(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id);
+    Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetLocationAssignment(int id);
     Task<ResultModel> GetIpAssignment(int id);
     Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int id);
