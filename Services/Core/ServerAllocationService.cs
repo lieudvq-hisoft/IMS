@@ -176,7 +176,7 @@ public class ServerAllocationService : IServerAllocationService
         {
             var serverAllocation = _dbContext.ServerAllocations
                 .Include(x => x.Customer)
-                .Include(x => x.RequestExpands).ThenInclude(x => x.RequestExpandLocations)
+                .Include(x => x.RequestExpands).ThenInclude(x => x.RequestExpandLocations).ThenInclude(x => x.Location)
                 .Include(x => x.RequestExpands).ThenInclude(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.RequestExpands).ThenInclude(x => x.RequestExpandUsers).ThenInclude(x => x.User)
                 .Include(x => x.Customer)
@@ -192,6 +192,42 @@ public class ServerAllocationService : IServerAllocationService
                 requestExpands = requestExpands.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
                 requestExpands = requestExpands.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
                 paging.Data = _mapper.Map<List<RequestExpandModel>>(requestExpands.ToList());
+
+                result.Data = paging;
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetRequestHost(PagingParam<BaseSortCriteria> paginationModel, int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.Customer)
+                .Include(x => x.RequestHosts).ThenInclude(x => x.RequestHostIps)
+                .Include(x => x.RequestHosts).ThenInclude(x => x.RequestHostUsers).ThenInclude(x => x.User)
+                .Include(x => x.Customer)
+                .FirstOrDefault(x => x.Id == id);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var requestHosts = serverAllocation.RequestHosts.AsQueryable();
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestHosts.Count());
+                requestHosts = requestHosts.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                requestHosts = requestHosts.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+                paging.Data = _mapper.Map<List<RequestHostModel>>(requestHosts.ToList());
 
                 result.Data = paging;
                 result.Succeed = true;
