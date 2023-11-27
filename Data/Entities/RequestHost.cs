@@ -4,11 +4,16 @@ using Data.Models;
 namespace Data.Entities.Pending;
 public class RequestHost : BaseEntity
 {
+    public string? Note { get; set; }
+    public string? SaleNote { get; set; }
+    public string? TechNote { get; set; }
     public IpAssignmentTypes Type { get; set; }
     public RequestStatus Status { get; set; }
     public int ServerAllocationId { get; set; }
     public ServerAllocation ServerAllocation { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Host;
+    public string? InspectionReportFilePath { get; set; }
+    public string? ReceiptOfRecipientFilePath { get; set; }
 
     public ICollection<RequestHostIp> RequestHostIps { get; set; }
 

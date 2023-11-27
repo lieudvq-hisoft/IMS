@@ -285,7 +285,11 @@ public class AppointmentService : IAppointmentService
         try
         {
             using var transaction = _dbContext.Database.BeginTransaction();
-            var appointment = _dbContext.Appointments.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == appointmentId && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
+            var appointment = _dbContext.Appointments
+                .Include(x => x.ServerAllocation)
+                .Include(x => x.RequestUpgradeAppointment)
+                .Include(x => x.RequestExpandAppointments)
+                .FirstOrDefault(x => x.Id == appointmentId && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
             if (appointment == null)
             {
                 validCondition = false;
