@@ -14,12 +14,12 @@ using Services.Utilities;
 namespace Services.Core;
 public interface IRequestHostService
 {
-    Task<ResultModel> Evaluate(int requestHostId, RequestStatus status, UserAssignModel model);
-    Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestStatus status);
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(RequestHostCreateModel model);
     Task<ResultModel> Update(RequestHostUpdateModel model);
+    Task<ResultModel> Evaluate(int requestHostId, RequestStatus status, UserAssignModel model);
+    Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestStatus status);
 }
 
 public class RequestHostService : IRequestHostService
@@ -31,6 +31,131 @@ public class RequestHostService : IRequestHostService
     {
         _dbContext = dbContext;
         _mapper = mapper;
+    }
+
+    public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestHosts = _dbContext.RequestHosts
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.RequestHostUsers).ThenInclude(x => x.User)
+                 .Where(delegate (RequestHost x)
+                 {
+                     return x.FilterRequestHost(searchModel);
+                 })
+                .AsQueryable();
+
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestHosts.Count());
+
+            requestHosts = requestHosts.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            requestHosts = requestHosts.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            paging.Data = _mapper.Map<List<RequestHostModel>>(requestHosts.ToList());
+
+            result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetDetail(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestHost = _dbContext.RequestHosts
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.RequestHostUsers).ThenInclude(x => x.User)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (requestHost != null)
+            {
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestHostModel>(requestHost);
+            }
+            else
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
+                result.Succeed = false;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> Create(RequestHostCreateModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var requestHost = _mapper.Map<RequestHost>(model);
+                requestHost.Status = RequestStatus.Waiting;
+                _dbContext.RequestHosts.Add(requestHost);
+                _dbContext.SaveChanges();
+
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestHostResultModel>(requestHost);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Update(RequestHostUpdateModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestHost = _dbContext.RequestHosts.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == model.Id && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
+            if (requestHost == null)
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                _mapper.Map<RequestHostUpdateModel, RequestHost>(model, requestHost);
+                _dbContext.SaveChanges();
+
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestHostResultModel>(requestHost);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
     }
 
     public async Task<ResultModel> Evaluate(int requestHostId, RequestStatus status, UserAssignModel model)
@@ -116,133 +241,6 @@ public class RequestHostService : IRequestHostService
                 transaction.Commit();
                 result.Succeed = true;
                 result.Data = results.Select(x => x.Data);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
-
-    public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            var requestHosts = _dbContext.RequestHosts
-                .Include(x => x.RequestHostAppointments).ThenInclude(x => x.Appointment)
-                .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .Include(x => x.RequestHostUsers).ThenInclude(x => x.User)
-                 .Where(delegate (RequestHost x)
-                 {
-                     return x.FilterRequestHost(searchModel);
-                 })
-                .AsQueryable();
-
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestHosts.Count());
-
-            requestHosts = requestHosts.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            requestHosts = requestHosts.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-
-            paging.Data = _mapper.Map<List<RequestHostModel>>(requestHosts.ToList());
-
-            result.Data = paging;
-            result.Succeed = true;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
-
-    public async Task<ResultModel> GetDetail(int id)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            var requestHost = _dbContext.RequestHosts
-                .Include(x => x.RequestHostAppointments).ThenInclude(x => x.Appointment)
-                .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .Include(x => x.RequestHostUsers).ThenInclude(x => x.User)
-                .FirstOrDefault(x => x.Id == id);
-
-            if (requestHost != null)
-            {
-                result.Succeed = true;
-                result.Data = _mapper.Map<RequestHostModel>(requestHost);
-            }
-            else
-            {
-                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
-                result.Succeed = false;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
-
-    public async Task<ResultModel> Create(RequestHostCreateModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
-            if (serverAllocation == null)
-            {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var requestHost = _mapper.Map<RequestHost>(model);
-                requestHost.Status = RequestStatus.Waiting;
-                _dbContext.RequestHosts.Add(requestHost);
-                _dbContext.SaveChanges();
-
-                result.Succeed = true;
-                result.Data = _mapper.Map<RequestHostResultModel>(requestHost);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
-    
-    public async Task<ResultModel> Update(RequestHostUpdateModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            var requestHost = _dbContext.RequestHosts.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == model.Id && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
-            if (requestHost == null)
-            {
-                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                _mapper.Map<RequestHostUpdateModel, RequestHost>(model, requestHost);
-                _dbContext.SaveChanges();
-
-                result.Succeed = true;
-                result.Data = _mapper.Map<RequestHostResultModel>(requestHost);
             }
         }
         catch (Exception e)

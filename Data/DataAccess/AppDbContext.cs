@@ -77,7 +77,6 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<RequestExpandLocation> RequestExpandLocations { get; set; }
     public DbSet<RequestExpandUser> RequestExpandUsers { get; set; }
     public DbSet<RequestHost> RequestHosts { get; set; }
-    public DbSet<RequestHostAppointment> RequestHostAppointments { get; set; }
     public DbSet<RequestHostIp> RequestHostIps { get; set; }
     public DbSet<RequestHostUser> RequestHostUsers { get; set; }
     public DbSet<RequestUpgrade> RequestUpgrades { get; set; }

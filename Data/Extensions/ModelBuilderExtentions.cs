@@ -366,7 +366,6 @@ public static class ModelBuilderExtentions
         builder.Entity<RequestExpandLocation>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestExpandUser>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestHost>().HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<RequestHostAppointment>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestHostIp>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestHostUser>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<RequestUpgrade>().HasQueryFilter(x => !x.IsDeleted);
@@ -390,9 +389,6 @@ public static class ModelBuilderExtentions
                 .WithOne(e => e.Appointment)
                 .OnDelete(DeleteBehavior.ClientCascade);
             b.HasMany(e => e.RequestExpandAppointments)
-               .WithOne(e => e.Appointment)
-               .OnDelete(DeleteBehavior.ClientCascade);
-            b.HasMany(e => e.RequestHostAppointments)
                .WithOne(e => e.Appointment)
                .OnDelete(DeleteBehavior.ClientCascade);
         });
@@ -477,9 +473,6 @@ public static class ModelBuilderExtentions
 
         builder.Entity<RequestHost>(b =>
         {
-            b.HasMany(e => e.RequestHostAppointments)
-                .WithOne(e => e.RequestHost)
-                .OnDelete(DeleteBehavior.ClientCascade);
             b.HasMany(e => e.RequestHostIps)
                 .WithOne(e => e.RequestHost)
                 .OnDelete(DeleteBehavior.ClientCascade);

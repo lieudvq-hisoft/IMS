@@ -21,6 +21,7 @@ public class RequestHostResultModel
     public RequestStatus Status { get; set; }
     public int ServerAllocationId { get; set; }
 }
+
 public class RequestHostCreateModel
 {
     public IpAssignmentTypes Type { get; set; }

@@ -10,8 +10,6 @@ public class RequestHost : BaseEntity
     public ServerAllocation ServerAllocation { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Host;
 
-    public ICollection<RequestHostAppointment> RequestHostAppointments { get; set; }
-
     public ICollection<RequestHostIp> RequestHostIps { get; set; }
 
     public ICollection<RequestHostUser> RequestHostUsers { get; set; }

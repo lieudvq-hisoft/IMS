@@ -23,7 +23,6 @@ public class Appointment : BaseEntity
     public ICollection<RequestUpgradeAppointment>? RequestUpgradeAppointment { get; set; }
     public ICollection<AppointmentUser>? AppointmentUsers { get; set; }
     public ICollection<RequestExpandAppointment>? RequestExpandAppointments { get; set; }
-    public ICollection<RequestHostAppointment>? RequestHostAppointments { get; set; }
 
     public bool FilterAppointment(AppointmentSearchModel model)
     {

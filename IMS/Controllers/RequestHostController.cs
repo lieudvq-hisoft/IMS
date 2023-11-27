@@ -21,6 +21,38 @@ public class RequestHostController : ControllerBase
         _environment = environment;
     }
 
+    [HttpGet]
+    public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestHostSearchModel searchModel)
+    {
+        var result = await _requestHostService.Get(pagingParam, searchModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult> GetDetail(int id)
+    {
+        var result = await _requestHostService.GetDetail(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPost]
+    public async Task<ActionResult> Create([FromBody] RequestHostCreateModel model)
+    {
+        var result = await _requestHostService.Create(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut]
+    public async Task<ActionResult> Update([FromBody] RequestHostUpdateModel model)
+    {
+        var result = await _requestHostService.Update(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut("{id}/Accept")]
     [SwaggerOperation(Summary = "Accept a waiting request host")]
     public async Task<ActionResult> Accept(int id, [FromBody] UserAssignModel model)
@@ -53,38 +85,6 @@ public class RequestHostController : ControllerBase
     public async Task<ActionResult> DenyBulk(RequestHostEvaluateBulkModel model)
     {
         var result = await _requestHostService.EvaluateBulk(model, RequestStatus.Denied);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
-    [HttpGet]
-    public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestHostSearchModel searchModel)
-    {
-        var result = await _requestHostService.Get(pagingParam, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
-    [HttpGet("{id}")]
-    public async Task<ActionResult> GetDetail(int id)
-    {
-        var result = await _requestHostService.GetDetail(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
-    [HttpPost]
-    public async Task<ActionResult> Create([FromBody] RequestHostCreateModel model)
-    {
-        var result = await _requestHostService.Create(model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
-    [HttpPut]
-    public async Task<ActionResult> Update([FromBody] RequestHostUpdateModel model)
-    {
-        var result = await _requestHostService.Update(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

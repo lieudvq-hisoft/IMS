@@ -296,6 +296,12 @@ public class AppointmentService : IAppointmentService
                 validCondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING;
             }
+            else
+            {
+                _dbContext.RequestUpgradeAppointments.RemoveRange(appointment.RequestUpgradeAppointment);
+                _dbContext.RequestExpandAppointments.RemoveRange(appointment.RequestExpandAppointments);
+                _dbContext.SaveChanges();
+            }
 
             var createRequestUpgradeAppointmentResults = new List<ResultModel>();
             if (validCondition)
@@ -352,8 +358,9 @@ public class AppointmentService : IAppointmentService
                 result.Data = new RequestAppointmentCreateResultModel
                 {
                     RequestUpgradeAppointments = createRequestUpgradeAppointmentResults.Select(x => x.Data),
-                    RequestExpandAppointments = createRequestExpandAppointmentResults.Select(x => x.Data)
-                }; ;
+                    RequestExpandAppointments = createRequestExpandAppointmentResults.Select(x => x.Data),
+                    RequestRemovealAppointments = createRequestRemovalAppointmentResults.Select(x => x.Data)
+                };
             }
         }
         catch (Exception e)
@@ -742,7 +749,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var appointment = _dbContext.Appointments.Include(x => x.RequestExpandAppointments).Include(x => x.RequestUpgradeAppointment).Include(x => x.RequestHostAppointments).FirstOrDefault(x => x.Id == appointmentId);
+            var appointment = _dbContext.Appointments.Include(x => x.RequestExpandAppointments).Include(x => x.RequestUpgradeAppointment).FirstOrDefault(x => x.Id == appointmentId);
             if (appointment == null)
             {
                 validPrecondition = false;
@@ -788,8 +795,7 @@ public class AppointmentService : IAppointmentService
         bool validPrecondition = true;
         var appointment = _dbContext.Appointments
             .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandLocations)
-            .Include(x => x.RequestUpgradeAppointment)
-            .Include(x => x.RequestHostAppointments).FirstOrDefault(x => x.Id == appointmentId);
+            .Include(x => x.RequestUpgradeAppointment).FirstOrDefault(x => x.Id == appointmentId);
         if (appointment == null)
         {
             validPrecondition = false;
@@ -804,7 +810,7 @@ public class AppointmentService : IAppointmentService
 
         if (appointment.InspectionReportFilePath == null || appointment.ReceiptOfRecipientFilePath == null)
         {
-            if (appointment.RequestExpandAppointments.Any() || appointment.RequestUpgradeAppointment.Any() || appointment.RequestHostAppointments.Any())
+            if (appointment.RequestExpandAppointments.Any() || appointment.RequestUpgradeAppointment.Any())
             {
                 validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_COMPLETABLE;
