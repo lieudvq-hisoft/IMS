@@ -111,10 +111,6 @@ public class AppointmentUpdateModel
     public string Reason { get; set; }
 
     public string? Note { get; set; }
-
-    [Required]
-    [GreaterThanZero]
-    public int ServerAllocationId { get; set; }
 }
 
 public class AppointmentCompleteModel

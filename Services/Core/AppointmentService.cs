@@ -594,15 +594,6 @@ public class AppointmentService : IAppointmentService
                 validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
-            else
-            {
-                var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId);
-                if (serverAllocation == null)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-                }
-            }
 
             if (validPrecondition)
             {
