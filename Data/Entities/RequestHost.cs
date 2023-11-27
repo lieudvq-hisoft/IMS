@@ -8,7 +8,7 @@ public class RequestHost : BaseEntity
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
     public IpAssignmentTypes Type { get; set; }
-    public RequestStatus Status { get; set; }
+    public RequestHostStatus Status { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Host;
     public string? InspectionReportFilePath { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }

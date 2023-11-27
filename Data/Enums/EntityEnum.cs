@@ -50,6 +50,16 @@ public enum RequestStatus
     Failed
 }
 
+public enum RequestHostStatus
+{
+    Waiting,
+    Accepted,
+    Denied,
+    Processed,
+    Success,
+    Failed
+}
+
 public enum RemovalStatus
 {
     Accepted,

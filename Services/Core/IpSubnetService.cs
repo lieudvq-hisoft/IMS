@@ -512,9 +512,10 @@ public class IpSubnetService : IIpSubnetService
                     while (rootSubnet.Parent != null && additionalIps.Count() < model.Quantity)
                     {
                         var numberOfRequired = model.Quantity - additionalIps.Count();
+                        var additionalIpIds = additionalIps.Select(x => x.Id);
                         var ipAddresses = GetAllIpAddress(rootSubnet)
-                            .Where(x => !x.Blocked && !x.IsReserved && !x.IpAssignments.Any() && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
-                            .Where(x => !additionalIps.Select(x => x.Id).Contains(x.Id));
+                            .Where(x => !x.Blocked && !x.IsReserved && !x.IpAssignments.Any() && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
+                            .Where(x => !additionalIpIds.Contains(x.Id));
                         if (ipAddresses.Count() >= numberOfRequired)
                         {
                             additionalIps.AddRange(ipAddresses.Take(numberOfRequired));
@@ -529,11 +530,12 @@ public class IpSubnetService : IIpSubnetService
                     if (additionalIps.Count() < model.Quantity)
                     {
                         var numberOfRequired = model.Quantity - additionalIps.Count();
+                        var additionalIpIds = additionalIps.Select(x => x.Id);
                         var ipAddresses = _dbContext.IpAddresses
                             .Include(x => x.IpAssignments)
                             .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
-                            .Where(x => !x.Blocked && !x.IsReserved && !x.IpAssignments.Any() && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
-                            .Where(x => !additionalIps.Select(x => x.Id).Contains(x.Id));
+                            .Where(x => !x.Blocked && !x.IsReserved && !x.IpAssignments.Any() && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
+                            .Where(x => !additionalIpIds.Contains(x.Id));
                         if (ipAddresses.Count() < numberOfRequired)
                         {
                             result.ErrorMessage = IpAddressErrorMessage.NO_AVAILABLE;
@@ -543,7 +545,7 @@ public class IpSubnetService : IIpSubnetService
                             additionalIps.AddRange(ipAddresses.Take(numberOfRequired));
                         }
                     }
-                    
+
                     if (additionalIps.Count() == model.Quantity)
                     {
                         var subnets = additionalIps.Select(x => x.IpSubnet).DistinctBy(x => x.Id);
@@ -563,32 +565,6 @@ public class IpSubnetService : IIpSubnetService
         }
 
         return result;
-    }
-
-    private bool IsAvailableIpAddress(int ipAddressId)
-    {
-        bool isAvailableIpAddress = true;
-        var ipAddress = _dbContext.IpAddresses.Include(x => x.IpAssignments)
-                .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
-                .FirstOrDefault(x => x.Id == ipAddressId);
-        if (ipAddress == null)
-        {
-            isAvailableIpAddress = false;
-        }
-        else
-        {
-            if (ipAddress.IsReserved || ipAddress.Blocked)
-            {
-                isAvailableIpAddress = false;
-            }
-
-            if (ipAddress.IpAssignments.Any() || ipAddress.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
-            {
-                isAvailableIpAddress = false;
-            }
-        }
-
-        return isAvailableIpAddress;
     }
 
     public async Task<ResultModel> Delete(int subnetId)

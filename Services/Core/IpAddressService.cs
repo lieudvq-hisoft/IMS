@@ -93,7 +93,7 @@ public class IpAddressService : IIpAddressService
                 .Include(x => x.IpAssignments)
                 .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
                 .Where(x => !x.IsReserved && !x.Blocked && !x.IpAssignments.Any())
-                .FirstOrDefault(x => !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted));
+                .FirstOrDefault(x => !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed));
 
             if (suggestedMasterIp == null)
             {

@@ -462,9 +462,9 @@ public class ServerAllocationService : IServerAllocationService
                 {
                     requestExpand.Status = RequestStatus.Failed;
                 }
-                foreach (var requestHost in serverAllocation.RequestHosts.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                foreach (var requestHost in serverAllocation.RequestHosts.Where(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
                 {
-                    requestHost.Status = RequestStatus.Failed;
+                    requestHost.Status = RequestHostStatus.Failed;
                 }
                 foreach (var requestUpgrade in serverAllocation.RequestUpgrades.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
                 {
@@ -520,7 +520,7 @@ public class ServerAllocationService : IServerAllocationService
                     result.ErrorMessage = IpAddressErrorMessage.UNASSIGNABLE;
                 }
 
-                if (ipAddress.IpAssignments.Any() || ipAddress.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                if (ipAddress.IpAssignments.Any() || ipAddress.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
                 {
                     validPrecondition = false;
                     result.ErrorMessage = IpAddressErrorMessage.UNAVAILABLE;

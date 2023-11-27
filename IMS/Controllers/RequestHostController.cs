@@ -57,7 +57,7 @@ public class RequestHostController : ControllerBase
     [SwaggerOperation(Summary = "Accept a waiting request host")]
     public async Task<ActionResult> Accept(int id, [FromBody] UserAssignModel model)
     {
-        var result = await _requestHostService.Evaluate(id, RequestStatus.Accepted, model);
+        var result = await _requestHostService.Evaluate(id, RequestHostStatus.Accepted, model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -66,7 +66,7 @@ public class RequestHostController : ControllerBase
     [SwaggerOperation(Summary = "Accept many waiting request host")]
     public async Task<ActionResult> AcceptBulk(RequestHostEvaluateBulkModel model)
     {
-        var result = await _requestHostService.EvaluateBulk(model, RequestStatus.Accepted);
+        var result = await _requestHostService.EvaluateBulk(model, RequestHostStatus.Accepted);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -75,7 +75,7 @@ public class RequestHostController : ControllerBase
     [SwaggerOperation(Summary = "Deny a waiting request host")]
     public async Task<ActionResult> Deny(int id, [FromBody] UserAssignModel model)
     {
-        var result = await _requestHostService.Evaluate(id, RequestStatus.Denied, model);
+        var result = await _requestHostService.Evaluate(id, RequestHostStatus.Denied, model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -84,7 +84,7 @@ public class RequestHostController : ControllerBase
     [SwaggerOperation(Summary = "Deny many waiting request host")]
     public async Task<ActionResult> DenyBulk(RequestHostEvaluateBulkModel model)
     {
-        var result = await _requestHostService.EvaluateBulk(model, RequestStatus.Denied);
+        var result = await _requestHostService.EvaluateBulk(model, RequestHostStatus.Denied);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

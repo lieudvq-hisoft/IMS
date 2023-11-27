@@ -18,8 +18,8 @@ public interface IRequestHostService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(RequestHostCreateModel model);
     Task<ResultModel> Update(RequestHostUpdateModel model);
-    Task<ResultModel> Evaluate(int requestHostId, RequestStatus status, UserAssignModel model);
-    Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestStatus status);
+    Task<ResultModel> Evaluate(int requestHostId, RequestHostStatus status, UserAssignModel model);
+    Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status);
 }
 
 public class RequestHostService : IRequestHostService
@@ -123,7 +123,7 @@ public class RequestHostService : IRequestHostService
             else
             {
                 var requestHost = _mapper.Map<RequestHost>(model);
-                requestHost.Status = RequestStatus.Waiting;
+                requestHost.Status = RequestHostStatus.Waiting;
                 _dbContext.RequestHosts.Add(requestHost);
                 _dbContext.SaveChanges();
 
@@ -179,7 +179,7 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    public async Task<ResultModel> Evaluate(int requestHostId, RequestStatus status, UserAssignModel model)
+    public async Task<ResultModel> Evaluate(int requestHostId, RequestHostStatus status, UserAssignModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -187,16 +187,30 @@ public class RequestHostService : IRequestHostService
 
         try
         {
-            if (status != RequestStatus.Accepted && status != RequestStatus.Denied)
+            if (status != RequestHostStatus.Accepted && status != RequestHostStatus.Denied)
             {
                 throw new Exception(ErrorMessage.WRONG_PURPOSE);
             }
 
-            var requestHost = _dbContext.RequestHosts.FirstOrDefault(x => x.Id == requestHostId);
+            var requestHost = _dbContext.RequestHosts.Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == requestHostId);
             if (requestHost == null)
             {
                 result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
+            }
+            else
+            {
+                if (!requestHost.RequestHostIps.Any())
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
+                }
+
+                if (requestHost.Status != RequestHostStatus.Waiting)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = RequestHostErrorMessage.NOT_WAITING;
+                }
             }
 
             var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
@@ -206,17 +220,12 @@ public class RequestHostService : IRequestHostService
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
 
-            if (validPrecondition && requestHost.Status != RequestStatus.Waiting)
-            {
-                result.ErrorMessage = RequestHostErrorMessage.NOT_WAITING;
-                validPrecondition = false;
-            }
-
             if (validPrecondition)
             {
                 requestHost.Status = status;
                 _dbContext.RequestHostUsers.Add(new RequestHostUser
                 {
+                    Action = RequestUserAction.Evaluate,
                     RequestHostId = requestHost.Id,
                     UserId = new Guid(model.UserId)
                 });
@@ -233,7 +242,7 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    public async Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestStatus status)
+    public async Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status)
     {
         var result = new ResultModel();
         result.Succeed = false;
