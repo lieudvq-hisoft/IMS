@@ -20,6 +20,7 @@ public interface IRequestUpgradeService
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
     Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model);
     Task<ResultModel> Delete(int requestUpgradeId);
+    Task<ResultModel> Fail(RequestUpgradeDeleteModel model);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
     Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, Guid userId);
     Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status, Guid userId);
@@ -344,6 +345,40 @@ public class RequestUpgradeService : IRequestUpgradeService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = requestUpgradeId;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Fail(RequestUpgradeDeleteModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == model.Id);
+            if (requestUpgrade == null)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+            }
+            else if (requestUpgrade.Status != RequestStatus.Waiting)
+            {
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING;
+            }
+            else
+            {
+                requestUpgrade.Status = RequestStatus.Failed;
+                requestUpgrade.TechNote = model.TechNote;
+                requestUpgrade.SaleNote = model.SaleNote;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = model.Id;
             }
         }
         catch (Exception e)

@@ -94,6 +94,16 @@ public class RequestUpgradeUpdateModel
     public string? SaleNote { get; set; }
 }
 
+public class RequestUpgradeDeleteModel
+{
+    [Required]
+    public int Id { get; set; }
+
+    public string? TechNote { get; set; }
+
+    public string? SaleNote { get; set; }
+}
+
 public class RequestUpgradeSearchModel
 {
     public int? Id { get; set; }

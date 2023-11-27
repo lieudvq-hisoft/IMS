@@ -114,6 +114,10 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = RequestHostErrorMessage.NO_MASTER_IP;
             }
+            else if (model.Type == IpAssignmentTypes.Master)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.HAVE_IP_MASTER_ALREADY;
+            }
             else
             {
                 var requestHost = _mapper.Map<RequestHost>(model);
@@ -141,9 +145,14 @@ public class RequestHostService : IRequestHostService
         try
         {
             var requestHost = _dbContext.RequestHosts.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == model.Id && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == requestHost.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
             if (requestHost == null)
             {
                 result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
+            }
+            else if (!serverAllocation.IpAssignments.Any(x => x.Type == IpAssignmentTypes.Master))
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NO_MASTER_IP;
             }
             else
             {

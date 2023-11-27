@@ -56,7 +56,6 @@ public class RequestHostUpdateModel
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
     public IpAssignmentTypes Type { get; set; }
-    public int ServerAllocationId { get; set; }
 }
 
 public class RequestHostSearchModel
