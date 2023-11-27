@@ -180,7 +180,6 @@ public class IpSubnetService : IIpSubnetService
             }
         }
 
-
         return ipAddresses;
     }
 

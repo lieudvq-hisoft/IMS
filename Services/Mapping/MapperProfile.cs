@@ -243,7 +243,37 @@ public class MapperProfile : Profile
         #endregion
 
         #region RequestHost
-        CreateMap<RequestHost, RequestHostModel>();
+        CreateMap<RequestHost, RequestHostModel>()
+            .AfterMap((src, dest, context) =>
+            {
+                if (src.ServerAllocation?.Customer != null)
+                {
+                    dest.Customer = context.Mapper.Map<Customer, CustomerResultModel>(src.ServerAllocation.Customer);
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                if (src.ServerAllocation != null)
+                {
+                    dest.ServerAllocation = context.Mapper.Map<ServerAllocation, ServerAllocationResultModel>(src.ServerAllocation);
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                var evaluator = src.RequestHostUsers?.FirstOrDefault(x => x.Action == RequestUserAction.Evaluate);
+                if (evaluator != null)
+                {
+                    dest.Evaluator = context.Mapper.Map<User, UserModel>(evaluator.User);
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                var executor = src.RequestHostUsers?.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
+                if (executor != null)
+                {
+                    dest.Executor = context.Mapper.Map<User, UserModel>(executor.User);
+                }
+            });
         CreateMap<RequestHostCreateModel, RequestHost>();
         CreateMap<RequestHostUpdateModel, RequestHost>();
         #endregion

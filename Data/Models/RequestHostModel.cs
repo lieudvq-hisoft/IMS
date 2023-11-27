@@ -8,6 +8,11 @@ public class RequestHostModel
     public IpAssignmentTypes Type { get; set; }
     public RequestStatus Status { get; set; }
     public int ServerAllocationId { get; set; }
+
+    public ServerAllocationResultModel? ServerAllocation { get; set; }
+    public CustomerResultModel? Customer { get; set; }
+    public UserModel? Evaluator { get; set; }
+    public UserModel? Executor { get; set; }
 }
 
 public class RequestHostResultModel
