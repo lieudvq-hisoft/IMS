@@ -1,4 +1,5 @@
 ﻿using Data.Enums;
+using Data.Models;
 
 namespace Data.Entities;
 public class RequestExpand : BaseEntity
@@ -16,4 +17,13 @@ public class RequestExpand : BaseEntity
     public ICollection<RequestExpandLocation>? RequestExpandLocations { get; set; }
     public ICollection<RequestExpandUser>? RequestExpandUsers { get; set; }
     public ICollection<RequestExpandAppointment>? RequestExpandAppointments { get; set; }
+
+    public bool FilterRequestUpgrade(RequestExpandSearchModel model)
+    {
+        bool matchId = model.Id != null ? this.Id == model.Id : true;
+        bool matchServerAllocationId = model.ServerAllocationId != null ? this.ServerAllocationId == model.ServerAllocationId : true;
+        bool matchStatus = model.Statuses != null ? model.Statuses.Contains(this.Status) : true;
+
+        return matchId && matchServerAllocationId && matchStatus;
+    }
 }

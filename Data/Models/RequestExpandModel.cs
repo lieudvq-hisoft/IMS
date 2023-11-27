@@ -88,5 +88,7 @@ public class RequestExpandSuggestLocationModel
 
 public class RequestExpandSearchModel
 {
-    public int? Id { get; set; } = null;
+    public int? Id { get; set; }
+    public int? ServerAllocationId { get; set; }
+    public List<RequestStatus?>? Statuses { get; set; }
 }

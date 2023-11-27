@@ -99,4 +99,5 @@ public class RequestUpgradeSearchModel
     public int? Id { get; set; }
     public int? ComponentId { get; set; }
     public int? ServerAllocationId { get; set; }
+    public List<RequestStatus?>? Statuses { get; set; }
 }
