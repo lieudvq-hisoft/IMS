@@ -22,6 +22,8 @@ public interface IRequestHostService
     Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status);
     Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model);
     Task<ResultModel> AssignInspectionReport(int requestHostId, DocumentFileUploadModel model);
+    Task<ResultModel> Process(int requestHostId, Guid userId);
+    Task<ResultModel> Complete(int requestHostId, Guid userId);
 }
 
 public class RequestHostService : IRequestHostService
@@ -328,24 +330,24 @@ public class RequestHostService : IRequestHostService
                         result.ErrorMessage = IpAddressErrorMessage.UNASSIGNABLE;
                     }
                 }
+            }
 
-                if (validPrecondition)
+            if (validPrecondition)
+            {
+                var requestHostIps = new List<RequestHostIp>();
+                foreach (var ipAddressId in model.IpAddressIds)
                 {
-                    var requestHostIps = new List<RequestHostIp>();
-                    foreach (var ipAddressId in model.IpAddressIds)
+                    requestHostIps.Add(new RequestHostIp
                     {
-                        requestHostIps.Add(new RequestHostIp
-                        {
-                            IpAddressId = ipAddressId,
-                            RequestHostId = requestHost.Id
-                        });
-                    }
-                    _dbContext.RequestHostIps.RemoveRange(requestHost.RequestHostIps);
-                    _dbContext.RequestHostIps.AddRange(requestHostIps);
-                    _dbContext.SaveChanges();
-                    result.Succeed = true;
-                    result.Data = _mapper.Map<RequestHostResultModel>(requestHost);
+                        IpAddressId = ipAddressId,
+                        RequestHostId = requestHost.Id
+                    });
                 }
+                _dbContext.RequestHostIps.RemoveRange(requestHost.RequestHostIps);
+                _dbContext.RequestHostIps.AddRange(requestHostIps);
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestHostResultModel>(requestHost);
             }
         }
         catch (Exception e)
@@ -363,9 +365,6 @@ public class RequestHostService : IRequestHostService
 
         try
         {
-            string inspectionReportFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
-
-            string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(model.ReceiptOfRecipient);
             var requestHost = _dbContext.RequestHosts.Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == requestHostId);
             if (requestHost == null)
             {
@@ -381,6 +380,9 @@ public class RequestHostService : IRequestHostService
             }
             else
             {
+                string inspectionReportFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
+                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(model.ReceiptOfRecipient);
+
                 requestHost.InspectionReportFilePath = inspectionReportFileName;
                 requestHost.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
                 _dbContext.SaveChanges();
@@ -390,6 +392,108 @@ public class RequestHostService : IRequestHostService
                     InspectionReport = inspectionReportFileName,
                     ReceiptOfRecipient = receiptOfRecipientFileName,
                 };
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Process(int requestHostId, Guid userId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestHost = _dbContext.RequestHosts.Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == requestHostId);
+            if (requestHost == null)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+            }
+            else if (requestHost.Status != RequestHostStatus.Accepted)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
+            }
+            else if (!requestHost.RequestHostIps.Any())
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
+            }
+            else if (requestHost.InspectionReportFilePath == null || requestHost.ReceiptOfRecipientFilePath == null)
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NOT_PROCESSABLE;
+            }
+            else
+            {
+                requestHost.Status = RequestHostStatus.Processed;
+                _dbContext.RequestHostUsers.Add(new RequestHostUser
+                {
+                    Action = RequestUserAction.Process,
+                    UserId = userId,
+                    RequestHostId = requestHostId,
+                });
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestHostResultModel>(requestHost);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Complete(int requestHostId, Guid userId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var requestHost = _dbContext.RequestHosts
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments)
+                .FirstOrDefault(x => x.Id == requestHostId);
+            if (requestHost == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+            }
+            else if (requestHost.Status != RequestHostStatus.Processed)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_PROCESSED;
+            }
+            else
+            {
+                var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress);
+                var ipAssignments = new List<IpAssignment>();
+                foreach (var ipAddress in ipAddresses)
+                {
+                    ipAssignments.Add(new IpAssignment
+                    {
+                        IpAddressId = ipAddress.Id,
+                        ServerAllocationId = requestHost.ServerAllocationId,
+                        Type = requestHost.Type
+                    });
+                }
+                _dbContext.IpAssignments.AddRange(ipAssignments);
+                _dbContext.RequestHostUsers.Add(new RequestHostUser
+                {
+                    Action = RequestUserAction.Execute,
+                    RequestHostId = requestHost.Id,
+                    UserId = userId,
+                });
+                requestHost.Status = RequestHostStatus.Success;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<IpAssignmentResultModel>>(ipAssignments);
             }
         }
         catch (Exception e)

@@ -48,6 +48,7 @@ public class RequestHostErrorMessage
     public const string NOT_WAITING = "Request Host not waiting";
     public const string NO_MASTER_IP = "Server allocation must have master ip";
     public const string NO_IP_CHOICE = "Request host must have ip to be evaluate";
+    public const string NOT_PROCESSABLE = "Request host with request must have document to be completable";
 }
 
 public class RequestExpandUserErrorMessage
@@ -176,6 +177,7 @@ public class AppointmentErrorMessage
     public const string EXISTED = "Appointment " + ErrorMessage.EXISTED;
     public const string NOT_ACCEPTED = "Appointment not accepted";
     public const string NOT_SUCCESS = "Appointment not success";
+    public const string NOT_PROCESSED = "Appointment not success";
     public const string NOT_WAITING = "Appointment not waiting";
     public const string NOT_COMPLETABLE = "Appointment with request must have document to be completable";
 }
