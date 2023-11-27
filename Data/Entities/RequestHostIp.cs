@@ -3,8 +3,6 @@
 namespace Data.Entities.Pending;
 public class RequestHostIp : BaseEntity
 {
-    public IpAssignmentTypes Type { get; set; }
-
     public int IpAddressId { get; set; }
     public virtual IpAddress IpAddress { get; set; }
 

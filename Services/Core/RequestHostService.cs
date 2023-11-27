@@ -20,6 +20,7 @@ public interface IRequestHostService
     Task<ResultModel> Update(RequestHostUpdateModel model);
     Task<ResultModel> Evaluate(int requestHostId, RequestHostStatus status, UserAssignModel model);
     Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status);
+    Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model);
 }
 
 public class RequestHostService : IRequestHostService
@@ -271,6 +272,77 @@ public class RequestHostService : IRequestHostService
                 transaction.Commit();
                 result.Succeed = true;
                 result.Data = results.Select(x => x.Data);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var requestHost = _dbContext.RequestHosts.Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == requestHostId);
+            if (requestHost == null)
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+            else
+            {
+                if (!requestHost.RequestHostIps.Any())
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
+                }
+
+                if (requestHost.Status != RequestHostStatus.Waiting)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = RequestHostErrorMessage.NOT_WAITING;
+                }
+            }
+
+            if (validPrecondition)
+            {
+                foreach (int ipAddressId in model.IpAddressIds)
+                {
+                    var ipAddress = _dbContext.IpAddresses.Include(x => x.IpAssignments)
+                        .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+                        .Where(x => !x.Blocked && !x.IsReserved && !x.IpAssignments.Any() && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
+                        .FirstOrDefault(x => x.Id == ipAddressId);
+                    if (ipAddress == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = IpAddressErrorMessage.UNASSIGNABLE;
+                    }
+                }
+
+                if (validPrecondition)
+                {
+                    var requestHostIps = new List<RequestHostIp>();
+                    foreach (var ipAddressId in model.IpAddressIds)
+                    {
+                        requestHostIps.Add(new RequestHostIp
+                        {
+                            IpAddressId = ipAddressId,
+                            RequestHostId = requestHost.Id
+                        });
+                    }
+                    _dbContext.RequestHostIps.RemoveRange(requestHost.RequestHostIps);
+                    _dbContext.RequestHostIps.AddRange(requestHostIps);
+                    _dbContext.SaveChanges();
+                    result.Succeed = true;
+                    result.Data = _mapper.Map<RequestHostResultModel>(requestHost);
+                }
             }
         }
         catch (Exception e)

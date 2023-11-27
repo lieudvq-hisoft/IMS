@@ -31,7 +31,8 @@ public enum IpPurpose
 public enum RequestUserAction
 {
     Evaluate,
-    Execute
+    Execute,
+    Process
 }
 
 public enum IpAssignmentTypes

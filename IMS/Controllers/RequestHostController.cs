@@ -53,6 +53,14 @@ public class RequestHostController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPut("{id}/IpAddress")]
+    public async Task<ActionResult> AssignIp(int id, [FromBody] RequestHostIpAssignmentModel model)
+    {
+        var result = await _requestHostService.AssignAdditionalIp(id, model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut("{id}/Accept")]
     [SwaggerOperation(Summary = "Accept a waiting request host")]
     public async Task<ActionResult> Accept(int id, [FromBody] UserAssignModel model)
