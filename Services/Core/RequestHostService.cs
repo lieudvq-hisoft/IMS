@@ -7,8 +7,8 @@ using Data.Entities.Pending;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
+using EbookStore.Client.ExternalService.ImageHostService;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Services.Utilities;
 
 namespace Services.Core;
@@ -21,17 +21,20 @@ public interface IRequestHostService
     Task<ResultModel> Evaluate(int requestHostId, RequestHostStatus status, UserAssignModel model);
     Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status);
     Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model);
+    Task<ResultModel> AssignInspectionReport(int requestHostId, DocumentFileUploadModel model);
 }
 
 public class RequestHostService : IRequestHostService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly ICloudinaryHelper _cloudinaryHelper;
 
-    public RequestHostService(AppDbContext dbContext, IMapper mapper)
+    public RequestHostService(AppDbContext dbContext, IMapper mapper, ICloudinaryHelper cloudinaryHelper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _cloudinaryHelper = cloudinaryHelper;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel)
@@ -343,6 +346,50 @@ public class RequestHostService : IRequestHostService
                     result.Succeed = true;
                     result.Data = _mapper.Map<RequestHostResultModel>(requestHost);
                 }
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> AssignInspectionReport(int requestHostId, DocumentFileUploadModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            string inspectionReportFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
+
+            string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(model.ReceiptOfRecipient);
+            var requestHost = _dbContext.RequestHosts.Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == requestHostId);
+            if (requestHost == null)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+            }
+            else if (requestHost.Status != RequestHostStatus.Accepted)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
+            }
+            else if (!requestHost.RequestHostIps.Any())
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
+            }
+            else
+            {
+                requestHost.InspectionReportFilePath = inspectionReportFileName;
+                requestHost.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = new DocumentFileResultModel
+                {
+                    InspectionReport = inspectionReportFileName,
+                    ReceiptOfRecipient = receiptOfRecipientFileName,
+                };
             }
         }
         catch (Exception e)

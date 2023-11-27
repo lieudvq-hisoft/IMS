@@ -96,4 +96,12 @@ public class RequestHostController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPost("{id}/Document")]
+    public async Task<ActionResult> UploadDocument(int id, [FromForm] DocumentFileUploadModel model)
+    {
+        var result = await _requestHostService.AssignInspectionReport(id, model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }
