@@ -105,7 +105,9 @@ public class RequestHostService : IRequestHostService
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
+            var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
@@ -144,7 +146,9 @@ public class RequestHostService : IRequestHostService
 
         try
         {
-            var requestHost = _dbContext.RequestHosts.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == model.Id && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
+            var requestHost = _dbContext.RequestHosts
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => IpAddress)
+                .FirstOrDefault(x => x.Id == model.Id && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
             var serverAllocation = requestHost.ServerAllocation;
             if (requestHost == null)
             {
