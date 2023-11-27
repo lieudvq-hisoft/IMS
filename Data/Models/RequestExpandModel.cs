@@ -15,6 +15,7 @@ public class RequestExpandModel
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
     public int? Size { get; set; }
+    public int? AppointmentId { get; set; }
 
     public ServerAllocationResultModel? ServerAllocation { get; set; }
     public AppointmentResultModel? SucceededAppointment { get; set; }

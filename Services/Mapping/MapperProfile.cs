@@ -34,6 +34,13 @@ public class MapperProfile : Profile
         CreateMap<RequestUpgrade, RequestUpgradeModel>()
             .AfterMap((src, dest, context) =>
             {
+                if (src.RequestUpgradeAppointments?.Any() == true)
+                {
+                    dest.AppointmentId = src.RequestUpgradeAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Accepted || x.Status == RequestStatus.Waiting)?.Id;
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
                 if (src.Component != null)
                 {
                     dest.Component = context.Mapper.Map<Component, ComponentResultModel>(src.Component);
@@ -92,7 +99,12 @@ public class MapperProfile : Profile
                 }
             })
             .AfterMap((src, dest, context) =>
-                dest.Customer = context.Mapper.Map<Customer, CustomerModel>(src.Customer));
+            {
+                if (src.Customer != null)
+                {
+                    dest.Customer = context.Mapper.Map<Customer, CustomerModel>(src.Customer);
+                }
+            });
         CreateMap<ServerAllocationCreateModel, ServerAllocation>();
         CreateMap<ServerAllocationUpdateModel, ServerAllocation>();
         #endregion
@@ -164,6 +176,13 @@ public class MapperProfile : Profile
 
         #region RequestExpand
         CreateMap<RequestExpand, RequestExpandModel>()
+            .AfterMap((src, dest, context) =>
+            {
+                if (src.RequestExpandAppointments?.Any() == true)
+                {
+                    dest.AppointmentId = src.RequestExpandAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Accepted || x.Status == RequestStatus.Waiting)?.Id;
+                }
+            })
             .AfterMap((src, dest, context) =>
             {
                 var completeAppointment = src.RequestExpandAppointments?.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success);
