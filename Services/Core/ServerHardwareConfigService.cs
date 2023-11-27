@@ -142,7 +142,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
                         Capacity = model.Capacity,
                         ServerAllocationId = model.ServerAllocationId,
                         ComponentId = model.ComponentId,
-                        Status = RequestStatus.Accepted
+                        Status = RequestStatus.Success
                     });
                     _dbContext.SaveChanges();
                 }

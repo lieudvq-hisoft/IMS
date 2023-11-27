@@ -46,7 +46,6 @@ public class RequestUpgradeCreateModel
     [Required]
     public string Information { get; set; }
 
-    [Required]
     public string? Note { get; set; }
 
     [Required]
