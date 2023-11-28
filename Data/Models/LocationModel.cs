@@ -21,6 +21,8 @@ public class LocationRackMapModel
     public int Position { get; set; }
     public int RackId { get; set; }
     public ServerAllocationModel? ServerAllocation { get; set; }
+    public ServerAllocationModel? RequestedServerAllocation { get; set; }
+    public RequestExpandResultModel? RequestExpand { get; set; }
 }
 
 public class LocationSearchModel
