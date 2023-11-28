@@ -82,7 +82,7 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpDelete("{id}/Reject")]
+    [HttpPut("{id}/Reject")]
     public async Task<ActionResult> Reject(RequestUpgradeDeleteModel model)
     {
         var result = await _requestUpgradeService.Reject(model);
