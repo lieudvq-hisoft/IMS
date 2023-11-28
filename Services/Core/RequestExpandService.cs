@@ -7,6 +7,7 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml.FormulaParsing.Excel.Functions.Math;
 using Services.Utilities;
 
 namespace Services.Core;
@@ -27,6 +28,7 @@ public interface IRequestExpandService
     Task<ResultModel> CompleteBulk(RequestExpandCompleteBulkModel model, Guid userId);
     Task<ResultModel> CompleteRemoval(int requestExpandId, Guid userId);
     Task<ResultModel> CompleteRemovalBulk(RequestExpandCompleteBulkModel model, Guid userId);
+    Task<ResultModel> GetChosenLocation(int requestExpandId);
     Task<ResultModel> GetRackChoiceSuggestionBySize(int requestExpandId);
 
 }
@@ -723,6 +725,44 @@ public class RequestExpandService : IRequestExpandService
                 transaction.Commit();
                 result.Succeed = true;
                 result.Data = results.Select(x => x.Data);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> GetChosenLocation(int requestExpandId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area).FirstOrDefault(x => x.Id == requestExpandId);
+            if (requestExpand == null)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+            }
+            if (!requestExpand.RequestExpandLocations.Any())
+            {
+                result.ErrorMessage = "Request expand dont have any chosen location";
+            }
+            else
+            {
+                var rack = requestExpand.RequestExpandLocations.Select(x => x.Location.Rack).DistinctBy(x => x.Id).FirstOrDefault();
+                var suggestedLocation = new LocationSuggestResultModel
+                {
+                    Area = _mapper.Map<AreaResultModel>(rack?.Area),
+                    Rack = _mapper.Map<RackResultModel>(rack),
+                    Position = requestExpand.RequestExpandLocations.Select(x => x.Location.Position).Min()
+                };
+
+                result.Succeed = true;
+                result.Data = suggestedLocation;
             }
         }
         catch (Exception e)

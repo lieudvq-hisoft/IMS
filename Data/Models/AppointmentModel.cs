@@ -131,7 +131,7 @@ public class AppointmentCompleteModel
     public DateTime DateCheckedIn { get; set; }
 
     [Required]
-    [DateMoreThan("DateCheckedIn")]
+    [SameDateAndLaterThan("DateCheckedIn")]
     public DateTime DateCheckedOut { get; set; }
 
     public string? SaleNote { get; set; }
