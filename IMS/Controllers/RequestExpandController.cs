@@ -161,7 +161,7 @@ public class RequestExpandController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPut("{id}/SuggestLocation")]
+    [HttpGet("{id}/SuggestLocation")]
     [SwaggerOperation(Summary = "Suggest location for request expand")]
     public async Task<ActionResult> Suggest(int id)
     {
