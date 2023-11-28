@@ -105,7 +105,7 @@ public class ServerAllocationService : IServerAllocationService
         try
         {
             var serverAllocation = _dbContext.ServerAllocations
-                .Include(x => x.ServerHardwareConfigs)
+                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
                 .FirstOrDefault(x => x.Id == id);
             if (serverAllocation == null)
             {
