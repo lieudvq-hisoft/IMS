@@ -789,7 +789,10 @@ public class RequestExpandService : IRequestExpandService
     {
         Location suggestedStartingLocation = null;
         var spaces = new List<List<Location>>(1);
-        var availableLocations = _dbContext.Locations.Include(x => x.LocationAssignments).Where(x => x.RackId == rack.Id && !x.LocationAssignments.Any());
+        var availableLocations = _dbContext.Locations
+            .Include(x => x.LocationAssignments)
+            .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand)
+            .Where(x => x.RackId == rack.Id && !x.LocationAssignments.Any() && !x.RequestExpandLocations.Select(x => x.RequestExpand).Any(x => x.Status == RequestStatus.Waiting && x.Status == RequestStatus.Accepted));
 
         int count = 0;
         var isEmpty = false;
