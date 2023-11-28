@@ -7,6 +7,7 @@ public class RequestExpand : BaseEntity
     public RequestStatus Status { get; set; }
     public RemovalStatus? RemovalStatus { get; set; }
     public string? Note { get; set; }
+    public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Expand;
     public int? Size { get; set; }

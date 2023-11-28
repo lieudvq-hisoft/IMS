@@ -198,6 +198,8 @@ public class RackService : IRackService
                         Id = location.Id,
                         Position = location.Position,
                         RackId = location.RackId,
+                        IsServer = location.LocationAssignments.FirstOrDefault()?.IsServer,
+                        IsReserved = location.IsReserved,
                         ServerAllocation = _mapper.Map<ServerAllocationModel>(location.LocationAssignments.FirstOrDefault()?.ServerAllocation),
                         RequestedServerAllocation = _mapper.Map<ServerAllocationModel>(requestExpand?.ServerAllocation),
                         RequestExpand = _mapper.Map<RequestExpandResultModel>(requestExpand),

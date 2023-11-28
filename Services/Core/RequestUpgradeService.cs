@@ -279,10 +279,10 @@ public class RequestUpgradeService : IRequestUpgradeService
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
-            else if (requestUpgrade.Status != RequestStatus.Waiting)
+            else if (requestUpgrade.Status != RequestStatus.Waiting && requestUpgrade.Status != RequestStatus.Accepted)
             {
                 validPrecondition = false;
-                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING;
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING + " & " + RequestUpgradeErrorMessage.NOT_ACCEPTED;
             }
 
             var component = requestUpgrade?.Component;

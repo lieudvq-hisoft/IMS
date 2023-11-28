@@ -13,6 +13,7 @@ public class AppointmentModel
     public DateTime DateCheckedOut { get; set; }
     public string Reason { get; set; }
     public string? Note { get; set; }
+    public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
     public bool IsCorrectPerson { get; set; }
     public RequestStatus Status { get; set; }
@@ -37,6 +38,7 @@ public class AppointmentResultModel
     public DateTime DateCheckedOut { get; set; }
     public string Reason { get; set; }
     public string? Note { get; set; }
+    public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
     public bool IsCorrectPerson { get; set; }
     public RequestStatus Status { get; set; }
@@ -110,6 +112,17 @@ public class AppointmentUpdateModel
     public string Reason { get; set; }
 
     public string? Note { get; set; }
+
+    public string? SaleNote { get; set; }
+
+    public string? TechNote { get; set; }
+}
+
+public class AppointmentFailModel
+{
+    public string? SaleNote { get; set; }
+
+    public string? TechNote { get; set; }
 }
 
 public class AppointmentCompleteModel
@@ -120,6 +133,8 @@ public class AppointmentCompleteModel
     [Required]
     [DateMoreThan("DateCheckedIn")]
     public DateTime DateCheckedOut { get; set; }
+
+    public string? SaleNote { get; set; }
 
     public string? TechNote { get; set; }
 

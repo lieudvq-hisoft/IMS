@@ -4,6 +4,7 @@ namespace Data.Models;
 public class LocationModel
 {
     public int Id { get; set; }
+    public bool IsReserved { get; set; }
     public int Position { get; set; }
     public int RackId { get; set; }
 }
@@ -11,6 +12,7 @@ public class LocationModel
 public class LocationResultModel
 {
     public int Id { get; set; }
+    public bool IsReserved { get; set; }
     public int Position { get; set; }
     public int RackId { get; set; }
 }
@@ -18,8 +20,10 @@ public class LocationResultModel
 public class LocationRackMapModel
 {
     public int Id { get; set; }
+    public bool IsReserved { get; set; }
     public int Position { get; set; }
     public int RackId { get; set; }
+    public bool? IsServer { get; set; }
     public ServerAllocationModel? ServerAllocation { get; set; }
     public ServerAllocationModel? RequestedServerAllocation { get; set; }
     public RequestExpandResultModel? RequestExpand { get; set; }

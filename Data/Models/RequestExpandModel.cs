@@ -10,6 +10,7 @@ public class RequestExpandModel
     public RemovalStatus? RemovalStatus { get; set; }
     public string RequestType { get; set; }
     public string? Note { get; set; }
+    public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
     public int ServerAllocationId { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
@@ -33,6 +34,7 @@ public class RequestExpandResultModel
     public RemovalStatus? RemovalStatus { get; set; }
     public string RequestType { get; set; }
     public string? Note { get; set; }
+    public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
     public int ServerAllocationId { get; set; }
 }
@@ -47,6 +49,8 @@ public class RequestExpandCreateModel
 {
     [Required]
     public string? Note { get; set; }
+
+    public string? SaleNote { get; set; }
 
     public string? TechNote { get; set; }
 
@@ -77,17 +81,16 @@ public class RequestExpandUpdateModel
 
     public string? Note { get; set; }
 
+    public string? SaleNote { get; set; }
+
     public string? TechNote { get; set; }
 }
 
-public class RequestExpandDeleteModel
+public class RequestExpandRejectModel
 {
-    [Required]
-    public int Id { get; set; }
+    public string? SaleNote { get; set; }
 
     public string? TechNote { get; set; }
-
-    public string? SaleNote { get; set; }
 }
 
 public class RequestExpandSuggestLocationModel

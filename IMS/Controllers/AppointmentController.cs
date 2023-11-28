@@ -117,10 +117,10 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPut("{id}/Fail")]
-    public async Task<ActionResult> Fail(int id)
+    public async Task<ActionResult> Fail(int id, AppointmentFailModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _appointmentService.Fail(id, new Guid(userId));
+        var result = await _appointmentService.Fail(id, model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

@@ -18,7 +18,7 @@ public interface IRequestExpandService
     Task<ResultModel> Create(RequestExpandCreateModel model);
     Task<ResultModel> Update(RequestExpandUpdateModel model);
     Task<ResultModel> Delete(int requestExpandId);
-    Task<ResultModel> Reject(RequestExpandDeleteModel model);
+    Task<ResultModel> Reject(int requestExpandId, RequestExpandRejectModel modell);
     Task<ResultModel> FailRemoval(int requestExpandId);
     Task<ResultModel> Evaluate(int requestExpandId, RequestStatus status, Guid userId);
     Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
@@ -177,6 +177,10 @@ public class RequestExpandService : IRequestExpandService
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
             }
+            else if (requestExpand.Status != RequestStatus.Waiting && requestExpand.Status != RequestStatus.Accepted)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_WAITING + " & " + RequestExpandErrorMessage.NOT_ACCEPTED;
+            }
             else
             {
                 if (requestExpand.Status != RequestStatus.Accepted)
@@ -231,14 +235,14 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
-    public async Task<ResultModel> Reject(RequestExpandDeleteModel model)
+    public async Task<ResultModel> Reject(int requestExpandId, RequestExpandRejectModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == model.Id);
+            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
             if (requestExpand == null)
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
@@ -250,10 +254,11 @@ public class RequestExpandService : IRequestExpandService
             else
             {
                 requestExpand.Status = RequestStatus.Failed;
+                requestExpand.SaleNote = model.SaleNote;
                 requestExpand.TechNote = model.TechNote;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = model.Id;
+                result.Data = requestExpandId;
             }
         }
         catch (Exception e)
@@ -440,7 +445,7 @@ public class RequestExpandService : IRequestExpandService
                 locations = _dbContext.Locations
                     .Include(x => x.LocationAssignments)
                     .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand)
-                    .Where(x => x.RackId == model.RackId && x.Position >= model.StartPosition && x.Position < model.StartPosition + requestExpand.Size.Value).ToList();
+                    .Where(x => x.RackId == model.RackId && x.Position >= model.StartPosition && x.Position < model.StartPosition + requestExpand.Size.Value && !x.IsReserved).ToList();
                 if (locations.Count != requestExpand.Size.Value)
                 {
                     validPrecondition = false;
@@ -792,7 +797,7 @@ public class RequestExpandService : IRequestExpandService
         var availableLocations = _dbContext.Locations
             .Include(x => x.LocationAssignments)
             .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand)
-            .Where(x => x.RackId == rack.Id && !x.LocationAssignments.Any() && !x.RequestExpandLocations.Select(x => x.RequestExpand).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted));
+            .Where(x => x.RackId == rack.Id && !x.IsReserved && !x.LocationAssignments.Any() && !x.RequestExpandLocations.Select(x => x.RequestExpand).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted));
 
         int count = 0;
         var isEmpty = false;

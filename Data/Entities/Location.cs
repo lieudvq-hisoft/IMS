@@ -2,6 +2,7 @@
 public class Location
 {
     public int Id { get; set; }
+    public bool IsReserved { get; set; }
     public bool IsDeleted { get; set; }
     public int Position { get; set; }
 

@@ -72,9 +72,9 @@ public class RequestExpandController : ControllerBase
     }
 
     [HttpPut("{id}/Reject")]
-    public async Task<ActionResult> Reject(RequestExpandDeleteModel model)
+    public async Task<ActionResult> Reject(int id, RequestExpandRejectModel model)
     {
-        var result = await _requestExpandService.Reject(model);
+        var result = await _requestExpandService.Reject(id, model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
