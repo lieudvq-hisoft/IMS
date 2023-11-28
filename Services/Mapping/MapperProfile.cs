@@ -186,7 +186,7 @@ public class MapperProfile : Profile
             .AfterMap((src, dest, context) =>
             {
                 bool forRemoval = src.RemovalStatus != null;
-                var completeAppointment = src.RequestExpandAppointments?.Where(x => x.ForRemoval == forRemoval).Select(x => x.Appointment).OrderByDescending(x => x.DateUpdated).FirstOrDefault(x => x.Status == RequestStatus.Success);
+                var completeAppointment = src.RequestExpandAppointments?.Where(x => x.ForRemoval == forRemoval).Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success);
                 if (completeAppointment != null)
                 {
                     dest.SucceededAppointment = context.Mapper.Map<Appointment, AppointmentResultModel>(completeAppointment);
