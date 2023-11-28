@@ -20,7 +20,7 @@ public interface IRequestUpgradeService
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
     Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model);
     Task<ResultModel> Delete(int requestUpgradeId);
-    Task<ResultModel> Fail(RequestUpgradeDeleteModel model);
+    Task<ResultModel> Reject(RequestUpgradeDeleteModel model);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
     Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, Guid userId);
     Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status, Guid userId);
@@ -355,7 +355,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> Fail(RequestUpgradeDeleteModel model)
+    public async Task<ResultModel> Reject(RequestUpgradeDeleteModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;

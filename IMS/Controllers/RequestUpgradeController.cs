@@ -82,10 +82,10 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpDelete("{id}/Fail")]
-    public async Task<ActionResult> Fail(RequestUpgradeDeleteModel model)
+    [HttpDelete("{id}/Reject")]
+    public async Task<ActionResult> Reject(RequestUpgradeDeleteModel model)
     {
-        var result = await _requestUpgradeService.Fail(model);
+        var result = await _requestUpgradeService.Reject(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
