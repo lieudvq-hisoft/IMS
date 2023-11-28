@@ -37,4 +37,15 @@ public class LocationChoiceModel
 
     [Required]
     public int Position { get; set; }
+
+}
+public class LocationSuggestResultModel
+{
+    public AreaResultModel Area { get; set; }
+
+    [Required]
+    public RackResultModel Rack { get; set; }
+
+    [Required]
+    public int Position { get; set; }
 }

@@ -732,7 +732,7 @@ public class RequestExpandService : IRequestExpandService
     {
         var result = new ResultModel();
         result.Succeed = false;
-        LocationChoiceModel suggestedLocation = null;
+        LocationSuggestResultModel suggestedLocation = null;
 
         try
         {
@@ -747,7 +747,7 @@ public class RequestExpandService : IRequestExpandService
             }
             else
             {
-                var racks = _dbContext.Racks.OrderBy(x => x.Id).ToList();
+                var racks = _dbContext.Racks.Include(x => x.Locations).Include(x => x.Area).OrderBy(x => x.Id).ToList();
 
                 int rackCount = 0;
                 while (rackCount < racks.Count && suggestedLocation == null)
@@ -756,10 +756,10 @@ public class RequestExpandService : IRequestExpandService
                     var suggestedStartingLocation = CheckRackAvailabilityLocation(rack, requestExpand.Size.Value);
                     if (suggestedStartingLocation != null)
                     {
-                        suggestedLocation = new LocationChoiceModel
+                        suggestedLocation = new LocationSuggestResultModel
                         {
-                            AreaId = rack.AreaId,
-                            RackId = rack.Id,
+                            Area = _mapper.Map<AreaResultModel>(rack.Area),
+                            Rack = _mapper.Map<RackResultModel>(rack),
                             Position = suggestedStartingLocation.Position
                         };
                     }
