@@ -133,19 +133,15 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
 
                 _dbContext.ServerHardwareConfigs.Add(serverHardwareConfig);
                 _dbContext.SaveChanges();
-
-                if (component.Type == ComponentType.Change)
+                _dbContext.RequestUpgrades.Add(new RequestUpgrade
                 {
-                    _dbContext.RequestUpgrades.Add(new RequestUpgrade
-                    {
-                        Information = model.Information,
-                        Capacity = model.Capacity,
-                        ServerAllocationId = model.ServerAllocationId,
-                        ComponentId = model.ComponentId,
-                        Status = RequestStatus.Success
-                    });
-                    _dbContext.SaveChanges();
-                }
+                    Information = model.Information,
+                    Capacity = model.Capacity,
+                    ServerAllocationId = model.ServerAllocationId,
+                    ComponentId = model.ComponentId,
+                    Status = RequestStatus.Success
+                });
+                _dbContext.SaveChanges();
 
                 result.Succeed = true;
                 result.Data = _mapper.Map<ServerHardwareConfigModel>(serverHardwareConfig);
