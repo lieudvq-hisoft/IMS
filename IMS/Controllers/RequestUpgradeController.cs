@@ -83,7 +83,7 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPut("{id}/Reject")]
-    public async Task<ActionResult> Reject(RequestUpgradeDeleteModel model)
+    public async Task<ActionResult> Reject(RequestUpgradeRejectModel model)
     {
         var result = await _requestUpgradeService.Reject(model);
         if (result.Succeed) return Ok(result.Data);

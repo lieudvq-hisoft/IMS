@@ -1,5 +1,6 @@
 ﻿using Data.Enums;
 using Data.Utils.ValidationAttributes;
+using IMS.Data.Utils.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models;
@@ -117,6 +118,7 @@ public class AppointmentCompleteModel
     public DateTime DateCheckedIn { get; set; }
 
     [Required]
+    [DateMoreThan("DateCheckedIn")]
     public DateTime DateCheckedOut { get; set; }
 
     public string? TechNote { get; set; }

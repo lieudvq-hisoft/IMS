@@ -20,7 +20,7 @@ public interface IRequestUpgradeService
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
     Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model);
     Task<ResultModel> Delete(int requestUpgradeId);
-    Task<ResultModel> Reject(RequestUpgradeDeleteModel model);
+    Task<ResultModel> Reject(int requestUpgradeId, RequestUpgradeRejectModel model);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
     Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, Guid userId);
     Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status, Guid userId);
@@ -355,14 +355,14 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> Reject(RequestUpgradeDeleteModel model)
+    public async Task<ResultModel> Reject(int requestUpgradeId, RequestUpgradeRejectModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == model.Id);
+            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
@@ -378,7 +378,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 requestUpgrade.SaleNote = model.SaleNote;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = model.Id;
+                result.Data = requestUpgradeId;
             }
         }
         catch (Exception e)

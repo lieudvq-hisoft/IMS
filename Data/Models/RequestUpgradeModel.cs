@@ -94,13 +94,12 @@ public class RequestUpgradeUpdateModel
     public string? SaleNote { get; set; }
 }
 
-public class RequestUpgradeDeleteModel
+public class RequestUpgradeRejectModel
 {
     [Required]
-    public int Id { get; set; }
-
     public string? TechNote { get; set; }
 
+    [Required]
     public string? SaleNote { get; set; }
 }
 
