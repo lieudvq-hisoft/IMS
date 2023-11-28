@@ -367,9 +367,9 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
             }
-            else if (requestUpgrade.Status != RequestStatus.Waiting)
+            else if (requestUpgrade.Status != RequestStatus.Accepted)
             {
-                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING;
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_ACCEPTED;
             }
             else
             {

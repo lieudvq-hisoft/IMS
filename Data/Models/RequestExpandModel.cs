@@ -80,6 +80,16 @@ public class RequestExpandUpdateModel
     public string? TechNote { get; set; }
 }
 
+public class RequestExpandDeleteModel
+{
+    [Required]
+    public int Id { get; set; }
+
+    public string? TechNote { get; set; }
+
+    public string? SaleNote { get; set; }
+}
+
 public class RequestExpandSuggestLocationModel
 {
     [Required]

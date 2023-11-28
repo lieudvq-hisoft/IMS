@@ -18,6 +18,7 @@ public interface IRequestExpandService
     Task<ResultModel> Create(RequestExpandCreateModel model);
     Task<ResultModel> Update(RequestExpandUpdateModel model);
     Task<ResultModel> Delete(int requestExpandId);
+    Task<ResultModel> Reject(RequestExpandDeleteModel model);
     Task<ResultModel> FailRemoval(int requestExpandId);
     Task<ResultModel> Evaluate(int requestExpandId, RequestStatus status, Guid userId);
     Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
@@ -220,6 +221,39 @@ public class RequestExpandService : IRequestExpandService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = requestExpand.Id;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Reject(RequestExpandDeleteModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == model.Id);
+            if (requestExpand == null)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+            }
+            else if (requestExpand.Status != RequestStatus.Accepted)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_ACCEPTED;
+            }
+            else
+            {
+                requestExpand.Status = RequestStatus.Failed;
+                requestExpand.TechNote = model.TechNote;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = model.Id;
             }
         }
         catch (Exception e)

@@ -71,6 +71,14 @@ public class RequestExpandController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpDelete("{id}/Reject")]
+    public async Task<ActionResult> Reject(RequestExpandDeleteModel model)
+    {
+        var result = await _requestExpandService.Reject(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut("{id}/Accept")]
     [SwaggerOperation(Summary = "Accept a waiting request expand")]
     public async Task<ActionResult> Accept(int id)
