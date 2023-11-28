@@ -440,7 +440,7 @@ public class IpSubnetService : IIpSubnetService
 
     private List<IpAddress> ExtractSubnetIpAddresses(double numberOfIps, List<int> octets, List<IpAddress> parentIps)
     {
-        double subnetIncremental = numberOfIps / SUBNET_MAX_SIZE;
+        int subnetIncremental = (int)numberOfIps / SUBNET_MAX_SIZE;
         double ipTaken = 0;
         var ips = new List<IpAddress>();
 
