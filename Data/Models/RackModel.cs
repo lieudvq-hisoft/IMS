@@ -59,6 +59,13 @@ public class RackUpdateModel
     public int Size { get; set; }
 }
 
+public class SuggestLocationModel
+{
+    [Required]
+    [GreaterThanZero]
+    public int Size { get; set; }
+}
+
 public class RackSearchModel
 {
     public int? RackId { get; set; } = null;

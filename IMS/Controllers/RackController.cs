@@ -100,4 +100,12 @@ public class RackController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpGet("SuggestLocation")]
+    public async Task<ActionResult> Suggest(SuggestLocationModel model)
+    {
+        var result = await _RackService.GetRackChoiceSuggestionBySize(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }
