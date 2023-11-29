@@ -168,4 +168,13 @@ public class RequestExpandController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpGet("{id}/SuggestLocation")]
+    [SwaggerOperation(Summary = "Suggest location for request expand")]
+    public async Task<ActionResult> Suggest(int id)
+    {
+        var result = await _requestExpandService.GetRackChoiceSuggestionBySize(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }

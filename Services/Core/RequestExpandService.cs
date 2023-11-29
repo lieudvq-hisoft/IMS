@@ -28,6 +28,7 @@ public interface IRequestExpandService
     Task<ResultModel> CompleteRemoval(int requestExpandId, Guid userId);
     Task<ResultModel> CompleteRemovalBulk(RequestExpandCompleteBulkModel model, Guid userId);
     Task<ResultModel> GetChosenLocation(int requestExpandId);
+    Task<ResultModel> GetRackChoiceSuggestionBySize(int requestExpandId);
 }
 
 public class RequestExpandService : IRequestExpandService
@@ -766,5 +767,102 @@ public class RequestExpandService : IRequestExpandService
         }
 
         return result;
+    }
+
+    public async Task<ResultModel> GetRackChoiceSuggestionBySize(int requestExpandId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        LocationSuggestResultModel suggestedLocation = null;
+        try
+        {
+            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
+            if (requestExpand == null)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+            }
+            else if (requestExpand.Size == null)
+            {
+                result.ErrorMessage = "Cannot suggest without size";
+            }
+            else
+            {
+                var racks = _dbContext.Racks.Include(x => x.Locations).Include(x => x.Area).OrderBy(x => x.Id).ToList();
+                int rackCount = 0;
+                while (rackCount < racks.Count && suggestedLocation == null)
+                {
+                    var rack = racks[rackCount];
+                    var suggestedStartingLocation = CheckRackAvailabilityLocation(rack, requestExpand.Size.Value);
+                    if (suggestedStartingLocation != null)
+                    {
+                        suggestedLocation = new LocationSuggestResultModel
+                        {
+                            Area = _mapper.Map<AreaResultModel>(rack.Area),
+                            Rack = _mapper.Map<RackResultModel>(rack),
+                            Position = suggestedStartingLocation.Position
+                        };
+                    }
+                    rackCount++;
+                }
+                if (suggestedLocation == null)
+                {
+                    result.ErrorMessage = LocationErrorMessgae.NO_AVAILABLE_FOUND;
+                }
+                else
+                {
+                    result.Data = suggestedLocation;
+                    result.Succeed = true;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+    private Location CheckRackAvailabilityLocation(Rack rack, int size)
+    {
+        Location suggestedStartingLocation = null;
+        var spaces = new List<List<Location>>(1);
+        var availableLocations = _dbContext.Locations
+            .Include(x => x.LocationAssignments)
+            .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand)
+            .Where(x => x.RackId == rack.Id && !x.IsReserved && !x.LocationAssignments.Any() && !x.RequestExpandLocations.Select(x => x.RequestExpand).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted));
+        int count = 0;
+        var isEmpty = false;
+        for (int i = 0; i < rack.Size; i++)
+        {
+            var location = availableLocations.FirstOrDefault(x => x.Position == i);
+            if (location != null)
+            {
+                if (spaces.Count < count + 1)
+                {
+                    spaces.Add(new List<Location>());
+                }
+                spaces[count].Add(location);
+                isEmpty = false;
+            }
+            else
+            {
+                if (!isEmpty)
+                {
+                    spaces.Add(new List<Location>());
+                    count++;
+                    isEmpty = true;
+                }
+            }
+        }
+        int spaceCount = 0;
+        while (spaceCount < spaces.Count && suggestedStartingLocation == null)
+        {
+            var space = spaces[spaceCount];
+            if (space.Count >= size)
+            {
+                suggestedStartingLocation = space[0];
+            }
+            spaceCount++;
+        }
+        return suggestedStartingLocation;
     }
 }
