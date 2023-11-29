@@ -118,8 +118,14 @@ public class MapperProfile : Profile
         CreateMap<RackCreateModel, Rack>();
         CreateMap<RackUpdateModel, Rack>();
 
-        CreateMap<Location, LocationModel>();
-
+        CreateMap<Location, LocationModel>()
+            .AfterMap((src, dest, context) =>
+            {
+                if (src.LocationAssignments?.Any() == true)
+                {
+                    dest.IsServer = src.LocationAssignments.FirstOrDefault()?.IsServer;
+                }
+            });
         CreateMap<LocationAssignment, LocationAssignmentModel>();
         CreateMap<LocationAssignmentCreateModel, LocationAssignment>();
         #endregion

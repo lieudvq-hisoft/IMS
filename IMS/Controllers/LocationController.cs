@@ -52,4 +52,20 @@ public class LocationController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPut("Reserve")]
+    public async Task<ActionResult> ReserveLocation(LocationReserveModel model)
+    {
+        var result = await _LocationService.ReservceLocation(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("Unreserve")]
+    public async Task<ActionResult> UnreserveLocation(LocationReserveModel model)
+    {
+        var result = await _LocationService.UnreservceLocation(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }

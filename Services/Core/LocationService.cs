@@ -2,6 +2,7 @@
 using Data.Common.PaginationModel;
 using Data.DataAccess;
 using Data.DataAccess.Constant;
+using Data.Entities;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
@@ -15,6 +16,8 @@ public interface ILocationService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetRequestExpandLocation(int id);
     Task<ResultModel> GetLocationAssignment(int id);
+    Task<ResultModel> ReservceLocation(LocationReserveModel model);
+    Task<ResultModel> UnreservceLocation(LocationReserveModel model);
 }
 
 public class LocationService : ILocationService
@@ -138,6 +141,80 @@ public class LocationService : ILocationService
         {
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
+        return result;
+    }
+
+    public async Task<ResultModel> ReservceLocation(LocationReserveModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var locations = _dbContext.Locations
+                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand)
+                .Include(x => x.LocationAssignments)
+                .Where(delegate (Location x)
+                {
+                    return x.IsAvailable() && model.LocationIds.Contains(x.Id);
+                });
+
+            if (locations.Count() != model.LocationIds.Count())
+            {
+                result.ErrorMessage = "Location not available";
+            }
+            else
+            {
+                foreach (var location in locations)
+                {
+                    location.IsReserved = true;
+                }
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<LocationResultModel>(locations);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> UnreservceLocation(LocationReserveModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var locations = _dbContext.Locations
+                .Where(delegate (Location x)
+                {
+                    return x.IsReserved && model.LocationIds.Contains(x.Id);
+                });
+
+            if (locations.Count() != model.LocationIds.Count())
+            {
+                result.ErrorMessage = "Location not reserved";
+            }
+            else
+            {
+                foreach (var location in locations)
+                {
+                    location.IsReserved = false;
+                }
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<LocationResultModel>(locations);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
         return result;
     }
 }

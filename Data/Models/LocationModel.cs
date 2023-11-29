@@ -5,6 +5,7 @@ public class LocationModel
 {
     public int Id { get; set; }
     public bool IsReserved { get; set; }
+    public bool? IsServer { get; set; }
     public int Position { get; set; }
     public int RackId { get; set; }
 }
@@ -15,6 +16,12 @@ public class LocationResultModel
     public bool IsReserved { get; set; }
     public int Position { get; set; }
     public int RackId { get; set; }
+}
+
+public class LocationReserveModel
+{
+    [Required]
+    public List<int> LocationIds { get; set; }
 }
 
 public class LocationRackMapModel
