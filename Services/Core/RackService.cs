@@ -357,7 +357,10 @@ public class RackService : IRackService
         var availableLocations = _dbContext.Locations
             .Include(x => x.LocationAssignments)
             .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand)
-            .Where(x => x.RackId == rack.Id && x.IsAvailable());
+            .Where(delegate (Location x)
+            {
+                return x.RackId == rack.Id && x.IsAvailable();
+            });
 
         int count = 0;
         var isEmpty = false;
