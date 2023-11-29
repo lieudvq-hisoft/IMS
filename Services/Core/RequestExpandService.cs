@@ -424,7 +424,7 @@ public class RequestExpandService : IRequestExpandService
                 if (requestExpand.Size == null)
                 {
                     validPrecondition = false;
-                    result.ErrorMessage = "Cannot suggest without size";
+                    result.ErrorMessage = "Cannot assign location without size";
                 }
             }
 
@@ -540,15 +540,13 @@ public class RequestExpandService : IRequestExpandService
             if (validPrecondition)
             {
                 var serverAllocation = requestExpand.ServerAllocation;
-                bool haveLocation = serverAllocation.LocationAssignments.Any();
                 var locationAssignments = new List<LocationAssignment>();
                 foreach (var location in locations)
                 {
                     locationAssignments.Add(new LocationAssignment
                     {
                         ServerAllocationId = requestExpand.ServerAllocationId,
-                        LocationId = location.Id,
-                        IsServer = !haveLocation
+                        LocationId = location.Id
                     });
                 }
                 _dbContext.LocationAssignments.AddRange(locationAssignments);

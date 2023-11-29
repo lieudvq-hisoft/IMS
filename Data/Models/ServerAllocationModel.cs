@@ -1,4 +1,5 @@
 ﻿using Data.Enums;
+using Data.Utils.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models;
@@ -33,6 +34,21 @@ public class ServerAllocationResultModel
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdated { get; set; }
     public int CustomerId { get; set; }
+}
+
+public class ServerAllocationAssignLocationModel
+{
+    [Required]
+    [GreaterThanZero]
+    public int RackId { get; set; }
+
+    [Required]
+    [NotNegative]
+    public int StartPosition { get; set; }
+
+    [Required]
+    [GreaterThanZero]
+    public int Size { get; set; }
 }
 
 public class ServerAllocationCreateModel

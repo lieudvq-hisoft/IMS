@@ -25,6 +25,7 @@ public interface IServerAllocationService
     Task<ResultModel> Update(ServerAllocationUpdateModel model);
     Task<ResultModel> Delete(int serverAllocationId);
     Task<ResultModel> AssignMasterIp(int serverAllocationId, ServerAllocationMasterIpAssignmentModel model);
+    Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model);
 }
 
 public class ServerAllocationService : IServerAllocationService
@@ -539,6 +540,70 @@ public class ServerAllocationService : IServerAllocationService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<IpAssignmentResultModel>(ipAssignment);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.LocationAssignments).ThenInclude(x => x.Location).Include(x => x.RequestExpands).FirstOrDefault(x => x.Id == serverAllocationId);
+            if (serverAllocation == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                if (serverAllocation.LocationAssignments.Any())
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Server have location already";
+                }
+            }
+
+            List<Location> locations = null;
+            if (validPrecondition)
+            {
+                locations = _dbContext.Locations
+                    .Include(x => x.LocationAssignments)
+                    .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandLocations)
+                    .Where(delegate (Location x)
+                    {
+                        return x.RackId == model.RackId && x.Position >= model.StartPosition && x.Position < model.StartPosition + model.Size && x.IsAvailable();
+                    })
+                    .ToList();
+                if (locations.Count != model.Size)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = RequestExpandLocationErrorMessage.INVALID_LOCATION;
+                }
+            }
+
+            if (validPrecondition)
+            {
+                foreach (var location in locations)
+                {
+                    _dbContext.LocationAssignments.Add(new LocationAssignment
+                    {
+                        IsServer = true,
+                        LocationId = location.Id,
+                        ServerAllocationId = serverAllocation.Id,
+                    });
+                }
+                _dbContext.SaveChanges();
+                result.Succeed = true;
             }
         }
         catch (Exception e)
