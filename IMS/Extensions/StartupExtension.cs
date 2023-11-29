@@ -9,7 +9,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using Services.Core;
-using Services.Core.NotUsed;
 using Services.Mapping;
 using Services.Utilities;
 using System.Reflection;

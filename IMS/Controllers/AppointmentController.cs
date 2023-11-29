@@ -1,7 +1,6 @@
 ﻿using Data.Common.PaginationModel;
 using Data.Enums;
 using Data.Models;
-using EbookStore.Client.ExternalService.ImageHostService;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;

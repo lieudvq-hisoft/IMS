@@ -7,7 +7,7 @@ namespace IMS.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = "Bearer")]
-public class RequestTypeController: ControllerBase
+public class RequestTypeController : ControllerBase
 {
     [HttpGet]
     public async Task<ActionResult> Get()

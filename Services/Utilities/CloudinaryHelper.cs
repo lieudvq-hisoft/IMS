@@ -9,7 +9,7 @@ public interface ICloudinaryHelper
     string UploadFile(IFormFile file);
 }
 
-public class CloudinaryHelper: ICloudinaryHelper
+public class CloudinaryHelper : ICloudinaryHelper
 {
     private readonly Cloudinary _cloudinary;
     private readonly IConfiguration _config;

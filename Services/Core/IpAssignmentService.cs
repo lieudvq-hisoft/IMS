@@ -1,18 +1,12 @@
 ﻿using AutoMapper;
 using Data.Common.PaginationModel;
-using Data.DataAccess.Constant;
 using Data.DataAccess;
+using Data.DataAccess.Constant;
 using Data.Entities;
 using Data.Enums;
 using Data.Models;
-using Services.Utilities;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Data.Utils.Paging;
-using Microsoft.EntityFrameworkCore;
+using Services.Utilities;
 
 namespace Services.Core;
 public interface IIpAssignmentService
@@ -113,7 +107,7 @@ public class IpAssignmentService : IIpAssignmentService
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
 
-            if(validPrecondition)
+            if (validPrecondition)
             {
                 var ipAssignment = _mapper.Map<IpAssignment>(model);
                 _dbContext.IpAssignments.Add(ipAssignment);

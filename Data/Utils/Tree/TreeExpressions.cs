@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Data.Utils.Tree;
+﻿namespace Data.Utils.Tree;
 public static class TreeExtensions
 {
     /// <summary> Generic interface for tree node structure </summary>

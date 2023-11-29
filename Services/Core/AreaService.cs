@@ -71,7 +71,7 @@ public class AreaService : IAreaService
             var areas = _dbContext.Areas
                 .AsQueryable();
 
-            result.Data = _mapper.Map<List<AreaModel>>(areas.ToList()); 
+            result.Data = _mapper.Map<List<AreaModel>>(areas.ToList());
             result.Succeed = true;
         }
         catch (Exception e)

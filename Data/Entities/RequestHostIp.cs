@@ -1,6 +1,4 @@
-﻿using Data.Enums;
-
-namespace Data.Entities.Pending;
+﻿namespace Data.Entities.Pending;
 public class RequestHostIp : BaseEntity
 {
     public int IpAddressId { get; set; }

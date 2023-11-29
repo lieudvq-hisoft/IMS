@@ -1,5 +1,4 @@
 ﻿using AutoMapper;
-using CloudinaryDotNet.Actions;
 using Data.Common.PaginationModel;
 using Data.DataAccess;
 using Data.DataAccess.Constant;

@@ -8,7 +8,6 @@ using Data.Models;
 using Data.Utils.Paging;
 using EbookStore.Client.ExternalService.ImageHostService;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Storage;
 using Services.Utilities;
 
 namespace Services.Core;
