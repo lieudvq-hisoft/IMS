@@ -1,4 +1,6 @@
-﻿namespace Data.Entities;
+﻿using Data.Enums;
+
+namespace Data.Entities;
 public class Location
 {
     public int Id { get; set; }
@@ -11,4 +13,9 @@ public class Location
 
     public ICollection<LocationAssignment> LocationAssignments { get; set; }
     public ICollection<RequestExpandLocation> RequestExpandLocations { get; set; }
+
+    public bool IsAvailable()
+    {
+        return !IsReserved && !LocationAssignments.Any() && !RequestExpandLocations.Select(x => x.RequestExpand).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted);
+    }
 }

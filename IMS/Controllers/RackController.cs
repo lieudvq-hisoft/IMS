@@ -102,7 +102,7 @@ public class RackController : ControllerBase
     }
 
     [HttpGet("SuggestLocation")]
-    public async Task<ActionResult> Suggest(SuggestLocationModel model)
+    public async Task<ActionResult> Suggest([FromQuery] SuggestLocationModel model)
     {
         var result = await _RackService.GetRackChoiceSuggestionBySize(model);
         if (result.Succeed) return Ok(result.Data);
