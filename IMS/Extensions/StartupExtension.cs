@@ -9,6 +9,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using Services.Core;
+using Services.Core.NotUsed;
 using Services.Mapping;
 using Services.Utilities;
 using System.Reflection;
@@ -54,7 +55,7 @@ public static class StartupExtension
     public static void AddBussinessService(this IServiceCollection services, IConfiguration configuration)
     {
         services.AddScoped<IAreaService, AreaService>();
-        services.AddScoped<ICompanyTypeService, CompanyTypeService>();
+
         services.AddScoped<IComponentService, ComponentService>();
         services.AddScoped<ICustomerService, CustomerService>();
         services.AddScoped<IFileService, FileService>();
@@ -71,6 +72,7 @@ public static class StartupExtension
         services.AddScoped<IRequestHostService, RequestHostService>();
         services.AddScoped<IIpAssignmentService, IpAssignmentService>();
 
+        //services.AddScoped<ICompanyTypeService, CompanyTypeService>();
         //services.AddScoped<IIpService, IpService>();
         //services.AddScoped<IAppointmentUserService, AppointmentUserService>();
         //services.AddScoped<ILocationAssignmentService, LocationAssignmentService>();

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using Data.Entities;
-using Data.Entities.Pending;
 using Data.Enums;
 using Data.Models;
 
@@ -11,9 +10,7 @@ public class MapperProfile : Profile
     public MapperProfile()
     {
         #region Customer
-        CreateMap<Customer, CustomerModel>()
-            .AfterMap((src, dest, context) =>
-                dest.CompanyType = context.Mapper.Map<CompanyType, CompanyTypeModel>(src.CompanyType));
+        CreateMap<Customer, CustomerModel>();
         CreateMap<CustomerCreateModel, Customer>();
         CreateMap<CustomerUpdateModel, Customer>();
         CreateMap<User, UserModel>();
@@ -254,9 +251,9 @@ public class MapperProfile : Profile
         CreateMap<RequestExpandAppointmentCreateModel, RequestExpandAppointment>();
         #endregion
 
-        #region CompanyType
-        CreateMap<CompanyType, CompanyTypeModel>();
-        #endregion
+        //#region CompanyType
+        //CreateMap<CompanyType, CompanyTypeModel>();
+        //#endregion
 
         #region IP
         CreateMap<IpAddress, IpAddressModel>();

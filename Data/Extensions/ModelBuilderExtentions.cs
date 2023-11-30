@@ -1,5 +1,4 @@
 ﻿using Data.Entities;
-using Data.Entities.Pending;
 using Data.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -10,38 +9,38 @@ public static class ModelBuilderExtentions
 {
     public static void Seed(this ModelBuilder builder)
     {
-        #region CompanyType
-        builder.Entity<CompanyType>().HasData(new CompanyType
-        {
-            Id = 1,
-            Name = "Doanh nghiệp tư nhân",
-            Description = "Doanh nghiệp tư nhân",
-        });
-        builder.Entity<CompanyType>().HasData(new CompanyType
-        {
-            Id = 2,
-            Name = "Công ty trách nhiệm hữu hạn một thành viên",
-            Description = "Công ty trách nhiệm hữu hạn một thành viên",
-        });
-        builder.Entity<CompanyType>().HasData(new CompanyType
-        {
-            Id = 3,
-            Name = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên",
-            Description = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên",
-        });
-        builder.Entity<CompanyType>().HasData(new CompanyType
-        {
-            Id = 4,
-            Name = "Công ty cổ phần",
-            Description = "Công ty cổ phần",
-        });
-        builder.Entity<CompanyType>().HasData(new CompanyType
-        {
-            Id = 5,
-            Name = "Công ty hợp danh",
-            Description = "Công ty hợp danh",
-        });
-        #endregion
+        //#region CompanyType
+        //builder.Entity<CompanyType>().HasData(new CompanyType
+        //{
+        //    Id = 1,
+        //    Name = "Doanh nghiệp tư nhân",
+        //    Description = "Doanh nghiệp tư nhân",
+        //});
+        //builder.Entity<CompanyType>().HasData(new CompanyType
+        //{
+        //    Id = 2,
+        //    Name = "Công ty trách nhiệm hữu hạn một thành viên",
+        //    Description = "Công ty trách nhiệm hữu hạn một thành viên",
+        //});
+        //builder.Entity<CompanyType>().HasData(new CompanyType
+        //{
+        //    Id = 3,
+        //    Name = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên",
+        //    Description = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên",
+        //});
+        //builder.Entity<CompanyType>().HasData(new CompanyType
+        //{
+        //    Id = 4,
+        //    Name = "Công ty cổ phần",
+        //    Description = "Công ty cổ phần",
+        //});
+        //builder.Entity<CompanyType>().HasData(new CompanyType
+        //{
+        //    Id = 5,
+        //    Name = "Công ty hợp danh",
+        //    Description = "Công ty hợp danh",
+        //});
+        //#endregion
 
         #region Component
         builder.Entity<Component>().HasData(new Component
@@ -352,7 +351,7 @@ public static class ModelBuilderExtentions
         builder.Entity<Appointment>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<AppointmentUser>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Area>().HasQueryFilter(x => !x.IsDeleted);
-        builder.Entity<CompanyType>().HasQueryFilter(x => !x.IsDeleted);
+        //builder.Entity<CompanyType>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Component>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Customer>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<IpAddress>().HasQueryFilter(x => !x.IsDeleted);

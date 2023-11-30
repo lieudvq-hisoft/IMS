@@ -1,6 +1,6 @@
 ﻿using Data.Enums;
 
-namespace Data.Entities.Pending;
+namespace Data.Entities;
 public class RequestHostUser : BaseEntity
 {
     public RequestUserAction Action { get; set; }

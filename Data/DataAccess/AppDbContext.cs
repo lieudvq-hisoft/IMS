@@ -1,5 +1,4 @@
 ﻿using Data.Entities;
-using Data.Entities.Pending;
 using Data.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
@@ -63,7 +62,7 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<Appointment> Appointments { get; set; }
     public DbSet<AppointmentUser> AppointmentUsers { get; set; }
     public DbSet<Area> Areas { get; set; }
-    public DbSet<CompanyType> CompanyTypes { get; set; }
+    //public DbSet<CompanyType> CompanyTypes { get; set; }
     public DbSet<Component> Components { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<IpAddress> IpAddresses { get; set; }

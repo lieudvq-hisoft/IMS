@@ -1,7 +1,7 @@
 ﻿using Data.Enums;
 using Data.Models;
 
-namespace Data.Entities.Pending;
+namespace Data.Entities;
 public class RequestHost : BaseEntity
 {
     public string? Note { get; set; }

@@ -1,5 +1,4 @@
-﻿using Data.Entities.Pending;
-using Data.Enums;
+﻿using Data.Enums;
 
 namespace Data.Entities;
 public class ServerAllocation : BaseEntity

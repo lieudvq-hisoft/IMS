@@ -1,4 +1,4 @@
-﻿namespace Data.Entities.Pending;
+﻿namespace Data.Entities;
 public class RequestHostIp : BaseEntity
 {
     public int IpAddressId { get; set; }

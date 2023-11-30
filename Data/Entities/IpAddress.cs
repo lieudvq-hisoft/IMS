@@ -1,5 +1,4 @@
-﻿using Data.Entities.Pending;
-using Data.Enums;
+﻿using Data.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 

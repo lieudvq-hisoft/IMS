@@ -59,7 +59,6 @@ public class CustomerService : ICustomerService
         try
         {
             var customers = _dbContext.Customers
-                .Include(x => x.CompanyType)
                 .Where(delegate (Customer x)
                 {
                     return MyFunction.MatchString(searchModel.CustomerName, x.CustomerName);
@@ -155,13 +154,6 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var companyType = _dbContext.CompanyTypes.FirstOrDefault(x => x.Id == model.CompanyTypeId);
-            if (companyType == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = CompanyTypeErrorMessage.NOT_EXISTED;
-            }
-
             var user = _dbContext.Users.FirstOrDefault(x => x.Id == userId);
             if (user == null)
             {
@@ -169,7 +161,7 @@ public class CustomerService : ICustomerService
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
 
-            if (_dbContext.Customers.Any(x => (x.CompanyName == model.CompanyName && x.CompanyTypeId == model.CompanyTypeId) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber))
+            if (_dbContext.Customers.Any(x => (x.CompanyName == model.CompanyName) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber))
             {
                 validPrecondition = false;
                 result.ErrorMessage = CustomerErrorMessage.EXISTED;
@@ -178,9 +170,8 @@ public class CustomerService : ICustomerService
             if (validPrecondition)
             {
                 var customer = _mapper.Map<Customer>(model);
-                var password = MyFunction.ConvertToUnSign(model.CompanyName.Trim().Replace(" ", "")) + "@a123";
-                customer.Username = GenerateUsername(model.CompanyName);
-                customer.CustomerName = $"{companyType.Name} - {model.CompanyName}";
+                var password = "Password@123";
+                customer.CustomerName = model.CompanyName;
                 customer.Password = _passwordHasher.HashPassword(customer, password);
                 _dbContext.Customers.Add(customer);
                 _dbContext.SaveChanges();
@@ -201,17 +192,6 @@ public class CustomerService : ICustomerService
         }
 
         return result;
-    }
-
-    private string GenerateUsername(string companyName)
-    {
-        string username = "";
-        var normalizedCompanyName = MyFunction.ConvertToUnSign(companyName.Trim().Replace(" ", ""));
-        var customerOfCompanyCount = _dbContext.Customers.IgnoreQueryFilters().Where(x => x.Username.Contains(normalizedCompanyName)).ToList().Count();
-
-        username = normalizedCompanyName + (customerOfCompanyCount + 1).ToString();
-
-        return username;
     }
 
     public async Task<ResultModel> Delete(int id)
@@ -261,7 +241,7 @@ public class CustomerService : ICustomerService
                 result.ErrorMessage = CustomerErrorMessage.UPDATE_FAILED;
             }
 
-            var existingCustomer = _dbContext.Customers.FirstOrDefault(x => ((x.CompanyName == model.CompanyName && x.CompanyTypeId == model.CompanyTypeId) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber) && x.Id != model.Id);
+            var existingCustomer = _dbContext.Customers.FirstOrDefault(x => ((x.CompanyName == model.CompanyName) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber) && x.Id != model.Id);
             if (existingCustomer != null)
             {
                 validPrecondition = false;
@@ -321,9 +301,8 @@ public class CustomerService : ICustomerService
             {
                 using var smtpClient = _emailService.GetClient();
                 var email = customer.Email;
-                var username = customer.Username;
-                var password = username.Remove(username.Length - 1) + "@a123";
-                var mailMessage = _emailService.GetActivationMessage(username, password, email);
+                var password = "Password@123";
+                var mailMessage = _emailService.GetActivationMessage(password, email);
                 mailMessage.To.Add(email);
                 smtpClient.SendMailAsync(mailMessage);
             }
@@ -340,7 +319,7 @@ public class CustomerService : ICustomerService
         var result = new ResultModel();
         result.Succeed = false;
 
-        var customer = _dbContext.Customers.FirstOrDefault(x => x.Username == model.Username);
+        var customer = _dbContext.Customers.FirstOrDefault(x => x.Email == model.Email);
 
         if (customer != null)
         {
@@ -383,7 +362,6 @@ public class CustomerService : ICustomerService
             Token_type = "Bearer",
             Expires_in = int.Parse(_config["Jwt:ExpireTimes"]) * 60,
             UserID = customer.Id.ToString(),
-            UserName = customer.Username,
             PhoneNumber = customer.PhoneNumber,
         };
     }
@@ -396,7 +374,6 @@ public class CustomerService : ICustomerService
             new Claim("UserId", customer.Id.ToString()),
             new Claim("Email", customer.Email),
             new Claim("FullName", customer.CustomerName),
-            new Claim("UserName", customer.Username),
             new Claim(ClaimTypes.Role, "Customer")
         };
 

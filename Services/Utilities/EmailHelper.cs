@@ -6,7 +6,7 @@ namespace Services.Utilities;
 public interface IEmailHelper
 {
     SmtpClient GetClient();
-    MailMessage GetActivationMessage(string username, string password, string email);
+    MailMessage GetActivationMessage(string password, string email);
 }
 
 public class EmailHelper : IEmailHelper
@@ -30,7 +30,7 @@ public class EmailHelper : IEmailHelper
         };
     }
 
-    public MailMessage GetActivationMessage(string username, string password, string email)
+    public MailMessage GetActivationMessage(string password, string email)
     {
         var subject = "Activate your new account";
         return new MailMessage
@@ -39,7 +39,7 @@ public class EmailHelper : IEmailHelper
             Subject = subject,
             Body = $"<h1>Click the following link to confirm your email address " +
             $"<a href='{_config[$"Email:{_env}:Link"] + email}'>Activation Link</a></h1>" +
-            $"<h1>Your username: [{username}] and password: [{password}]</h1>",
+            $"<h1>Your password: [{password}]</h1>",
             IsBodyHtml = true,
         };
     }

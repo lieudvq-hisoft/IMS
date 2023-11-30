@@ -4,7 +4,6 @@ namespace Data.Models;
 public class CustomerModel
 {
     public int Id { get; set; }
-    public string Username { get; set; }
     public string? CompanyName { get; set; }
     public string? Address { get; set; }
     public string? TaxNumber { get; set; }
@@ -12,7 +11,7 @@ public class CustomerModel
     public string? PhoneNumber { get; set; }
     public string? CustomerName { get; set; }
 
-    public int? CompanyTypeId { get; set; }
+    //public int? CompanyTypeId { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
 
@@ -22,7 +21,6 @@ public class CustomerModel
 public class CustomerResultModel
 {
     public int Id { get; set; }
-    public string Username { get; set; }
     public string? CompanyName { get; set; }
     public string? Address { get; set; }
     public string? TaxNumber { get; set; }
@@ -30,7 +28,7 @@ public class CustomerResultModel
     public string? PhoneNumber { get; set; }
     public string? CustomerName { get; set; }
 
-    public int? CompanyTypeId { get; set; }
+    //public int? CompanyTypeId { get; set; }
 }
 
 public class CustomerCreateModel
@@ -42,18 +40,19 @@ public class CustomerCreateModel
     public string Address { get; set; }
 
     [Required]
+    [RegularExpression(@"^\d{10}$|^\d{13}$", ErrorMessage = "Tax number must be a string of 10 or 13 number")]
     public string TaxNumber { get; set; }
 
-    [EmailAddress]
     [Required]
+    [EmailAddress]
     public string Email { get; set; }
 
-    [Phone]
     [Required]
+    [Phone]
     public string PhoneNumber { get; set; }
 
-    [Required]
-    public int CompanyTypeId { get; set; }
+    //[Required]
+    //public int CompanyTypeId { get; set; }
 }
 
 public class CustomerUpdateModel
@@ -68,18 +67,19 @@ public class CustomerUpdateModel
     public string Address { get; set; }
 
     [Required]
+    [RegularExpression(@"^\d{10}$|^\d{13}$", ErrorMessage = "Tax number must be a string of 10 or 13 number")]
     public string TaxNumber { get; set; }
 
-    [EmailAddress]
     [Required]
+    [EmailAddress]
     public string Email { get; set; }
 
-    [Phone]
     [Required]
+    [Phone]
     public string PhoneNumber { get; set; }
 
-    [Required]
-    public int CompanyTypeId { get; set; }
+    //[Required]
+    //public int CompanyTypeId { get; set; }
 }
 
 public class CustomerChangePasswordModel
@@ -96,6 +96,6 @@ public class CustomerSearchModel
 
 public class CustomerLoginModel
 {
-    public string Username { get; set; }
+    public string Email { get; set; }
     public string Password { get; set; }
 }
