@@ -198,14 +198,26 @@ public class AppointmentService : IAppointmentService
         {
             using var transaction = _dbContext.Database.BeginTransaction();
             var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == model.UserId);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (user == null)
+            {
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
             else
             {
                 var appointment = _mapper.Map<Appointment>(model);
                 _dbContext.Appointments.Add(appointment);
+                _dbContext.SaveChanges();
+                _dbContext.AppointmentUsers.Add(new AppointmentUser
+                {
+                    Action = RequestUserAction.Execute,
+                    AppointmentId = appointment.Id,
+                    UserId = user.Id
+                });
                 _dbContext.SaveChanges();
 
                 var createRequestUpgradeAppointmentResults = new List<ResultModel>();
@@ -599,15 +611,29 @@ public class AppointmentService : IAppointmentService
         try
         {
             var appointment = _dbContext.Appointments.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == model.Id && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == model.UserId);
             if (appointment == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
 
+            if (user == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+
             if (validPrecondition)
             {
+                _dbContext.AppointmentUsers.RemoveRange(_dbContext.AppointmentUsers.Where(x => x.AppointmentId == appointment.Id && x.Action == RequestUserAction.Execute));
                 _mapper.Map<AppointmentUpdateModel, Appointment>(model, appointment);
+                _dbContext.AppointmentUsers.Add(new AppointmentUser
+                {
+                    Action = RequestUserAction.Execute,
+                    AppointmentId = appointment.Id,
+                    UserId = model.UserId
+                });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<AppointmentResultModel>(appointment);
@@ -763,6 +789,21 @@ public class AppointmentService : IAppointmentService
                 validPrecondition = IsCompletable(appointmentId, result);
             }
 
+            if (validPrecondition)
+            {
+                var executor = _dbContext.AppointmentUsers.FirstOrDefault(x => x.AppointmentId == appointment.Id && x.Action == RequestUserAction.Execute);
+                if (executor == null)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Appointment must have an assigned tech";
+                }
+                else if (executor.UserId != userId)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Unassigned tech cannot complete this appointment";
+                }
+            }
+
             var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
             if (user == null)
             {
@@ -774,12 +815,6 @@ public class AppointmentService : IAppointmentService
             {
                 _mapper.Map<AppointmentCompleteModel, Appointment>(model, appointment);
                 appointment.Status = RequestStatus.Success;
-                _dbContext.AppointmentUsers.Add(new AppointmentUser
-                {
-                    Action = RequestUserAction.Execute,
-                    AppointmentId = appointmentId,
-                    UserId = userId
-                });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<AppointmentResultModel>(appointment);

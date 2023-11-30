@@ -61,6 +61,10 @@ public class AppointmentCreateModel
 
     [Required]
     [GreaterThanZero]
+    public Guid UserId { get; set; }
+
+    [Required]
+    [GreaterThanZero]
     public int ServerAllocationId { get; set; }
 
     public List<int>? RequestUpgradeIds { get; set; }
@@ -109,6 +113,10 @@ public class AppointmentUpdateModel
 
     [Required]
     public string Reason { get; set; }
+
+    [Required]
+    [GreaterThanZero]
+    public Guid UserId { get; set; }
 
     public string? Note { get; set; }
 
