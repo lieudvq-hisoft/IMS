@@ -89,7 +89,7 @@ public class CustomerChangePasswordModel
     public string CurrentPassword { get; set; }
 
     [Required]
-    [DataType(DataType.Password)]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$", ErrorMessage = "Password must be at least 8 character with lower, upper and special character and number")]
     public string Password { get; set; }
 }
 
@@ -101,5 +101,7 @@ public class CustomerSearchModel
 public class CustomerLoginModel
 {
     public string Email { get; set; }
+
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$")]
     public string Password { get; set; }
 }

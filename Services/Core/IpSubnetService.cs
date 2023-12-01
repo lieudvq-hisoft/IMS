@@ -129,7 +129,10 @@ public class IpSubnetService : IIpSubnetService
 
         try
         {
-            var allSubnets = _dbContext.IpSubnets.Include(x => x.ParentNetwork).Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).Include(x => x.IpAddresses).ToList();
+            var allSubnets = _dbContext.IpSubnets
+                .Include(x => x.ParentNetwork)
+                .Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.IpAddresses).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer).ToList();
 
             var rootSubnet = GetSubnetTree(subnetId, allSubnets);
             var ipAddressesQuery = GetAllIpAddress(rootSubnet)

@@ -256,7 +256,21 @@ public class MapperProfile : Profile
         //#endregion
 
         #region IP
-        CreateMap<IpAddress, IpAddressModel>();
+        CreateMap<IpAddress, IpAddressModel>()
+            .AfterMap((src, dest, context) =>
+            {
+                if (src.IpAssignments.FirstOrDefault()?.ServerAllocation != null)
+                {
+                    dest.Customer = context.Mapper.Map<Customer, CustomerResultModel>(src.IpAssignments.FirstOrDefault()?.ServerAllocation?.Customer);
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                if (src.IpAssignments.FirstOrDefault()?.ServerAllocation != null)
+                {
+                    dest.ServerAllocation = context.Mapper.Map<ServerAllocation, ServerAllocationResultModel>(src.IpAssignments.FirstOrDefault()?.ServerAllocation);
+                }
+            });
         CreateMap<IpSubnet, IpSubnetModel>()
             .ForMember(dest => dest.SubnetIds, opt => opt.MapFrom(src => src.SubNets.Select(x => x.Id)));
 
