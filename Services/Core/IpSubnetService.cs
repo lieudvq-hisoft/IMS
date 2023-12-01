@@ -18,9 +18,10 @@ public interface IIpSubnetService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
     Task<ResultModel> GetIpRange(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
+    Task<ResultModel> GetIpSubnet(int subnetId);
+    Task<ResultModel> GetNextAddress(int subnetId);
     Task<ResultModel> CreateIpRange(IpRangeCreateModel model);
     Task<ResultModel> Create(int ipSubnetId, List<IpSubnetCreateModel> models);
-    Task<ResultModel> GetIpSubnet(int subnetId);
     Task<ResultModel> Delete(int subnetId);
     Task<ResultModel> GetIpAddress(int ipSubnetId, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> SuggestAdditionalIps(SuggestAdditionalIpModel model);
@@ -209,6 +210,40 @@ public class IpSubnetService : IIpSubnetService
             {
                 result.Data = _mapper.Map<List<IpSubnetModel>>(subnet.SubNets);
                 result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetNextAddress(int subnetId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var subnet = _dbContext.IpSubnets.Include(x => x.ParentNetwork).Include(x => x.SubNets).ThenInclude(x => x.SubNets).FirstOrDefault(x => x.Id == subnetId);
+            if (subnet == null)
+            {
+                result.ErrorMessage = IpSubnetErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var numberOfIp = Math.Pow(2, PREFIX_LENGTH_MAX - subnet.PrefixLength);
+                var newFourthOctet = subnet.FourthOctet + numberOfIp;
+                if (newFourthOctet > SUBNET_MAX_SIZE)
+                {
+                    result.ErrorMessage = "End of subnet";
+                }
+                else
+                {
+                    result.Data = $"{subnet.FirstOctet}.{subnet.SecondOctet}.{subnet.ThirdOctet}.{newFourthOctet}";
+                    result.Succeed = true;
+                }
             }
         }
         catch (Exception e)

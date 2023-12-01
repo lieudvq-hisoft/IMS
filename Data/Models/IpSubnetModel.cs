@@ -45,6 +45,12 @@ public class IpRangeCreateModel
     public List<IpSubnetCreateModel?>? IpSubnets { get; set; }
 }
 
+public class CreateSubnetModel
+{
+    [Required]
+    public List<IpSubnetCreateModel> IpSubnets { get; set; }
+}
+
 public class IpSubnetCreateModel
 {
     [IsIpV4]

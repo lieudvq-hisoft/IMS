@@ -59,10 +59,26 @@ public class IpSubnetController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/NextAddress")]
+    public async Task<ActionResult> GetNextAddress(int id)
+    {
+        var result = await _ipSubnetService.GetNextAddress(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost]
     public async Task<ActionResult> CreateIpRange([FromBody] IpRangeCreateModel model)
     {
         var result = await _ipSubnetService.CreateIpRange(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPost("{id}/Subnet")]
+    public async Task<ActionResult> CreateIpSubnet(int id, [FromBody] CreateSubnetModel model)
+    {
+        var result = await _ipSubnetService.Create(id, model.IpSubnets);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
