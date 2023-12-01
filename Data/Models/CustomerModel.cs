@@ -88,8 +88,8 @@ public class CustomerChangePasswordModel
     [DataType(DataType.Password)]
     public string CurrentPassword { get; set; }
 
-    [Required]
-    [DataType(DataType.Password)]
+    //[Required]
+    //[DataType(DataType.Password)]
     public string Password { get; set; }
 }
 
