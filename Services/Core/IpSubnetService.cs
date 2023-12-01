@@ -28,14 +28,16 @@ public interface IIpSubnetService
 public class IpSubnetService : IIpSubnetService
 {
     private readonly AppDbContext _dbContext;
+    private readonly IIpTreeHelper _ipTreeHelper;
     private readonly IMapper _mapper;
     private const int SUBNET_MAX_SIZE = 256;
     private const int PREFIX_LENGTH_MAX = 32;
 
-    public IpSubnetService(AppDbContext dbContext, IMapper mapper)
+    public IpSubnetService(AppDbContext dbContext, IMapper mapper, IIpTreeHelper ipTreeHelper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _ipTreeHelper = ipTreeHelper;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel)
@@ -129,12 +131,7 @@ public class IpSubnetService : IIpSubnetService
 
         try
         {
-            var allSubnets = _dbContext.IpSubnets
-                .Include(x => x.ParentNetwork)
-                .Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .Include(x => x.IpAddresses).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer).ToList();
-
-            var rootSubnet = GetSubnetTree(subnetId, allSubnets);
+            var rootSubnet = _ipTreeHelper.GetSubnetTree(subnetId);
             var ipAddressesQuery = GetAllIpAddress(rootSubnet)
                 .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
                 .AsQueryable();
@@ -156,29 +153,26 @@ public class IpSubnetService : IIpSubnetService
         return result;
     }
 
-    private ITree<IpSubnet> GetSubnetTree(int subnetId, List<IpSubnet> subnets)
-    {
-        ITree<IpSubnet> virtualRootNode = subnets.ToTree((parent, child) => child.ParentNetworkId == parent.Id);
-        ITree<IpSubnet> rootLevelSubnetWithSubTree = virtualRootNode.GetAllChildren().FirstOrDefault(x => x.Data.Id == subnetId);
-
-        if (rootLevelSubnetWithSubTree == null)
-        {
-            throw new Exception(IpSubnetErrorMessage.NOT_EXISTED);
-        }
-
-        return rootLevelSubnetWithSubTree;
-    }
-
     private List<IpAddress> GetAllIpAddress(ITree<IpSubnet> subnet)
     {
         List<ITree<IpSubnet>> childSubnets = subnet.GetAllChildren().ToList();
         var ipAddresses = new List<IpAddress>();
         if (subnet.Data != null)
         {
-            ipAddresses.AddRange(subnet.Data.IpAddresses.ToList());
+            var subnetIps = _dbContext.IpAddresses
+                .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+                .Where(x => x.IpSubnetId == subnet.Data.Id)
+                .ToList();
+            ipAddresses.AddRange(subnetIps);
             foreach (var ipSubnet in childSubnets.Select(x => x.Data))
             {
-                ipAddresses.AddRange(ipSubnet.IpAddresses);
+                var childSubnetIps = _dbContext.IpAddresses
+                    .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                    .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+                    .Where(x => x.IpSubnetId == ipSubnet.Id)
+                    .ToList();
+                ipAddresses.AddRange(childSubnetIps);
             }
         }
 
@@ -507,15 +501,15 @@ public class IpSubnetService : IIpSubnetService
                 }
                 else
                 {
-                    var allSubnets = _dbContext.IpSubnets
-                        .Include(x => x.ParentNetwork)
-                        .Include(x => x.IpAddresses).ThenInclude(x => x.IpAssignments)
-                        .Include(x => x.IpAddresses).ThenInclude(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
-                        .Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).ThenInclude(x => x.IpAssignments)
-                        .Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).ThenInclude(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
-                        .ToList();
+                    //var allSubnets = _dbContext.IpSubnets
+                    //    .Include(x => x.ParentNetwork)
+                    //    .Include(x => x.IpAddresses).ThenInclude(x => x.IpAssignments)
+                    //    .Include(x => x.IpAddresses).ThenInclude(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+                    //    .Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).ThenInclude(x => x.IpAssignments)
+                    //    .Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).ThenInclude(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+                    //    .ToList();
 
-                    var rootSubnet = GetSubnetTree(masterSubnet.Id, allSubnets);
+                    var rootSubnet = _ipTreeHelper.GetSubnetTree(masterSubnet.Id);
                     var additionalIps = new List<IpAddress>();
                     while (rootSubnet.Parent != null && additionalIps.Count() < model.Quantity)
                     {
