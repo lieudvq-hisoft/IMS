@@ -19,6 +19,7 @@ public interface IIpSubnetService
     Task<ResultModel> GetIpRange(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> CreateIpRange(IpRangeCreateModel model);
+    Task<ResultModel> Create(int ipSubnetId, List<IpSubnetCreateModel> models);
     Task<ResultModel> GetIpSubnet(int subnetId);
     Task<ResultModel> Delete(int subnetId);
     Task<ResultModel> GetIpAddress(int ipSubnetId, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
@@ -28,16 +29,14 @@ public interface IIpSubnetService
 public class IpSubnetService : IIpSubnetService
 {
     private readonly AppDbContext _dbContext;
-    private readonly IIpTreeHelper _ipTreeHelper;
     private readonly IMapper _mapper;
     private const int SUBNET_MAX_SIZE = 256;
     private const int PREFIX_LENGTH_MAX = 32;
 
-    public IpSubnetService(AppDbContext dbContext, IMapper mapper, IIpTreeHelper ipTreeHelper)
+    public IpSubnetService(AppDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _ipTreeHelper = ipTreeHelper;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel)
@@ -131,7 +130,8 @@ public class IpSubnetService : IIpSubnetService
 
         try
         {
-            var rootSubnet = _ipTreeHelper.GetSubnetTree(subnetId);
+            var subnetTree = CreateSubnetTree();
+            var rootSubnet = GetSubnetTree(subnetId, subnetTree);
             var ipAddressesQuery = GetAllIpAddress(rootSubnet)
                 //.Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
                 .AsQueryable();
@@ -151,6 +151,20 @@ public class IpSubnetService : IIpSubnetService
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
         return result;
+    }
+
+    private ITree<IpSubnet> CreateSubnetTree()
+    {
+        var allSubnets = _dbContext.IpSubnets
+            .Include(x => x.ParentNetwork)
+            .Include(x => x.SubNets).ToList();
+
+        return allSubnets.ToTree((parent, child) => child.ParentNetworkId == parent.Id);
+    }
+
+    private ITree<IpSubnet> GetSubnetTree(int subnetId, ITree<IpSubnet> subnetTree)
+    {
+        return subnetTree.GetAllChildren().FirstOrDefault(x => x.Data.Id == subnetId);
     }
 
     private List<IpAddress> GetAllIpAddress(ITree<IpSubnet> subnet)
@@ -509,7 +523,8 @@ public class IpSubnetService : IIpSubnetService
                     //    .Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).ThenInclude(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
                     //    .ToList();
 
-                    var rootSubnet = _ipTreeHelper.GetSubnetTree(masterSubnet.Id);
+                    var subnetTree = CreateSubnetTree();
+                    var rootSubnet = GetSubnetTree(masterSubnet.Id, subnetTree);
                     var additionalIps = new List<IpAddress>();
                     while (rootSubnet.Parent != null && additionalIps.Count() < model.Quantity)
                     {
