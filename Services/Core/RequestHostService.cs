@@ -113,7 +113,11 @@ public class RequestHostService : IRequestHostService
             var serverAllocation = _dbContext.ServerAllocations
                 .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                 .FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
-            if (serverAllocation == null)
+            if (model.Type == IpAssignmentTypes.Master)
+            {
+                result.ErrorMessage = "Cannot request more master ip";
+            }
+            else if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
