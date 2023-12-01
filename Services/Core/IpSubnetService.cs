@@ -219,7 +219,12 @@ public class IpSubnetService : IIpSubnetService
         {
             using var transaction = _dbContext.Database.BeginTransaction();
             var octets = GetIPv4Octets(model.IpAddresss);
-            if (octets[3] != 0)
+            var existedSubnet = _dbContext.IpSubnets.FirstOrDefault(x => x.FirstOctet == octets[0] && x.SecondOctet == octets[1] && x.ThirdOctet == octets[2]);
+            if (existedSubnet != null)
+            {
+                result.ErrorMessage = "Subnet existed";
+            }
+            else if (octets[3] != 0)
             {
                 result.ErrorMessage = IpSubnetErrorMessage.IP_RANGE_FOURTH_OCTET;
             }

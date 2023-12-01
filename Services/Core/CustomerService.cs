@@ -26,7 +26,6 @@ public interface ICustomerService
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Update(CustomerUpdateModel model);
     Task<ResultModel> ChangePassword(CustomerChangePasswordModel model, int customerId);
-    Task<ResultModel> SendActivationEmail(List<int> customerIds);
     Task<ResultModel> Login(CustomerLoginModel model);
 }
 
@@ -287,6 +286,7 @@ public class CustomerService : ICustomerService
                 {
                     customer.Password = _passwordHasher.HashPassword(customer, model.Password);
                     _dbContext.SaveChanges();
+                    SendActivationEmail(customer);
                     result.Succeed = true;
                     result.Data = _mapper.Map<CustomerResultModel>(customer);
                 }
@@ -300,26 +300,14 @@ public class CustomerService : ICustomerService
         return result;
     }
 
-    public async Task<ResultModel> SendActivationEmail(List<int> customerIds)
+    private void SendActivationEmail(Customer customer)
     {
-        foreach (int customerId in customerIds)
-        {
-            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == customerId);
-            if (customer != null)
-            {
-                using var smtpClient = _emailService.GetClient();
-                var email = customer.Email;
-                var password = "Password@123";
-                var mailMessage = _emailService.GetActivationMessage(password, email);
-                mailMessage.To.Add(email);
-                smtpClient.SendMailAsync(mailMessage);
-            }
-        }
-
-        return new ResultModel
-        {
-            Succeed = true
-        };
+        using var smtpClient = _emailService.GetClient();
+        var email = customer.Email;
+        var password = "Password@123";
+        var mailMessage = _emailService.GetActivationMessage(password, email);
+        mailMessage.To.Add(email);
+        smtpClient.SendMailAsync(mailMessage);
     }
 
     public async Task<ResultModel> Login(CustomerLoginModel model)
