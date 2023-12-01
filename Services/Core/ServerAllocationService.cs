@@ -17,6 +17,7 @@ public interface IServerAllocationService
     Task<ResultModel> GetHardwareConfig(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id);
+    Task<ResultModel> GetRequestHost(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetLocationAssignment(int id);
     Task<ResultModel> GetIpAssignment(int id);
     Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int id);
@@ -143,7 +144,6 @@ public class ServerAllocationService : IServerAllocationService
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.Component)
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
-                .Include(x => x.Customer)
                 .FirstOrDefault(x => x.Id == id);
             if (serverAllocation == null)
             {
@@ -180,7 +180,6 @@ public class ServerAllocationService : IServerAllocationService
                 .Include(x => x.RequestExpands).ThenInclude(x => x.RequestExpandLocations).ThenInclude(x => x.Location)
                 .Include(x => x.RequestExpands).ThenInclude(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.RequestExpands).ThenInclude(x => x.RequestExpandUsers).ThenInclude(x => x.User)
-                .Include(x => x.Customer)
                 .FirstOrDefault(x => x.Id == id);
             if (serverAllocation == null)
             {
@@ -216,7 +215,6 @@ public class ServerAllocationService : IServerAllocationService
                 .Include(x => x.Customer)
                 .Include(x => x.RequestHosts).ThenInclude(x => x.RequestHostIps)
                 .Include(x => x.RequestHosts).ThenInclude(x => x.RequestHostUsers).ThenInclude(x => x.User)
-                .Include(x => x.Customer)
                 .FirstOrDefault(x => x.Id == id);
             if (serverAllocation == null)
             {
