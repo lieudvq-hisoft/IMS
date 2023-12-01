@@ -217,6 +217,7 @@ public class IpSubnetService : IIpSubnetService
 
         try
         {
+
             using var transaction = _dbContext.Database.BeginTransaction();
             var octets = GetIPv4Octets(model.IpAddresss);
             var existedSubnet = _dbContext.IpSubnets.FirstOrDefault(x => x.FirstOctet == octets[0] && x.SecondOctet == octets[1] && x.ThirdOctet == octets[2]);
