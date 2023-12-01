@@ -48,7 +48,7 @@ public class CustomerCreateModel
     public string Email { get; set; }
 
     [Required]
-    [Phone]
+    [RegularExpression(@"^\d{10}$", ErrorMessage = "Phone number must be a string of 10 number")]
     public string PhoneNumber { get; set; }
 
     //[Required]
