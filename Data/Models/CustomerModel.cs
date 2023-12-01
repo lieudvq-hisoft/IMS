@@ -86,6 +86,10 @@ public class CustomerChangePasswordModel
 {
     [Required]
     [DataType(DataType.Password)]
+    public string CurrentPassword { get; set; }
+
+    [Required]
+    [DataType(DataType.Password)]
     public string Password { get; set; }
 }
 

@@ -278,10 +278,18 @@ public class CustomerService : ICustomerService
             }
             else
             {
-                customer.Password = _passwordHasher.HashPassword(customer, model.Password);
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = _mapper.Map<CustomerResultModel>(customer);
+                var passwordVerifyResult = _passwordHasher.VerifyHashedPassword(customer, customer.Password, model.CurrentPassword);
+                if (passwordVerifyResult != PasswordVerificationResult.Success && passwordVerifyResult != PasswordVerificationResult.SuccessRehashNeeded)
+                {
+                    result.ErrorMessage = "Old password not match";
+                }
+                else
+                {
+                    customer.Password = _passwordHasher.HashPassword(customer, model.Password);
+                    _dbContext.SaveChanges();
+                    result.Succeed = true;
+                    result.Data = _mapper.Map<CustomerResultModel>(customer);
+                }
             }
         }
         catch (Exception e)
