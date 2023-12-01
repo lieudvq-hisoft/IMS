@@ -1,4 +1,5 @@
 ﻿using Data.Enums;
+using Data.Utils.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models;
@@ -37,9 +38,23 @@ public class RequestHostResultModel
 public class RequestHostCreateModel
 {
     public string? Note { get; set; }
+
     public string? SaleNote { get; set; }
+
     public string? TechNote { get; set; }
+
+    [Required]
+    [GreaterThanZero]
+    public int Quantity { get; set; }
+
+    [Required]
+    public bool IsRemoval { get; set; }
+
+    [Required]
     public IpAssignmentTypes Type { get; set; }
+
+    [Required]
+    [GreaterThanZero]
     public int ServerAllocationId { get; set; }
 }
 
@@ -51,10 +66,20 @@ public class RequestHostIpAssignmentModel
 
 public class RequestHostUpdateModel
 {
+    [Required]
+    [GreaterThanZero]
     public int Id { get; set; }
+
     public string? Note { get; set; }
+
     public string? SaleNote { get; set; }
+
     public string? TechNote { get; set; }
+
+    [Required]
+    [GreaterThanZero]
+    public int Quantity { get; set; }
+
     public IpAssignmentTypes Type { get; set; }
 }
 

@@ -171,6 +171,10 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.HAVE_IP_MASTER_ALREADY;
             }
+            else if (requestHost.RequestHostIps.Any())
+            {
+                result.ErrorMessage = "Have ip choice already";
+            }
             else
             {
                 _mapper.Map<RequestHostUpdateModel, RequestHost>(model, requestHost);
@@ -306,12 +310,6 @@ public class RequestHostService : IRequestHostService
             }
             else
             {
-                if (!requestHost.RequestHostIps.Any())
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
-                }
-
                 if (requestHost.Status != RequestHostStatus.Waiting)
                 {
                     validPrecondition = false;
@@ -323,15 +321,18 @@ public class RequestHostService : IRequestHostService
             {
                 foreach (int ipAddressId in model.IpAddressIds)
                 {
-                    var ipAddress = _dbContext.IpAddresses.Include(x => x.IpAssignments)
-                        .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
-                        .Where(x => !x.Blocked && !x.IsReserved && !x.IpAssignments.Any() && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
-                        .FirstOrDefault(x => x.Id == ipAddressId);
+                    var ipAddress = GetValidIpAddress(ipAddressId, requestHost.IsRemoval);
                     if (ipAddress == null)
                     {
                         validPrecondition = false;
                         result.ErrorMessage = IpAddressErrorMessage.UNASSIGNABLE;
                     }
+                    else if (requestHost.IsRemoval && ipAddress.IpAssignments.FirstOrDefault().ServerAllocationId != requestHost.ServerAllocationId)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "Can only removed owned ip address";
+                    }
+
                 }
             }
 
@@ -359,6 +360,16 @@ public class RequestHostService : IRequestHostService
         }
 
         return result;
+    }
+
+    private IpAddress GetValidIpAddress(int ipAddressId, bool isRemoval)
+    {
+        var ipAddress = _dbContext.IpAddresses.Include(x => x.IpAssignments)
+            .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+            .Where(x => !x.Blocked && !x.IsReserved && x.IpAssignments.Any() == isRemoval && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
+            .FirstOrDefault(x => x.Id == ipAddressId);
+
+        return ipAddress;
     }
 
     public async Task<ResultModel> AssignInspectionReport(int requestHostId, DocumentFileUploadModel model)
@@ -479,14 +490,24 @@ public class RequestHostService : IRequestHostService
                 var ipAssignments = new List<IpAssignment>();
                 foreach (var ipAddress in ipAddresses)
                 {
-                    ipAssignments.Add(new IpAssignment
+                    if (!requestHost.IsRemoval)
                     {
-                        IpAddressId = ipAddress.Id,
-                        ServerAllocationId = requestHost.ServerAllocationId,
-                        Type = requestHost.Type
-                    });
+                        ipAssignments.Add(new IpAssignment
+                        {
+                            IpAddressId = ipAddress.Id,
+                            ServerAllocationId = requestHost.ServerAllocationId,
+                            Type = requestHost.Type
+                        });
+                    }
+                    else
+                    {
+                        _dbContext.IpAssignments.RemoveRange(ipAddress.IpAssignments);
+                    }
                 }
-                _dbContext.IpAssignments.AddRange(ipAssignments);
+                if (!requestHost.IsRemoval)
+                {
+                    _dbContext.IpAssignments.AddRange(ipAssignments);
+                }
                 _dbContext.RequestHostUsers.Add(new RequestHostUser
                 {
                     Action = RequestUserAction.Execute,
