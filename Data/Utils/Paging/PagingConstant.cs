@@ -19,14 +19,14 @@ public static class PagingConstant
     public enum OrderCriteria
     {
         /// <summary>
-        /// descendant
-        /// </summary>
-        DESC,
-
-        /// <summary>
         /// ascendant
         /// </summary>
         ASC,
+
+        /// <summary>
+        /// descendant
+        /// </summary>
+        DESC,
     }
 }
 

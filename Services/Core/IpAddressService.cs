@@ -15,6 +15,7 @@ public interface IIpAddressService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> SuggestMasterIp();
+    Task<ResultModel> ChangeBlockingStatus(IpAddressIdListModel model, bool isBlock);
 }
 
 public class IpAddressService : IIpAddressService
@@ -111,6 +112,40 @@ public class IpAddressService : IIpAddressService
             {
                 result.Succeed = true;
                 result.Data = _mapper.Map<IpAddressResultModel>(suggestedMasterIp);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> ChangeBlockingStatus(IpAddressIdListModel model, bool isBlock)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var ipAddresses = _dbContext.IpAddresses
+                .Where(x => model.IpAddressIds.Contains(x.Id) && x.Blocked == isBlock)
+                .ToList();
+            if (ipAddresses.Count() != model.IpAddressIds.Count())
+            {
+                result.ErrorMessage = $"Not all ip valid to be {(isBlock ? "block": "unblock")}";
+            }
+            else
+            {
+                ipAddresses.ForEach(x =>
+                {
+                    x.Blocked = isBlock;
+                    x.Note = model.Note;
+                });
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<IpAddressResultModel>>(ipAddresses);
             }
         }
         catch (Exception e)

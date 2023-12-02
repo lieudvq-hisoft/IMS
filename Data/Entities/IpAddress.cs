@@ -10,6 +10,7 @@ public class IpAddress
     public int Id { get; set; }
     public bool IsDeleted { get; set; }
     public string Address { get; set; }
+    public string Note { get; set; }
     public bool Blocked { get; set; }
     public bool IsReserved { get; set; }
     public IpPurpose Purpose { get; set; }

@@ -25,7 +25,9 @@ public enum IpPurpose
 {
     Host,
     Network,
-    Broadcast
+    Broadcast,
+    Dns,
+    Gateway,
 }
 
 public enum RequestUserAction

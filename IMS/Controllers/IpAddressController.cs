@@ -42,4 +42,20 @@ public class IpAddressController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPut("Block")]
+    public async Task<ActionResult> Block([FromBody] IpAddressIdListModel model)
+    {
+        var result = await _ipAddressService.ChangeBlockingStatus(model, true);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("Unblock")]
+    public async Task<ActionResult> Unblock([FromBody] IpAddressIdListModel model)
+    {
+        var result = await _ipAddressService.ChangeBlockingStatus(model, false);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }
