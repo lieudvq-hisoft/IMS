@@ -8,6 +8,7 @@ using Data.Models;
 using Data.Utils.Paging;
 using EbookStore.Client.ExternalService.ImageHostService;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml.FormulaParsing.Utilities;
 using Services.Utilities;
 
 namespace Services.Core;
@@ -195,7 +196,10 @@ public class RequestHostService : IRequestHostService
         try
         {
             var requestHost = _dbContext.RequestHosts
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress).ThenInclude(x => x.RequestHostIps)
+                .Include(x => x.RequestHostIps)
+                .Include(x => x.ServerAllocation)
+                .ThenInclude(x => x.IpAssignments)
+                .ThenInclude(x => x.IpAddress)
                 .FirstOrDefault(x => x.Id == model.Id && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
             var serverAllocation = requestHost.ServerAllocation;
             if (requestHost == null)
