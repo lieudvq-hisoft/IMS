@@ -270,6 +270,13 @@ public class MapperProfile : Profile
                 {
                     dest.ServerAllocation = context.Mapper.Map<ServerAllocation, ServerAllocationResultModel>(src.IpAssignments.FirstOrDefault()?.ServerAllocation);
                 }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                if (src.IpAssignments.FirstOrDefault()?.ServerAllocation != null)
+                {
+                    dest.AssignmentType = src.IpAssignments.FirstOrDefault()?.Type.ToString();
+                }
             });
         CreateMap<IpSubnet, IpSubnetModel>()
             .ForMember(dest => dest.SubnetIds, opt => opt.MapFrom(src => src.SubNets.Select(x => x.Id)));

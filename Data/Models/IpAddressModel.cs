@@ -9,6 +9,7 @@ public class IpAddressModel
     public bool Blocked { get; set; }
     public bool IsReserved { get; set; }
     public string Purpose { get; set; }
+    public string AssignmentType { get; set; }
     public string Note { get; set; }
     public ServerAllocationResultModel? ServerAllocation { get; set; }
     public CustomerResultModel? Customer { get; set; }

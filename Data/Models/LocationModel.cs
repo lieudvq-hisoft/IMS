@@ -52,6 +52,7 @@ public class LocationChoiceModel
     public int Position { get; set; }
 
 }
+
 public class LocationSuggestResultModel
 {
     public AreaResultModel Area { get; set; }
