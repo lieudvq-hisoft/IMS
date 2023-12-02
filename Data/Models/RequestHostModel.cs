@@ -6,6 +6,7 @@ namespace Data.Models;
 public class RequestHostModel
 {
     public int Id { get; set; }
+    public int Quantity { get; set; }
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
@@ -14,6 +15,9 @@ public class RequestHostModel
     public RequestHostStatus Status { get; set; }
     public string? InspectionReportFilePath { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
+    public RequestType RequestType { get; set; } = RequestType.Host;
+    public DateTime DateCreated { get; set; } = DateTime.Now;
+    public DateTime DateUpdated { get; set; } = DateTime.Now;
     public int ServerAllocationId { get; set; }
 
     public ServerAllocationResultModel? ServerAllocation { get; set; }
@@ -26,6 +30,7 @@ public class RequestHostResultModel
 {
     public int Id { get; set; }
     public string? Note { get; set; }
+    public int Quantity { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
     public bool IsRemoval { get; set; }
