@@ -19,7 +19,7 @@ public interface IServerAllocationService
     Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestHost(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetLocationAssignment(int id);
-    Task<ResultModel> GetIpAssignment(int id);
+    Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel);
     Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetAppointment(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> Create(ServerAllocationCreateModel model);
@@ -264,21 +264,32 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> GetIpAssignment(int id)
+    public async Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.IpAssignments).FirstOrDefault(x => x.Id == id);
+            var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .Include(x => x.Customer)
+                .FirstOrDefault(x => x.Id == id);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
             {
-                result.Data = _mapper.Map<List<LocationAssignmentModel>>(serverAllocation.LocationAssignments);
+                var ipAddresses = serverAllocation.IpAssignments?.Select(x => x.IpAddress).AsQueryable();
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddresses.Count());
+
+                ipAddresses = ipAddresses.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                ipAddresses = ipAddresses.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+                paging.Data = _mapper.Map<List<IpAddressModel>>(ipAddresses.ToList());
+
+                result.Data = paging;
                 result.Succeed = true;
             }
         }
