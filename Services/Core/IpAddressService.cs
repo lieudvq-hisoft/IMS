@@ -63,7 +63,7 @@ public class IpAddressService : IIpAddressService
 
         try
         {
-            var ipAddress = _dbContext.IpAddresses.FirstOrDefault(x => x.Id == id);
+            var ipAddress = _dbContext.IpAddresses.Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer).FirstOrDefault(x => x.Id == id);
 
             if (ipAddress != null)
             {
