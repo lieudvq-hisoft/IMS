@@ -72,8 +72,8 @@ public class IpAddressService : IIpAddressService
             }
             else
             {
-                result.ErrorMessage = IpAddressErrorMessage.NOT_EXISTED;
                 result.Succeed = false;
+                result.ErrorMessage = IpAddressErrorMessage.NOT_EXISTED;
             }
         }
         catch (Exception e)

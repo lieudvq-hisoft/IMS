@@ -37,6 +37,14 @@ public class RequestHostController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/IpAddress")]
+    public async Task<ActionResult> GetAssignedIp(int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel)
+    {
+        var result = await _requestHostService.GetIpAddress(id, paginationModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] RequestHostCreateModel model)
     {
