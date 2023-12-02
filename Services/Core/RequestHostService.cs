@@ -305,8 +305,13 @@ public class RequestHostService : IRequestHostService
             var requestHost = _dbContext.RequestHosts.Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == requestHostId);
             if (requestHost == null)
             {
-                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
+                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
+            }
+            else if (requestHost.Quantity != model.IpAddressIds.Count)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Number of assign ip not match requested";
             }
             else
             {
