@@ -233,15 +233,31 @@ public class IpSubnetService : IIpSubnetService
         {
             var octets = GetIPv4Octets(model.IpAddresss);
             var numberOfIp = Math.Pow(2, PREFIX_LENGTH_MAX - model.PrefixLength);
-            var newFourthOctet = octets[3] + numberOfIp;
-            if (newFourthOctet > SUBNET_MAX_SIZE - 1)
+            if (numberOfIp < SUBNET_MAX_SIZE)
             {
-                result.ErrorMessage = "End of subnet";
+                var newFourthOctet = octets[3] + numberOfIp;
+                if (newFourthOctet > SUBNET_MAX_SIZE - 1)
+                {
+                    result.ErrorMessage = "End of subnet";
+                }
+                else
+                {
+                    result.Data = $"{octets[0]}.{octets[1]}.{octets[3]}.{newFourthOctet}";
+                    result.Succeed = true;
+                }
             }
             else
             {
-                result.Data = $"{octets[0]}.{octets[1]}.{octets[3]}.{newFourthOctet}";
-                result.Succeed = true;
+                var newThirdOctet = octets[2] + numberOfIp/256;
+                if (newThirdOctet >  SUBNET_MAX_SIZE - 1)
+                {
+                    result.ErrorMessage = "End of subnet";
+                }
+                else
+                {
+                    result.Data = $"{octets[0]}.{octets[1]}.{newThirdOctet}.{octets[3]}";
+                    result.Succeed = true;
+                }
             }
         }
         catch (Exception e)
