@@ -13,6 +13,9 @@ public class RequestHostModel
     public RequestHostStatus Status { get; set; }
     public string? InspectionReportFilePath { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
+    public string RequestType { get; set; }
+    public DateTime DateCreated { get; set; } = DateTime.Now;
+    public DateTime DateUpdated { get; set; } = DateTime.Now;
     public int ServerAllocationId { get; set; }
 
     public ServerAllocationResultModel? ServerAllocation { get; set; }
