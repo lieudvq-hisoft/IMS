@@ -402,10 +402,19 @@ public class RequestHostService : IRequestHostService
                         validPrecondition = false;
                         result.ErrorMessage = IpAddressErrorMessage.UNASSIGNABLE;
                     }
-                    else if (requestHost.IsRemoval && ipAddress.IpAssignments.FirstOrDefault().ServerAllocationId != requestHost.ServerAllocationId)
+                    else if (requestHost.IsRemoval)
                     {
-                        validPrecondition = false;
-                        result.ErrorMessage = "Can only removed owned ip address";
+                        if (ipAddress.IpAssignments.FirstOrDefault().ServerAllocationId != requestHost.ServerAllocationId)
+                        {
+                            validPrecondition = false;
+                            result.ErrorMessage = "Can only removed owned ip address";
+                        }
+                        
+                        if (ipAddress.IpAssignments.FirstOrDefault().Type == IpAssignmentTypes.Master)
+                        {
+                            validPrecondition = false;
+                            result.ErrorMessage = "Cannot unassign master ip";
+                        }
                     }
 
                 }
