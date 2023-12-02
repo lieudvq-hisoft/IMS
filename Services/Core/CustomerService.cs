@@ -116,9 +116,8 @@ public class CustomerService : ICustomerService
         try
         {
             var customer = _dbContext.Customers
-                .Include(x => x.ServerAllocations)
-                .ThenInclude(x => x.IpAssignments)
-                .ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocations).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+                .Include(x => x.ServerAllocations).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                 .FirstOrDefault(x => x.Id == id);
 
             if (customer == null)

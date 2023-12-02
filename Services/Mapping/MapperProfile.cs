@@ -87,6 +87,7 @@ public class MapperProfile : Profile
 
         #region ServerAllocation
         CreateMap<ServerAllocation, ServerAllocationModel>()
+            .ForMember(dest => dest.IpCount, opt => opt.MapFrom(src => src.IpAssignments.Count))
             .AfterMap((src, dest, context) =>
             {
                 var masterIp = src.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress;
@@ -100,6 +101,17 @@ public class MapperProfile : Profile
                 if (src.Customer != null)
                 {
                     dest.Customer = context.Mapper.Map<Customer, CustomerModel>(src.Customer);
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                if (src.LocationAssignments?.Any() == true)
+                {
+                    var locations = src.LocationAssignments.Select(x => x.Location);
+                    var rack = locations.Select(x => x.Rack).Distinct().FirstOrDefault();
+                    var startPosition = locations.Select(x => x.Position).Min();
+                    var endPosition = locations.Select(x => x.Position).Min();
+                    dest.Location = $"{rack.Area.Name}{rack.Column}-{rack.Row} {startPosition}-{endPosition}";
                 }
             });
         CreateMap<ServerAllocationCreateModel, ServerAllocation>();

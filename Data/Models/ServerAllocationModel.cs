@@ -16,7 +16,9 @@ public class ServerAllocationModel
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdated { get; set; }
     public int CustomerId { get; set; }
+    public string Location { get; set; }
     public IpAddressResultModel? MasterIp { get; set; }
+    public int IpCount { get; set; }
     public CustomerModel? Customer { get; set; }
 }
 
