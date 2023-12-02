@@ -61,6 +61,14 @@ public class RequestHostController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpDelete]
+    public async Task<ActionResult> Delete(int id)
+    {
+        var result = await _requestHostService.Delete(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut("{id}/IpAddress")]
     public async Task<ActionResult> AssignIp(int id, [FromBody] RequestHostIpAssignmentModel model)
     {
