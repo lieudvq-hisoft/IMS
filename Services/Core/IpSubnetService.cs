@@ -234,7 +234,7 @@ public class IpSubnetService : IIpSubnetService
             var octets = GetIPv4Octets(model.IpAddresss);
             var numberOfIp = Math.Pow(2, PREFIX_LENGTH_MAX - model.PrefixLength);
             var newFourthOctet = octets[3] + numberOfIp;
-            if (newFourthOctet > SUBNET_MAX_SIZE)
+            if (newFourthOctet > SUBNET_MAX_SIZE - 1)
             {
                 result.ErrorMessage = "End of subnet";
             }
