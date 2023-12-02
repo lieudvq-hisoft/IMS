@@ -352,13 +352,10 @@ public class RequestHostService : IRequestHostService
                 validPrecondition = false;
                 result.ErrorMessage = "Number of assign ip not match requested";
             }
-            else
+            else if (requestHost.Status != RequestHostStatus.Accepted)
             {
-                if (requestHost.Status != RequestHostStatus.Waiting)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = RequestHostErrorMessage.NOT_WAITING;
-                }
+                validPrecondition = false;
+                result.ErrorMessage = RequestHostErrorMessage.NOT_ACCEPTED;
             }
 
             if (validPrecondition)
