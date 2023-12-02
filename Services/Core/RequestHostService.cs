@@ -455,11 +455,11 @@ public class RequestHostService : IRequestHostService
             var requestHost = _dbContext.RequestHosts.Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == requestHostId);
             if (requestHost == null)
             {
-                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
             }
             else if (requestHost.Status != RequestHostStatus.Accepted)
             {
-                result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
+                result.ErrorMessage = RequestHostErrorMessage.NOT_ACCEPTED;
             }
             else if (!requestHost.RequestHostIps.Any())
             {
