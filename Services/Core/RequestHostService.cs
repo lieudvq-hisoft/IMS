@@ -248,7 +248,7 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
             }
-            else if (!requestHost.Status.Equals(RequestStatus.Waiting))
+            else if (requestHost.Status != 0)
             {
                 result.ErrorMessage = RequestHostErrorMessage.NOT_WAITING;
             }
