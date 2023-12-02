@@ -9,6 +9,7 @@ public class RequestHostModel
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
+    public bool IsRemoval { get; set; }
     public IpAssignmentTypes Type { get; set; }
     public RequestHostStatus Status { get; set; }
     public string? InspectionReportFilePath { get; set; }
@@ -23,9 +24,11 @@ public class RequestHostModel
 
 public class RequestHostResultModel
 {
+    public int Id { get; set; }
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
+    public bool IsRemoval { get; set; }
     public IpAssignmentTypes Type { get; set; }
     public RequestHostStatus Status { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Host;
