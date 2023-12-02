@@ -25,6 +25,7 @@ public class IpAddressResultModel
 
 public class IpAddressSearchModel
 {
-    public string? Address { get; set; } = null;
+    public string? Address { get; set; }
+    public bool? IsAvailable { get; set; }
 }
 

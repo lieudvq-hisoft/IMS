@@ -2,6 +2,7 @@
 using Data.Common.PaginationModel;
 using Data.DataAccess;
 using Data.DataAccess.Constant;
+using Data.Entities;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
@@ -36,7 +37,13 @@ public class IpAddressService : IIpAddressService
         {
             var IpAddresses = _dbContext.IpAddresses
                 .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .Where(x => searchModel.Address != null ? x.Address.Contains(searchModel.Address) : true)
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+                .Where(delegate (IpAddress x)
+                {
+                    var matchAddress = searchModel.Address != null ? x.Address.Contains(searchModel.Address) : true;
+                    var available = searchModel.IsAvailable != null ? x.IsAvailable() == searchModel.IsAvailable : true;
+                    return matchAddress && available;
+                })
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, IpAddresses.Count());

@@ -19,4 +19,9 @@ public class IpAddress
 
     public virtual ICollection<IpAssignment> IpAssignments { get; set; }
     public virtual ICollection<RequestHostIp> RequestHostIps { get; set; }
+
+    public bool IsAvailable()
+    {
+        return Blocked && !IsReserved && !IpAssignments.Any() && !RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed);
+    }
 }

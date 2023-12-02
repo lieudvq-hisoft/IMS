@@ -273,6 +273,7 @@ public class ServerAllocationService : IServerAllocationService
         {
             var serverAllocation = _dbContext.ServerAllocations
                 .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .Include(x => x.RequestHosts).ThenInclude(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
                 .Include(x => x.Customer)
                 .FirstOrDefault(x => x.Id == id);
             if (serverAllocation == null)
@@ -281,7 +282,13 @@ public class ServerAllocationService : IServerAllocationService
             }
             else
             {
-                var ipAddresses = serverAllocation.IpAssignments?.Select(x => x.IpAddress).Where(x => searchModel.Address != null ? x.Address.Contains(searchModel.Address) : true).AsQueryable();
+                var ipAddresses = serverAllocation.IpAssignments?.Select(x => x.IpAddress)
+                    .Where(delegate (IpAddress x)
+                    {
+                        var matchAddress = searchModel.Address != null ? x.Address.Contains(searchModel.Address) : true;
+                        var available = searchModel.IsAvailable != null ? x.IsAvailable() == searchModel.IsAvailable : true;
+                        return matchAddress && available;
+                    }).AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddresses.Count());
 
                 ipAddresses = ipAddresses.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);

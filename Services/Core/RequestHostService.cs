@@ -120,7 +120,13 @@ public class RequestHostService : IRequestHostService
 
             if (requestHost != null)
             {
-                var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress).Where(x => searchModel.Address != null ? x.Address.Contains(searchModel.Address) : true).AsQueryable();
+                var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress)
+                    .Where(delegate (IpAddress x)
+                    {
+                        var matchAddress = searchModel.Address != null ? x.Address.Contains(searchModel.Address) : true;
+                        var available = searchModel.IsAvailable != null ? x.IsAvailable() == searchModel.IsAvailable : true;
+                        return matchAddress && available;
+                    }).AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddresses.Count());
 
                 ipAddresses = ipAddresses.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
