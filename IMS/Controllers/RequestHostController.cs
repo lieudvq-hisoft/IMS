@@ -113,6 +113,15 @@ public class RequestHostController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPut("{id}/Process")]
+    public async Task<ActionResult> Process(int id)
+    {
+        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+        var result = await _requestHostService.Process(id, new Guid(userId));
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut("{id}/Complete")]
     public async Task<ActionResult> Complete(int id)
     {
