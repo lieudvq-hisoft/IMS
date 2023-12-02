@@ -116,7 +116,9 @@ public class RackService : IRackService
 
         try
         {
-            var rack = _dbContext.Racks.Include(x => x.Locations).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+            var rack = _dbContext.Racks
+                .Include(x => x.Area)
+                .Include(x => x.Locations).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                 .Include(x => x.Locations).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .FirstOrDefault(x => x.Id == rackId);
             if (rack == null)
