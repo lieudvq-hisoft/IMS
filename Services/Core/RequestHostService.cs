@@ -250,19 +250,10 @@ public class RequestHostService : IRequestHostService
                 result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
-            else
+            else if (requestHost.Status != RequestHostStatus.Waiting)
             {
-                if (!requestHost.RequestHostIps.Any())
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
-                }
-
-                if (requestHost.Status != RequestHostStatus.Waiting)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = RequestHostErrorMessage.NOT_WAITING;
-                }
+                validPrecondition = false;
+                result.ErrorMessage = RequestHostErrorMessage.NOT_WAITING;
             }
 
             var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
