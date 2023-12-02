@@ -70,8 +70,8 @@ public static class StartupExtension
         services.AddScoped<IIpAddressService, IpAddressService>();
         services.AddScoped<IIpSubnetService, IpSubnetService>();
         services.AddScoped<IRequestHostService, RequestHostService>();
-        services.AddScoped<IIpAssignmentService, IpAssignmentService>();
 
+        //services.AddScoped<IIpAssignmentService, IpAssignmentService>();
         //services.AddScoped<ICompanyTypeService, CompanyTypeService>();
         //services.AddScoped<IIpService, IpService>();
         //services.AddScoped<IAppointmentUserService, AppointmentUserService>();
