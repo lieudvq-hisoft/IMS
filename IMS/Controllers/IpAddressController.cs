@@ -58,4 +58,12 @@ public class IpAddressController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPut("Purpose")]
+    public async Task<ActionResult> Purpose([FromBody] IpAddressChangePurposeModel model)
+    {
+        var result = await _ipAddressService.ChangePurpose(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }

@@ -16,6 +16,7 @@ public interface IIpAddressService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> SuggestMasterIp();
     Task<ResultModel> ChangeBlockingStatus(IpAddressIdListModel model, bool isBlock);
+    Task<ResultModel> ChangePurpose(IpAddressChangePurposeModel model);
 }
 
 public class IpAddressService : IIpAddressService
@@ -142,6 +143,51 @@ public class IpAddressService : IIpAddressService
                 {
                     x.Blocked = isBlock;
                     x.Note = model.Note;
+                });
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<IpAddressResultModel>>(ipAddresses);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> ChangePurpose(IpAddressChangePurposeModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var ipAddresses = _dbContext.IpAddresses
+                .Where(x => model.IpAddressIds.Contains(x.Id) && !x.Blocked && !x.IsReserved)
+                .ToList();
+            if (ipAddresses.Count() != model.IpAddressIds.Count())
+            {
+                result.ErrorMessage = $"Not all ip valid";
+            }
+            else if (model.Purpose == IpPurpose.Network && model.Purpose == IpPurpose.Broadcast)
+            {
+                result.ErrorMessage = "Cannot change purpose to network or broadcast";
+            }
+            else if (ipAddresses.Any(x => x.IpAssignments.Any()))
+            {
+                result.ErrorMessage = "Cannot change purpose of assigned ip address";
+            }
+            else if (ipAddresses.Any(x => x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed)))
+            {
+                result.ErrorMessage = "Cannot change purpose of requested ip address";
+            }
+            else
+            {
+                ipAddresses.ForEach(x =>
+                {
+                    x.Purpose = model.Purpose;
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;

@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Data.Enums;
+using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models;
 public class IpAddressModel
@@ -31,6 +32,15 @@ public class IpAddressIdListModel
 {
     [Required]
     public string Note { get; set; }
+
+    [Required]
+    public List<int> IpAddressIds { get; set; }
+}
+
+public class IpAddressChangePurposeModel
+{
+    [Required]
+    public IpPurpose Purpose { get; set; }
 
     [Required]
     public List<int> IpAddressIds { get; set; }
