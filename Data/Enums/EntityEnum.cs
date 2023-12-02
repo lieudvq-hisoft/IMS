@@ -37,9 +37,9 @@ public enum RequestUserAction
 
 public enum IpAssignmentTypes
 {
-    Master,
     Additional,
-    Port
+    Port,
+    Master,
 }
 
 public enum RequestStatus

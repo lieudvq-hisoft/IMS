@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IMS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231128144806_initial")]
+    [Migration("20231201192341_initial")]
     partial class initial
     {
         /// <inheritdoc />
@@ -159,8 +159,8 @@ namespace IMS.Migrations
                         {
                             Id = 1,
                             ColumnCount = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3136),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3136),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8584),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8585),
                             IsDeleted = false,
                             Name = "A",
                             RowCount = 8
@@ -169,88 +169,11 @@ namespace IMS.Migrations
                         {
                             Id = 2,
                             ColumnCount = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3157),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3157),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8602),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8603),
                             IsDeleted = false,
                             Name = "B",
                             RowCount = 5
-                        });
-                });
-
-            modelBuilder.Entity("Data.Entities.CompanyType", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("CompanyTypes");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(2807),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(2818),
-                            Description = "Doanh nghiệp tư nhân",
-                            IsDeleted = false,
-                            Name = "Doanh nghiệp tư nhân"
-                        },
-                        new
-                        {
-                            Id = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(2900),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(2901),
-                            Description = "Công ty trách nhiệm hữu hạn một thành viên",
-                            IsDeleted = false,
-                            Name = "Công ty trách nhiệm hữu hạn một thành viên"
-                        },
-                        new
-                        {
-                            Id = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(2917),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(2917),
-                            Description = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên",
-                            IsDeleted = false,
-                            Name = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên"
-                        },
-                        new
-                        {
-                            Id = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(2931),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(2932),
-                            Description = "Công ty cổ phần",
-                            IsDeleted = false,
-                            Name = "Công ty cổ phần"
-                        },
-                        new
-                        {
-                            Id = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(2944),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(2945),
-                            Description = "Công ty hợp danh",
-                            IsDeleted = false,
-                            Name = "Công ty hợp danh"
                         });
                 });
 
@@ -293,8 +216,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3023),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3024),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8402),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8414),
                             IsDeleted = false,
                             Name = "CPU",
                             Type = 1,
@@ -303,8 +226,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3044),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3044),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8504),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8504),
                             IsDeleted = false,
                             Name = "GPU",
                             Type = 1,
@@ -313,8 +236,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3059),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3059),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8519),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8519),
                             IsDeleted = false,
                             Name = "RAM",
                             Type = 1,
@@ -323,8 +246,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 6,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3074),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3074),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8531),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8532),
                             IsDeleted = false,
                             Name = "RAM",
                             Type = 0,
@@ -333,8 +256,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3088),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3089),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8544),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8544),
                             IsDeleted = false,
                             Name = "OS",
                             Type = 1,
@@ -343,8 +266,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3104),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3105),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8559),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8559),
                             IsDeleted = false,
                             Name = "ROM",
                             Type = 1,
@@ -367,9 +290,6 @@ namespace IMS.Migrations
                     b.Property<string>("CompanyName")
                         .IsRequired()
                         .HasColumnType("text");
-
-                    b.Property<int>("CompanyTypeId")
-                        .HasColumnType("integer");
 
                     b.Property<string>("CustomerName")
                         .IsRequired()
@@ -400,13 +320,7 @@ namespace IMS.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<string>("Username")
-                        .IsRequired()
-                        .HasColumnType("text");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("CompanyTypeId");
 
                     b.HasIndex("TaxNumber")
                         .IsUnique();
@@ -35536,124 +35450,6 @@ namespace IMS.Migrations
                     b.ToTable("LocationAssignments");
                 });
 
-            modelBuilder.Entity("Data.Entities.Pending.RequestHost", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("InspectionReportFilePath")
-                        .HasColumnType("text");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<string>("Note")
-                        .HasColumnType("text");
-
-                    b.Property<string>("ReceiptOfRecipientFilePath")
-                        .HasColumnType("text");
-
-                    b.Property<int>("RequestType")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("SaleNote")
-                        .HasColumnType("text");
-
-                    b.Property<int>("ServerAllocationId")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Status")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("TechNote")
-                        .HasColumnType("text");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ServerAllocationId");
-
-                    b.ToTable("RequestHosts");
-                });
-
-            modelBuilder.Entity("Data.Entities.Pending.RequestHostIp", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<int>("IpAddressId")
-                        .HasColumnType("integer");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("RequestHostId")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IpAddressId");
-
-                    b.HasIndex("RequestHostId");
-
-                    b.ToTable("RequestHostIps");
-                });
-
-            modelBuilder.Entity("Data.Entities.Pending.RequestHostUser", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("Action")
-                        .HasColumnType("integer");
-
-                    b.Property<DateTime>("DateCreated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<DateTime>("DateUpdated")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("boolean");
-
-                    b.Property<int>("RequestHostId")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("UserId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RequestHostId");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("RequestHostUsers");
-                });
-
             modelBuilder.Entity("Data.Entities.Rack", b =>
                 {
                     b.Property<int>("Id")
@@ -35698,8 +35494,8 @@ namespace IMS.Migrations
                             Id = 1,
                             AreaId = 1,
                             Column = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3166),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3170),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8609),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8610),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 1,
@@ -35710,8 +35506,8 @@ namespace IMS.Migrations
                             Id = 2,
                             AreaId = 1,
                             Column = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3198),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3198),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8646),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8646),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 1,
@@ -35722,8 +35518,8 @@ namespace IMS.Migrations
                             Id = 3,
                             AreaId = 1,
                             Column = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3206),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3207),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8727),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8728),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 1,
@@ -35734,8 +35530,8 @@ namespace IMS.Migrations
                             Id = 4,
                             AreaId = 1,
                             Column = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3216),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3216),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8736),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8737),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 1,
@@ -35746,8 +35542,8 @@ namespace IMS.Migrations
                             Id = 5,
                             AreaId = 1,
                             Column = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3224),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3224),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8744),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8744),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 1,
@@ -35758,8 +35554,8 @@ namespace IMS.Migrations
                             Id = 6,
                             AreaId = 1,
                             Column = 6,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3233),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3233),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8753),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8753),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 1,
@@ -35770,8 +35566,8 @@ namespace IMS.Migrations
                             Id = 7,
                             AreaId = 1,
                             Column = 7,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3241),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3241),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8761),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8761),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 1,
@@ -35782,8 +35578,8 @@ namespace IMS.Migrations
                             Id = 8,
                             AreaId = 1,
                             Column = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3299),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3299),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8768),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8768),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 1,
@@ -35794,8 +35590,8 @@ namespace IMS.Migrations
                             Id = 9,
                             AreaId = 1,
                             Column = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3189),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3189),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8614),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8614),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 2,
@@ -35806,8 +35602,8 @@ namespace IMS.Migrations
                             Id = 10,
                             AreaId = 1,
                             Column = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3199),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3200),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8647),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8648),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 2,
@@ -35818,8 +35614,8 @@ namespace IMS.Migrations
                             Id = 11,
                             AreaId = 1,
                             Column = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3208),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3209),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8730),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8730),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 2,
@@ -35830,8 +35626,8 @@ namespace IMS.Migrations
                             Id = 12,
                             AreaId = 1,
                             Column = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3217),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3217),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8738),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8738),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 2,
@@ -35842,8 +35638,8 @@ namespace IMS.Migrations
                             Id = 13,
                             AreaId = 1,
                             Column = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3225),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3226),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8746),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8746),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 2,
@@ -35854,8 +35650,8 @@ namespace IMS.Migrations
                             Id = 14,
                             AreaId = 1,
                             Column = 6,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3234),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3234),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8754),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8754),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 2,
@@ -35866,8 +35662,8 @@ namespace IMS.Migrations
                             Id = 15,
                             AreaId = 1,
                             Column = 7,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3242),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3242),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8761),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8762),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 2,
@@ -35878,8 +35674,8 @@ namespace IMS.Migrations
                             Id = 16,
                             AreaId = 1,
                             Column = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3300),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3300),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8769),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8769),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 2,
@@ -35890,8 +35686,8 @@ namespace IMS.Migrations
                             Id = 17,
                             AreaId = 1,
                             Column = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3190),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3190),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8615),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8615),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 3,
@@ -35902,8 +35698,8 @@ namespace IMS.Migrations
                             Id = 18,
                             AreaId = 1,
                             Column = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3200),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3201),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8649),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8649),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 3,
@@ -35914,8 +35710,8 @@ namespace IMS.Migrations
                             Id = 19,
                             AreaId = 1,
                             Column = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3209),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3210),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8731),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8731),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 3,
@@ -35926,8 +35722,8 @@ namespace IMS.Migrations
                             Id = 20,
                             AreaId = 1,
                             Column = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3218),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3218),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8738),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8739),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 3,
@@ -35938,8 +35734,8 @@ namespace IMS.Migrations
                             Id = 21,
                             AreaId = 1,
                             Column = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3227),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3227),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8747),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8747),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 3,
@@ -35950,8 +35746,8 @@ namespace IMS.Migrations
                             Id = 22,
                             AreaId = 1,
                             Column = 6,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3235),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3235),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8755),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8755),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 3,
@@ -35962,8 +35758,8 @@ namespace IMS.Migrations
                             Id = 23,
                             AreaId = 1,
                             Column = 7,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3242),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3243),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8762),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8763),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 3,
@@ -35974,8 +35770,8 @@ namespace IMS.Migrations
                             Id = 24,
                             AreaId = 1,
                             Column = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3301),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3301),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8770),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8770),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 3,
@@ -35986,8 +35782,8 @@ namespace IMS.Migrations
                             Id = 25,
                             AreaId = 1,
                             Column = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3191),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3191),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8616),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8616),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 4,
@@ -35998,8 +35794,8 @@ namespace IMS.Migrations
                             Id = 26,
                             AreaId = 1,
                             Column = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3201),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3202),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8650),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8650),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 4,
@@ -36010,8 +35806,8 @@ namespace IMS.Migrations
                             Id = 27,
                             AreaId = 1,
                             Column = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3210),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3211),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8731),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8732),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 4,
@@ -36022,8 +35818,8 @@ namespace IMS.Migrations
                             Id = 28,
                             AreaId = 1,
                             Column = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3218),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3219),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8739),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8740),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 4,
@@ -36034,8 +35830,8 @@ namespace IMS.Migrations
                             Id = 29,
                             AreaId = 1,
                             Column = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3228),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3228),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8748),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8748),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 4,
@@ -36046,8 +35842,8 @@ namespace IMS.Migrations
                             Id = 30,
                             AreaId = 1,
                             Column = 6,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3236),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3236),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8756),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8756),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 4,
@@ -36058,8 +35854,8 @@ namespace IMS.Migrations
                             Id = 31,
                             AreaId = 1,
                             Column = 7,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3243),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3244),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8763),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8764),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 4,
@@ -36070,8 +35866,8 @@ namespace IMS.Migrations
                             Id = 32,
                             AreaId = 1,
                             Column = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3302),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3302),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8771),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8771),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 4,
@@ -36082,8 +35878,8 @@ namespace IMS.Migrations
                             Id = 33,
                             AreaId = 1,
                             Column = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3192),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3192),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8624),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8624),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 5,
@@ -36094,8 +35890,8 @@ namespace IMS.Migrations
                             Id = 34,
                             AreaId = 1,
                             Column = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3202),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3203),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8650),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8651),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 5,
@@ -36106,8 +35902,8 @@ namespace IMS.Migrations
                             Id = 35,
                             AreaId = 1,
                             Column = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3211),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3212),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8732),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8733),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 5,
@@ -36118,8 +35914,8 @@ namespace IMS.Migrations
                             Id = 36,
                             AreaId = 1,
                             Column = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3219),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3220),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8740),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8741),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 5,
@@ -36130,8 +35926,8 @@ namespace IMS.Migrations
                             Id = 37,
                             AreaId = 1,
                             Column = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3229),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3229),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8749),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8749),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 5,
@@ -36142,8 +35938,8 @@ namespace IMS.Migrations
                             Id = 38,
                             AreaId = 1,
                             Column = 6,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3237),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3237),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8757),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8757),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 5,
@@ -36154,8 +35950,8 @@ namespace IMS.Migrations
                             Id = 39,
                             AreaId = 1,
                             Column = 7,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3294),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3294),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8764),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8765),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 5,
@@ -36166,8 +35962,8 @@ namespace IMS.Migrations
                             Id = 40,
                             AreaId = 1,
                             Column = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3303),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3303),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8772),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8772),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 5,
@@ -36178,8 +35974,8 @@ namespace IMS.Migrations
                             Id = 41,
                             AreaId = 1,
                             Column = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3194),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3195),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8626),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8631),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 6,
@@ -36190,8 +35986,8 @@ namespace IMS.Migrations
                             Id = 42,
                             AreaId = 1,
                             Column = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3203),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3204),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8651),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8652),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 6,
@@ -36202,8 +35998,8 @@ namespace IMS.Migrations
                             Id = 43,
                             AreaId = 1,
                             Column = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3213),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3213),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8733),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8734),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 6,
@@ -36214,8 +36010,8 @@ namespace IMS.Migrations
                             Id = 44,
                             AreaId = 1,
                             Column = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3220),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3221),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8741),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8742),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 6,
@@ -36226,8 +36022,8 @@ namespace IMS.Migrations
                             Id = 45,
                             AreaId = 1,
                             Column = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3230),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3230),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8750),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8750),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 6,
@@ -36238,8 +36034,8 @@ namespace IMS.Migrations
                             Id = 46,
                             AreaId = 1,
                             Column = 6,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3238),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3238),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8758),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8758),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 6,
@@ -36250,8 +36046,8 @@ namespace IMS.Migrations
                             Id = 47,
                             AreaId = 1,
                             Column = 7,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3295),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3296),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8765),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8766),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 6,
@@ -36262,8 +36058,8 @@ namespace IMS.Migrations
                             Id = 48,
                             AreaId = 1,
                             Column = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3304),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3304),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8773),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8773),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 6,
@@ -36274,8 +36070,8 @@ namespace IMS.Migrations
                             Id = 49,
                             AreaId = 1,
                             Column = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3195),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3196),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8643),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8644),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 7,
@@ -36286,8 +36082,8 @@ namespace IMS.Migrations
                             Id = 50,
                             AreaId = 1,
                             Column = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3204),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3205),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8725),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8725),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 7,
@@ -36298,8 +36094,8 @@ namespace IMS.Migrations
                             Id = 51,
                             AreaId = 1,
                             Column = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3214),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3214),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8734),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8735),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 7,
@@ -36310,8 +36106,8 @@ namespace IMS.Migrations
                             Id = 52,
                             AreaId = 1,
                             Column = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3221),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3222),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8742),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8742),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 7,
@@ -36322,8 +36118,8 @@ namespace IMS.Migrations
                             Id = 53,
                             AreaId = 1,
                             Column = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3231),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3231),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8751),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8751),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 7,
@@ -36334,8 +36130,8 @@ namespace IMS.Migrations
                             Id = 54,
                             AreaId = 1,
                             Column = 6,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3239),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3239),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8759),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8759),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 7,
@@ -36346,8 +36142,8 @@ namespace IMS.Migrations
                             Id = 55,
                             AreaId = 1,
                             Column = 7,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3296),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3297),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8766),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8767),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 7,
@@ -36358,8 +36154,8 @@ namespace IMS.Migrations
                             Id = 56,
                             AreaId = 1,
                             Column = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3305),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3305),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8774),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8774),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 7,
@@ -36370,8 +36166,8 @@ namespace IMS.Migrations
                             Id = 57,
                             AreaId = 1,
                             Column = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3196),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3197),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8644),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8645),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 8,
@@ -36382,8 +36178,8 @@ namespace IMS.Migrations
                             Id = 58,
                             AreaId = 1,
                             Column = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3205),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3206),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8726),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8727),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 8,
@@ -36394,8 +36190,8 @@ namespace IMS.Migrations
                             Id = 59,
                             AreaId = 1,
                             Column = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3214),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3215),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8735),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8735),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 8,
@@ -36406,8 +36202,8 @@ namespace IMS.Migrations
                             Id = 60,
                             AreaId = 1,
                             Column = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3222),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3223),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8743),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8743),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 8,
@@ -36418,8 +36214,8 @@ namespace IMS.Migrations
                             Id = 61,
                             AreaId = 1,
                             Column = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3231),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3232),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8752),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8752),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 8,
@@ -36430,8 +36226,8 @@ namespace IMS.Migrations
                             Id = 62,
                             AreaId = 1,
                             Column = 6,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3240),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3240),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8760),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8760),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 8,
@@ -36442,8 +36238,8 @@ namespace IMS.Migrations
                             Id = 63,
                             AreaId = 1,
                             Column = 7,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3298),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3298),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8767),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8767),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 8,
@@ -36454,8 +36250,8 @@ namespace IMS.Migrations
                             Id = 64,
                             AreaId = 1,
                             Column = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3306),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3306),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8775),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8775),
                             IsDeleted = false,
                             MaxPower = 3000,
                             Row = 8,
@@ -36466,8 +36262,8 @@ namespace IMS.Migrations
                             Id = 65,
                             AreaId = 2,
                             Column = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3308),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3308),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8776),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8776),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 1,
@@ -36478,8 +36274,8 @@ namespace IMS.Migrations
                             Id = 66,
                             AreaId = 2,
                             Column = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3315),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3315),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8782),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8783),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 1,
@@ -36490,8 +36286,8 @@ namespace IMS.Migrations
                             Id = 67,
                             AreaId = 2,
                             Column = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3320),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3321),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8787),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8788),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 1,
@@ -36502,8 +36298,8 @@ namespace IMS.Migrations
                             Id = 68,
                             AreaId = 2,
                             Column = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3325),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3326),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8792),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8792),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 1,
@@ -36514,8 +36310,8 @@ namespace IMS.Migrations
                             Id = 69,
                             AreaId = 2,
                             Column = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3331),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3331),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8797),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8797),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 1,
@@ -36526,8 +36322,8 @@ namespace IMS.Migrations
                             Id = 70,
                             AreaId = 2,
                             Column = 6,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3336),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3336),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8801),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8802),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 1,
@@ -36538,8 +36334,8 @@ namespace IMS.Migrations
                             Id = 71,
                             AreaId = 2,
                             Column = 7,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3341),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3342),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8845),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8845),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 1,
@@ -36550,8 +36346,8 @@ namespace IMS.Migrations
                             Id = 72,
                             AreaId = 2,
                             Column = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3346),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3347),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8850),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8850),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 1,
@@ -36562,8 +36358,8 @@ namespace IMS.Migrations
                             Id = 73,
                             AreaId = 2,
                             Column = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3310),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3311),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8778),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8779),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 2,
@@ -36574,8 +36370,8 @@ namespace IMS.Migrations
                             Id = 74,
                             AreaId = 2,
                             Column = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3316),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3316),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8783),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8784),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 2,
@@ -36586,8 +36382,8 @@ namespace IMS.Migrations
                             Id = 75,
                             AreaId = 2,
                             Column = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3321),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3322),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8788),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8789),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 2,
@@ -36598,8 +36394,8 @@ namespace IMS.Migrations
                             Id = 76,
                             AreaId = 2,
                             Column = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3326),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3327),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8793),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8793),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 2,
@@ -36610,8 +36406,8 @@ namespace IMS.Migrations
                             Id = 77,
                             AreaId = 2,
                             Column = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3332),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3332),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8798),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8798),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 2,
@@ -36622,8 +36418,8 @@ namespace IMS.Migrations
                             Id = 78,
                             AreaId = 2,
                             Column = 6,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3337),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3337),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8802),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8803),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 2,
@@ -36634,8 +36430,8 @@ namespace IMS.Migrations
                             Id = 79,
                             AreaId = 2,
                             Column = 7,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3342),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3343),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8846),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8846),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 2,
@@ -36646,8 +36442,8 @@ namespace IMS.Migrations
                             Id = 80,
                             AreaId = 2,
                             Column = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3347),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3348),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8851),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8851),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 2,
@@ -36658,8 +36454,8 @@ namespace IMS.Migrations
                             Id = 81,
                             AreaId = 2,
                             Column = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3312),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3312),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8779),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8780),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 3,
@@ -36670,8 +36466,8 @@ namespace IMS.Migrations
                             Id = 82,
                             AreaId = 2,
                             Column = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3317),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3317),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8784),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8785),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 3,
@@ -36682,8 +36478,8 @@ namespace IMS.Migrations
                             Id = 83,
                             AreaId = 2,
                             Column = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3322),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3323),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8789),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8790),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 3,
@@ -36694,8 +36490,8 @@ namespace IMS.Migrations
                             Id = 84,
                             AreaId = 2,
                             Column = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3327),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3328),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8794),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8794),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 3,
@@ -36706,8 +36502,8 @@ namespace IMS.Migrations
                             Id = 85,
                             AreaId = 2,
                             Column = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3333),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3333),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8799),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8799),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 3,
@@ -36718,8 +36514,8 @@ namespace IMS.Migrations
                             Id = 86,
                             AreaId = 2,
                             Column = 6,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3338),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3338),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8803),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8804),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 3,
@@ -36730,8 +36526,8 @@ namespace IMS.Migrations
                             Id = 87,
                             AreaId = 2,
                             Column = 7,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3343),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3344),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8847),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8847),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 3,
@@ -36742,8 +36538,8 @@ namespace IMS.Migrations
                             Id = 88,
                             AreaId = 2,
                             Column = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3348),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3349),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8852),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8852),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 3,
@@ -36754,8 +36550,8 @@ namespace IMS.Migrations
                             Id = 89,
                             AreaId = 2,
                             Column = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3313),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3313),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8780),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8781),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 4,
@@ -36766,8 +36562,8 @@ namespace IMS.Migrations
                             Id = 90,
                             AreaId = 2,
                             Column = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3318),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3318),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8785),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8786),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 4,
@@ -36778,8 +36574,8 @@ namespace IMS.Migrations
                             Id = 91,
                             AreaId = 2,
                             Column = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3323),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3324),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8790),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8790),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 4,
@@ -36790,8 +36586,8 @@ namespace IMS.Migrations
                             Id = 92,
                             AreaId = 2,
                             Column = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3328),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3329),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8795),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8795),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 4,
@@ -36802,8 +36598,8 @@ namespace IMS.Migrations
                             Id = 93,
                             AreaId = 2,
                             Column = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3334),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3334),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8799),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8800),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 4,
@@ -36814,8 +36610,8 @@ namespace IMS.Migrations
                             Id = 94,
                             AreaId = 2,
                             Column = 6,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3339),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3339),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8804),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8805),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 4,
@@ -36826,8 +36622,8 @@ namespace IMS.Migrations
                             Id = 95,
                             AreaId = 2,
                             Column = 7,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3344),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3344),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8848),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8848),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 4,
@@ -36838,8 +36634,8 @@ namespace IMS.Migrations
                             Id = 96,
                             AreaId = 2,
                             Column = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3349),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3350),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8853),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8853),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 4,
@@ -36850,8 +36646,8 @@ namespace IMS.Migrations
                             Id = 97,
                             AreaId = 2,
                             Column = 1,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3314),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3314),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8781),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8782),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 5,
@@ -36862,8 +36658,8 @@ namespace IMS.Migrations
                             Id = 98,
                             AreaId = 2,
                             Column = 2,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3319),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3319),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8786),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8787),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 5,
@@ -36874,8 +36670,8 @@ namespace IMS.Migrations
                             Id = 99,
                             AreaId = 2,
                             Column = 3,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3324),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3325),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8791),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8791),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 5,
@@ -36886,8 +36682,8 @@ namespace IMS.Migrations
                             Id = 100,
                             AreaId = 2,
                             Column = 4,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3329),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3330),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8796),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8796),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 5,
@@ -36898,8 +36694,8 @@ namespace IMS.Migrations
                             Id = 101,
                             AreaId = 2,
                             Column = 5,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3335),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3335),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8800),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8801),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 5,
@@ -36910,8 +36706,8 @@ namespace IMS.Migrations
                             Id = 102,
                             AreaId = 2,
                             Column = 6,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3340),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3340),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8843),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8844),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 5,
@@ -36922,8 +36718,8 @@ namespace IMS.Migrations
                             Id = 103,
                             AreaId = 2,
                             Column = 7,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3345),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3346),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8849),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8849),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 5,
@@ -36934,8 +36730,8 @@ namespace IMS.Migrations
                             Id = 104,
                             AreaId = 2,
                             Column = 8,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3350),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 344, DateTimeKind.Local).AddTicks(3351),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8854),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 610, DateTimeKind.Local).AddTicks(8854),
                             IsDeleted = false,
                             MaxPower = 3500,
                             Row = 5,
@@ -37094,6 +36890,130 @@ namespace IMS.Migrations
                     b.HasIndex("UserId");
 
                     b.ToTable("RequestExpandUsers");
+                });
+
+            modelBuilder.Entity("Data.Entities.RequestHost", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("InspectionReportFilePath")
+                        .HasColumnType("text");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("IsRemoval")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Note")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Quantity")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("ReceiptOfRecipientFilePath")
+                        .HasColumnType("text");
+
+                    b.Property<int>("RequestType")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("SaleNote")
+                        .HasColumnType("text");
+
+                    b.Property<int>("ServerAllocationId")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("TechNote")
+                        .HasColumnType("text");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ServerAllocationId");
+
+                    b.ToTable("RequestHosts");
+                });
+
+            modelBuilder.Entity("Data.Entities.RequestHostIp", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<int>("IpAddressId")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("RequestHostId")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IpAddressId");
+
+                    b.HasIndex("RequestHostId");
+
+                    b.ToTable("RequestHostIps");
+                });
+
+            modelBuilder.Entity("Data.Entities.RequestHostUser", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Action")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime>("DateCreated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<DateTime>("DateUpdated")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("boolean");
+
+                    b.Property<int>("RequestHostId")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("RequestHostId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RequestHostUsers");
                 });
 
             modelBuilder.Entity("Data.Entities.RequestUpgrade", b =>
@@ -37463,10 +37383,10 @@ namespace IMS.Migrations
                             Id = new Guid("57ffb575-7c79-4133-8433-aebbcd71f824"),
                             AccessFailedCount = 0,
                             Address = "Address1",
-                            ConcurrencyStamp = "bc54ef13-dc7a-44b0-991f-d2fa5d3d27e9",
+                            ConcurrencyStamp = "02288414-b77f-418e-9e80-c73fa4cde2ab",
                             CurrenNoticeCount = 0,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 350, DateTimeKind.Local).AddTicks(2152),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 350, DateTimeKind.Local).AddTicks(2162),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 616, DateTimeKind.Local).AddTicks(2408),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 616, DateTimeKind.Local).AddTicks(2421),
                             Email = "super@gmail.com",
                             EmailConfirmed = true,
                             Fullname = "Fullname1",
@@ -37474,7 +37394,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "super@gmail.com",
                             NormalizedUserName = "super",
-                            PasswordHash = "AQAAAAIAAYagAAAAENjankEPXTPCoffGrMFLLbF+8DgModAsdvKZK7hPDVaqQPGDwJa3/TCAM63ZEwd9Pw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEAdXFaPDGJM1g0JNnKZ0bfTCvwlRHhCRgopGToGh3ft3WCUw6YzveIZ2tygpCLj5JA==",
                             PhoneNumber = "0000000001",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -37486,10 +37406,10 @@ namespace IMS.Migrations
                             Id = new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab"),
                             AccessFailedCount = 0,
                             Address = "Address2",
-                            ConcurrencyStamp = "e47897fa-2697-497a-ab81-9ce965bd1b5d",
+                            ConcurrencyStamp = "49bbf27a-205e-4563-b6bf-258e8ef37bcd",
                             CurrenNoticeCount = 0,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 419, DateTimeKind.Local).AddTicks(1067),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 419, DateTimeKind.Local).AddTicks(1077),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 693, DateTimeKind.Local).AddTicks(969),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 693, DateTimeKind.Local).AddTicks(980),
                             Email = "tech@gmail.com",
                             EmailConfirmed = true,
                             Fullname = "Fullname2",
@@ -37497,7 +37417,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "tech@gmail.com",
                             NormalizedUserName = "tech",
-                            PasswordHash = "AQAAAAIAAYagAAAAEEaH3GGIb5FdZy2JNjWGfHg7AcseBK1WVankr0KMCkl7Iop2zdz+GPwQSegkw53M0A==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEIRkuig4pnA74sZg7VYzvKSf6D81ohbhQS7gjpMWVPF170EOXiW6Lkr2EGWnbEp+gQ==",
                             PhoneNumber = "0000000002",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -37509,10 +37429,10 @@ namespace IMS.Migrations
                             Id = new Guid("1abb6e28-793d-460f-8a24-745998356da8"),
                             AccessFailedCount = 0,
                             Address = "Address3",
-                            ConcurrencyStamp = "53f3eaf9-1f0a-47ae-8150-ce952445ec63",
+                            ConcurrencyStamp = "a7ab0918-7af8-4fef-bfde-206d54b454c8",
                             CurrenNoticeCount = 0,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 502, DateTimeKind.Local).AddTicks(5657),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 502, DateTimeKind.Local).AddTicks(5669),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 777, DateTimeKind.Local).AddTicks(7315),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 777, DateTimeKind.Local).AddTicks(7330),
                             Email = "sale@gmail.com",
                             EmailConfirmed = true,
                             Fullname = "Fullname3",
@@ -37520,7 +37440,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "sale@gmail.com",
                             NormalizedUserName = "sale",
-                            PasswordHash = "AQAAAAIAAYagAAAAEO0okzklQdOhHrtmExcGw5R/KurMm3sEHnspC2nMqfJsblPTEb5Bal/LkBaMzADe+g==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEImGUorixbqAxxGDbuanODOX6eYajFAtThj8u7aPlAGzZhJmnHYRj67d7vKirAivsQ==",
                             PhoneNumber = "0000000003",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -37532,10 +37452,10 @@ namespace IMS.Migrations
                             Id = new Guid("2e3566a9-02b1-4ec4-a2d4-b3bb3c4f2b45"),
                             AccessFailedCount = 0,
                             Address = "Address4",
-                            ConcurrencyStamp = "380a99a8-cbb2-4390-84c0-e447793b3770",
+                            ConcurrencyStamp = "83c7842b-499b-4d1a-ba91-b39938fe5690",
                             CurrenNoticeCount = 0,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 581, DateTimeKind.Local).AddTicks(5885),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 581, DateTimeKind.Local).AddTicks(5900),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 858, DateTimeKind.Local).AddTicks(1103),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 858, DateTimeKind.Local).AddTicks(1115),
                             Email = "manager@gmail.com",
                             EmailConfirmed = true,
                             Fullname = "Fullname4",
@@ -37543,7 +37463,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "manager@gmail.com",
                             NormalizedUserName = "manager",
-                            PasswordHash = "AQAAAAIAAYagAAAAELwd/00He2cA0qCgbgitnqskYdwUkDjl8HnCBrQj6O4LVXotRhBiyx2hm/zL0qGzMw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMf8PFjn8VO/S4uex1l5NNsbD6qHbuYSzttpWO6aYeKvrOZweQeA183zB8YxWW2kTQ==",
                             PhoneNumber = "0000000004",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -37555,10 +37475,10 @@ namespace IMS.Migrations
                             Id = new Guid("01fc684c-d9d0-4fcc-b0a7-56fea6945928"),
                             AccessFailedCount = 0,
                             Address = "Address5",
-                            ConcurrencyStamp = "26a663db-c79b-489b-ba2c-7d172d38fb87",
+                            ConcurrencyStamp = "2e2fff36-8c9d-4013-8929-c603d1e26d32",
                             CurrenNoticeCount = 0,
-                            DateCreated = new DateTime(2023, 11, 28, 21, 48, 5, 652, DateTimeKind.Local).AddTicks(7300),
-                            DateUpdated = new DateTime(2023, 11, 28, 21, 48, 5, 652, DateTimeKind.Local).AddTicks(7312),
+                            DateCreated = new DateTime(2023, 12, 2, 2, 23, 39, 929, DateTimeKind.Local).AddTicks(2860),
+                            DateUpdated = new DateTime(2023, 12, 2, 2, 23, 39, 929, DateTimeKind.Local).AddTicks(2872),
                             Email = "admin@gmail.com",
                             EmailConfirmed = true,
                             Fullname = "Fullname5",
@@ -37566,7 +37486,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "admin@gmail.com",
                             NormalizedUserName = "admin",
-                            PasswordHash = "AQAAAAIAAYagAAAAEO57kf2Rdb4tRh9akQjQLgwB0AzjKRw2nDMTN4vrzAO8+iLcNvXTPz1zAn14ZRzuBw==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEMSRanIwgq1uboe/MA3sgUxyHK3oF7l3Rhv7gig+2io6ct9Xrh9iu4roHJ1kIaqSMA==",
                             PhoneNumber = "0000000005",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -37782,17 +37702,6 @@ namespace IMS.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("Data.Entities.Customer", b =>
-                {
-                    b.HasOne("Data.Entities.CompanyType", "CompanyType")
-                        .WithMany("Customer")
-                        .HasForeignKey("CompanyTypeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("CompanyType");
-                });
-
             modelBuilder.Entity("Data.Entities.IpAddress", b =>
                 {
                     b.HasOne("Data.Entities.IpSubnet", "IpSubnet")
@@ -37861,55 +37770,6 @@ namespace IMS.Migrations
                     b.Navigation("Location");
 
                     b.Navigation("ServerAllocation");
-                });
-
-            modelBuilder.Entity("Data.Entities.Pending.RequestHost", b =>
-                {
-                    b.HasOne("Data.Entities.ServerAllocation", "ServerAllocation")
-                        .WithMany("RequestHosts")
-                        .HasForeignKey("ServerAllocationId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.Navigation("ServerAllocation");
-                });
-
-            modelBuilder.Entity("Data.Entities.Pending.RequestHostIp", b =>
-                {
-                    b.HasOne("Data.Entities.IpAddress", "IpAddress")
-                        .WithMany("RequestHostIps")
-                        .HasForeignKey("IpAddressId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entities.Pending.RequestHost", "RequestHost")
-                        .WithMany("RequestHostIps")
-                        .HasForeignKey("RequestHostId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.Navigation("IpAddress");
-
-                    b.Navigation("RequestHost");
-                });
-
-            modelBuilder.Entity("Data.Entities.Pending.RequestHostUser", b =>
-                {
-                    b.HasOne("Data.Entities.Pending.RequestHost", "RequestHost")
-                        .WithMany("RequestHostUsers")
-                        .HasForeignKey("RequestHostId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.HasOne("Data.Entities.User", "User")
-                        .WithMany("RequestHostUsers")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.Navigation("RequestHost");
-
-                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("Data.Entities.Rack", b =>
@@ -37987,6 +37847,55 @@ namespace IMS.Migrations
                         .IsRequired();
 
                     b.Navigation("RequestExpand");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("Data.Entities.RequestHost", b =>
+                {
+                    b.HasOne("Data.Entities.ServerAllocation", "ServerAllocation")
+                        .WithMany("RequestHosts")
+                        .HasForeignKey("ServerAllocationId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.Navigation("ServerAllocation");
+                });
+
+            modelBuilder.Entity("Data.Entities.RequestHostIp", b =>
+                {
+                    b.HasOne("Data.Entities.IpAddress", "IpAddress")
+                        .WithMany("RequestHostIps")
+                        .HasForeignKey("IpAddressId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("Data.Entities.RequestHost", "RequestHost")
+                        .WithMany("RequestHostIps")
+                        .HasForeignKey("RequestHostId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.Navigation("IpAddress");
+
+                    b.Navigation("RequestHost");
+                });
+
+            modelBuilder.Entity("Data.Entities.RequestHostUser", b =>
+                {
+                    b.HasOne("Data.Entities.RequestHost", "RequestHost")
+                        .WithMany("RequestHostUsers")
+                        .HasForeignKey("RequestHostId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.HasOne("Data.Entities.User", "User")
+                        .WithMany("RequestHostUsers")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
+
+                    b.Navigation("RequestHost");
 
                     b.Navigation("User");
                 });
@@ -38166,11 +38075,6 @@ namespace IMS.Migrations
                     b.Navigation("Racks");
                 });
 
-            modelBuilder.Entity("Data.Entities.CompanyType", b =>
-                {
-                    b.Navigation("Customer");
-                });
-
             modelBuilder.Entity("Data.Entities.Component", b =>
                 {
                     b.Navigation("RequestUpgrades");
@@ -38206,13 +38110,6 @@ namespace IMS.Migrations
                     b.Navigation("RequestExpandLocations");
                 });
 
-            modelBuilder.Entity("Data.Entities.Pending.RequestHost", b =>
-                {
-                    b.Navigation("RequestHostIps");
-
-                    b.Navigation("RequestHostUsers");
-                });
-
             modelBuilder.Entity("Data.Entities.Rack", b =>
                 {
                     b.Navigation("Locations");
@@ -38225,6 +38122,13 @@ namespace IMS.Migrations
                     b.Navigation("RequestExpandLocations");
 
                     b.Navigation("RequestExpandUsers");
+                });
+
+            modelBuilder.Entity("Data.Entities.RequestHost", b =>
+                {
+                    b.Navigation("RequestHostIps");
+
+                    b.Navigation("RequestHostUsers");
                 });
 
             modelBuilder.Entity("Data.Entities.RequestUpgrade", b =>
