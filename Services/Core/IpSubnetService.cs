@@ -133,7 +133,7 @@ public class IpSubnetService : IIpSubnetService
         {
             var subnetTree = CreateSubnetTree();
             var rootSubnet = GetSubnetTree(subnetId, subnetTree);
-            var ipAddressesQuery = GetAllIpAddress(rootSubnet).AsQueryable();
+            var ipAddressesQuery = GetAllIpAddress(rootSubnet).Where(x => searchModel.Address != null ? x.Address.Contains(searchModel.Address) : true).AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddressesQuery.Count());
 
