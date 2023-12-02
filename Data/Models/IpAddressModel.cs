@@ -25,6 +25,6 @@ public class IpAddressResultModel
 
 public class IpAddressSearchModel
 {
-    //public int? Id { get; set; } = null;
+    public string? Address { get; set; } = null;
 }
 

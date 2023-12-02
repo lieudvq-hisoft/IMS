@@ -36,7 +36,7 @@ public class IpAddressService : IIpAddressService
         {
             var IpAddresses = _dbContext.IpAddresses
                 .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                //.Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
+                .Where(x => searchModel.Address != null ? x.Address.Contains(searchModel.Address) : true)
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, IpAddresses.Count());
