@@ -184,17 +184,18 @@ public class RackService : IRackService
             else
             {
                 var locations = _dbContext.Locations
-               .Include(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-               .Include(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
-               .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-               .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                    .Include(x => x.Rack).ThenInclude(x => x.Area)
+                    .Include(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                    .Include(x => x.LocationAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                    .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                    .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                .Where(x => x.RackId == rackId);
 
                 var locationRackMap = new List<LocationRackMapModel>();
                 foreach (var location in locations)
                 {
                     var requestExpand = location.RequestExpandLocations.Select(x => x.RequestExpand).FirstOrDefault(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted);
-                    locationRackMap.Add(new LocationRackMapModel
+                    var rackMapModel = new LocationRackMapModel
                     {
                         Id = location.Id,
                         Position = location.Position,
@@ -202,9 +203,13 @@ public class RackService : IRackService
                         IsServer = location.LocationAssignments.FirstOrDefault()?.IsServer,
                         IsReserved = location.IsReserved,
                         ServerAllocation = _mapper.Map<ServerAllocationModel>(location.LocationAssignments.FirstOrDefault()?.ServerAllocation),
-                        RequestedServerAllocation = _mapper.Map<ServerAllocationModel>(requestExpand?.ServerAllocation),
-                        RequestExpand = _mapper.Map<RequestExpandResultModel>(requestExpand),
-                    });
+                    };
+                    if (requestExpand != null)
+                    {
+                        rackMapModel.RequestedServerAllocation = _mapper.Map<ServerAllocationModel>(requestExpand?.ServerAllocation);
+                        rackMapModel.RequestExpand = _mapper.Map<RequestExpandResultModel>(requestExpand);
+                    }
+                    locationRackMap.Add(rackMapModel);
                 }
 
                 result.Data = _mapper.Map<List<LocationRackMapModel>>(locationRackMap);

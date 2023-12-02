@@ -110,7 +110,7 @@ public class MapperProfile : Profile
                     var locations = src.LocationAssignments.Select(x => x.Location);
                     var rack = locations.Select(x => x.Rack).Distinct().FirstOrDefault();
                     var startPosition = locations.Select(x => x.Position).Min();
-                    var endPosition = locations.Select(x => x.Position).Min();
+                    var endPosition = locations.Select(x => x.Position).Max();
                     dest.Location = $"{rack.Area.Name}{rack.Column}-{rack.Row} {startPosition}-{endPosition}";
                 }
             });
