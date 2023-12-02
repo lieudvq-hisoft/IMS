@@ -79,9 +79,10 @@ public class RequestHostController : ControllerBase
 
     [HttpPut("{id}/Accept")]
     [SwaggerOperation(Summary = "Accept a waiting request host")]
-    public async Task<ActionResult> Accept(int id, [FromBody] UserAssignModel model)
+    public async Task<ActionResult> Accept(int id)
     {
-        var result = await _requestHostService.Evaluate(id, RequestHostStatus.Accepted, model);
+        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+        var result = await _requestHostService.Evaluate(id, RequestHostStatus.Accepted, new Guid(userId));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -90,16 +91,18 @@ public class RequestHostController : ControllerBase
     [SwaggerOperation(Summary = "Accept many waiting request host")]
     public async Task<ActionResult> AcceptBulk(RequestHostEvaluateBulkModel model)
     {
-        var result = await _requestHostService.EvaluateBulk(model, RequestHostStatus.Accepted);
+        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+        var result = await _requestHostService.EvaluateBulk(model, RequestHostStatus.Accepted, new Guid(userId));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpPut("{id}/Deny")]
     [SwaggerOperation(Summary = "Deny a waiting request host")]
-    public async Task<ActionResult> Deny(int id, [FromBody] UserAssignModel model)
+    public async Task<ActionResult> Deny(int id)
     {
-        var result = await _requestHostService.Evaluate(id, RequestHostStatus.Denied, model);
+        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+        var result = await _requestHostService.Evaluate(id, RequestHostStatus.Denied, new Guid(userId));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -108,7 +111,8 @@ public class RequestHostController : ControllerBase
     [SwaggerOperation(Summary = "Deny many waiting request host")]
     public async Task<ActionResult> DenyBulk(RequestHostEvaluateBulkModel model)
     {
-        var result = await _requestHostService.EvaluateBulk(model, RequestHostStatus.Denied);
+        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+        var result = await _requestHostService.EvaluateBulk(model, RequestHostStatus.Denied, new Guid(userId));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

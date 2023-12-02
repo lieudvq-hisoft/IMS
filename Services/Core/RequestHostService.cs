@@ -20,8 +20,8 @@ public interface IRequestHostService
     Task<ResultModel> Create(RequestHostCreateModel model);
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Update(RequestHostUpdateModel model);
-    Task<ResultModel> Evaluate(int requestHostId, RequestHostStatus status, UserAssignModel model);
-    Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status);
+    Task<ResultModel> Evaluate(int requestHostId, RequestHostStatus status, Guid userId);
+    Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status, Guid userId);
     Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model);
     Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model);
     Task<ResultModel> Process(int requestHostId, Guid userId);
@@ -269,7 +269,7 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    public async Task<ResultModel> Evaluate(int requestHostId, RequestHostStatus status, UserAssignModel model)
+    public async Task<ResultModel> Evaluate(int requestHostId, RequestHostStatus status, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -294,7 +294,7 @@ public class RequestHostService : IRequestHostService
                 result.ErrorMessage = RequestHostErrorMessage.NOT_WAITING;
             }
 
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
             if (user == null)
             {
                 validPrecondition = false;
@@ -308,7 +308,7 @@ public class RequestHostService : IRequestHostService
                 {
                     Action = RequestUserAction.Evaluate,
                     RequestHostId = requestHost.Id,
-                    UserId = new Guid(model.UserId)
+                    UserId = userId
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
@@ -323,7 +323,7 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    public async Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status)
+    public async Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -332,14 +332,10 @@ public class RequestHostService : IRequestHostService
         {
             using var transaction = _dbContext.Database.BeginTransaction();
             var results = new List<ResultModel>();
-            var userAssignModel = new UserAssignModel
-            {
-                UserId = model.UserId
-            };
             foreach (var requestHostId in model.RequestHostIds)
             {
 
-                results.Add(await Evaluate(requestHostId, status, userAssignModel));
+                results.Add(await Evaluate(requestHostId, status, userId));
             }
 
             if (results.Any(x => !x.Succeed))

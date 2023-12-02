@@ -102,7 +102,4 @@ public class RequestHostEvaluateBulkModel
 {
     [Required]
     public List<int> RequestHostIds { get; set; }
-
-    [Required]
-    public string UserId { get; set; }
 }

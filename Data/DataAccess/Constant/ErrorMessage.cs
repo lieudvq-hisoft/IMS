@@ -1,6 +1,6 @@
 ﻿namespace Data.DataAccess.Constant;
 
-public class ErrorMessage
+public static class ErrorMessage
 {
     public const string EXISTED = "EXISTED";
     public const string NOT_EXISTED = "NOT EXISTED";
@@ -13,7 +13,7 @@ public class ErrorMessage
     public const string WRONG_PURPOSE = "Wrong purpose";
 }
 
-public class CustomerErrorMessage
+public static class CustomerErrorMessage
 {
     public const string EXISTED = "Customer " + ErrorMessage.EXISTED;
     public const string NOT_EXISTED = "Customer " + ErrorMessage.NOT_EXISTED;
@@ -21,7 +21,7 @@ public class CustomerErrorMessage
     public const string UPDATE_FAILED = "Update customer failed";
 }
 
-public class ServerAllocationErrorMessage
+public static class ServerAllocationErrorMessage
 {
     public const string EXISTED = "Server allocation " + ErrorMessage.EXISTED;
     public const string NOT_EXISTED = "Server allocation " + ErrorMessage.NOT_EXISTED;
@@ -52,25 +52,25 @@ public class RequestHostErrorMessage
     public const string NOT_PROCESSED = "Request host not process";
 }
 
-public class RequestExpandUserErrorMessage
+public static class RequestExpandUserErrorMessage
 {
     public const string NOT_EXISTED = "Request Expand User " + ErrorMessage.NOT_EXISTED;
 }
 
-public class IpAssignmentErrorMessage
+public static class IpAssignmentErrorMessage
 {
     public const string NOT_EXISTED = "Ip Assignment " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Ip Assignment " + ErrorMessage.EXISTED;
 
 }
 
-public class AreaErrorMessage
+public static class AreaErrorMessage
 {
     public const string NOT_EXISTED = "Area " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Area " + ErrorMessage.EXISTED;
 }
 
-public class IpAddressErrorMessage
+public static class IpAddressErrorMessage
 {
     public const string NOT_EXISTED = "Ip Address " + ErrorMessage.NOT_EXISTED;
     public const string NO_AVAILABLE = "No available ip address";
@@ -79,7 +79,7 @@ public class IpAddressErrorMessage
     public const string EXISTED = "Ip Address " + ErrorMessage.EXISTED;
 }
 
-public class IpSubnetErrorMessage
+public static class IpSubnetErrorMessage
 {
     public const string NOT_EXISTED = "Ip Subnet " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Ip Subnet " + ErrorMessage.EXISTED;
@@ -89,7 +89,7 @@ public class IpSubnetErrorMessage
 }
 
 
-public class RequestExpandErrorMessage
+public static class RequestExpandErrorMessage
 {
     public const string NOT_EXISTED = "Request expand " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Request expand " + ErrorMessage.EXISTED;
@@ -100,7 +100,7 @@ public class RequestExpandErrorMessage
     public const string REMOVAL_NOT_ACCEPTED = "Non success removal request";
 }
 
-public class RequestExpandAppointmentErrorMessage
+public static class RequestExpandAppointmentErrorMessage
 {
     public const string NOT_EXISTED = "Request Expand Appointment " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Request Expand Appointment " + ErrorMessage.EXISTED;
@@ -108,32 +108,32 @@ public class RequestExpandAppointmentErrorMessage
     public const string INVALID_SERVER_ALLOCATION = "Appointment and Request expand have different server allocation";
 }
 
-public class RequestExpandLocationErrorMessage
+public static class RequestExpandLocationErrorMessage
 {
     public const string NOT_EXISTED = "Request Expand Location " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Request Expand Location " + ErrorMessage.EXISTED;
     public const string INVALID_LOCATION = "Location is not valid";
 }
 
-public class RackErrorMessage
+public static class RackErrorMessage
 {
     public const string NOT_EXISTED = "Rack " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Rack " + ErrorMessage.EXISTED;
     public const string POSITION_INVALID = "Rack position is invalid";
 }
 
-public class RequestErrorMessage
+public static class RequestErrorMessage
 {
     public const string NOT_EXISTED = "Request " + ErrorMessage.NOT_EXISTED;
 }
 
-public class CompanyTypeErrorMessage
+public static class CompanyTypeErrorMessage
 {
     public const string NOT_EXISTED = "Company type " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Company type " + ErrorMessage.NOT_EXISTED;
 }
 
-public class UserErrorMessage
+public static  class UserErrorMessage
 {
     public const string NOT_EXISTED = "User " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "User " + ErrorMessage.EXISTED;
@@ -145,7 +145,7 @@ public class UserErrorMessage
     public const string CREATE_CUSTOMER = "Cannot create a customer";
 }
 
-public class IpErrorMessage
+public static class IpErrorMessage
 {
     public const string ASSIGN_IP_TO_NON_PENDING_REQUEST = "Can only assign Ip to pending request";
     public const string ASSIGN_IP_TO_REQUEST_WITHOUT_SERVER = "Request dont have a server";
@@ -153,7 +153,7 @@ public class IpErrorMessage
     public const string NOT_AVAILABLE = "Ip Not available";
 }
 
-public class LocationAssignmentErrorMessage
+public static class LocationAssignmentErrorMessage
 {
     public const string EXISTED = "Location assignment " + ErrorMessage.EXISTED;
     public const string NOT_EXISTED = "Location assignment " + ErrorMessage.NOT_EXISTED;
@@ -166,13 +166,13 @@ public class LocationAssignmentErrorMessage
     public const string INVALID_LOCATION = "Location is not valid";
 }
 
-public class ServerErrorMessgae
+public static class ServerErrorMessgae
 {
     public const string NOT_EXISTED = "Server " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Server " + ErrorMessage.EXISTED;
 }
 
-public class AppointmentErrorMessage
+public static class AppointmentErrorMessage
 {
     public const string NOT_EXISTED = "Appointment " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Appointment " + ErrorMessage.EXISTED;
@@ -182,45 +182,45 @@ public class AppointmentErrorMessage
     public const string NOT_COMPLETABLE = "Appointment with request must have document to be completable";
 }
 
-public class LocationErrorMessgae
+public static class LocationErrorMessgae
 {
     public const string NOT_EXISTED = "Location " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Location " + ErrorMessage.EXISTED;
     public const string NO_AVAILABLE_FOUND = "No location available found";
 }
 
-public class ComponentErrorMessgae
+public static class ComponentErrorMessgae
 {
     public const string NOT_EXISTED = "Appointment " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Appointment " + ErrorMessage.EXISTED;
 }
 
 
-public class CompanyTypeErrorMessgae
+public static class CompanyTypeErrorMessgae
 {
     public const string NOT_EXISTED = "Company Type " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Company Type " + ErrorMessage.EXISTED;
 }
 
-public class RequestUpgradeAppointmentErrorMessgae
+public static class RequestUpgradeAppointmentErrorMessgae
 {
     public const string NOT_EXISTED = "Request Upgrade Appointment " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Request Upgrade Appointment " + ErrorMessage.EXISTED;
 }
 
-public class ServiceErrorMessage
+public static class ServiceErrorMessage
 {
     public const string NOT_EXISTED = "Service " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Service " + ErrorMessage.EXISTED;
 }
 
-public class ComponentErrorMessage
+public static class ComponentErrorMessage
 {
     public const string NOT_EXISTED = "Component " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Component " + ErrorMessage.EXISTED;
 }
 
-public class ServerHardwareConfigErrorMessage
+public static class ServerHardwareConfigErrorMessage
 {
     public const string EXISTED = "Server hardware config " + ErrorMessage.EXISTED;
     public const string NOT_EXISTED = "Server hardware config " + ErrorMessage.NOT_EXISTED;
@@ -228,7 +228,7 @@ public class ServerHardwareConfigErrorMessage
     public const string DELETE_CURRENT = "Cannot delete current server hardware config";
 }
 
-public class RequestUpgradeErrorMessage
+public static class RequestUpgradeErrorMessage
 {
     public const string NOT_EXISTED = "Request upgrade " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "Request upgrade " + ErrorMessage.EXISTED;
