@@ -10,7 +10,7 @@ public class IpAddressModel
     public bool IsReserved { get; set; }
     public string Purpose { get; set; }
     public string AssignmentType { get; set; }
-    public string Note { get; set; }
+    public string Reason { get; set; }
     public ServerAllocationResultModel? ServerAllocation { get; set; }
     public CustomerResultModel? Customer { get; set; }
 
@@ -24,7 +24,7 @@ public class IpAddressResultModel
     public bool Blocked { get; set; }
     public bool IsReserved { get; set; }
     public string Purpose { get; set; }
-    public string Note { get; set; }
+    public string Reason { get; set; }
 
     public int IpSubnetId { get; set; }
 }
@@ -32,7 +32,7 @@ public class IpAddressResultModel
 public class IpAddressIdListModel
 {
     [Required]
-    public string Note { get; set; }
+    public string Reason { get; set; }
 
     [Required]
     public List<int> IpAddressIds { get; set; }

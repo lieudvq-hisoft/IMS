@@ -131,18 +131,31 @@ public class IpAddressService : IIpAddressService
         try
         {
             var ipAddresses = _dbContext.IpAddresses
+                .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation)
                 .Where(x => model.IpAddressIds.Contains(x.Id) && x.Blocked == !isBlock)
                 .ToList();
             if (ipAddresses.Count() != model.IpAddressIds.Count())
             {
-                result.ErrorMessage = $"Not all ip valid to be {(isBlock ? "block": "unblock")}";
+                result.ErrorMessage = $"Not all ip valid to be {(isBlock ? "block" : "unblock")}";
             }
             else
             {
                 ipAddresses.ForEach(x =>
                 {
+                    var masterIpServer = x.IpAssignments.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.ServerAllocation;
+                    if (masterIpServer != null)
+                    {
+                        if (isBlock)
+                        {
+                            masterIpServer.Status = ServerAllocationStatus.Pausing;
+                        }
+                        else
+                        {
+                            masterIpServer.Status = ServerAllocationStatus.Working;
+                        }
+                    }
                     x.Blocked = isBlock;
-                    x.Note = model.Note;
+                    x.Reason = model.Reason;
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
