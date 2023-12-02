@@ -59,10 +59,10 @@ public class IpSubnetController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("{id}/NextAddress")]
-    public async Task<ActionResult> GetNextAddress(int id)
+    [HttpGet("NextAddress")]
+    public async Task<ActionResult> GetNextAddress([FromQuery] NextAddressModel model)
     {
-        var result = await _ipSubnetService.GetNextAddress(id);
+        var result = await _ipSubnetService.GetNextAddress(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

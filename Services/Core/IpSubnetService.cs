@@ -20,7 +20,7 @@ public interface IIpSubnetService
     Task<ResultModel> GetIpAddress(int ipSubnetId, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetIpSubnet(int subnetId);
-    Task<ResultModel> GetNextAddress(int subnetId);
+    Task<ResultModel> GetNextAddress(NextAddressModel model);
     Task<ResultModel> CreateIpRange(IpRangeCreateModel model);
     Task<ResultModel> Create(int ipSubnetId, List<IpSubnetCreateModel> models);
     Task<ResultModel> Delete(int subnetId);
@@ -224,31 +224,24 @@ public class IpSubnetService : IIpSubnetService
         return result;
     }
 
-    public async Task<ResultModel> GetNextAddress(int subnetId)
+    public async Task<ResultModel> GetNextAddress(NextAddressModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var subnet = _dbContext.IpSubnets.Include(x => x.ParentNetwork).Include(x => x.SubNets).ThenInclude(x => x.SubNets).FirstOrDefault(x => x.Id == subnetId);
-            if (subnet == null)
+            var octets = GetIPv4Octets(model.IpAddresss);
+            var numberOfIp = Math.Pow(2, PREFIX_LENGTH_MAX - model.PrefixLength);
+            var newFourthOctet = octets[3] + numberOfIp;
+            if (newFourthOctet > SUBNET_MAX_SIZE)
             {
-                result.ErrorMessage = IpSubnetErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = "End of subnet";
             }
             else
             {
-                var numberOfIp = Math.Pow(2, PREFIX_LENGTH_MAX - subnet.PrefixLength);
-                var newFourthOctet = subnet.FourthOctet + numberOfIp;
-                if (newFourthOctet > SUBNET_MAX_SIZE)
-                {
-                    result.ErrorMessage = "End of subnet";
-                }
-                else
-                {
-                    result.Data = $"{subnet.FirstOctet}.{subnet.SecondOctet}.{subnet.ThirdOctet}.{newFourthOctet}";
-                    result.Succeed = true;
-                }
+                result.Data = $"{octets[0]}.{octets[1]}.{octets[3]}.{newFourthOctet}";
+                result.Succeed = true;
             }
         }
         catch (Exception e)

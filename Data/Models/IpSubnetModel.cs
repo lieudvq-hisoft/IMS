@@ -51,6 +51,16 @@ public class CreateSubnetModel
     public List<IpSubnetCreateModel> IpSubnets { get; set; }
 }
 
+public class NextAddressModel
+{
+    [IsIpV4]
+    [Required]
+    public string IpAddresss { get; set; }
+
+    [Required]
+    public int PrefixLength { get; set; }
+}
+
 public class IpSubnetCreateModel
 {
     [IsIpV4]
