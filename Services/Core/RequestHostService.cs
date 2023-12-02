@@ -248,13 +248,13 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
             }
-            else if (!requestHost.Status.Equals(RequestStatus.Waiting))
+            else if (requestHost.Status != RequestHostStatus.Waiting)
             {
                 result.ErrorMessage = RequestHostErrorMessage.NOT_WAITING;
             }
             else
             {
-                requestHost.Status.Equals(RequestStatus.Failed);
+                requestHost.Status = RequestHostStatus.Failed;
                 _dbContext.RequestHostIps.RemoveRange(requestHost.RequestHostIps);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
