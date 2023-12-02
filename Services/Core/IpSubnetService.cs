@@ -248,8 +248,8 @@ public class IpSubnetService : IIpSubnetService
             }
             else
             {
-                var newThirdOctet = octets[2] + numberOfIp/256;
-                if (newThirdOctet >  SUBNET_MAX_SIZE - 1)
+                var newThirdOctet = octets[2] + numberOfIp / 256;
+                if (newThirdOctet > SUBNET_MAX_SIZE - 1 || octets[3] != 0)
                 {
                     result.ErrorMessage = "End of subnet";
                 }
