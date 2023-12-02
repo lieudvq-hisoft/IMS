@@ -347,10 +347,15 @@ public class RequestHostService : IRequestHostService
                 validPrecondition = false;
                 result.ErrorMessage = "Number of assign ip not match requested";
             }
-            else if (requestHost.Status != RequestHostStatus.Accepted)
+            else if (!requestHost.IsRemoval && requestHost.Status != RequestHostStatus.Accepted)
             {
                 validPrecondition = false;
                 result.ErrorMessage = RequestHostErrorMessage.NOT_ACCEPTED;
+            }
+            else if (requestHost.IsRemoval && requestHost.Status != RequestHostStatus.Waiting)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = RequestHostErrorMessage.NOT_WAITING;
             }
 
             if (validPrecondition)
