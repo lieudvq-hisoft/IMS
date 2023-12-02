@@ -195,7 +195,7 @@ public class RequestHostService : IRequestHostService
         try
         {
             var requestHost = _dbContext.RequestHosts
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress).ThenInclude(x => x.RequestHostIps)
                 .FirstOrDefault(x => x.Id == model.Id && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
             var serverAllocation = requestHost.ServerAllocation;
             if (requestHost == null)
