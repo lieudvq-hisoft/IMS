@@ -18,6 +18,7 @@ public interface IRequestHostService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> Create(RequestHostCreateModel model);
+    Task<ResultModel> Delete(int id);
     Task<ResultModel> Update(RequestHostUpdateModel model);
     Task<ResultModel> Evaluate(int requestHostId, RequestHostStatus status, UserAssignModel model);
     Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status);
@@ -225,6 +226,39 @@ public class RequestHostService : IRequestHostService
 
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestHostResultModel>(requestHost);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Delete(int id)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestHost = _dbContext.RequestHosts.Include(x => x.RequestHostIps).FirstOrDefault(x => x.Id == id);
+            if (requestHost == null)
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
+            }
+            else if (!requestHost.Status.Equals(RequestStatus.Waiting))
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NOT_WAITING;
+            }
+            else
+            {
+                requestHost.Status.Equals(RequestStatus.Failed);
+                _dbContext.RequestHostIps.RemoveRange(requestHost.RequestHostIps);
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = requestHost.Id;
             }
         }
         catch (Exception e)
