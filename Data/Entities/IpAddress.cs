@@ -22,6 +22,6 @@ public class IpAddress
 
     public bool IsAvailable()
     {
-        return Blocked && !IsReserved && !IpAssignments.Any() && !RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed);
+        return !Blocked && !IsReserved && !IpAssignments.Any() && !RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed);
     }
 }
