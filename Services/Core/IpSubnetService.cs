@@ -17,13 +17,13 @@ public interface IIpSubnetService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
     Task<ResultModel> GetIpRange(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
+    Task<ResultModel> GetIpAddress(int ipSubnetId, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetIpSubnet(int subnetId);
     Task<ResultModel> GetNextAddress(int subnetId);
     Task<ResultModel> CreateIpRange(IpRangeCreateModel model);
     Task<ResultModel> Create(int ipSubnetId, List<IpSubnetCreateModel> models);
     Task<ResultModel> Delete(int subnetId);
-    Task<ResultModel> GetIpAddress(int ipSubnetId, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> SuggestAdditionalIps(SuggestAdditionalIpModel model);
 }
 
