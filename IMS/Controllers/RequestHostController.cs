@@ -61,7 +61,7 @@ public class RequestHostController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _requestHostService.Delete(id);
