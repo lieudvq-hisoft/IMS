@@ -131,7 +131,7 @@ public class IpAddressService : IIpAddressService
         try
         {
             var ipAddresses = _dbContext.IpAddresses
-                .Where(x => model.IpAddressIds.Contains(x.Id) && x.Blocked == isBlock)
+                .Where(x => model.IpAddressIds.Contains(x.Id) && x.Blocked == !isBlock)
                 .ToList();
             if (ipAddresses.Count() != model.IpAddressIds.Count())
             {
