@@ -19,7 +19,7 @@ public interface IServerAllocationService
     Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestHost(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetLocationAssignment(int id);
-    Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel);
+    Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetAppointment(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> Create(ServerAllocationCreateModel model);
@@ -264,7 +264,7 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel)
+    public async Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -281,7 +281,7 @@ public class ServerAllocationService : IServerAllocationService
             }
             else
             {
-                var ipAddresses = serverAllocation.IpAssignments?.Select(x => x.IpAddress).AsQueryable();
+                var ipAddresses = serverAllocation.IpAssignments?.Select(x => x.IpAddress).Where(x => searchModel.Address != null ? x.Address.Contains(searchModel.Address) : true).AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddresses.Count());
 
                 ipAddresses = ipAddresses.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);

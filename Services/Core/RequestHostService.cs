@@ -15,13 +15,13 @@ public interface IRequestHostService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel);
+    Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> Create(RequestHostCreateModel model);
     Task<ResultModel> Update(RequestHostUpdateModel model);
     Task<ResultModel> Evaluate(int requestHostId, RequestHostStatus status, UserAssignModel model);
     Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status);
     Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model);
-    Task<ResultModel> AssignInspectionReport(int requestHostId, DocumentFileUploadModel model);
+    Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model);
     Task<ResultModel> Process(int requestHostId, Guid userId);
     Task<ResultModel> Complete(int requestHostId, Guid userId);
 }
@@ -104,7 +104,7 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    public async Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel)
+    public async Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -118,7 +118,7 @@ public class RequestHostService : IRequestHostService
 
             if (requestHost != null)
             {
-                var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress).AsQueryable();
+                var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress).Where(x => searchModel.Address != null ? x.Address.Contains(searchModel.Address) : true).AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddresses.Count());
 
                 ipAddresses = ipAddresses.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
@@ -352,13 +352,10 @@ public class RequestHostService : IRequestHostService
                 validPrecondition = false;
                 result.ErrorMessage = "Number of assign ip not match requested";
             }
-            else
+            else if (requestHost.Status != RequestHostStatus.Accepted)
             {
-                if (requestHost.Status != RequestHostStatus.Waiting)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = RequestHostErrorMessage.NOT_WAITING;
-                }
+                validPrecondition = false;
+                result.ErrorMessage = RequestHostErrorMessage.NOT_ACCEPTED;
             }
 
             if (validPrecondition)
@@ -416,7 +413,7 @@ public class RequestHostService : IRequestHostService
         return ipAddress;
     }
 
-    public async Task<ResultModel> AssignInspectionReport(int requestHostId, DocumentFileUploadModel model)
+    public async Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -439,16 +436,13 @@ public class RequestHostService : IRequestHostService
             else
             {
                 string inspectionReportFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
-                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(model.ReceiptOfRecipient);
 
                 requestHost.InspectionReportFilePath = inspectionReportFileName;
-                requestHost.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = new DocumentFileResultModel
+                result.Data = new RequestHostDocumentFileResultModel
                 {
                     InspectionReport = inspectionReportFileName,
-                    ReceiptOfRecipient = receiptOfRecipientFileName,
                 };
             }
         }
@@ -480,7 +474,7 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
             }
-            else if (requestHost.InspectionReportFilePath == null || requestHost.ReceiptOfRecipientFilePath == null)
+            else if (requestHost.InspectionReportFilePath == null)
             {
                 result.ErrorMessage = RequestHostErrorMessage.NOT_PROCESSABLE;
             }
@@ -521,12 +515,12 @@ public class RequestHostService : IRequestHostService
             if (requestHost == null)
             {
                 validPrecondition = false;
-                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
             }
             else if (requestHost.Status != RequestHostStatus.Processed)
             {
                 validPrecondition = false;
-                result.ErrorMessage = AppointmentErrorMessage.NOT_PROCESSED;
+                result.ErrorMessage = RequestHostErrorMessage.NOT_PROCESSED;
             }
             else
             {

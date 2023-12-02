@@ -27,11 +27,26 @@ public class DocumentFileUploadModel
     public string ReceiptOfRecipientFileName => ReceiptOfRecipient?.FileName;
 }
 
+public class RequestHostDocumentFileUploadModel
+{
+    [Required]
+    public IFormFile InspectionReport { get; set; }
+
+
+    [FileExtensions(Extensions = "pdf,docx,doc,jpeg")]
+    public string InspectionReportFileName => InspectionReport?.FileName;
+}
+
 public class DocumentFileResultModel
 {
     public string InspectionReport { get; set; }
 
     public string ReceiptOfRecipient { get; set; }
+}
+
+public class RequestHostDocumentFileResultModel
+{
+    public string InspectionReport { get; set; }
 }
 
 public class ExcelFileUploadModel

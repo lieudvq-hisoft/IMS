@@ -38,9 +38,9 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpGet("{id}/IpAddress")]
-    public async Task<ActionResult> GetAssignedIp(int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel)
+    public async Task<ActionResult> GetAssignedIp(int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] IpAddressSearchModel searchModel)
     {
-        var result = await _requestHostService.GetIpAddress(id, paginationModel);
+        var result = await _requestHostService.GetIpAddress(id, paginationModel, searchModel);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -106,9 +106,18 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpPost("{id}/Document")]
-    public async Task<ActionResult> UploadDocument(int id, [FromForm] DocumentFileUploadModel model)
+    public async Task<ActionResult> UploadDocument(int id, [FromForm] RequestHostDocumentFileUploadModel model)
     {
         var result = await _requestHostService.AssignInspectionReport(id, model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("{id}/Process")]
+    public async Task<ActionResult> Process(int id)
+    {
+        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+        var result = await _requestHostService.Process(id, new Guid(userId));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

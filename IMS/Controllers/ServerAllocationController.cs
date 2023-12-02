@@ -87,9 +87,9 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpGet("{id}/IpAddress")]
-    public async Task<ActionResult> GetIpAddress([FromRoute] int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel)
+    public async Task<ActionResult> GetIpAddress([FromRoute] int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] IpAddressSearchModel searchModel)
     {
-        var result = await _serverAllocationService.GetIpAddress(id, paginationModel);
+        var result = await _serverAllocationService.GetIpAddress(id, paginationModel, searchModel);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
