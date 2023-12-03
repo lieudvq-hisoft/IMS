@@ -591,7 +591,7 @@ public class IpSubnetService : IIpSubnetService
                     {
                         var numberOfRequired = model.Quantity - additionalIps.Count();
                         var additionalIpIds = additionalIps.Select(x => x.Id);
-                        var ipAddresses = GetAllIpAddress(rootSubnet)
+                        var ipAddresses = GetAllIpAddress(rootSubnet, model.Purpose)
                             .Where(x => !x.Blocked && !x.IsReserved && !x.IpAssignments.Any() && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
                             .Where(x => !additionalIpIds.Contains(x.Id));
                         if (ipAddresses.Count() >= numberOfRequired)
