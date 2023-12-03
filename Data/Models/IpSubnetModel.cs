@@ -80,7 +80,7 @@ public class SuggestAdditionalIpModel
     [Required]
     public int ServerAllocationId { get; set; }
 
-    public IpPurpose? Purpose { get; set; }
+    public List<IpPurpose>? Purposes { get; set; }
 
     [Required]
     public int Quantity { get; set; }

@@ -173,7 +173,7 @@ public class IpSubnetService : IIpSubnetService
         return subnetTree.GetAllChildren().FirstOrDefault(x => x.Data.Id == subnetId);
     }
 
-    private List<IpAddress> GetAllIpAddress(ITree<IpSubnet> subnet, IpPurpose? purpuse = null)
+    private List<IpAddress> GetAllIpAddress(ITree<IpSubnet> subnet, List<IpPurpose>? purposes = null)
     {
         List<ITree<IpSubnet>> childSubnets = subnet.GetAllChildren().ToList();
         var ipAddresses = new List<IpAddress>();
@@ -183,7 +183,7 @@ public class IpSubnetService : IIpSubnetService
                 .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
                 .Where(x => x.IpSubnetId == subnet.Data.Id)
-                .Where(x => purpuse != null ? x.Purpose == purpuse : true)
+                .Where(x => purposes != null && purposes.Count > 0 ? purposes.Contains(x.Purpose) : true)
                 .ToList();
             ipAddresses.AddRange(subnetIps);
             foreach (var ipSubnet in childSubnets.Select(x => x.Data))
@@ -192,7 +192,7 @@ public class IpSubnetService : IIpSubnetService
                     .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                     .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
                     .Where(x => x.IpSubnetId == ipSubnet.Id)
-                    .Where(x => purpuse != null ? x.Purpose == purpuse : true)
+                    .Where(x => purposes != null && purposes.Count > 0 ? purposes.Contains(x.Purpose) : true)
                     .ToList();
                 ipAddresses.AddRange(childSubnetIps);
             }
@@ -591,7 +591,7 @@ public class IpSubnetService : IIpSubnetService
                     {
                         var numberOfRequired = model.Quantity - additionalIps.Count();
                         var additionalIpIds = additionalIps.Select(x => x.Id);
-                        var ipAddresses = GetAllIpAddress(rootSubnet, model.Purpose)
+                        var ipAddresses = GetAllIpAddress(rootSubnet, model.Purposes)
                             .Where(x => !x.Blocked && !x.IsReserved && !x.IpAssignments.Any() && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
                             .Where(x => !additionalIpIds.Contains(x.Id));
                         if (ipAddresses.Count() >= numberOfRequired)
@@ -613,7 +613,7 @@ public class IpSubnetService : IIpSubnetService
                             .Include(x => x.IpAssignments)
                             .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
                             .Where(x => !x.Blocked && !x.IsReserved && !x.IpAssignments.Any() && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
-                            .Where(x => model.Purpose != null ? x.Purpose == model.Purpose : true)
+                            .Where(x => model.Purposes != null && model.Purposes.Count > 0 ? model.Purposes.Contains(x.Purpose) : true)
                             .Where(x => !additionalIpIds.Contains(x.Id));
                         if (ipAddresses.Count() < numberOfRequired)
                         {
