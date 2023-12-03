@@ -15,7 +15,7 @@ public interface IRequestExpandService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetAppointment(int requestExpandId, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
-    Task<ResultModel> Create(RequestExpandCreateModel model);
+    //Task<ResultModel> Create(RequestExpandCreateModel model);
     Task<ResultModel> Update(RequestExpandUpdateModel model);
     Task<ResultModel> Delete(int requestExpandId);
     Task<ResultModel> Reject(int requestExpandId, RequestExpandRejectModel modell);
@@ -134,59 +134,59 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
-    public async Task<ResultModel> Create(RequestExpandCreateModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-        bool validPrecondition = true;
+    //public async Task<ResultModel> Create(RequestExpandCreateModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+    //    bool validPrecondition = true;
 
-        try
-        {
-            var serverAllocation = _dbContext.ServerAllocations
-                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
-                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location)
-                .FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
-            var requiredComponents = _dbContext.Components.Where(x => x.IsRequired);
-            if (serverAllocation == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else if (serverAllocation.LocationAssignments.Any())
-            {
-                validPrecondition = false;
-                result.ErrorMessage = LocationAssignmentErrorMessage.EXISTED;
-            }
-            else
-            {
-                foreach (var component in requiredComponents)
-                {
-                    if (serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == component.Id) == null)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = "Cannot allocate server missing config for required component";
-                    }
-                }
-            }
-            
-            if (validPrecondition)
-            {
-                var requestExpand = _mapper.Map<RequestExpand>(model);
-                requestExpand.Status = RequestStatus.Waiting;
-                _dbContext.RequestExpands.Add(requestExpand);
-                _dbContext.SaveChanges();
+    //    try
+    //    {
+    //        var serverAllocation = _dbContext.ServerAllocations
+    //            .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+    //            .Include(x => x.LocationAssignments).ThenInclude(x => x.Location)
+    //            .FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
+    //        var requiredComponents = _dbContext.Components.Where(x => x.IsRequired);
+    //        if (serverAllocation == null)
+    //        {
+    //            validPrecondition = false;
+    //            result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+    //        }
+    //        else if (serverAllocation.LocationAssignments.Any())
+    //        {
+    //            validPrecondition = false;
+    //            result.ErrorMessage = LocationAssignmentErrorMessage.EXISTED;
+    //        }
+    //        else
+    //        {
+    //            foreach (var component in requiredComponents)
+    //            {
+    //                if (serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == component.Id) == null)
+    //                {
+    //                    validPrecondition = false;
+    //                    result.ErrorMessage = "Cannot allocate server missing config for required component";
+    //                }
+    //            }
+    //        }
 
-                result.Succeed = true;
-                result.Data = _mapper.Map<RequestExpandResultModel>(requestExpand);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //        if (validPrecondition)
+    //        {
+    //            var requestExpand = _mapper.Map<RequestExpand>(model);
+    //            requestExpand.Status = RequestStatus.Waiting;
+    //            _dbContext.RequestExpands.Add(requestExpand);
+    //            _dbContext.SaveChanges();
 
-        return result;
-    }
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<RequestExpandResultModel>(requestExpand);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+
+    //    return result;
+    //}
 
     public async Task<ResultModel> Update(RequestExpandUpdateModel model)
     {
@@ -531,13 +531,27 @@ public class RequestExpandService : IRequestExpandService
         try
         {
             var requestExpand = _dbContext.RequestExpands
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
                 .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Accepted);
+            ServerAllocation serverAllocation = null;
+            var requiredComponents = _dbContext.Components.Where(x => x.IsRequired);
             if (requestExpand == null)
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
+            }
+            else
+            {
+                serverAllocation = requestExpand.ServerAllocation;
+                foreach (var component in requiredComponents)
+                {
+                    if (serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == component.Id) == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "Cannot allocate server missing config for required component";
+                    }
+                }
             }
 
             if (!IsCompletable(requestExpandId, false))
@@ -563,7 +577,6 @@ public class RequestExpandService : IRequestExpandService
 
             if (validPrecondition)
             {
-                var serverAllocation = requestExpand.ServerAllocation;
                 var locationAssignments = new List<LocationAssignment>();
                 foreach (var location in locations)
                 {

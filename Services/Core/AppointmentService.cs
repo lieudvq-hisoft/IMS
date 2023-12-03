@@ -848,7 +848,7 @@ public class AppointmentService : IAppointmentService
 
         if (appointment.InspectionReportFilePath == null || appointment.ReceiptOfRecipientFilePath == null)
         {
-            if (appointment.RequestExpandAppointments.Any() || appointment.RequestUpgradeAppointment.Any())
+            if (appointment.RequestUpgradeAppointment.Any())
             {
                 validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_COMPLETABLE;

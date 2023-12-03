@@ -412,6 +412,12 @@ public class ServerAllocationService : IServerAllocationService
 
                 _dbContext.ServerAllocations.Add(serverAllocation);
                 _dbContext.SaveChanges();
+                _dbContext.RequestExpands.Add(new RequestExpand
+                {
+                    Size = 0,
+                    Note = model.Note,
+                    ServerAllocationId = serverAllocation.Id
+                });
                 result.Succeed = true;
                 result.Data = _mapper.Map<ServerAllocationModel>(serverAllocation);
             }

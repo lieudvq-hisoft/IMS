@@ -74,7 +74,7 @@ public static class IpAddressErrorMessage
 {
     public const string NOT_EXISTED = "Ip Address " + ErrorMessage.NOT_EXISTED;
     public const string NO_AVAILABLE = "No available ip address";
-    public const string UNASSIGNABLE = "Ip address cannot be ipassigned";
+    public const string UNASSIGNABLE = "Ip address cannot be assigned";
     public const string UNAVAILABLE = "Ip address not available for assignment";
     public const string EXISTED = "Ip Address " + ErrorMessage.EXISTED;
 }
