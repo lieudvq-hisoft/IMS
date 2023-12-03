@@ -47,6 +47,9 @@ public class RequestExpandCompleteBulkModel
 
 public class RequestExpandCreateModel
 {
+    [GreaterThanZero]
+    public int? Size { get; set; }
+
     [Required]
     public string? Note { get; set; }
 
