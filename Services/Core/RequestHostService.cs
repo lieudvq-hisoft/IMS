@@ -418,7 +418,12 @@ public class RequestHostService : IRequestHostService
                             result.ErrorMessage = "Cannot unassign master ip";
                         }
                     }
-
+                    // validate ips for assignment
+                    else if (requestHost.Type == IpAssignmentTypes.Port && (ipAddress.Purpose == IpPurpose.Dns || ipAddress.Purpose == IpPurpose.Gateway))
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "Cannot assign dns or gateway ip to port";
+                    }
                 }
             }
 
