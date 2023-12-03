@@ -142,7 +142,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
                 _dbContext.SaveChanges();
                 _dbContext.RequestUpgrades.Add(new RequestUpgrade
                 {
-                    Description = JsonSerializer.Serialize(model.Description),
+                    Description = JsonSerializer.Serialize(model.Descriptions),
                     ServerAllocationId = model.ServerAllocationId,
                     ComponentId = model.ComponentId,
                     Status = RequestStatus.Success
