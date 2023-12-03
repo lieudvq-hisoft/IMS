@@ -58,9 +58,11 @@ public class ServerAllocationCreateModel
     public string Name { get; set; }
 
     [Required]
+    [StringLength(255, MinimumLength = 6)]
     public string SerialNumber { get; set; }
 
     [Required]
+    [Range(500, 700)]
     public int Power { get; set; }
 
     public string? Note { get; set; }
