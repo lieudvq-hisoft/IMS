@@ -63,7 +63,7 @@ public class ServerAllocationCreateModel
     public string SerialNumber { get; set; }
 
     [Required]
-    [Range(500, 700)]
+    [Range(100, double.MaxValue)]
     public int Power { get; set; }
 
     public string? Note { get; set; }

@@ -418,6 +418,7 @@ public class ServerAllocationService : IServerAllocationService
                     Note = model.Note,
                     ServerAllocationId = serverAllocation.Id
                 });
+                _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<ServerAllocationModel>(serverAllocation);
             }

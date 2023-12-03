@@ -1,4 +1,6 @@
-﻿using Data.Enums;
+﻿using Data.DataAccess.Constant;
+using Data.Enums;
+using Data.Utils.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models;
@@ -41,6 +43,7 @@ public class RequestUpgradeResultModel
 public class RequestUpgradeCreateModel
 {
     [Required]
+    [EnsureMinimumElements(min: 1, ErrorMessage = "Select at least one item")]
     public List<ConfigDescriptionModel> Descriptions { get; set; }
 
     public string? Note { get; set; }
@@ -76,6 +79,7 @@ public class RequestUpgradeUpdateModel
     public int Id { get; set; }
 
     [Required]
+    [EnsureMinimumElements(min: 1, ErrorMessage = "Select at least one item")]
     public List<ConfigDescriptionModel> Descriptions { get; set; }
 
     public string? Note { get; set; }

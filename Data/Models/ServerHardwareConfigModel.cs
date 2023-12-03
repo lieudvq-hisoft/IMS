@@ -25,6 +25,7 @@ public class ServerHardwareConfigResultModel
 public class ServerHardwareConfigCreateModel
 {
     [Required]
+    [EnsureMinimumElements(min: 1)]
     public List<ConfigDescriptionModel> Descriptions { get; set; }
 
     [Required]
@@ -63,6 +64,7 @@ public class ServerHardwareConfigUpdateModel
     public int Id { get; set; }
 
     [Required]
+    [EnsureMinimumElements(min: 1, ErrorMessage = "Select at least one item")]
     public List<ConfigDescriptionModel> Descriptions { get; set; }
 
     [Required]
