@@ -142,12 +142,20 @@ public class RequestExpandService : IRequestExpandService
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
+            var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location)
+                .FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
             var requiredComponents = _dbContext.Components.Where(x => x.IsRequired);
             if (serverAllocation == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (serverAllocation.LocationAssignments.Any())
+            {
+                validPrecondition = false;
+                result.ErrorMessage = LocationAssignmentErrorMessage.EXISTED;
             }
             else
             {
