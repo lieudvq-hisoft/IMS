@@ -16,10 +16,10 @@ public enum ComponentType
 
 public enum ServerAllocationStatus
 {
-    Waiting,
     Working,
     Pausing,
-    Removed
+    Removed,
+    Waiting,
 }
 
 public enum IpPurpose
