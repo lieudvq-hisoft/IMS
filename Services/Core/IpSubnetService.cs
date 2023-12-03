@@ -173,7 +173,7 @@ public class IpSubnetService : IIpSubnetService
         return subnetTree.GetAllChildren().FirstOrDefault(x => x.Data.Id == subnetId);
     }
 
-    private List<IpAddress> GetAllIpAddress(ITree<IpSubnet> subnet)
+    private List<IpAddress> GetAllIpAddress(ITree<IpSubnet> subnet, IpPurpose? purpuse = null)
     {
         List<ITree<IpSubnet>> childSubnets = subnet.GetAllChildren().ToList();
         var ipAddresses = new List<IpAddress>();
@@ -183,6 +183,7 @@ public class IpSubnetService : IIpSubnetService
                 .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
                 .Where(x => x.IpSubnetId == subnet.Data.Id)
+                .Where(x => purpuse != null? x.Purpose == purpuse : true)
                 .ToList();
             ipAddresses.AddRange(subnetIps);
             foreach (var ipSubnet in childSubnets.Select(x => x.Data))
@@ -191,6 +192,7 @@ public class IpSubnetService : IIpSubnetService
                     .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                     .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
                     .Where(x => x.IpSubnetId == ipSubnet.Id)
+                    .Where(x => purpuse != null ? x.Purpose == purpuse : true)
                     .ToList();
                 ipAddresses.AddRange(childSubnetIps);
             }
@@ -582,14 +584,6 @@ public class IpSubnetService : IIpSubnetService
                 }
                 else
                 {
-                    //var allSubnets = _dbContext.IpSubnets
-                    //    .Include(x => x.ParentNetwork)
-                    //    .Include(x => x.IpAddresses).ThenInclude(x => x.IpAssignments)
-                    //    .Include(x => x.IpAddresses).ThenInclude(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
-                    //    .Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).ThenInclude(x => x.IpAssignments)
-                    //    .Include(x => x.SubNets).ThenInclude(x => x.IpAddresses).ThenInclude(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
-                    //    .ToList();
-
                     var subnetTree = CreateSubnetTree();
                     var rootSubnet = GetSubnetTree(masterSubnet.Id, subnetTree);
                     var additionalIps = new List<IpAddress>();

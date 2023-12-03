@@ -1,4 +1,5 @@
-﻿using Data.Utils.ValidationAttributes;
+﻿using Data.Enums;
+using Data.Utils.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models;
@@ -78,6 +79,9 @@ public class SuggestAdditionalIpModel
 {
     [Required]
     public int ServerAllocationId { get; set; }
+
+    [Required] 
+    public IpPurpose Purpose { get; set; }
 
     [Required]
     public int Quantity { get; set; }
