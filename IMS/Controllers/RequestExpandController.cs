@@ -47,13 +47,13 @@ public class RequestExpandController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPost]
-    public async Task<ActionResult> Create([FromBody] RequestExpandCreateModel model)
-    {
-        var result = await _requestExpandService.Create(model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPost]
+    //public async Task<ActionResult> Create([FromBody] RequestExpandCreateModel model)
+    //{
+    //    var result = await _requestExpandService.Create(model);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPut]
     public async Task<ActionResult> Update([FromBody] RequestExpandUpdateModel model)
