@@ -135,7 +135,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
                 result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
             }
 
-            if (validPrecondition && CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList()))
+            if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList()))
             {
                 validPrecondition = false;
                 result.ErrorMessage = "Serial number existed";
@@ -253,7 +253,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
                 result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
             }
 
-            if (validPrecondition && CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), serverAllocationId: serverAllocation.Id))
+            if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), serverAllocationId: serverAllocation.Id))
             {
                 validPrecondition = false;
                 result.ErrorMessage = "Serial number existed";
