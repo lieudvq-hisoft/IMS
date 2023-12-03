@@ -9,81 +9,40 @@ public static class ModelBuilderExtentions
 {
     public static void Seed(this ModelBuilder builder)
     {
-        //#region CompanyType
-        //builder.Entity<CompanyType>().HasData(new CompanyType
-        //{
-        //    Id = 1,
-        //    Name = "Doanh nghiệp tư nhân",
-        //    Description = "Doanh nghiệp tư nhân",
-        //});
-        //builder.Entity<CompanyType>().HasData(new CompanyType
-        //{
-        //    Id = 2,
-        //    Name = "Công ty trách nhiệm hữu hạn một thành viên",
-        //    Description = "Công ty trách nhiệm hữu hạn một thành viên",
-        //});
-        //builder.Entity<CompanyType>().HasData(new CompanyType
-        //{
-        //    Id = 3,
-        //    Name = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên",
-        //    Description = "Công ty trách nhiệm hữu hạn từ hai thành viên trở lên",
-        //});
-        //builder.Entity<CompanyType>().HasData(new CompanyType
-        //{
-        //    Id = 4,
-        //    Name = "Công ty cổ phần",
-        //    Description = "Công ty cổ phần",
-        //});
-        //builder.Entity<CompanyType>().HasData(new CompanyType
-        //{
-        //    Id = 5,
-        //    Name = "Công ty hợp danh",
-        //    Description = "Công ty hợp danh",
-        //});
-        //#endregion
-
         #region Component
         builder.Entity<Component>().HasData(new Component
         {
             Id = 1,
             Name = "CPU",
-            Unit = "Cái",
-            Type = ComponentType.Change
+            IsRequired = true,
         });
         builder.Entity<Component>().HasData(new Component
         {
             Id = 2,
             Name = "GPU",
-            Unit = "Cái",
-            Type = ComponentType.Change
         });
         builder.Entity<Component>().HasData(new Component
         {
             Id = 3,
             Name = "RAM",
-            Unit = "Cái",
-            Type = ComponentType.Change
-        });
-        builder.Entity<Component>().HasData(new Component
-        {
-            Id = 6,
-            Name = "RAM",
-            Unit = "Cái",
-            Type = ComponentType.Upgrade
+            IsRequired = true
         });
         builder.Entity<Component>().HasData(new Component
         {
             Id = 4,
             Name = "OS",
-            Unit = "Cái",
-            Type = ComponentType.Change
+            IsRequired = true
         });
         builder.Entity<Component>().HasData(new Component
         {
             Id = 5,
-            Name = "ROM",
-            Unit = "Cái",
-            Type = ComponentType.Change
+            Name = "Motherboard",
+        });
+        builder.Entity<Component>().HasData(new Component
+        {
+            Id = 6,
+            Name = "Harddisk",
+            IsRequired = true
         });
         #endregion
 

@@ -138,15 +138,30 @@ public class RequestExpandService : IRequestExpandService
     {
         var result = new ResultModel();
         result.Succeed = false;
+        bool validPrecondition = true;
 
         try
         {
             var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
+            var requiredComponents = _dbContext.Components.Where(x => x.IsRequired);
             if (serverAllocation == null)
             {
+                validPrecondition = false;
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
+            {
+                foreach (var component in requiredComponents)
+                {
+                    if (serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == component.Id) == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "Cannot allocate server missing config for required component";
+                    }
+                }
+            }
+            
+            if (validPrecondition)
             {
                 var requestExpand = _mapper.Map<RequestExpand>(model);
                 requestExpand.Status = RequestStatus.Waiting;

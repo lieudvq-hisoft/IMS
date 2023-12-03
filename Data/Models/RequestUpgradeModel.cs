@@ -6,7 +6,6 @@ public class RequestUpgradeModel
 {
     public int Id { get; set; }
     public string Information { get; set; }
-    public int Capacity { get; set; }
     public string Status { get; set; }
     public string? Note { get; set; }
     public string? TechNote { get; set; }
@@ -30,7 +29,6 @@ public class RequestUpgradeResultModel
 {
     public int Id { get; set; }
     public string Information { get; set; }
-    public int Capacity { get; set; }
     public string Status { get; set; }
     public RequestType RequestType { get; set; }
     public string? Note { get; set; }
@@ -46,9 +44,6 @@ public class RequestUpgradeCreateModel
     public string Information { get; set; }
 
     public string? Note { get; set; }
-
-    [Required]
-    public int Capacity { get; set; }
 
     [Required]
     public int ComponentId { get; set; }
@@ -82,9 +77,6 @@ public class RequestUpgradeUpdateModel
 
     [Required]
     public string Information { get; set; }
-
-    [Required]
-    public int Capacity { get; set; }
 
     public string? Note { get; set; }
 

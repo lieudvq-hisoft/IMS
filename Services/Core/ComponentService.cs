@@ -117,7 +117,7 @@ public class ComponentService : IComponentService
 
         try
         {
-            var existingComponent = _dbContext.Components.FirstOrDefault(x => x.Name == model.Name && x.Type == model.Type);
+            var existingComponent = _dbContext.Components.FirstOrDefault(x => x.Name == model.Name);
             if (existingComponent != null)
             {
                 result.ErrorMessage = ComponentErrorMessage.EXISTED;
@@ -147,7 +147,7 @@ public class ComponentService : IComponentService
 
         try
         {
-            var existingComponent = _dbContext.Components.FirstOrDefault(x => x.Name == model.Name && x.Type == model.Type && x.Id != model.Id);
+            var existingComponent = _dbContext.Components.FirstOrDefault(x => x.Name == model.Name && x.Id != model.Id);
             var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.Id);
             if (existingComponent != null)
             {

@@ -15,6 +15,7 @@ public interface IServerHardwareConfigService
     Task<ResultModel> Get(PagingParam<ServerHardwareConfigSortCriteria> paginationModel, ServerHardwareConfigSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(ServerHardwareConfigCreateModel model);
+    Task<ResultModel> CreateBulk(ServerHardwareConfigCreateBulkModel model);
     Task<ResultModel> Update(ServerHardwareConfigUpdateModel model);
     Task<ResultModel> Delete(int serverHardwareConfigId);
 }
@@ -106,25 +107,31 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
         try
         {
             var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location)
                 .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
                 .FirstOrDefault(x => x.Id == model.ServerAllocationId);
             if (serverAllocation == null)
             {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (serverAllocation.LocationAssignments.Any())
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Cannot change config of allocated server";
             }
 
             var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
             if (component == null)
             {
-                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
+                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
             }
 
-            if (serverAllocation.ServerHardwareConfigs.Any(x => x.Component.Name == component.Name))
+            if (serverAllocation.ServerHardwareConfigs.Any(x => x.ComponentId == component.Id))
             {
-                result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
                 validPrecondition = false;
+                result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
             }
 
             if (validPrecondition)
@@ -136,7 +143,6 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
                 _dbContext.RequestUpgrades.Add(new RequestUpgrade
                 {
                     Information = model.Information,
-                    Capacity = model.Capacity,
                     ServerAllocationId = model.ServerAllocationId,
                     ComponentId = model.ComponentId,
                     Status = RequestStatus.Success
@@ -155,6 +161,40 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
         return result;
     }
 
+    public async Task<ResultModel> CreateBulk(ServerHardwareConfigCreateBulkModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            using var transaction = _dbContext.Database.BeginTransaction();
+            var results = new List<ResultModel>();
+            foreach (var serverHardwareConfigModel in model.ServerHardwareConfigCreateModels)
+            {
+                results.Add(await Create(serverHardwareConfigModel));
+            }
+
+            if (results.Any(x => !x.Succeed))
+            {
+                result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                transaction.Rollback();
+            }
+            else
+            {
+                transaction.Commit();
+                result.Succeed = true;
+                result.Data = results.Select(x => x.Data);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
     public async Task<ResultModel> Update(ServerHardwareConfigUpdateModel model)
     {
         var result = new ResultModel();
@@ -163,31 +203,39 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component).FirstOrDefault(x => x.Id == model.ServerAllocationId);
+            var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.LocationAssignments)
+                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+                .FirstOrDefault(x => x.Id == model.ServerAllocationId);
             if (serverAllocation == null)
             {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (serverAllocation.LocationAssignments.Any())
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Cannot change config of allocated server";
             }
 
             var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
             if (component == null)
             {
-                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
+                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
             }
 
             var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault(x => x.Id == model.Id);
             if (serverHardwareConfig == null)
             {
-                result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
+                result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
             }
 
-            if (serverAllocation.ServerHardwareConfigs.Any(x => x.Component.Name == component.Name && x.Id != serverHardwareConfig.Id))
+            if (serverAllocation.ServerHardwareConfigs.Any(x => x.ComponentId == component.Id))
             {
-                result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
                 validPrecondition = false;
+                result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
             }
 
             if (validPrecondition)
@@ -213,10 +261,16 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
 
         try
         {
-            var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault(x => x.Id == serverHardwareConfigId);
+            var serverHardwareConfig = _dbContext.ServerHardwareConfigs
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+                .FirstOrDefault(x => x.Id == serverHardwareConfigId);
             if (serverHardwareConfig == null)
             {
                 result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
+            }
+            else if (serverHardwareConfig.ServerAllocation.LocationAssignments.Any())
+            {
+                result.ErrorMessage = "Cannot change config of allocated server";
             }
             else
             {

@@ -2,7 +2,6 @@
 public class ServerHardwareConfig : BaseEntity
 {
     public string Information { get; set; }
-    public int Capacity { get; set; }
 
     public int ServerAllocationId { get; set; }
     public ServerAllocation ServerAllocation { get; set; }

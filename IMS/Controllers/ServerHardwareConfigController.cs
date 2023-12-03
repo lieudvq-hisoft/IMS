@@ -42,6 +42,14 @@ public class ServerHardwareConfigController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPost("Bulk")]
+    public async Task<ActionResult> CreateBulk([FromBody] ServerHardwareConfigCreateBulkModel model)
+    {
+        var result = await _serverHardwareConfigService.CreateBulk(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut]
     public async Task<ActionResult> Update([FromBody] ServerHardwareConfigUpdateModel model)
     {

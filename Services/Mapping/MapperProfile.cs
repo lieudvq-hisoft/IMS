@@ -17,8 +17,7 @@ public class MapperProfile : Profile
         #endregion
 
         #region ServerHardware
-        CreateMap<Component, ComponentModel>()
-            .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToString()));
+        CreateMap<Component, ComponentModel>();
         CreateMap<ComponentCreateModel, Component>();
         CreateMap<ComponentUpdateModel, Component>();
 

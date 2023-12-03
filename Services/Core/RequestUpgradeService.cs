@@ -145,27 +145,26 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
             }
 
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component).FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
+            var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.LocationAssignments)
+                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+                .FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
             if (validPrecondition)
             {
                 if (serverAllocation == null)
                 {
-                    result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
                     validPrecondition = false;
+                    result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
                 }
-                else
+                else if (!serverAllocation.LocationAssignments.Any())
                 {
-                    if (serverAllocation.ServerHardwareConfigs.Select(x => x.Component).Any(x => x.Name == component.Name && x.Type != component.Type))
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = "Server have config for different type of component";
-                    }
-
-                    if (!serverAllocation.ServerHardwareConfigs.Select(x => x.Component).Any(x => x.Name == component.Name && x.Type == component.Type))
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
-                    }
+                    validPrecondition = false;
+                    result.ErrorMessage = "Cannot modify unallocated server";
+                }
+                else if (!serverAllocation.ServerHardwareConfigs.Select(x => x.Component).Any(x => x.Id == component.Id))
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
                 }
             }
 
@@ -179,12 +178,6 @@ public class RequestUpgradeService : IRequestUpgradeService
                     validPrecondition = false;
                     result.ErrorMessage = RequestUpgradeErrorMessage.EXISTED;
                 }
-            }
-
-            if (validPrecondition)
-            {
-                var serverHardwareConfig = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == component.Id);
-                validPrecondition = CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
             }
 
             if (validPrecondition)
@@ -205,29 +198,6 @@ public class RequestUpgradeService : IRequestUpgradeService
         }
 
         return result;
-    }
-
-    private bool CheckValidCapacity(ResultModel result, Component component, ServerHardwareConfig serverHardwareConfig, int capacity)
-    {
-        bool validCapacity = true;
-        if (component.Type == ComponentType.Change && capacity <= 0)
-        {
-            result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
-            validCapacity = false;
-        }
-
-        if (serverHardwareConfig != null && (serverHardwareConfig.Capacity + capacity <= 0))
-        {
-            result.ErrorMessage = RequestUpgradeErrorMessage.CANNOT_DOWNGRADE;
-            validCapacity = false;
-        }
-        else if (serverHardwareConfig == null && capacity <= 0)
-        {
-            result.ErrorMessage = RequestUpgradeErrorMessage.INITIATE_NON_POSITIVE_CAPACITY;
-            validCapacity = false;
-        }
-
-        return validCapacity;
     }
 
     public async Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model)
@@ -272,7 +242,10 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.Component).Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == model.Id);
+            var requestUpgrade = _dbContext.RequestUpgrades
+                .Include(x => x.Component)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+                .FirstOrDefault(x => x.Id == model.Id);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
@@ -297,11 +270,10 @@ public class RequestUpgradeService : IRequestUpgradeService
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
-
-            if (validPrecondition)
+            else if (!serverAllocation.LocationAssignments.Any())
             {
-                var serverHardwareConfig = serverAllocation?.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == component.Id);
-                validPrecondition = CheckValidCapacity(result, component, serverHardwareConfig, model.Capacity);
+                validPrecondition = false;
+                result.ErrorMessage = "Cannot modify unallocated server";
             }
 
             if (validPrecondition)
@@ -516,23 +488,28 @@ public class RequestUpgradeService : IRequestUpgradeService
         {
             var requestUpgrade = _dbContext.RequestUpgrades
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
                 .Include(x => x.Component).FirstOrDefault(x => x.Id == requestUpgradeId && x.Status == RequestStatus.Accepted);
+            ServerHardwareConfig serverHardwareConfig = null;
             if (requestUpgrade == null)
             {
-                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+            }
+            else if (!requestUpgrade.ServerAllocation.LocationAssignments.Any())
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Cannot modify unallocated server";
+            }
+            else
+            {
+                serverHardwareConfig = requestUpgrade.ServerAllocation?.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId);
             }
 
             if (!IsCompletable(requestUpgradeId))
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_COMPLETABLE;
                 validPrecondition = false;
-            }
-
-            ServerHardwareConfig serverHardwareConfig = requestUpgrade.ServerAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId); ;
-            if (validPrecondition)
-            {
-                validPrecondition = CheckValidCapacity(result, requestUpgrade.Component, serverHardwareConfig, requestUpgrade.Capacity);
             }
 
 
@@ -543,22 +520,13 @@ public class RequestUpgradeService : IRequestUpgradeService
                     _dbContext.ServerHardwareConfigs.Add(new ServerHardwareConfig
                     {
                         Information = requestUpgrade.Information,
-                        Capacity = requestUpgrade.Capacity,
                         ServerAllocationId = requestUpgrade.ServerAllocationId,
-                        ComponentId = requestUpgrade.ComponentId,
+                        ComponentId = requestUpgrade.ComponentId
                     });
                 }
                 else
                 {
-                    if (requestUpgrade.Component.Type == ComponentType.Change)
-                    {
-                        serverHardwareConfig.Information = requestUpgrade.Information;
-                        serverHardwareConfig.Capacity = requestUpgrade.Capacity;
-                    }
-                    else
-                    {
-                        serverHardwareConfig.Capacity += requestUpgrade.Capacity;
-                    }
+                    serverHardwareConfig.Information = requestUpgrade.Information;
                 }
                 requestUpgrade.Status = RequestStatus.Success;
                 _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser

@@ -6,7 +6,6 @@ public class ServerHardwareConfigModel
 {
     public int Id { get; set; }
     public string Information { get; set; }
-    public int Capacity { get; set; }
     public int ServerAllocationId { get; set; }
     public int ComponentId { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
@@ -19,11 +18,9 @@ public class ServerHardwareConfigResultModel
 {
     public int Id { get; set; }
     public string Information { get; set; }
-    public int Capacity { get; set; }
     public int ServerAllocationId { get; set; }
     public int ComponentId { get; set; }
 }
-
 
 public class ServerHardwareConfigCreateModel
 {
@@ -31,15 +28,17 @@ public class ServerHardwareConfigCreateModel
     public string Information { get; set; }
 
     [Required]
-    public int Capacity { get; set; }
-
-    [Required]
     [GreaterThanZero]
     public int ServerAllocationId { get; set; }
 
     [Required]
     [GreaterThanZero]
     public int ComponentId { get; set; }
+}
+
+public class ServerHardwareConfigCreateBulkModel
+{
+    public List<ServerHardwareConfigCreateModel> ServerHardwareConfigCreateModels { set; get; }
 }
 
 public class ServerHardwareConfigUpdateModel
@@ -50,9 +49,6 @@ public class ServerHardwareConfigUpdateModel
 
     [Required]
     public string Information { get; set; }
-
-    [Required]
-    public int Capacity { get; set; }
 
     [Required]
     [GreaterThanZero]
