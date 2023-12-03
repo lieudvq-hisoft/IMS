@@ -84,7 +84,11 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress).Include(x => x.Customer)
+            var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.IpAssignments)
+                .ThenInclude(x => x.IpAddress)
+                .Include(x => x.Customer)
+                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                 .FirstOrDefault(x => x.Id == id);
             if (serverAllocation == null)
             {
