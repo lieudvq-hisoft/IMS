@@ -55,6 +55,7 @@ public class ServerAllocationAssignLocationModel
 public class ServerAllocationCreateModel
 {
     [Required]
+    [StringLength(255, MinimumLength = 6)]
     public string Name { get; set; }
 
     [Required]
