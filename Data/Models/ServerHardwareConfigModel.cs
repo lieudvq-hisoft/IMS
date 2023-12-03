@@ -5,7 +5,7 @@ namespace Data.Models;
 public class ServerHardwareConfigModel
 {
     public int Id { get; set; }
-    public string Information { get; set; }
+    public string Description { get; set; }
     public int ServerAllocationId { get; set; }
     public int ComponentId { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
@@ -17,7 +17,7 @@ public class ServerHardwareConfigModel
 public class ServerHardwareConfigResultModel
 {
     public int Id { get; set; }
-    public string Information { get; set; }
+    public string Description { get; set; }
     public int ServerAllocationId { get; set; }
     public int ComponentId { get; set; }
 }
@@ -25,7 +25,7 @@ public class ServerHardwareConfigResultModel
 public class ServerHardwareConfigCreateModel
 {
     [Required]
-    public string Information { get; set; }
+    public List<ConfigDescriptionModel> Description { get; set; }
 
     [Required]
     [GreaterThanZero]
@@ -34,6 +34,21 @@ public class ServerHardwareConfigCreateModel
     [Required]
     [GreaterThanZero]
     public int ComponentId { get; set; }
+}
+
+public class ConfigDescriptionModel
+{
+    [Required]
+    [StringLength(255, MinimumLength = 20)]
+    public string SerialNumber { get; set; }
+
+    [Required]
+    [StringLength(255, MinimumLength = 8)]
+    public string Model { get; set; }
+
+    public int Capacity { get; set; }
+
+    public string Description { get; set; }
 }
 
 public class ServerHardwareConfigCreateBulkModel
@@ -48,7 +63,7 @@ public class ServerHardwareConfigUpdateModel
     public int Id { get; set; }
 
     [Required]
-    public string Information { get; set; }
+    public string Description { get; set; }
 
     [Required]
     [GreaterThanZero]

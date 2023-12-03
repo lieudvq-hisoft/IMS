@@ -5,7 +5,7 @@ namespace Data.Models;
 public class RequestUpgradeModel
 {
     public int Id { get; set; }
-    public string Information { get; set; }
+    public string Description { get; set; }
     public string Status { get; set; }
     public string? Note { get; set; }
     public string? TechNote { get; set; }
@@ -28,7 +28,7 @@ public class RequestUpgradeModel
 public class RequestUpgradeResultModel
 {
     public int Id { get; set; }
-    public string Information { get; set; }
+    public string Description { get; set; }
     public string Status { get; set; }
     public RequestType RequestType { get; set; }
     public string? Note { get; set; }
@@ -41,7 +41,7 @@ public class RequestUpgradeResultModel
 public class RequestUpgradeCreateModel
 {
     [Required]
-    public string Information { get; set; }
+    public string Description { get; set; }
 
     public string? Note { get; set; }
 
@@ -76,7 +76,7 @@ public class RequestUpgradeUpdateModel
     public int Id { get; set; }
 
     [Required]
-    public string Information { get; set; }
+    public string Description { get; set; }
 
     public string? Note { get; set; }
 

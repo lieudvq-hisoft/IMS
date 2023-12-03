@@ -519,14 +519,14 @@ public class RequestUpgradeService : IRequestUpgradeService
                 {
                     _dbContext.ServerHardwareConfigs.Add(new ServerHardwareConfig
                     {
-                        Information = requestUpgrade.Information,
+                        Description = requestUpgrade.Description,
                         ServerAllocationId = requestUpgrade.ServerAllocationId,
                         ComponentId = requestUpgrade.ComponentId
                     });
                 }
                 else
                 {
-                    serverHardwareConfig.Information = requestUpgrade.Information;
+                    serverHardwareConfig.Description = requestUpgrade.Description;
                 }
                 requestUpgrade.Status = RequestStatus.Success;
                 _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser

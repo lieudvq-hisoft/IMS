@@ -4,7 +4,7 @@ using Data.Models;
 namespace Data.Entities;
 public class RequestUpgrade : BaseEntity
 {
-    public string? Information { get; set; }
+    public string? Description { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Upgrade;
     public RequestStatus Status { get; set; }
     public string? Note { get; set; }

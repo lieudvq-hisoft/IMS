@@ -8,6 +8,7 @@ using Data.Models;
 using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
+using System.Text.Json;
 
 namespace Services.Core;
 public interface IServerHardwareConfigService
@@ -136,13 +137,18 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
 
             if (validPrecondition)
             {
-                var serverHardwareConfig = _mapper.Map<ServerHardwareConfig>(model);
+                var serverHardwareConfig = new ServerHardwareConfig
+                {
+                    Description = JsonSerializer.Serialize(model.Description),
+                    ServerAllocationId = model.ServerAllocationId,
+                    ComponentId = model.ComponentId,
+                };
 
                 _dbContext.ServerHardwareConfigs.Add(serverHardwareConfig);
                 _dbContext.SaveChanges();
                 _dbContext.RequestUpgrades.Add(new RequestUpgrade
                 {
-                    Information = model.Information,
+                    Description = JsonSerializer.Serialize(model.Description),
                     ServerAllocationId = model.ServerAllocationId,
                     ComponentId = model.ComponentId,
                     Status = RequestStatus.Success
