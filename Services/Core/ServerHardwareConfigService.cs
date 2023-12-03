@@ -135,6 +135,12 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
                 result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
             }
 
+            if (validPrecondition && CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList()))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Serial number existed";
+            }
+
             if (validPrecondition)
             {
                 var serverHardwareConfig = _mapper.Map<ServerHardwareConfig>(model);
@@ -159,6 +165,15 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
         }
 
         return result;
+    }
+
+    private bool CheckValidSerialNumber(List<string> serialNumbers, int serverAllocationId = 0)
+    {
+        var existedSerialNumber = _dbContext.ServerHardwareConfigs.Include(x => x.ServerAllocation)
+            .Where(x => x.ServerAllocation.Status == ServerAllocationStatus.Removed)
+            .Where(x => serverAllocationId != 0 ? x.ServerAllocationId != serverAllocationId : true)
+            .ToList().SelectMany(x => JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(x.Description).Select(x => x.SerialNumber));
+        return !serialNumbers.Any(x => existedSerialNumber.Contains(x));
     }
 
     public async Task<ResultModel> CreateBulk(ServerHardwareConfigCreateBulkModel model)
@@ -236,6 +251,12 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
             {
                 validPrecondition = false;
                 result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
+            }
+
+            if (validPrecondition && CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), serverAllocationId: serverAllocation.Id))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Serial number existed";
             }
 
             if (validPrecondition)
