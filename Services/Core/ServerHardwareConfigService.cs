@@ -173,7 +173,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
             .Where(x => x.ServerAllocation.Status == ServerAllocationStatus.Removed)
             .Where(x => serverAllocationId != 0 ? x.ServerAllocationId != serverAllocationId : true)
             .ToList().SelectMany(x => JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(x.Description).Select(x => x.SerialNumber));
-        return !serialNumbers.Any(x => existedSerialNumber.Contains(x));
+        return !serialNumbers.Any(x => existedSerialNumber.Contains(x)) && serialNumbers.Distinct().Count() == serialNumbers.Count();
     }
 
     public async Task<ResultModel> CreateBulk(ServerHardwareConfigCreateBulkModel model)
