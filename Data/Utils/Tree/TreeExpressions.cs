@@ -1,4 +1,7 @@
-﻿namespace Data.Utils.Tree;
+﻿using Newtonsoft.Json;
+//using System.Text.Json.Serialization;
+
+namespace Data.Utils.Tree;
 public static class TreeExtensions
 {
     /// <summary> Generic interface for tree node structure </summary>
@@ -6,6 +9,7 @@ public static class TreeExtensions
     public interface ITree<T>
     {
         T Data { get; }
+        [JsonIgnore]
         ITree<T> Parent { get; }
         ICollection<ITree<T>> Children { get; }
         bool IsRoot { get; }
@@ -36,6 +40,7 @@ public static class TreeExtensions
     internal class Tree<T> : ITree<T>
     {
         public T Data { get; }
+        [JsonIgnore]
         public ITree<T> Parent { get; private set; }
         public ICollection<ITree<T>> Children { get; }
         public bool IsRoot => Parent == null;

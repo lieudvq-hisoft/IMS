@@ -18,6 +18,7 @@ public interface IIpSubnetService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
     Task<ResultModel> GetIpRange(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
     Task<ResultModel> GetIpAddress(int ipSubnetId, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
+    Task<ResultModel> GetIpSubnetTree();
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetIpSubnet(int subnetId);
     Task<ResultModel> GetNextAddress(NextAddressModel model);
@@ -199,6 +200,25 @@ public class IpSubnetService : IIpSubnetService
         }
 
         return ipAddresses;
+    }
+
+    public async Task<ResultModel> GetIpSubnetTree()
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var allSubnets = _mapper.Map<List<IpSubnetModel>>(_dbContext.IpSubnets.ToList());
+            result.Succeed = true;
+            result.Data = allSubnets.ToTree((parent, child) => child.ParentNetworkId == parent.Id);
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
     }
 
     public async Task<ResultModel> GetIpSubnet(int subnetId)
