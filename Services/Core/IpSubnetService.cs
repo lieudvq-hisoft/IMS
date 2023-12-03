@@ -271,10 +271,10 @@ public class IpSubnetService : IIpSubnetService
     {
         var result = new ResultModel();
         result.Succeed = false;
+        var createIpRangeSuccess = true;
 
         try
         {
-
             using var transaction = _dbContext.Database.BeginTransaction();
             var octets = GetIPv4Octets(model.IpAddresss);
             var existedSubnet = _dbContext.IpSubnets.FirstOrDefault(x => x.FirstOctet == octets[0] && x.SecondOctet == octets[1] && x.ThirdOctet == octets[2]);
@@ -310,39 +310,56 @@ public class IpSubnetService : IIpSubnetService
                     for (int t = 0; t < SUBNET_MAX_SIZE && ipCreated < rangeSize; t++)
                     {
                         ipCreated++;
-                        IpPurpose purpose = IpPurpose.Host;
-                        if (t == 0)
+                        var address = $"{ipRange.FirstOctet}.{ipRange.SecondOctet}.{ipRange.ThirdOctet + i}.{t}";
+                        var existedIp = _dbContext.IpAddresses.FirstOrDefault(x => x.Address == address);
+                        if (existedIp != null)
                         {
-                            purpose = IpPurpose.Network;
+                            createIpRangeSuccess = false;
+                            result.ErrorMessage = "Ip address existed";
                         }
-                        if (t == 255)
+                        else
                         {
-                            purpose = IpPurpose.Broadcast;
+                            IpPurpose purpose = IpPurpose.Host;
+                            if (t == 0)
+                            {
+                                purpose = IpPurpose.Network;
+                            }
+                            if (t == 255)
+                            {
+                                purpose = IpPurpose.Broadcast;
+                            }
+                            ips.Add(new IpAddress
+                            {
+                                Address = address,
+                                IsReserved = purpose != IpPurpose.Host,
+                                Purpose = purpose,
+                                IpSubnetId = ipRange.Id
+                            });
                         }
-                        ips.Add(new IpAddress
-                        {
-                            Address = $"{ipRange.FirstOctet}.{ipRange.SecondOctet}.{ipRange.ThirdOctet + i}.{t}",
-                            IsReserved = purpose != IpPurpose.Host,
-                            Purpose = purpose,
-                            IpSubnetId = ipRange.Id
-                        });
                     }
                 }
 
-                _dbContext.IpAddresses.AddRange(ips);
-                _dbContext.SaveChanges();
-
-                var createSubnetResult = await Create(ipRange.Id, model.IpSubnets);
-                if (!createSubnetResult.Succeed)
+                if (!createIpRangeSuccess)
                 {
-                    result.ErrorMessage = createSubnetResult.ErrorMessage;
                     transaction.Rollback();
                 }
                 else
                 {
-                    transaction.Commit();
-                    result.Data = _mapper.Map<IpSubnetModel>(ipRange);
-                    result.Succeed = true;
+                    _dbContext.IpAddresses.AddRange(ips);
+                    _dbContext.SaveChanges();
+
+                    var createSubnetResult = await Create(ipRange.Id, model.IpSubnets);
+                    if (!createSubnetResult.Succeed)
+                    {
+                        result.ErrorMessage = createSubnetResult.ErrorMessage;
+                        transaction.Rollback();
+                    }
+                    else
+                    {
+                        transaction.Commit();
+                        result.Data = _mapper.Map<IpSubnetModel>(ipRange);
+                        result.Succeed = true;
+                    }
                 }
             }
         }
@@ -383,6 +400,7 @@ public class IpSubnetService : IIpSubnetService
 
         try
         {
+            //using var transaction = _dbContext.Database.BeginTransaction();
             var parentSubnet = _dbContext.IpSubnets.Include(x => x.IpAddresses).FirstOrDefault(x => x.Id
              == ipSubnetId);
             var subnetsOctets = new List<List<int>>();
