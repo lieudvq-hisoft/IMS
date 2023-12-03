@@ -599,6 +599,7 @@ public class RequestExpandService : IRequestExpandService
                 if (serverAllocation.LocationAssignments.Any() && serverAllocation.IpAssignments.Any())
                 {
                     serverAllocation.Status = ServerAllocationStatus.Working;
+                    _dbContext.SaveChanges();
                 }
                 result.Succeed = true;
                 result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);

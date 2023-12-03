@@ -605,11 +605,6 @@ public class RequestHostService : IRequestHostService
                 });
                 requestHost.Status = RequestHostStatus.Success;
                 _dbContext.SaveChanges();
-                var serverAllocation = requestHost.ServerAllocation;
-                if (serverAllocation.LocationAssignments.Any() && serverAllocation.IpAssignments.Any())
-                {
-                    serverAllocation.Status = ServerAllocationStatus.Working;
-                }
                 result.Succeed = true;
                 result.Data = _mapper.Map<List<IpAssignmentResultModel>>(ipAssignments);
             }

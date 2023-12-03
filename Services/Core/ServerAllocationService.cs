@@ -524,7 +524,10 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.IpAssignments).FirstOrDefault(x => x.Id == serverAllocationId && x.Status != ServerAllocationStatus.Removed);
+            var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.IpAssignments)
+                .Include(x => x.LocationAssignments)
+                .FirstOrDefault(x => x.Id == serverAllocationId && x.Status != ServerAllocationStatus.Removed);
             if (serverAllocation == null)
             {
                 validPrecondition = false;
@@ -569,6 +572,11 @@ public class ServerAllocationService : IServerAllocationService
                 };
                 _dbContext.IpAssignments.Add(ipAssignment);
                 _dbContext.SaveChanges();
+                if (serverAllocation.LocationAssignments.Any() && serverAllocation.IpAssignments.Any())
+                {
+                    serverAllocation.Status = ServerAllocationStatus.Working;
+                    _dbContext.SaveChanges();
+                }
                 result.Succeed = true;
                 result.Data = _mapper.Map<IpAssignmentResultModel>(ipAssignment);
             }
