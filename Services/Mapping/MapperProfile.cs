@@ -2,7 +2,6 @@
 using Data.Entities;
 using Data.Enums;
 using Data.Models;
-using Newtonsoft.Json;
 using System.Text.Json;
 
 namespace Services.Mapping;
@@ -25,9 +24,15 @@ public class MapperProfile : Profile
 
         CreateMap<ServerHardwareConfig, ServerHardwareConfigModel>()
             .AfterMap((src, dest, context) =>
-                dest.Component = context.Mapper.Map<Component, ComponentModel>(src.Component));
-        CreateMap<ServerHardwareConfigCreateModel, ServerHardwareConfig>();
-        CreateMap<ServerHardwareConfigUpdateModel, ServerHardwareConfig>();
+                dest.Component = context.Mapper.Map<Component, ComponentModel>(src.Component))
+            .AfterMap((src, dest, context) =>
+                dest.Description = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description));
+        CreateMap<ServerHardwareConfigCreateModel, ServerHardwareConfig>()
+            .AfterMap((src, dest, context) =>
+                dest.Description = JsonSerializer.Serialize(src.Description));
+        CreateMap<ServerHardwareConfigUpdateModel, ServerHardwareConfig>()
+            .AfterMap((src, dest, context) =>
+                dest.Description = JsonSerializer.Serialize(src.Description));
 
         CreateMap<RequestUpgrade, RequestUpgradeModel>()
             .AfterMap((src, dest, context) =>
@@ -37,6 +42,8 @@ public class MapperProfile : Profile
                     dest.AppointmentId = src.RequestUpgradeAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Accepted || x.Status == RequestStatus.Waiting)?.Id;
                 }
             })
+            .AfterMap((src, dest, context) =>
+                dest.Description = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description))
             .AfterMap((src, dest, context) =>
             {
                 if (src.Component != null)
@@ -82,9 +89,13 @@ public class MapperProfile : Profile
                     dest.Executor = context.Mapper.Map<User, UserModel>(executor.User);
                 }
             });
-        CreateMap<RequestUpgradeCreateModel, RequestUpgrade>();
-        CreateMap<RequestUpgradeUpdateModel, RequestUpgrade>();
-        #endregion'
+        CreateMap<RequestUpgradeCreateModel, RequestUpgrade>()
+            .AfterMap((src, dest, context) =>
+                dest.Description = JsonSerializer.Serialize(src.Description));
+        CreateMap<RequestUpgradeUpdateModel, RequestUpgrade>()
+            .AfterMap((src, dest, context) =>
+                dest.Description = JsonSerializer.Serialize(src.Description));
+        #endregion
 
         #region ServerAllocation
         CreateMap<ServerAllocation, ServerAllocationModel>()
@@ -336,9 +347,13 @@ public class MapperProfile : Profile
         #endregion
 
         #region ResultModel
-        CreateMap<ServerHardwareConfig, ServerHardwareConfigResultModel>();
+        CreateMap<ServerHardwareConfig, ServerHardwareConfigResultModel>()
+            .AfterMap((src, dest, context) =>
+                dest.Description = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description));
         CreateMap<ServerAllocation, ServerAllocationResultModel>();
-        CreateMap<RequestUpgrade, RequestUpgradeResultModel>();
+        CreateMap<RequestUpgrade, RequestUpgradeResultModel>()
+            .AfterMap((src, dest, context) =>
+                dest.Description = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description));
         CreateMap<RequestExpand, RequestExpandResultModel>();
         CreateMap<RequestUpgradeUser, RequestUpgradeUserResultModel>();
         CreateMap<RequestUpgradeAppointment, RequestUpgradeAppointmentResultModel>();

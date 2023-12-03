@@ -5,7 +5,7 @@ namespace Data.Models;
 public class ServerHardwareConfigModel
 {
     public int Id { get; set; }
-    public string Description { get; set; }
+    public List<ConfigDescriptionModel> Description { get; set; }
     public int ServerAllocationId { get; set; }
     public int ComponentId { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
@@ -17,7 +17,7 @@ public class ServerHardwareConfigModel
 public class ServerHardwareConfigResultModel
 {
     public int Id { get; set; }
-    public string Description { get; set; }
+    public List<ConfigDescriptionModel> Description { get; set; }
     public int ServerAllocationId { get; set; }
     public int ComponentId { get; set; }
 }
@@ -63,7 +63,7 @@ public class ServerHardwareConfigUpdateModel
     public int Id { get; set; }
 
     [Required]
-    public string Description { get; set; }
+    public List<ConfigDescriptionModel> Description { get; set; }
 
     [Required]
     [GreaterThanZero]

@@ -137,13 +137,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
 
             if (validPrecondition)
             {
-                var serverHardwareConfig = new ServerHardwareConfig
-                {
-                    Description = JsonSerializer.Serialize(model.Description),
-                    ServerAllocationId = model.ServerAllocationId,
-                    ComponentId = model.ComponentId,
-                };
-
+                var serverHardwareConfig = _mapper.Map<ServerHardwareConfig>(model);
                 _dbContext.ServerHardwareConfigs.Add(serverHardwareConfig);
                 _dbContext.SaveChanges();
                 _dbContext.RequestUpgrades.Add(new RequestUpgrade
