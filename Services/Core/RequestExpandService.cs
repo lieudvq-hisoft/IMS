@@ -533,6 +533,7 @@ public class RequestExpandService : IRequestExpandService
             var requestExpand = _dbContext.RequestExpands
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments)
                 .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Accepted);
             ServerAllocation serverAllocation = null;
             var requiredComponents = _dbContext.Components.Where(x => x.IsRequired);
@@ -595,6 +596,10 @@ public class RequestExpandService : IRequestExpandService
                     UserId = userId
                 });
                 _dbContext.SaveChanges();
+                if (serverAllocation.LocationAssignments.Any() && serverAllocation.IpAssignments.Any())
+                {
+                    serverAllocation.Status = ServerAllocationStatus.Working;
+                }
                 result.Succeed = true;
                 result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
             }

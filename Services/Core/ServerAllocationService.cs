@@ -408,7 +408,7 @@ public class ServerAllocationService : IServerAllocationService
             if (validPrecondition)
             {
                 var serverAllocation = _mapper.Map<ServerAllocation>(model);
-                serverAllocation.Status = ServerAllocationStatus.Working;
+                serverAllocation.Status = ServerAllocationStatus.Waiting;
 
                 _dbContext.ServerAllocations.Add(serverAllocation);
                 _dbContext.SaveChanges();

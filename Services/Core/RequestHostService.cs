@@ -561,6 +561,7 @@ public class RequestHostService : IRequestHostService
             var requestHost = _dbContext.RequestHosts
                 .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
                 .FirstOrDefault(x => x.Id == requestHostId);
             if (requestHost == null)
             {
@@ -604,6 +605,11 @@ public class RequestHostService : IRequestHostService
                 });
                 requestHost.Status = RequestHostStatus.Success;
                 _dbContext.SaveChanges();
+                var serverAllocation = requestHost.ServerAllocation;
+                if (serverAllocation.LocationAssignments.Any() && serverAllocation.IpAssignments.Any())
+                {
+                    serverAllocation.Status = ServerAllocationStatus.Working;
+                }
                 result.Succeed = true;
                 result.Data = _mapper.Map<List<IpAssignmentResultModel>>(ipAssignments);
             }
