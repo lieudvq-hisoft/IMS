@@ -9,6 +9,7 @@ using Data.Utils.Paging;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Services.Utilities;
+using System.Text.Json;
 
 namespace Services.Core;
 public interface IRequestUpgradeService
@@ -180,6 +181,12 @@ public class RequestUpgradeService : IRequestUpgradeService
                 }
             }
 
+            if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), serverAllocation.Id))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Serial number existed";
+            }
+
             if (validPrecondition)
             {
                 var requestUpgrade = _mapper.Map<RequestUpgrade>(model);
@@ -198,6 +205,15 @@ public class RequestUpgradeService : IRequestUpgradeService
         }
 
         return result;
+    }
+
+    private bool CheckValidSerialNumber(List<string> serialNumbers, int serverAllocationId)
+    {
+        var existedSerialNumber = _dbContext.ServerHardwareConfigs.Include(x => x.ServerAllocation)
+            .Where(x => x.ServerAllocation.Status == ServerAllocationStatus.Removed)
+            .Where(x => serverAllocationId != 0 ? x.ServerAllocationId != serverAllocationId : true)
+            .ToList().SelectMany(x => JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(x.Description).Select(x => x.SerialNumber));
+        return !serialNumbers.Any(x => existedSerialNumber.Contains(x));
     }
 
     public async Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model)
@@ -274,6 +290,12 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 validPrecondition = false;
                 result.ErrorMessage = "Cannot modify unallocated server";
+            }
+
+            if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), serverAllocation.Id))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Serial number existed";
             }
 
             if (validPrecondition)
