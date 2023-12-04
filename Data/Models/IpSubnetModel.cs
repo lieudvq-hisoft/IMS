@@ -13,7 +13,7 @@ public class IpSubnetModel
     public int PrefixLength { get; set; }
     public string? Note { get; set; }
 
-    public int ParentNetworkId { get; set; }
+    public int? ParentNetworkId { get; set; }
     public List<int> SubnetIds { get; set; }
 }
 
@@ -96,4 +96,9 @@ public class SuggestAdditionalIpResultModel
 public class IpSubnetSearchModel
 {
     public int? Id { get; set; } = null;
+}
+
+public class IpSubnetTreeModel : IpSubnetModel
+{
+    public List<IpSubnetTreeModel>? Children { get; set; }
 }

@@ -26,6 +26,8 @@ public interface IIpSubnetService
     Task<ResultModel> Create(int ipSubnetId, List<IpSubnetCreateModel> models);
     Task<ResultModel> Delete(int subnetId);
     Task<ResultModel> SuggestAdditionalIps(SuggestAdditionalIpModel model);
+    Task<ResultModel> GetTree();
+
 }
 
 public class IpSubnetService : IIpSubnetService
@@ -685,5 +687,64 @@ public class IpSubnetService : IIpSubnetService
         }
 
         return result;
+    }
+
+    public async Task<ResultModel> GetTree()
+    {
+        ResultModel result = new ResultModel();
+        try
+        {
+            var parentIpSubnets = _dbContext.IpSubnets.Include(_ => _.SubNets)
+                .Where(_ => _.ParentNetworkId == null && !_.IsDeleted).ToList();
+
+            var treeView = new List<IpSubnetTreeModel>();
+            foreach (var node in parentIpSubnets)
+            {
+                treeView.Add(new IpSubnetTreeModel
+                {
+                    Id = node.Id,
+                    FirstOctet = node.FirstOctet,
+                    SecondOctet = node.SecondOctet,
+                    ThirdOctet = node.ThirdOctet,
+                    FourthOctet = node.FourthOctet,
+                    PrefixLength = node.PrefixLength,
+                    Note = node.Note,
+                    ParentNetworkId = node.ParentNetworkId,
+                    SubnetIds = node.SubNets.Select(_ => _.Id).ToList(),
+                    Children = RecursiveChildrensTree(node.Id),
+                });
+            }
+
+            result.Succeed = true;
+            result.Data = treeView;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = e.InnerException != null ? e.InnerException.Message : e.Message;
+        }
+        return result;
+    }
+
+    private List<IpSubnetTreeModel> RecursiveChildrensTree(int parentCategoryId)
+    {
+        var treeView = new List<IpSubnetTreeModel>();
+        var childrenIpSubnets = _dbContext.IpSubnets.Include(_ => _.SubNets).Where(_ => _.ParentNetworkId == parentCategoryId && !_.IsDeleted).ToList();
+        foreach (var node in childrenIpSubnets)
+        {
+            treeView.Add(new IpSubnetTreeModel
+            {
+                Id = node.Id,
+                FirstOctet = node.FirstOctet,
+                SecondOctet = node.SecondOctet,
+                ThirdOctet = node.ThirdOctet,
+                FourthOctet = node.FourthOctet,
+                PrefixLength = node.PrefixLength,
+                Note = node.Note,
+                ParentNetworkId = node.ParentNetworkId,
+                SubnetIds = node.SubNets.Select(_ => _.Id).ToList(),
+                Children = RecursiveChildrensTree(node.Id),
+            });
+        }
+        return treeView;
     }
 }
