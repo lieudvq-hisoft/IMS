@@ -10,7 +10,7 @@ public class ServerAllocationModel
     public int Power { get; set; }
     public string Name { get; set; }
     public string SerialNumber { get; set; }
-    public string? MasterIp { get; set; }
+    public IpAddressResultModel? MasterIp { get; set; }
     public string? Note { get; set; }
     public string? TechNote { get; set; }
     public string? SaleNote { get; set; }
@@ -29,7 +29,7 @@ public class ServerAllocationResultModel
     public int Power { get; set; }
     public string Name { get; set; }
     public string SerialNumber { get; set; }
-    public string? MasterIp { get; set; }
+    public string? MasterIpAddress { get; set; }
     public string? Note { get; set; }
     public string? TechNote { get; set; }
     public string? SaleNote { get; set; }

@@ -155,10 +155,10 @@ public class IpAddressService : IIpAddressService
                 var customers = _dbContext.Customers
                     .Include(x => x.ServerAllocations).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                     .Where(x => x.ServerAllocations.Any(x => x.IpAssignments.Any(x => x.IpAddressId == ipAddressId)))
-                    .Where(delegate (Customer x)
-                    {
-                        return MyFunction.MatchString(searchModel.CompanyName, x.CustomerName);
-                    })
+                    //.Where(delegate (Customer x)
+                    //{
+                    //    return MyFunction.MatchString(searchModel.CompanyName, x.CustomerName);
+                    //})
                     .AsQueryable();
 
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, customers.Count());

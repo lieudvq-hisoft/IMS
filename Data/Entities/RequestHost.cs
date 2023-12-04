@@ -25,7 +25,7 @@ public class RequestHost : BaseEntity
     {
         bool matchIpAssignmentTypes = model.Type != null ? Type == model.Type : true;
         bool matchStatus = model.Status != null ? Status == model.Status : true;
-        bool matchMasterIp = model.MasterIp != null ? ServerAllocation.MasterIp.Contains(model.MasterIp) : true;
+        bool matchMasterIp = model.MasterIp != null ? ServerAllocation.MasterIpAddress.Contains(model.MasterIp) : true;
         bool matchCustomer = model.Customer != null ? ServerAllocation.Customer.CompanyName.Contains(model.Customer) : true;
         bool matchPurpose = model.IsRemoved != null ? IsRemoval == model.IsRemoved : true;
 

@@ -435,10 +435,11 @@ public class UserService : IUserService
 
         var customers = _dbContext.Customers.Include(x => x.UserCustomers)
             .Where(x => x.UserCustomers.Any(x => x.UserId == userId))
-            .Where(delegate (Customer x)
-            {
-                return MyFunction.MatchString(searchModel.CompanyName, x.CustomerName);
-            }).AsQueryable();
+            //.Where(delegate (Customer x)
+            //{
+            //    return MyFunction.MatchString(searchModel.CompanyName, x.CustomerName);
+            //})
+            .AsQueryable();
 
         var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, customers.Count());
 
