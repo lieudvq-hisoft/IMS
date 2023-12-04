@@ -43,6 +43,14 @@ public class IpAddressController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/Customer")]
+    public async Task<ActionResult> GetCustomer(int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] CustomerSearchModel searchModel)
+    {
+        var result = await _ipAddressService.GetCustomer(id, paginationModel, searchModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpGet("SuggestMaster")]
     public async Task<ActionResult> GetSuggestion()
     {

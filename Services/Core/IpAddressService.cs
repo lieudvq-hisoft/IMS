@@ -14,10 +14,11 @@ public interface IIpAddressService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
+    Task<ResultModel> GetServerAllocation(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
+    Task<ResultModel> GetCustomer(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> SuggestMasterIp();
     Task<ResultModel> ChangeBlockingStatus(IpAddressIdListModel model, bool isBlock);
     Task<ResultModel> ChangePurpose(IpAddressChangePurposeModel model);
-    Task<ResultModel> GetServerAllocation(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
 }
 
 public class IpAddressService : IIpAddressService
@@ -108,17 +109,17 @@ public class IpAddressService : IIpAddressService
             else
             {
                 var serverAllocations = _dbContext.ServerAllocations
-                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
-                .Include(x => x.Customer)
-                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-                .Where(x => x.IpAssignments.Any(x => x.IpAddressId == ipAddressId))
-                .Where(delegate (ServerAllocation x)
-                {
-                    var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(x.Status) : true;
-                    var matchCustomerId = searchModel.CustomerId != null ? x.Id == searchModel.CustomerId : true;
-                    return matchStatus;
-                })
-                .AsQueryable();
+                    .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                    .Include(x => x.Customer)
+                    .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+                    .Where(x => x.IpAssignments.Any(x => x.IpAddressId == ipAddressId))
+                    .Where(delegate (ServerAllocation x)
+                    {
+                        var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(x.Status) : true;
+                        var matchCustomerId = searchModel.CustomerId != null ? x.Id == searchModel.CustomerId : true;
+                        return matchStatus;
+                    })
+                    .AsQueryable();
 
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, serverAllocations.Count());
 
@@ -126,6 +127,48 @@ public class IpAddressService : IIpAddressService
                 serverAllocations = serverAllocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
                 paging.Data = _mapper.Map<List<ServerAllocationModel>>(serverAllocations.ToList());
+
+                result.Data = paging;
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> GetCustomer(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var ipAddress = _dbContext.IpAddresses.FirstOrDefault(x => x.Id == ipAddressId);
+            if (ipAddress == null)
+            {
+                result.ErrorMessage = IpAddressErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var customers = _dbContext.Customers
+                    .Include(x => x.ServerAllocations).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                    .Where(x => x.ServerAllocations.Any(x => x.IpAssignments.Any(x => x.IpAddressId == ipAddressId)))
+                    .Where(delegate (Customer x)
+                    {
+                        return MyFunction.MatchString(searchModel.CustomerName, x.CustomerName);
+                    })
+                    .AsQueryable();
+
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, customers.Count());
+
+                customers = customers.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                customers = customers.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+                paging.Data = _mapper.Map<List<CustomerModel>>(customers.ToList());
 
                 result.Data = paging;
                 result.Succeed = true;
