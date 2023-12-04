@@ -170,7 +170,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
     private bool CheckValidSerialNumber(List<string> serialNumbers, int serverAllocationId = 0)
     {
         var existedSerialNumber = _dbContext.ServerHardwareConfigs.Include(x => x.ServerAllocation)
-            .Where(x => x.ServerAllocation.Status == ServerAllocationStatus.Removed)
+            .Where(x => x.ServerAllocation.Status != ServerAllocationStatus.Removed)
             .Where(x => serverAllocationId != 0 ? x.ServerAllocationId != serverAllocationId : true)
             .ToList().SelectMany(x => JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(x.Description).Select(x => x.SerialNumber));
         return !serialNumbers.Any(x => existedSerialNumber.Contains(x)) && serialNumbers.Distinct().Count() == serialNumbers.Count();
