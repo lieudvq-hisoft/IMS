@@ -62,7 +62,7 @@ public class IpSubnetController : ControllerBase
     [HttpGet("Tree")]
     public async Task<ActionResult> GetIpSubnetTree()
     {
-        var result = await _ipSubnetService.GetIpSubnetTree();
+        var result = await _ipSubnetService.GetTree();
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
