@@ -27,7 +27,6 @@ public interface IIpSubnetService
     Task<ResultModel> Delete(int subnetId);
     Task<ResultModel> SuggestAdditionalIps(SuggestAdditionalIpModel model);
     Task<ResultModel> GetTree();
-
 }
 
 public class IpSubnetService : IIpSubnetService
@@ -139,9 +138,7 @@ public class IpSubnetService : IIpSubnetService
             var ipAddressesQuery = GetAllIpAddress(rootSubnet)
                 .Where(delegate (IpAddress x)
                 {
-                    var matchAddress = searchModel.Address != null ? x.Address.Contains(searchModel.Address) : true;
-                    var available = searchModel.IsAvailable != null ? x.IsAvailable() == searchModel.IsAvailable : true;
-                    return matchAddress && available;
+                    return x.Filter(searchModel);
                 })
                 .AsQueryable();
 

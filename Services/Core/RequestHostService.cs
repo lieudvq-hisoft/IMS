@@ -123,9 +123,7 @@ public class RequestHostService : IRequestHostService
                 var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress)
                     .Where(delegate (IpAddress x)
                     {
-                        var matchAddress = searchModel.Address != null ? x.Address.Contains(searchModel.Address) : true;
-                        var available = searchModel.IsAvailable != null ? x.IsAvailable() == searchModel.IsAvailable : true;
-                        return matchAddress && available;
+                        return x.Filter(searchModel);
                     }).AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddresses.Count());
 
@@ -411,7 +409,7 @@ public class RequestHostService : IRequestHostService
                             validPrecondition = false;
                             result.ErrorMessage = "Can only removed owned ip address";
                         }
-                        
+
                         if (ipAddress.IpAssignments.FirstOrDefault().Type == IpAssignmentTypes.Master)
                         {
                             validPrecondition = false;

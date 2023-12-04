@@ -293,9 +293,7 @@ public class ServerAllocationService : IServerAllocationService
                 var ipAddresses = serverAllocation.IpAssignments?.Select(x => x.IpAddress)
                     .Where(delegate (IpAddress x)
                     {
-                        var matchAddress = searchModel.Address != null ? x.Address.Contains(searchModel.Address) : true;
-                        var available = searchModel.IsAvailable != null ? x.IsAvailable() == searchModel.IsAvailable : true;
-                        return matchAddress && available;
+                        return x.Filter(searchModel);
                     }).AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddresses.Count());
 

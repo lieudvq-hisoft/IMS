@@ -1,4 +1,5 @@
 ﻿using Data.Enums;
+using Data.Models;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -24,5 +25,13 @@ public class IpAddress
     public bool IsAvailable()
     {
         return !Blocked && !IsReserved && !IpAssignments.Any() && !RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed);
+    }
+
+    public bool Filter(IpAddressSearchModel searchModel)
+    {
+        var matchAddress = searchModel.Address != null ? Address.Contains(searchModel.Address) : true;
+        var available = searchModel.IsAvailable != null ? IsAvailable() == searchModel.IsAvailable : true;
+        var assigned = searchModel.IsAssigned != null ? IpAssignments.Any() == searchModel.IsAssigned : true;
+        return matchAddress && available && assigned;
     }
 }

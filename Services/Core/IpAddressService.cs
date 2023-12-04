@@ -44,9 +44,7 @@ public class IpAddressService : IIpAddressService
                 .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
                 .Where(delegate (IpAddress x)
                 {
-                    var matchAddress = searchModel.Address != null ? x.Address.Contains(searchModel.Address) : true;
-                    var available = searchModel.IsAvailable != null ? x.IsAvailable() == searchModel.IsAvailable : true;
-                    return matchAddress && available;
+                    return x.Filter(searchModel);
                 })
                 .AsQueryable();
 
