@@ -17,6 +17,7 @@ public interface IIpAddressService
     Task<ResultModel> SuggestMasterIp();
     Task<ResultModel> ChangeBlockingStatus(IpAddressIdListModel model, bool isBlock);
     Task<ResultModel> ChangePurpose(IpAddressChangePurposeModel model);
+    Task<ResultModel> GetServerAllocation(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
 }
 
 public class IpAddressService : IIpAddressService
@@ -89,6 +90,52 @@ public class IpAddressService : IIpAddressService
         {
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
+        return result;
+    }
+
+    public async Task<ResultModel> GetServerAllocation(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var ipAddress = _dbContext.IpAddresses.FirstOrDefault(x => x.Id == ipAddressId);
+            if (ipAddress == null)
+            {
+                result.ErrorMessage = IpAddressErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var serverAllocations = _dbContext.ServerAllocations
+                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .Include(x => x.Customer)
+                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+                .Where(x => x.IpAssignments.Any(x => x.IpAddressId == ipAddressId))
+                .Where(delegate (ServerAllocation x)
+                {
+                    var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(x.Status) : true;
+                    var matchCustomerId = searchModel.CustomerId != null ? x.Id == searchModel.CustomerId : true;
+                    return matchStatus;
+                })
+                .AsQueryable();
+
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, serverAllocations.Count());
+
+                serverAllocations = serverAllocations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                serverAllocations = serverAllocations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+                paging.Data = _mapper.Map<List<ServerAllocationModel>>(serverAllocations.ToList());
+
+                result.Data = paging;
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
         return result;
     }
 
