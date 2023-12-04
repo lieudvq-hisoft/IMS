@@ -552,6 +552,12 @@ public class RequestExpandService : IRequestExpandService
                         validPrecondition = false;
                         result.ErrorMessage = "Cannot allocate server missing config for required component";
                     }
+
+                    if (serverAllocation.SerialNumber == null || serverAllocation.Power == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "Server must have serial number and power";
+                    }
                 }
             }
 
