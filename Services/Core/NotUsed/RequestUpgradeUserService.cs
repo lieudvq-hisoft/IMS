@@ -4,8 +4,8 @@ using Data.DataAccess;
 using Data.DataAccess.Constant;
 using Data.Enums;
 using Data.Models;
+using Data.Utils.Common;
 using Data.Utils.Paging;
-using Services.Utilities;
 
 namespace Services.Core.NotUsed;
 public interface IRequestUpgradeUserService

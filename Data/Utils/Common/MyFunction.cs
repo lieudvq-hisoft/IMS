@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using System.Text.RegularExpressions;
 
-namespace Services.Utilities;
+namespace Data.Utils.Common;
 
 public static class MyFunction
 {
@@ -33,4 +33,3 @@ public static class MyFunction
             .IndexOf(ConvertToUnSign(searchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
     }
 }
-

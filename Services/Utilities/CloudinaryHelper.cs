@@ -3,7 +3,7 @@ using CloudinaryDotNet.Actions;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 
-namespace EbookStore.Client.ExternalService.ImageHostService;
+namespace Services.Utilities;
 public interface ICloudinaryHelper
 {
     string UploadFile(IFormFile file);

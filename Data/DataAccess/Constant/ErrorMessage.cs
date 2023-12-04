@@ -133,7 +133,7 @@ public static class CompanyTypeErrorMessage
     public const string EXISTED = "Company type " + ErrorMessage.NOT_EXISTED;
 }
 
-public static  class UserErrorMessage
+public static class UserErrorMessage
 {
     public const string NOT_EXISTED = "User " + ErrorMessage.NOT_EXISTED;
     public const string EXISTED = "User " + ErrorMessage.EXISTED;

@@ -5,11 +5,10 @@ using Data.DataAccess.Constant;
 using Data.Entities;
 using Data.Enums;
 using Data.Models;
+using Data.Utils.Common;
 using Data.Utils.Paging;
-using EbookStore.Client.ExternalService.ImageHostService;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using OfficeOpenXml.FormulaParsing.Utilities;
 using Services.Utilities;
 
 namespace Services.Core;

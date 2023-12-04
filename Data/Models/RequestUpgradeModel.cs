@@ -1,5 +1,4 @@
-﻿using Data.DataAccess.Constant;
-using Data.Enums;
+﻿using Data.Enums;
 using Data.Utils.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
 

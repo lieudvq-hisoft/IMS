@@ -1,5 +1,4 @@
 ﻿using Data.Entities;
-using Data.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 

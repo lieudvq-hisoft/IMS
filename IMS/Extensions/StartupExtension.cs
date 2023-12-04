@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using Data.DataAccess;
 using Data.Entities;
-using EbookStore.Client.ExternalService.ImageHostService;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,7 +8,6 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using Services.Core;
-using Services.Core.NotUsed;
 using Services.Mapping;
 using Services.Utilities;
 using System.Reflection;
