@@ -52,5 +52,6 @@ public class IpAddressSearchModel
     public string? Address { get; set; }
     public bool? IsAvailable { get; set; }
     public bool? IsAssigned { get; set; }
+    public bool? IsBlocked { get; set; }
+    public bool? IsReserved { get; set; }
 }
-

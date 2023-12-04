@@ -32,6 +32,8 @@ public class IpAddress
         var matchAddress = searchModel.Address != null ? Address.Contains(searchModel.Address) : true;
         var available = searchModel.IsAvailable != null ? IsAvailable() == searchModel.IsAvailable : true;
         var assigned = searchModel.IsAssigned != null ? IpAssignments.Any() == searchModel.IsAssigned : true;
-        return matchAddress && available && assigned;
+        var isReserved = searchModel.IsReserved != null ? IsReserved == searchModel.IsReserved : true;
+        var blocked = searchModel.IsBlocked != null? Blocked == searchModel.IsBlocked : true;
+        return matchAddress && available && assigned && isReserved && blocked;
     }
 }
