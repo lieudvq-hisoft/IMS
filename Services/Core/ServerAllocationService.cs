@@ -570,6 +570,7 @@ public class ServerAllocationService : IServerAllocationService
                     ServerAllocationId = serverAllocation.Id,
                     IpAddressId = ipAddress.Id,
                 };
+                serverAllocation.MasterIp = ipAddress.Address;
                 _dbContext.IpAssignments.Add(ipAssignment);
                 _dbContext.SaveChanges();
                 if (serverAllocation.LocationAssignments.Any() && serverAllocation.IpAssignments.Any())

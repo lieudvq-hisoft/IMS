@@ -102,14 +102,6 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.IpCount, opt => opt.MapFrom(src => src.IpAssignments.Count))
             .AfterMap((src, dest, context) =>
             {
-                var masterIp = src.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress;
-                if (masterIp != null)
-                {
-                    dest.MasterIp = context.Mapper.Map<IpAddress, IpAddressResultModel>(masterIp);
-                }
-            })
-            .AfterMap((src, dest, context) =>
-            {
                 if (src.Customer != null)
                 {
                     dest.Customer = context.Mapper.Map<Customer, CustomerModel>(src.Customer);
