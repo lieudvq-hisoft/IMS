@@ -22,7 +22,7 @@ public interface IAppointmentService
     Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model);
     Task<ResultModel> Update(AppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
-    Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, Guid userId);
+    Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, Guid userId, UserAssignModel model);
     Task<ResultModel> AssignTech(int appointmentId, UserAssignModel model);
     Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model, Guid userId);
     Task<ResultModel> Fail(int appointmentId, AppointmentFailModel model);
@@ -673,7 +673,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, Guid userId)
+    public async Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, Guid userId, UserAssignModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -697,10 +697,33 @@ public class AppointmentService : IAppointmentService
             }
 
             var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
+            User executor = null;
+            if (status == RequestStatus.Accepted)
+            {
+                executor = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
+            }
             if (user == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+
+            if (status == RequestStatus.Accepted)
+            {
+                if (executor == null)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+                }
+                else
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (!roles.Contains(RoleType.Tech.ToString()))
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "User assigned is not a tech";
+                    }
+                }
             }
 
             if (validPrecondition && appointment.Status != RequestStatus.Waiting)
@@ -717,6 +740,13 @@ public class AppointmentService : IAppointmentService
                     Action = RequestUserAction.Evaluate,
                     AppointmentId = appointment.Id,
                     UserId = userId
+                });
+
+                _dbContext.AppointmentUsers.Add(new AppointmentUser
+                {
+                    Action = RequestUserAction.Execute,
+                    AppointmentId = appointmentId,
+                    UserId = user.Id,
                 });
 
                 if (status == RequestStatus.Accepted)
