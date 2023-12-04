@@ -7,6 +7,7 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
 using EbookStore.Client.ExternalService.ImageHostService;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
 
@@ -22,6 +23,7 @@ public interface IAppointmentService
     Task<ResultModel> Update(AppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, Guid userId);
+    Task<ResultModel> AssignTech(int appointmentId, UserAssignModel model);
     Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model, Guid userId);
     Task<ResultModel> Fail(int appointmentId, AppointmentFailModel model);
     Task<ResultModel> AssignInspectionReport(int appointmentId, DocumentFileUploadModel model);
@@ -32,12 +34,14 @@ public class AppointmentService : IAppointmentService
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly ICloudinaryHelper _cloudinaryHelper;
+    private readonly UserManager<User> _userManager;
 
-    public AppointmentService(AppDbContext dbContext, IMapper mapper, ICloudinaryHelper cloudinaryHelper)
+    public AppointmentService(AppDbContext dbContext, IMapper mapper, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManage)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _cloudinaryHelper = cloudinaryHelper;
+        _userManager = userManage;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel)
@@ -198,26 +202,15 @@ public class AppointmentService : IAppointmentService
         {
             using var transaction = _dbContext.Database.BeginTransaction();
             var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == model.UserId);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else if (user == null)
-            {
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
             else
             {
                 var appointment = _mapper.Map<Appointment>(model);
                 _dbContext.Appointments.Add(appointment);
                 _dbContext.SaveChanges();
-                _dbContext.AppointmentUsers.Add(new AppointmentUser
-                {
-                    Action = RequestUserAction.Execute,
-                    AppointmentId = appointment.Id,
-                    UserId = user.Id
-                });
                 _dbContext.SaveChanges();
 
                 var createRequestUpgradeAppointmentResults = new List<ResultModel>();
@@ -770,6 +763,60 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
+    public async Task<ResultModel> AssignTech(int appointmentId, UserAssignModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
+            var appointment = _dbContext.Appointments.Include(x => x.AppointmentUsers).FirstOrDefault(x => x.Id == appointmentId);
+            if (appointment == null)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+            }
+            else if (appointment.Status != RequestStatus.Accepted)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
+            }
+            else if (user == null)
+            {
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                if (!roles.Contains(RoleType.Tech.ToString()))
+                {
+                    result.ErrorMessage = "User assigned is not a tech";
+                }
+                else
+                {
+                    var existedExecutor = appointment.AppointmentUsers?.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
+                    if (existedExecutor != null)
+                    {
+                        _dbContext.AppointmentUsers.Remove(existedExecutor);
+                    }
+                    _dbContext.AppointmentUsers.Add(new AppointmentUser
+                    {
+                        Action = RequestUserAction.Execute,
+                        AppointmentId = appointmentId,
+                        UserId = user.Id,
+                    });
+                    _dbContext.SaveChanges();
+                    result.Succeed = true;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
     public async Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model, Guid userId)
     {
         var result = new ResultModel();
@@ -833,7 +880,9 @@ public class AppointmentService : IAppointmentService
         bool validPrecondition = true;
         var appointment = _dbContext.Appointments
             .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandLocations)
-            .Include(x => x.RequestUpgradeAppointment).FirstOrDefault(x => x.Id == appointmentId);
+            .Include(x => x.RequestUpgradeAppointment)
+            .Include(x => x.AppointmentUsers)
+            .FirstOrDefault(x => x.Id == appointmentId);
         if (appointment == null)
         {
             validPrecondition = false;

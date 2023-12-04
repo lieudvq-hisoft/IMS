@@ -106,6 +106,14 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPut("{id}/Executor")]
+    public async Task<ActionResult> AssignExecutor(int id, [FromBody] UserAssignModel model)
+    {
+        var result = await _appointmentService.AssignTech(id, model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut("{id}/Complete")]
     public async Task<ActionResult> Complete(int id, [FromBody] AppointmentCompleteModel model)
     {

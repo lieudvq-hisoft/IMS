@@ -59,8 +59,8 @@ public class AppointmentCreateModel
 
     public string? Note { get; set; }
 
-    [Required]
-    public Guid UserId { get; set; }
+    //[Required]
+    //public Guid UserId { get; set; }
 
     [Required]
     [GreaterThanZero]
