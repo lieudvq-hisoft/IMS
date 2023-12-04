@@ -7,6 +7,7 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
@@ -22,8 +23,9 @@ public interface IRequestUpgradeService
     Task<ResultModel> Delete(int requestUpgradeId);
     Task<ResultModel> Reject(int requestUpgradeId, RequestUpgradeRejectModel model);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
-    Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, Guid userId);
-    Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status, Guid userId);
+    Task<ResultModel> Accept(int requestUpgradeId, Guid userId, UserAssignModel model);
+    Task<ResultModel> Deny(int requestUpgradeId, Guid userId, DenyModel model);
+    //Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status, Guid userId);
     Task<ResultModel> CheckCompletability(int requestUpgradeId);
     Task<ResultModel> Complete(int requestUpgradeId, Guid userId);
     Task<ResultModel> CompleteBulk(RequestUpgradeCompleteBulkModel model, Guid userId);
@@ -33,11 +35,13 @@ public class RequestUpgradeService : IRequestUpgradeService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly UserManager<User> _userManager;
 
-    public RequestUpgradeService(AppDbContext dbContext, IMapper mapper)
+    public RequestUpgradeService(AppDbContext dbContext, IMapper mapper, UserManager<User> userManager)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _userManager = userManager;
     }
 
     public async Task<ResultModel> Get(PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel)
@@ -382,7 +386,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> Evaluate(int requestUpgradeId, RequestStatus status, Guid userId)
+    public async Task<ResultModel> Accept(int requestUpgradeId, Guid userId, UserAssignModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -390,34 +394,44 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            if (status != RequestStatus.Accepted && status != RequestStatus.Denied)
-            {
-                throw new Exception(ErrorMessage.WRONG_PURPOSE);
-            }
-
-            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
+            var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.Component).ThenInclude(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == requestUpgradeId);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
+            else if (requestUpgrade.Status != RequestStatus.Waiting)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING;
+            }
 
             var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
+            User executor = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
             if (user == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
 
-            if (validPrecondition && requestUpgrade.Status != RequestStatus.Waiting)
+            if (executor == null)
             {
-                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING;
                 validPrecondition = false;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                if (!roles.Contains(RoleType.Tech.ToString()))
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "User assigned is not a tech";
+                }
             }
 
             if (validPrecondition)
             {
-                requestUpgrade.Status = status;
+                requestUpgrade.Status = RequestStatus.Accepted;
                 _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
                 {
                     Action = RequestUserAction.Evaluate,
@@ -425,6 +439,13 @@ public class RequestUpgradeService : IRequestUpgradeService
                     UserId = userId
                 });
                 _dbContext.SaveChanges();
+
+                _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
+                {
+                    Action = RequestUserAction.Execute,
+                    RequestUpgradeId = requestUpgradeId,
+                    UserId = executor.Id,
+                });
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
             }
@@ -437,30 +458,46 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status, Guid userId)
+    public async Task<ResultModel> Deny(int requestUpgradeId, Guid userId, DenyModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
+        bool validPrecondition = true;
 
         try
         {
-            using var transaction = _dbContext.Database.BeginTransaction();
-            var results = new List<ResultModel>();
-            foreach (var requestUpgradeId in model.RequestUpgradeIds)
+            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
+            if (requestUpgrade == null)
             {
-                results.Add(await Evaluate(requestUpgradeId, status, userId));
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+            else if (requestUpgrade.Status != RequestStatus.Waiting)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING;
             }
 
-            if (results.Any(x => !x.Succeed))
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
+            if (user == null)
             {
-                result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-                transaction.Rollback();
+                validPrecondition = false;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
-            else
+
+            if (validPrecondition)
             {
-                transaction.Commit();
+                requestUpgrade.Status = RequestStatus.Denied;
+                requestUpgrade.SaleNote = model.SaleNote;
+                _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
+                {
+                    Action = RequestUserAction.Evaluate,
+                    RequestUpgradeId = requestUpgrade.Id,
+                    UserId = userId
+                });
+                _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = results.Select(x => x.Data);
+                result.Data = _mapper.Map<RequestHostModel>(requestUpgrade);
             }
         }
         catch (Exception e)
@@ -470,6 +507,40 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         return result;
     }
+
+    //public async Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status, Guid userId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+
+    //    try
+    //    {
+    //        using var transaction = _dbContext.Database.BeginTransaction();
+    //        var results = new List<ResultModel>();
+    //        foreach (var requestUpgradeId in model.RequestUpgradeIds)
+    //        {
+    //            results.Add(await Evaluate(requestUpgradeId, status, userId));
+    //        }
+
+    //        if (results.Any(x => !x.Succeed))
+    //        {
+    //            result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+    //            transaction.Rollback();
+    //        }
+    //        else
+    //        {
+    //            transaction.Commit();
+    //            result.Succeed = true;
+    //            result.Data = results.Select(x => x.Data);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+
+    //    return result;
+    //}
 
     public async Task<ResultModel> CheckCompletability(int requestUpgradeId)
     {

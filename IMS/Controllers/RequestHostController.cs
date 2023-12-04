@@ -82,7 +82,7 @@ public class RequestHostController : ControllerBase
     public async Task<ActionResult> Accept(int id, [FromBody] UserAssignModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestHostService.Evaluate(id, RequestHostStatus.Accepted, new Guid(userId), model);
+        var result = await _requestHostService.Accept(id, new Guid(userId), model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -99,10 +99,10 @@ public class RequestHostController : ControllerBase
 
     [HttpPut("{id}/Deny")]
     [SwaggerOperation(Summary = "Deny a waiting request host")]
-    public async Task<ActionResult> Deny(int id)
+    public async Task<ActionResult> Deny(int id, [FromBody] DenyModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestHostService.Evaluate(id, RequestHostStatus.Denied, new Guid(userId), new UserAssignModel());
+        var result = await _requestHostService.Deny(id, new Guid(userId), model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

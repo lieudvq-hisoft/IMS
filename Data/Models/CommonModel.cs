@@ -44,6 +44,11 @@ public class DocumentFileResultModel
     public string ReceiptOfRecipient { get; set; }
 }
 
+public class RequestAcceptModel
+{
+    public Guid userId { get; set; }
+}
+
 public class RequestHostDocumentFileResultModel
 {
     public string InspectionReport { get; set; }

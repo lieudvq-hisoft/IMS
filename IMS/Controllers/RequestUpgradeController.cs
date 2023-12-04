@@ -91,43 +91,43 @@ public class RequestUpgradeController : ControllerBase
 
     [HttpPut("{id}/Accept")]
     [SwaggerOperation(Summary = "Accept a waiting request upgrade")]
-    public async Task<ActionResult> Accept(int id)
+    public async Task<ActionResult> Accept(int id, [FromBody] UserAssignModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestUpgradeService.Evaluate(id, RequestStatus.Accepted, new Guid(userId));
+        var result = await _requestUpgradeService.Accept(id, new Guid(userId), model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPut("Accept/Bulk")]
-    [SwaggerOperation(Summary = "Accept many waiting request upgrade")]
-    public async Task<ActionResult> AcceptBulk(RequestUpgradeEvaluateBulkModel model)
-    {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestUpgradeService.EvaluateBulk(model, RequestStatus.Accepted, new Guid(userId));
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPut("Accept/Bulk")]
+    //[SwaggerOperation(Summary = "Accept many waiting request upgrade")]
+    //public async Task<ActionResult> AcceptBulk(RequestUpgradeEvaluateBulkModel model)
+    //{
+    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+    //    var result = await _requestUpgradeService.EvaluateBulk(model, RequestStatus.Accepted, new Guid(userId));
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPut("{id}/Deny")]
     [SwaggerOperation(Summary = "Deny a waiting request upgrade")]
-    public async Task<ActionResult> Deny(int id)
+    public async Task<ActionResult> Deny(int id, [FromBody] DenyModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestUpgradeService.Evaluate(id, RequestStatus.Denied, new Guid(userId));
+        var result = await _requestUpgradeService.Deny(id, new Guid(userId), model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPut("Deny/Bulk")]
-    [SwaggerOperation(Summary = "Deny many waiting request upgrade")]
-    public async Task<ActionResult> DenyBulk(RequestUpgradeEvaluateBulkModel model)
-    {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestUpgradeService.EvaluateBulk(model, RequestStatus.Denied, new Guid(userId));
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPut("Deny/Bulk")]
+    //[SwaggerOperation(Summary = "Deny many waiting request upgrade")]
+    //public async Task<ActionResult> DenyBulk(RequestUpgradeEvaluateBulkModel model)
+    //{
+    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+    //    var result = await _requestUpgradeService.EvaluateBulk(model, RequestStatus.Denied, new Guid(userId));
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpGet("{id}/Completability")]
     [SwaggerOperation(Summary = "True if any appointment success and have inspection record")]

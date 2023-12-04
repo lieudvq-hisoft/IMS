@@ -22,7 +22,8 @@ public interface IAppointmentService
     Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model);
     Task<ResultModel> Update(AppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
-    Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, Guid userId, UserAssignModel model);
+    Task<ResultModel> Accept(int appointmentId, Guid userId, UserAssignModel model);
+    Task<ResultModel> Deny(int appointmentId, Guid userId, DenyModel model);
     Task<ResultModel> AssignTech(int appointmentId, UserAssignModel model);
     Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model, Guid userId);
     Task<ResultModel> Fail(int appointmentId, AppointmentFailModel model);
@@ -673,7 +674,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> Evaluate(int appointmentId, RequestStatus status, Guid userId, UserAssignModel model)
+    public async Task<ResultModel> Accept(int appointmentId, Guid userId, UserAssignModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -681,11 +682,6 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            if (status != RequestStatus.Accepted && status != RequestStatus.Denied)
-            {
-                throw new Exception(ErrorMessage.WRONG_PURPOSE);
-            }
-
             var appointment = _dbContext.Appointments
                 .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade)
                 .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand)
@@ -697,32 +693,25 @@ public class AppointmentService : IAppointmentService
             }
 
             var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
-            User executor = null;
-            if (status == RequestStatus.Accepted)
-            {
-                executor = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
-            }
+            User executor = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
             if (user == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
 
-            if (status == RequestStatus.Accepted)
+            if (executor == null)
             {
-                if (executor == null)
+                validPrecondition = false;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                if (!roles.Contains(RoleType.Tech.ToString()))
                 {
                     validPrecondition = false;
-                    result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-                }
-                else
-                {
-                    var roles = await _userManager.GetRolesAsync(user);
-                    if (!roles.Contains(RoleType.Tech.ToString()))
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = "User assigned is not a tech";
-                    }
+                    result.ErrorMessage = "User assigned is not a tech";
                 }
             }
 
@@ -734,7 +723,7 @@ public class AppointmentService : IAppointmentService
 
             if (validPrecondition)
             {
-                appointment.Status = status;
+                appointment.Status = RequestStatus.Accepted;
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
                     Action = RequestUserAction.Evaluate,
@@ -752,36 +741,89 @@ public class AppointmentService : IAppointmentService
                     });
                 }
 
-                if (status == RequestStatus.Accepted)
+                foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
                 {
-                    foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
+                    requestUpgrade.Status = RequestStatus.Accepted;
+                    _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
                     {
-                        requestUpgrade.Status = status;
-                        _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
-                        {
-                            Action = RequestUserAction.Evaluate,
-                            RequestUpgradeId = requestUpgrade.Id,
-                            UserId = userId
-                        });
-                    }
-                    foreach (var requestExpand in appointment.RequestExpandAppointments.Select(x => x.RequestExpand))
-                    {
-                        if (requestExpand.Status != RequestStatus.Success)
-                        {
-                            requestExpand.Status = status;
-                        }
-                        else
-                        {
-                            requestExpand.RemovalStatus = RemovalStatus.Accepted;
-                        }
-                        _dbContext.RequestExpandUsers.Add(new RequestExpandUser
-                        {
-                            Action = RequestUserAction.Evaluate,
-                            RequestExpandId = requestExpand.Id,
-                            UserId = userId
-                        });
-                    }
+                        Action = RequestUserAction.Evaluate,
+                        RequestUpgradeId = requestUpgrade.Id,
+                        UserId = userId
+                    });
                 }
+
+                foreach (var requestExpand in appointment.RequestExpandAppointments.Select(x => x.RequestExpand))
+                {
+                    if (requestExpand.Status != RequestStatus.Success)
+                    {
+                        requestExpand.Status = RequestStatus.Accepted;
+                    }
+                    else
+                    {
+                        requestExpand.RemovalStatus = RemovalStatus.Accepted;
+                    }
+                    _dbContext.RequestExpandUsers.Add(new RequestExpandUser
+                    {
+                        Action = RequestUserAction.Evaluate,
+                        RequestExpandId = requestExpand.Id,
+                        UserId = userId
+                    });
+                }
+
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<AppointmentResultModel>(appointment);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Deny(int appointmentId, Guid userId, DenyModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var appointment = _dbContext.Appointments
+                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade)
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand)
+                .FirstOrDefault(x => x.Id == appointmentId);
+            if (appointment == null)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
+            if (user == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+
+            if (validPrecondition && appointment.Status != RequestStatus.Waiting)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING;
+                validPrecondition = false;
+            }
+
+            if (validPrecondition)
+            {
+                appointment.Status = RequestStatus.Denied;
+                appointment.SaleNote = model.SaleNote;
+                _dbContext.AppointmentUsers.Add(new AppointmentUser
+                {
+                    Action = RequestUserAction.Evaluate,
+                    AppointmentId = appointment.Id,
+                    UserId = userId
+                });
 
                 _dbContext.SaveChanges();
                 result.Succeed = true;

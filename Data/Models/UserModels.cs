@@ -29,6 +29,12 @@ public class UserAssignModel
     public string UserId { get; set; }
 }
 
+public class DenyModel
+{
+    [Required]
+    public string SaleNote { get; set; }
+}
+
 public class UserRoleModel
 {
     public RoleModel role { get; set; }

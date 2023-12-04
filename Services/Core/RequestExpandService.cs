@@ -7,6 +7,7 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace Services.Core;
@@ -19,7 +20,8 @@ public interface IRequestExpandService
     Task<ResultModel> Delete(int requestExpandId);
     Task<ResultModel> Reject(int requestExpandId, RequestExpandRejectModel modell);
     Task<ResultModel> FailRemoval(int requestExpandId);
-    Task<ResultModel> Evaluate(int requestExpandId, RequestStatus status, Guid userId);
+    Task<ResultModel> Accept(int requestExpandId, Guid userId, UserAssignModel model);
+    Task<ResultModel> Deny(int requestExpandId, Guid userId, DenyModel model);
     Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
     Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model);
     Task<ResultModel> Complete(int requestExpandId, Guid userId);
@@ -34,11 +36,13 @@ public class RequestExpandService : IRequestExpandService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly UserManager<User> _userManager;
 
-    public RequestExpandService(AppDbContext dbContext, IMapper mapper)
+    public RequestExpandService(AppDbContext dbContext, IMapper mapper, UserManager<User> userManager)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _userManager = userManager;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel)
@@ -328,7 +332,7 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
-    public async Task<ResultModel> Evaluate(int requestExpandId, RequestStatus status, Guid userId)
+    public async Task<ResultModel> Accept(int requestExpandId, Guid userId, UserAssignModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -336,16 +340,88 @@ public class RequestExpandService : IRequestExpandService
 
         try
         {
-            if (status != RequestStatus.Accepted && status != RequestStatus.Denied)
-            {
-                throw new Exception(ErrorMessage.WRONG_PURPOSE);
-            }
-
             var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
             if (requestExpand == null)
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
+            }
+            else if (requestExpand.Status != RequestStatus.Waiting)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_WAITING;
+            }
+
+            var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
+            User executor = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
+            if (user == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+
+            if (executor == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var roles = await _userManager.GetRolesAsync(user);
+                if (!roles.Contains(RoleType.Tech.ToString()))
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "User assigned is not a tech";
+                }
+            }
+
+            if (validPrecondition)
+            {
+                requestExpand.Status = RequestStatus.Accepted;
+                _dbContext.RequestExpandUsers.Add(new RequestExpandUser
+                {
+                    Action = RequestUserAction.Evaluate,
+                    RequestExpandId = requestExpand.Id,
+                    UserId = userId
+                });
+                _dbContext.SaveChanges();
+
+                _dbContext.RequestExpandUsers.Add(new RequestExpandUser
+                {
+                    Action = RequestUserAction.Execute,
+                    RequestExpandId = requestExpandId,
+                    UserId = executor.Id,
+                });
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestHostModel>(requestExpand);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Deny(int requestExpandId, Guid userId, DenyModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
+            if (requestExpand == null)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+            else if (requestExpand.Status != RequestStatus.Waiting)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_WAITING;
             }
 
             var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
@@ -355,15 +431,10 @@ public class RequestExpandService : IRequestExpandService
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
 
-            if (validPrecondition && requestExpand.Status != RequestStatus.Waiting)
-            {
-                result.ErrorMessage = RequestExpandErrorMessage.NOT_WAITING;
-                validPrecondition = false;
-            }
-
             if (validPrecondition)
             {
-                requestExpand.Status = status;
+                requestExpand.Status = RequestStatus.Denied;
+                requestExpand.SaleNote = model.SaleNote;
                 _dbContext.RequestExpandUsers.Add(new RequestExpandUser
                 {
                     Action = RequestUserAction.Evaluate,
@@ -372,7 +443,7 @@ public class RequestExpandService : IRequestExpandService
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<RequestExpandResultModel>(requestExpand);
+                result.Data = _mapper.Map<RequestHostModel>(requestExpand);
             }
         }
         catch (Exception e)
