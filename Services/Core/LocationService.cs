@@ -12,7 +12,7 @@ using Services.Utilities;
 namespace Services.Core;
 public interface ILocationService
 {
-    Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, LocationSearchModel searchModel);
+    Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, LocationSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetRequestExpandLocation(int id);
     Task<ResultModel> GetLocationAssignment(int id);
@@ -31,7 +31,7 @@ public class LocationService : ILocationService
         _mapper = mapper;
     }
 
-    public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, LocationSearchModel searchModel)
+    public async Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, LocationSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;

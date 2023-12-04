@@ -17,7 +17,7 @@ public interface IIpSubnetService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
     Task<ResultModel> GetIpRange(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
-    Task<ResultModel> GetIpAddress(int ipSubnetId, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
+    Task<ResultModel> GetIpAddress(int ipSubnetId, PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetIpSubnetTree();
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetIpSubnet(int subnetId);
@@ -126,7 +126,7 @@ public class IpSubnetService : IIpSubnetService
         return result;
     }
 
-    public async Task<ResultModel> GetIpAddress(int subnetId, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel)
+    public async Task<ResultModel> GetIpAddress(int subnetId, PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;

@@ -19,8 +19,8 @@ public interface IServerAllocationService
     Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestHost(int id, PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel);
     Task<ResultModel> GetLocationAssignment(int id);
-    Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
-    Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int id);
+    Task<ResultModel> GetIpAddress(int id, PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
+    Task<ResultModel> GetLocation(PagingParam<SimpleSortCriteria> paginationModel, int id);
     Task<ResultModel> GetAppointment(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> Create(ServerAllocationCreateModel model);
     Task<ResultModel> Update(ServerAllocationUpdateModel model);
@@ -276,7 +276,7 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel)
+    public async Task<ResultModel> GetIpAddress(int id, PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -317,7 +317,7 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int id)
+    public async Task<ResultModel> GetLocation(PagingParam<SimpleSortCriteria> paginationModel, int id)
     {
         var result = new ResultModel();
         result.Succeed = false;
