@@ -60,7 +60,7 @@ public class CustomerService : ICustomerService
             var customers = _dbContext.Customers
                 .Where(delegate (Customer x)
                 {
-                    return MyFunction.MatchString(searchModel.CustomerName, x.CustomerName);
+                    return MyFunction.MatchString(searchModel.CompanyName, x.CompanyName);
                 })
                 .AsQueryable();
 
@@ -169,7 +169,6 @@ public class CustomerService : ICustomerService
             {
                 var customer = _mapper.Map<Customer>(model);
                 var password = "Password@123";
-                customer.CustomerName = model.CompanyName;
                 customer.Password = _passwordHasher.HashPassword(customer, password);
                 _dbContext.Customers.Add(customer);
                 _dbContext.SaveChanges();
@@ -369,7 +368,7 @@ public class CustomerService : ICustomerService
         {
             new Claim("UserId", customer.Id.ToString()),
             new Claim("Email", customer.Email),
-            new Claim("FullName", customer.CustomerName),
+            new Claim("FullName", customer.CompanyName),
             new Claim(ClaimTypes.Role, "Customer")
         };
 

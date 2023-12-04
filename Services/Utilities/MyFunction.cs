@@ -29,9 +29,8 @@ public static class MyFunction
 
     public static bool MatchString(string searchValue, string? value)
     {
-        return MyFunction
-            .ConvertToUnSign(value ?? "")
-            .IndexOf(MyFunction.ConvertToUnSign(searchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
+        return ConvertToUnSign(value ?? "")
+            .IndexOf(ConvertToUnSign(searchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0;
     }
 }
 

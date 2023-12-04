@@ -157,7 +157,7 @@ public class IpAddressService : IIpAddressService
                     .Where(x => x.ServerAllocations.Any(x => x.IpAssignments.Any(x => x.IpAddressId == ipAddressId)))
                     .Where(delegate (Customer x)
                     {
-                        return MyFunction.MatchString(searchModel.CustomerName, x.CustomerName);
+                        return MyFunction.MatchString(searchModel.CompanyName, x.CustomerName);
                     })
                     .AsQueryable();
 

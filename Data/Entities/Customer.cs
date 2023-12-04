@@ -8,7 +8,7 @@ public class Customer : BaseEntity
     public string TaxNumber { get; set; }
     public string Email { get; set; }
     public string PhoneNumber { get; set; }
-    public string CustomerName { get; set; }
+    //public string CustomerName { get; set; }
 
     //public int CompanyTypeId { get; set; }
     //public CompanyType CompanyType { get; set; }

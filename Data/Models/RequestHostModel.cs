@@ -95,9 +95,9 @@ public class RequestHostSearchModel
 {
     public IpAssignmentTypes? Type { get; set; }
     public RequestHostStatus? Status { get; set; }
-    public int? ServerAllocationId { get; set; }
-    public int? CustomerId { get; set; }
-    public IpPurpose? Purpose { get; set; }
+    public string? MasterIp { get; set; }
+    public string? Customer { get; set; }
+    public bool? IsRemoved { get; set; }
 }
 
 public class RequestHostEvaluateBulkModel

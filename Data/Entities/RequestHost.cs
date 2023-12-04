@@ -25,10 +25,10 @@ public class RequestHost : BaseEntity
     {
         bool matchIpAssignmentTypes = model.Type != null ? Type == model.Type : true;
         bool matchStatus = model.Status != null ? Status == model.Status : true;
-        bool matchServerAllocationId = model.ServerAllocationId != null ? ServerAllocationId == model.ServerAllocationId : true;
-        bool matchCustomer = model.CustomerId != null ? ServerAllocation.CustomerId == model.CustomerId : true;
-        bool matchPurpose = model.Purpose != null ? RequestHostIps.Select(x => x.IpAddress).Any(x => x.Purpose == model.Purpose) : true;
+        bool matchMasterIp = model.MasterIp != null ? ServerAllocation.MasterIp.Contains(model.MasterIp) : true;
+        bool matchCustomer = model.Customer != null ? ServerAllocation.Customer.CompanyName.Contains(model.Customer) : true;
+        bool matchPurpose = model.IsRemoved != null ? IsRemoval == model.IsRemoved : true;
 
-        return matchIpAssignmentTypes && matchStatus && matchServerAllocationId && matchCustomer && matchPurpose;
+        return matchIpAssignmentTypes && matchStatus && matchMasterIp && matchCustomer && matchPurpose;
     }
 }

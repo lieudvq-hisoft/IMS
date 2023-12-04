@@ -15,7 +15,6 @@ public interface IRequestExpandService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetAppointment(int requestExpandId, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
-    //Task<ResultModel> Create(RequestExpandCreateModel model);
     Task<ResultModel> Update(RequestExpandUpdateModel model);
     Task<ResultModel> Delete(int requestExpandId);
     Task<ResultModel> Reject(int requestExpandId, RequestExpandRejectModel modell);

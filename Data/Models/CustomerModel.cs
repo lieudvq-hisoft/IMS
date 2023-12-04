@@ -9,7 +9,7 @@ public class CustomerModel
     public string? TaxNumber { get; set; }
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
-    public string? CustomerName { get; set; }
+    //public string? CustomerName { get; set; }
 
     //public int? CompanyTypeId { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
@@ -19,7 +19,7 @@ public class CustomerModel
 public class CustomerResultModel
 {
     public int Id { get; set; }
-    public string? CompanyName { get; set; }
+    //public string? CompanyName { get; set; }
     public string? Address { get; set; }
     public string? TaxNumber { get; set; }
     public string? Email { get; set; }
@@ -93,7 +93,7 @@ public class CustomerChangePasswordModel
 
 public class CustomerSearchModel
 {
-    public string? CustomerName { get; set; } = "";
+    public string? CompanyName { get; set; } = "";
 }
 
 public class CustomerLoginModel

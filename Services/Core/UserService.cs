@@ -437,7 +437,7 @@ public class UserService : IUserService
             .Where(x => x.UserCustomers.Any(x => x.UserId == userId))
             .Where(delegate (Customer x)
             {
-                return MyFunction.MatchString(searchModel.CustomerName, x.CustomerName);
+                return MyFunction.MatchString(searchModel.CompanyName, x.CustomerName);
             }).AsQueryable();
 
         var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, customers.Count());
