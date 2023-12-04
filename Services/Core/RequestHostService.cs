@@ -637,6 +637,7 @@ public class RequestHostService : IRequestHostService
                     UserId = userId,
                 });
                 requestHost.Status = RequestHostStatus.Success;
+                requestHost.ServerAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<List<IpAssignmentResultModel>>(ipAssignments);

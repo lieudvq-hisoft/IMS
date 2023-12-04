@@ -601,6 +601,7 @@ public class RequestExpandService : IRequestExpandService
                     RequestExpandId = requestExpand.Id,
                     UserId = userId
                 });
+                serverAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
                 if (serverAllocation.LocationAssignments.Any() && serverAllocation.IpAssignments.Any())
                 {

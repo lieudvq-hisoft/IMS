@@ -557,6 +557,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                     RequestUpgradeId = requestUpgrade.Id,
                     UserId = userId
                 });
+                requestUpgrade.ServerAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
 
 
