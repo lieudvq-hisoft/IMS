@@ -25,7 +25,7 @@ public interface IRequestHostService
     //Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status, Guid userId);
     Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model);
     Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model);
-    Task<ResultModel> Process(int requestHostId, Guid userId);
+    //Task<ResultModel> Process(int requestHostId, Guid userId);
     Task<ResultModel> Complete(int requestHostId, Guid userId);
 }
 
@@ -522,6 +522,7 @@ public class RequestHostService : IRequestHostService
                 string inspectionReportFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
 
                 requestHost.InspectionReportFilePath = inspectionReportFileName;
+                requestHost.Status = RequestHostStatus.Processed;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = new RequestHostDocumentFileResultModel
@@ -538,51 +539,51 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    public async Task<ResultModel> Process(int requestHostId, Guid userId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> Process(int requestHostId, Guid userId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var requestHost = _dbContext.RequestHosts.Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == requestHostId);
-            if (requestHost == null)
-            {
-                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
-            }
-            else if (requestHost.Status != RequestHostStatus.Accepted)
-            {
-                result.ErrorMessage = RequestHostErrorMessage.NOT_ACCEPTED;
-            }
-            else if (!requestHost.RequestHostIps.Any())
-            {
-                result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
-            }
-            else if (requestHost.InspectionReportFilePath == null)
-            {
-                result.ErrorMessage = RequestHostErrorMessage.NOT_PROCESSABLE;
-            }
-            else
-            {
-                requestHost.Status = RequestHostStatus.Processed;
-                _dbContext.RequestHostUsers.Add(new RequestHostUser
-                {
-                    Action = RequestUserAction.Process,
-                    UserId = userId,
-                    RequestHostId = requestHostId,
-                });
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = _mapper.Map<RequestHostResultModel>(requestHost);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //    try
+    //    {
+    //        var requestHost = _dbContext.RequestHosts.Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == requestHostId);
+    //        if (requestHost == null)
+    //        {
+    //            result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
+    //        }
+    //        else if (requestHost.Status != RequestHostStatus.Accepted)
+    //        {
+    //            result.ErrorMessage = RequestHostErrorMessage.NOT_ACCEPTED;
+    //        }
+    //        else if (!requestHost.RequestHostIps.Any())
+    //        {
+    //            result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
+    //        }
+    //        else if (requestHost.InspectionReportFilePath == null)
+    //        {
+    //            result.ErrorMessage = RequestHostErrorMessage.NOT_PROCESSABLE;
+    //        }
+    //        else
+    //        {
+    //            requestHost.Status = RequestHostStatus.Processed;
+    //            _dbContext.RequestHostUsers.Add(new RequestHostUser
+    //            {
+    //                Action = RequestUserAction.Process,
+    //                UserId = userId,
+    //                RequestHostId = requestHostId,
+    //            });
+    //            _dbContext.SaveChanges();
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<RequestHostResultModel>(requestHost);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> Complete(int requestHostId, Guid userId)
     {
