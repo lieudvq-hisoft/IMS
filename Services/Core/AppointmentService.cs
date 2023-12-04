@@ -742,12 +742,15 @@ public class AppointmentService : IAppointmentService
                     UserId = userId
                 });
 
-                _dbContext.AppointmentUsers.Add(new AppointmentUser
+                if (executor != null)
                 {
-                    Action = RequestUserAction.Execute,
-                    AppointmentId = appointmentId,
-                    UserId = user.Id,
-                });
+                    _dbContext.AppointmentUsers.Add(new AppointmentUser
+                    {
+                        Action = RequestUserAction.Execute,
+                        AppointmentId = appointmentId,
+                        UserId = executor.Id,
+                    });
+                }
 
                 if (status == RequestStatus.Accepted)
                 {

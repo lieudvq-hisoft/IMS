@@ -79,43 +79,43 @@ public class RequestHostController : ControllerBase
 
     [HttpPut("{id}/Accept")]
     [SwaggerOperation(Summary = "Accept a waiting request host")]
-    public async Task<ActionResult> Accept(int id)
+    public async Task<ActionResult> Accept(int id, [FromBody] UserAssignModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestHostService.Evaluate(id, RequestHostStatus.Accepted, new Guid(userId));
+        var result = await _requestHostService.Evaluate(id, RequestHostStatus.Accepted, new Guid(userId), model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPut("Accept/Bulk")]
-    [SwaggerOperation(Summary = "Accept many waiting request host")]
-    public async Task<ActionResult> AcceptBulk(RequestHostEvaluateBulkModel model)
-    {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestHostService.EvaluateBulk(model, RequestHostStatus.Accepted, new Guid(userId));
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPut("Accept/Bulk")]
+    //[SwaggerOperation(Summary = "Accept many waiting request host")]
+    //public async Task<ActionResult> AcceptBulk(RequestHostEvaluateBulkModel model)
+    //{
+    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+    //    var result = await _requestHostService.EvaluateBulk(model, RequestHostStatus.Accepted, new Guid(userId));
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPut("{id}/Deny")]
     [SwaggerOperation(Summary = "Deny a waiting request host")]
     public async Task<ActionResult> Deny(int id)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestHostService.Evaluate(id, RequestHostStatus.Denied, new Guid(userId));
+        var result = await _requestHostService.Evaluate(id, RequestHostStatus.Denied, new Guid(userId), new UserAssignModel());
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPut("Deny/Bulk")]
-    [SwaggerOperation(Summary = "Deny many waiting request host")]
-    public async Task<ActionResult> DenyBulk(RequestHostEvaluateBulkModel model)
-    {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestHostService.EvaluateBulk(model, RequestHostStatus.Denied, new Guid(userId));
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPut("Deny/Bulk")]
+    //[SwaggerOperation(Summary = "Deny many waiting request host")]
+    //public async Task<ActionResult> DenyBulk(RequestHostEvaluateBulkModel model)
+    //{
+    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+    //    var result = await _requestHostService.EvaluateBulk(model, RequestHostStatus.Denied, new Guid(userId));
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPost("{id}/Document")]
     public async Task<ActionResult> UploadDocument(int id, [FromForm] RequestHostDocumentFileUploadModel model)

@@ -7,6 +7,7 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
 using EbookStore.Client.ExternalService.ImageHostService;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using OfficeOpenXml.FormulaParsing.Utilities;
 using Services.Utilities;
@@ -20,8 +21,8 @@ public interface IRequestHostService
     Task<ResultModel> Create(RequestHostCreateModel model);
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Update(RequestHostUpdateModel model);
-    Task<ResultModel> Evaluate(int requestHostId, RequestHostStatus status, Guid userId);
-    Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status, Guid userId);
+    Task<ResultModel> Evaluate(int requestHostId, RequestHostStatus status, Guid userId, UserAssignModel model);
+    //Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status, Guid userId);
     Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model);
     Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model);
     Task<ResultModel> Process(int requestHostId, Guid userId);
@@ -33,12 +34,14 @@ public class RequestHostService : IRequestHostService
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly ICloudinaryHelper _cloudinaryHelper;
+    private readonly UserManager<User> _userManager;
 
-    public RequestHostService(AppDbContext dbContext, IMapper mapper, ICloudinaryHelper cloudinaryHelper)
+    public RequestHostService(AppDbContext dbContext, IMapper mapper, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManager)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _cloudinaryHelper = cloudinaryHelper;
+        _userManager = userManager;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel)
@@ -273,7 +276,7 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    public async Task<ResultModel> Evaluate(int requestHostId, RequestHostStatus status, Guid userId)
+    public async Task<ResultModel> Evaluate(int requestHostId, RequestHostStatus status, Guid userId, UserAssignModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -299,10 +302,33 @@ public class RequestHostService : IRequestHostService
             }
 
             var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
+            User executor = null;
+            if (status == RequestHostStatus.Accepted)
+            {
+                executor = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
+            }
             if (user == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+
+            if (status == RequestHostStatus.Accepted)
+            {
+                if (executor == null)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+                }
+                else
+                {
+                    var roles = await _userManager.GetRolesAsync(user);
+                    if (!roles.Contains(RoleType.Tech.ToString()))
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "User assigned is not a tech";
+                    }
+                }
             }
 
             if (validPrecondition)
@@ -315,6 +341,15 @@ public class RequestHostService : IRequestHostService
                     UserId = userId
                 });
                 _dbContext.SaveChanges();
+                if (executor != null)
+                {
+                    _dbContext.RequestHostUsers.Add(new RequestHostUser
+                    {
+                        Action = RequestUserAction.Execute,
+                        RequestHostId = requestHostId,
+                        UserId = executor.Id,
+                    });
+                }
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestHostModel>(requestHost);
             }
@@ -327,40 +362,40 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    public async Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status, Guid userId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status, Guid userId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            using var transaction = _dbContext.Database.BeginTransaction();
-            var results = new List<ResultModel>();
-            foreach (var requestHostId in model.RequestHostIds)
-            {
+    //    try
+    //    {
+    //        using var transaction = _dbContext.Database.BeginTransaction();
+    //        var results = new List<ResultModel>();
+    //        foreach (var requestHostId in model.RequestHostIds)
+    //        {
 
-                results.Add(await Evaluate(requestHostId, status, userId));
-            }
+    //            results.Add(await Evaluate(requestHostId, status, userId));
+    //        }
 
-            if (results.Any(x => !x.Succeed))
-            {
-                result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-                transaction.Rollback();
-            }
-            else
-            {
-                transaction.Commit();
-                result.Succeed = true;
-                result.Data = results.Select(x => x.Data);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //        if (results.Any(x => !x.Succeed))
+    //        {
+    //            result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+    //            transaction.Rollback();
+    //        }
+    //        else
+    //        {
+    //            transaction.Commit();
+    //            result.Succeed = true;
+    //            result.Data = results.Select(x => x.Data);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model)
     {
