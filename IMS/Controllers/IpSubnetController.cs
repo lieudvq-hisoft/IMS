@@ -52,7 +52,7 @@ public class IpSubnetController : ControllerBase
     }
 
     [HttpGet("{id}/IpAddress")]
-    public async Task<ActionResult> GetIpAddress(int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] IpAddressSearchModel searchModel)
+    public async Task<ActionResult> GetIpAddress(int id, [FromQuery] PagingParam<SimpleSortCriteria> paginationModel, [FromQuery] IpAddressSearchModel searchModel)
     {
         var result = await _ipSubnetService.GetIpAddress(id, paginationModel, searchModel);
         if (result.Succeed) return Ok(result.Data);

@@ -20,7 +20,7 @@ public class IpAddressController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] IpAddressSearchModel searchModel)
+    public async Task<ActionResult> Get([FromQuery] PagingParam<SimpleSortCriteria> pagingParam, [FromQuery] IpAddressSearchModel searchModel)
     {
         var result = await _ipAddressService.Get(pagingParam, searchModel);
         if (result.Succeed) return Ok(result.Data);

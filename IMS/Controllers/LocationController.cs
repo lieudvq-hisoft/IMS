@@ -22,7 +22,7 @@ public class LocationController : ControllerBase
 
     [HttpGet]
     [SwaggerOperation(Summary = "Get all Location")]
-    public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] LocationSearchModel searchModel)
+    public async Task<ActionResult> Get([FromQuery] PagingParam<SimpleSortCriteria> pagingParam, [FromQuery] LocationSearchModel searchModel)
     {
         var result = await _LocationService.Get(pagingParam, searchModel);
         if (result.Succeed) return Ok(result.Data);
