@@ -691,8 +691,11 @@ public class IpSubnetService : IIpSubnetService
         ResultModel result = new ResultModel();
         try
         {
-            var parentIpSubnets = _dbContext.IpSubnets.Include(_ => _.SubNets)
-                .Where(_ => _.ParentNetworkId == null && !_.IsDeleted).ToList();
+            var parentIpSubnets = _dbContext.IpSubnets
+                .Include(_ => _.SubNets)
+                .Where(_ => _.ParentNetworkId == null && !_.IsDeleted)
+                .ToList()
+                .OrderBy(x => $"{x.FirstOctet}.{x.SecondOctet}.{x.ThirdOctet}.{x.FourthOctet}");
 
             var treeView = new List<IpSubnetTreeModel>();
             foreach (var node in parentIpSubnets)
