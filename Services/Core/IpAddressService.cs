@@ -15,6 +15,8 @@ public interface IIpAddressService
     Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetServerAllocation(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
+    Task<ResultModel> GetIsBlockedCount();
+    Task<ResultModel> GetIsReservedCount();
     Task<ResultModel> GetCustomer(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> SuggestMasterIp();
     Task<ResultModel> ChangeBlockingStatus(IpAddressIdListModel model, bool isBlock);
@@ -171,6 +173,42 @@ public class IpAddressService : IIpAddressService
                 result.Data = paging;
                 result.Succeed = true;
             }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> GetIsReservedCount()
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            result.Succeed = true;
+            result.Data = _dbContext.IpAddresses.Where(x => x.IsReserved).Count();
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> GetIsBlockedCount()
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            result.Succeed = true;
+            result.Data = _dbContext.IpAddresses.Where(x => x.Blocked).Count();
         }
         catch (Exception e)
         {

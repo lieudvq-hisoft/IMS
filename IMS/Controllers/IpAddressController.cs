@@ -59,6 +59,22 @@ public class IpAddressController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("BlockedCount")]
+    public async Task<ActionResult> GetBlockedCount()
+    {
+        var result = await _ipAddressService.GetIsBlockedCount();
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("ReservedCount")]
+    public async Task<ActionResult> GetReservedCount()
+    {
+        var result = await _ipAddressService.GetIsReservedCount();
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut("Block")]
     public async Task<ActionResult> Block([FromBody] IpAddressIdListModel model)
     {
