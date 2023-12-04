@@ -93,9 +93,11 @@ public class RequestHostUpdateModel
 
 public class RequestHostSearchModel
 {
-    public IpAssignmentTypes? Type { get; set; } = null;
-    public RequestHostStatus? Status { get; set; } = null;
-    public int? ServerAllocationId { get; set; } = null;
+    public IpAssignmentTypes? Type { get; set; }
+    public RequestHostStatus? Status { get; set; }
+    public int? ServerAllocationId { get; set; }
+    public int? CustomerId { get; set; }
+    public IpPurpose? Purpose { get; set; }
 }
 
 public class RequestHostEvaluateBulkModel

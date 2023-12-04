@@ -70,9 +70,9 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpGet("{id}/RequestHost")]
-    public async Task<ActionResult> GetRequestHost([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromRoute] int id)
+    public async Task<ActionResult> GetRequestHost(int id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestHostSearchModel searchModel)
     {
-        var result = await _serverAllocationService.GetRequestHost(pagingParam, id);
+        var result = await _serverAllocationService.GetRequestHost(id, pagingParam, searchModel);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

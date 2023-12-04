@@ -87,6 +87,12 @@ public enum LocationAssignmentSortingCriteria
 
 public enum BaseSortCriteria
 {
+    Id,
+    DateCreated
+}
+
+public enum SimpleSortCriteria
+{
     Id
 }
 

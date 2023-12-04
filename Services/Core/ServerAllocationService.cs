@@ -17,7 +17,7 @@ public interface IServerAllocationService
     Task<ResultModel> GetHardwareConfig(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id);
-    Task<ResultModel> GetRequestHost(PagingParam<BaseSortCriteria> paginationModel, int id);
+    Task<ResultModel> GetRequestHost(int id, PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel);
     Task<ResultModel> GetLocationAssignment(int id);
     Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetLocation(PagingParam<BaseSortCriteria> paginationModel, int id);
@@ -212,25 +212,29 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> GetRequestHost(PagingParam<BaseSortCriteria> paginationModel, int id)
+    public async Task<ResultModel> GetRequestHost(int id, PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations
-                .Include(x => x.Customer)
-                .Include(x => x.RequestHosts).ThenInclude(x => x.RequestHostIps)
-                .Include(x => x.RequestHosts).ThenInclude(x => x.RequestHostUsers).ThenInclude(x => x.User)
-                .FirstOrDefault(x => x.Id == id);
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == id);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
             {
-                var requestHosts = serverAllocation.RequestHosts.AsQueryable();
+                var requestHosts = _dbContext.RequestHosts
+                    .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
+                    .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                    .Include(x => x.RequestHostUsers).ThenInclude(x => x.User)
+                     .Where(delegate (RequestHost x)
+                     {
+                         return x.FilterRequestHost(searchModel);
+                     })
+                    .AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestHosts.Count());
                 requestHosts = requestHosts.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
                 requestHosts = requestHosts.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);

@@ -13,7 +13,6 @@ public class RequestHost : BaseEntity
     public RequestHostStatus Status { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Host;
     public string? InspectionReportFilePath { get; set; }
-    //public string? ReceiptOfRecipientFilePath { get; set; }
 
     public int ServerAllocationId { get; set; }
     public ServerAllocation ServerAllocation { get; set; }
@@ -24,10 +23,12 @@ public class RequestHost : BaseEntity
 
     public bool FilterRequestHost(RequestHostSearchModel model)
     {
-        bool matchIpAssignmentTypes = model.Type != null ? this.Type == model.Type : true;
-        bool matchStatus = model.Status != null ? this.Status == model.Status : true;
-        bool matchServerAllocationId = model.ServerAllocationId != null ? this.ServerAllocationId == model.ServerAllocationId : true;
+        bool matchIpAssignmentTypes = model.Type != null ? Type == model.Type : true;
+        bool matchStatus = model.Status != null ? Status == model.Status : true;
+        bool matchServerAllocationId = model.ServerAllocationId != null ? ServerAllocationId == model.ServerAllocationId : true;
+        bool matchCustomer = model.CustomerId != null ? ServerAllocation.CustomerId == model.CustomerId : true;
+        bool matchPurpose = model.Purpose != null ? RequestHostIps.Select(x => x.IpAddress).Any(x => x.Purpose == model.Purpose) : true;
 
-        return matchIpAssignmentTypes && matchStatus && matchServerAllocationId;
+        return matchIpAssignmentTypes && matchStatus && matchServerAllocationId && matchCustomer && matchPurpose;
     }
 }
