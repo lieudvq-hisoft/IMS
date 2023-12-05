@@ -428,6 +428,93 @@ public class UserService : IUserService
         return result;
     }
 
+    public async Task<ResultModel> GetAssignRequestExpand(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var user = _dbContext.User
+                .FirstOrDefault(x => x.Id == new Guid(userId));
+            if (user == null)
+            {
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var requestExpands = _dbContext.RequestExpands
+                    .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location)
+                    .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
+                    .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                    .Include(x => x.RequestExpandUsers).ThenInclude(x => x.User)
+                    .Where(x => x.RequestExpandUsers.Any(x => x.UserId == new Guid(userId) && x.Action == RequestUserAction.Execute))
+                    .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
+                    .AsQueryable();
+
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpands.Count());
+
+                requestExpands = requestExpands.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                requestExpands = requestExpands.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+                paging.Data = _mapper.Map<List<RequestExpandModel>>(requestExpands.ToList());
+
+                result.Data = paging;
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetAssignRequestUpgrade(string userId, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var user = _dbContext.User
+                .FirstOrDefault(x => x.Id == new Guid(userId));
+            if (user == null)
+            {
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var requestUpgrades = _dbContext.RequestUpgrades
+                     .Include(x => x.Component)
+                     .Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
+                     .Include(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
+                     .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                     .Where(x => x.RequestUpgradeUsers.Any(x => x.UserId == new Guid(userId) && x.Action == RequestUserAction.Execute))
+                     .Where(delegate (RequestUpgrade x)
+                     {
+                         return x.FilterRequestUpgrade(searchModel);
+                     })
+                     .AsQueryable();
+
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestUpgrades.Count());
+
+                requestUpgrades = requestUpgrades.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                requestUpgrades = requestUpgrades.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+                paging.Data = _mapper.Map<List<RequestUpgradeModel>>(requestUpgrades.ToList());
+
+                result.Data = paging;
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
     public async Task<ResultModel> GetCustomer(Guid userId, PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel)
     {
         var result = new ResultModel();

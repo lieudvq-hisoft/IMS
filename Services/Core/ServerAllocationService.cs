@@ -698,7 +698,7 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = "Cannot create document to a not waiting server";
             }
-            else if (serverAllocation.InspectionRecordFilePath == null && serverAllocation.ReceiptOfRecipientFilePath == null)
+            else if (serverAllocation.InspectionRecordFilePath != null)
             {
                 result.ErrorMessage = "Server have document already";
             }
@@ -844,7 +844,7 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = "Cannot create document to a not waiting server";
             }
-            else if (serverAllocation.InspectionRecordFilePath == null && serverAllocation.ReceiptOfRecipientFilePath == null)
+            else if (serverAllocation.ReceiptOfRecipientFilePath != null)
             {
                 result.ErrorMessage = "Server have document already";
             }
