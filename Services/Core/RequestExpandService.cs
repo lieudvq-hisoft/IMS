@@ -642,6 +642,7 @@ public class RequestExpandService : IRequestExpandService
                 }
                 _dbContext.LocationAssignments.AddRange(locationAssignments);
                 requestExpand.Status = RequestStatus.Success;
+                requestExpand.SuccessExpandAppointmentId = requestExpand.RequestExpandAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success).Id;
                 serverAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
                 serverAllocation.ServerLocation = serverAllocation.GetServerLocation();

@@ -688,9 +688,9 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
-            else if (serverAllocation.Status != ServerAllocationStatus.Pausing)
+            else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
             {
-                result.ErrorMessage = "Cannot create document to a not pausing server";
+                result.ErrorMessage = "Cannot create document to a not waiting server";
             }
             else if (serverAllocation.InspectionRecordFilePath == null && serverAllocation.ReceiptOfRecipientFilePath == null)
             {
@@ -700,9 +700,9 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
             }
-            else if (!serverAllocation.IpAssignments.Select(x => x.IpAddress).Any(x => x.Purpose == IpPurpose.Gateway) || !serverAllocation.IpAssignments.Select(x => x.IpAddress).Any(x => x.Purpose == IpPurpose.Dns))
+            else if (serverAllocation.MasterIpAddress == null)
             {
-                result.ErrorMessage = "Server need dns and gateway";
+                result.ErrorMessage = "Server need ip master";
             }
             else
             {
@@ -834,9 +834,9 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
-            else if (serverAllocation.Status != ServerAllocationStatus.Pausing)
+            else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
             {
-                result.ErrorMessage = "Cannot create document to a not pausing server";
+                result.ErrorMessage = "Cannot create document to a not waiting server";
             }
             else if (serverAllocation.InspectionRecordFilePath == null && serverAllocation.ReceiptOfRecipientFilePath == null)
             {
@@ -846,9 +846,9 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
             }
-            else if (!serverAllocation.IpAssignments.Select(x => x.IpAddress).Any(x => x.Purpose == IpPurpose.Gateway) || !serverAllocation.IpAssignments.Select(x => x.IpAddress).Any(x => x.Purpose == IpPurpose.Dns))
+            else if (serverAllocation.MasterIpAddress == null)
             {
-                result.ErrorMessage = "Server need dns and gateway";
+                result.ErrorMessage = "Server need ip master";
             }
             else
             {

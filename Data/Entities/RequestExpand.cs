@@ -11,6 +11,9 @@ public class RequestExpand : BaseEntity
     public string? TechNote { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Expand;
     public int? Size { get; set; }
+    public int? SuccessExpandAppointmentId { get; set; }
+    public DateTime? RemovalDateCreated { get; set; }
+    public DateTime? RemovalDateUpdated { get; set; }
 
     public int ServerAllocationId { get; set; }
     public ServerAllocation? ServerAllocation { get; set; }
