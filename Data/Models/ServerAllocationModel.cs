@@ -120,7 +120,7 @@ public class ServerAllocationImportModel
     public ServerAllocationCreateModel RequestCreateModel { get; set; }
 }
 
-public class MainDocModel
+public class ServerAllocationCreateInspectionReportModel
 {
     //[Required]
     public string CustomerName { get; set; } = "CustomerName";

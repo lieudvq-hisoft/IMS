@@ -36,7 +36,8 @@ public interface IServerAllocationService
     Task<ResultModel> Delete(int serverAllocationId);
     Task<ResultModel> AssignMasterIp(int serverAllocationId, ServerAllocationMasterIpAssignmentModel model);
     Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model);
-    Task<ResultModel> GetMainDoc(int serverAllocationId, MainDocModel model);
+    Task<ResultModel> CreateInspectionReport(int serverAllocationId, ServerAllocationCreateInspectionReportModel model);
+    Task<ResultModel> CreateReceiptReport(int serverAllocationId);
 }
 
 public class ServerAllocationService : IServerAllocationService
@@ -669,7 +670,7 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> GetMainDoc(int serverAllocationId, MainDocModel model)
+    public async Task<ResultModel> CreateInspectionReport(int serverAllocationId, ServerAllocationCreateInspectionReportModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -813,5 +814,66 @@ public class ServerAllocationService : IServerAllocationService
     static bool IsClassC(int firstByte)
     {
         return firstByte >= 192 && firstByte <= 223;
+    }
+
+    public async Task<ResultModel> CreateReceiptReport(int serverAllocationId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            string inputPath = Path.Combine(_env.WebRootPath, "Report", "Template2.docx");
+            string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
+            var serverAllocation = _dbContext.ServerAllocations
+               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+               .Include(x => x.Customer)
+               .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+               .FirstOrDefault(x => x.Id == serverAllocationId);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (serverAllocation.Status != ServerAllocationStatus.Pausing)
+            {
+                result.ErrorMessage = "Cannot create document to a not pausing server";
+            }
+            else if (serverAllocation.InspectionRecordFilePath == null && serverAllocation.ReceiptOfRecipientFilePath == null)
+            {
+                result.ErrorMessage = "Server have document already";
+            }
+            else if (!serverAllocation.LocationAssignments.Any())
+            {
+                result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+            }
+            else if (!serverAllocation.IpAssignments.Select(x => x.IpAddress).Any(x => x.Purpose == IpPurpose.Gateway) || !serverAllocation.IpAssignments.Select(x => x.IpAddress).Any(x => x.Purpose == IpPurpose.Dns))
+            {
+                result.ErrorMessage = "Server need dns and gateway";
+            }
+            else
+            {
+                File.Copy(inputPath, outputPath, true);
+                using WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true);
+                document.MainDocumentPart.Document.Save();
+                var formfile = document.ConvertToIFormFile(outputPath);
+                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(formfile);
+                serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+
+                if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)
+                {
+                    serverAllocation.Status = ServerAllocationStatus.Working;
+                }
+                _dbContext.SaveChanges();
+
+                result.Succeed = true;
+                result.Data = outputPath;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
     }
 }

@@ -152,9 +152,28 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpPost("{id}/InspectionReport")]
-    public async Task<ActionResult> GetMainDoc(int id, [FromQuery] MainDocModel model)
+    public async Task<ActionResult> CreateInspectionReport(int id, [FromBody] ServerAllocationCreateInspectionReportModel model)
     {
-        var result = await _serverAllocationService.GetMainDoc(id, model);
+        var result = await _serverAllocationService.CreateInspectionReport(id, model);
+        if (result.Succeed)
+        {
+            var path = result.Data as string;
+            if (System.IO.File.Exists(path))
+            {
+                return File(System.IO.File.OpenRead(path), "application/vnd.openxmlformats-officedocument.wordprocessingml.document", Path.GetFileName(path));
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPost("{id}/ReceiptOfRecipient")]
+    public async Task<ActionResult> CreateReceiptOfRecipient(int id)
+    {
+        var result = await _serverAllocationService.CreateReceiptReport(id);
         if (result.Succeed)
         {
             var path = result.Data as string;
