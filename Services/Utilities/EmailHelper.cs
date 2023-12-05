@@ -25,7 +25,7 @@ public class EmailHelper : IEmailHelper
         return new SmtpClient(_config[$"Email:{_env}:Client"])
         {
             Port = 587,
-            Credentials = new NetworkCredential(_config["Email:Local:Account"], _config[$"Email:{_env}:Key"]),
+            Credentials = new NetworkCredential(_config[$"Email:{_env}:Account"], _config[$"Email:{_env}:Key"]),
             EnableSsl = true,
         };
     }
