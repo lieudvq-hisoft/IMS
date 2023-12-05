@@ -7,7 +7,11 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Metadata;
+using Xceed.Document.NET;
+using Xceed.Words.NET;
 
 namespace Services.Core;
 public interface IServerAllocationService
@@ -27,17 +31,20 @@ public interface IServerAllocationService
     Task<ResultModel> Delete(int serverAllocationId);
     Task<ResultModel> AssignMasterIp(int serverAllocationId, ServerAllocationMasterIpAssignmentModel model);
     Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model);
+    Task<ResultModel> GenerateMainDoc(int serverAllocationId, MainDocModel model);
 }
 
 public class ServerAllocationService : IServerAllocationService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly IHostingEnvironment _env;
 
-    public ServerAllocationService(AppDbContext dbContext, IMapper mapper)
+    public ServerAllocationService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _env = env;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel)
@@ -654,5 +661,77 @@ public class ServerAllocationService : IServerAllocationService
         }
 
         return result;
+    }
+
+    public async Task<ResultModel> GenerateMainDoc(int serverAllocationId, MainDocModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            string inputPath = Path.Combine(_env.WebRootPath, "Report", "Template1.docx");
+            string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
+            var serverAllocation = _dbContext.ServerAllocations
+               .Include(x => x.IpAssignments)
+               .ThenInclude(x => x.IpAddress)
+               .Include(x => x.Customer)
+               .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+               .FirstOrDefault(x => x.Id == serverAllocationId);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                using (DocX document = DocX.Load(inputPath))
+                {
+                    ReplaceText(document, "__CustomerName__", model.CustomerName);
+                    document.SaveAs(outputPath);
+                }
+
+                result.Succeed = true;
+                result.Data = outputPath;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    private void ReplaceText(DocX document, string dest, string text)
+    {
+        // Iterate through paragraphs in the document
+        foreach (var paragraph in document.Paragraphs)
+        {
+            if (paragraph.Text.Contains(dest))
+            {
+                // Replace oldText with newText in the paragraph
+                paragraph.ReplaceText(new StringReplaceTextOptions
+                {
+                    SearchValue = dest,
+                    NewValue = text
+                });
+            }
+        }
+
+        //// Iterate through tables in the document
+        //foreach (var table in document.Tables)
+        //{
+        //    foreach (var row in table.Rows)
+        //    {
+        //        foreach (var cell in row.Cells)
+        //        {
+        //            if (cell.Text.Contains(oldText))
+        //            {
+        //                // Replace oldText with newText in the cell
+        //                cell.ReplaceText(oldText, newText);
+        //            }
+        //        }
+        //    }
+        //}
     }
 }

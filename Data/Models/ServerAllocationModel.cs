@@ -111,3 +111,9 @@ public class ServerAllocationImportModel
     [Required]
     public ServerAllocationCreateModel RequestCreateModel { get; set; }
 }
+
+public class MainDocModel
+{
+    [Required]
+    public string CustomerName { get; set; }
+}

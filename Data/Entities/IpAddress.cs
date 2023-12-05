@@ -27,13 +27,18 @@ public class IpAddress
         return !Blocked && !IsReserved && !IpAssignments.Any() && !RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed);
     }
 
+    public bool IsAssigned()
+    {
+        return IpAssignments.Any() && !RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed);
+    }
+
     public bool Filter(IpAddressSearchModel searchModel)
     {
         var matchAddress = searchModel.Address != null ? Address.Contains(searchModel.Address) : true;
         var available = searchModel.IsAvailable != null ? IsAvailable() == searchModel.IsAvailable : true;
-        var assigned = searchModel.IsAssigned != null ? IpAssignments.Any() == searchModel.IsAssigned : true;
+        var assigned = searchModel.IsAssigned != null ? IsAssigned() == searchModel.IsAssigned : true;
         var isReserved = searchModel.IsReserved != null ? IsReserved == searchModel.IsReserved : true;
-        var blocked = searchModel.IsBlocked != null? Blocked == searchModel.IsBlocked : true;
+        var blocked = searchModel.IsBlocked != null ? Blocked == searchModel.IsBlocked : true;
         return matchAddress && available && assigned && isReserved && blocked;
     }
 }

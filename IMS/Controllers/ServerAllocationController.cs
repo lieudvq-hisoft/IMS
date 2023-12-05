@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
 using Swashbuckle.AspNetCore.Annotations;
+using System.IO;
 
 namespace IMS.Controllers;
 [Route("api/[controller]")]
@@ -147,6 +148,25 @@ public class ServerAllocationController : ControllerBase
     {
         var result = await _serverAllocationService.AssignLocation(id, model);
         if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpGet("MainDoc")]
+    public async Task<ActionResult> GetMainDoc(int id, [FromQuery] MainDocModel model)
+    {
+        var result = await _serverAllocationService.GenerateMainDoc(id, model);
+        if (result.Succeed)
+        {
+            var path = result.Data as string;
+            if (System.IO.File.Exists(path))
+            {
+                return File(System.IO.File.OpenRead(path), "application/vnd.openxmlformats-officedocument.wordprocessingml.document", Path.GetFileName(path));
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
         return BadRequest(result.ErrorMessage);
     }
 }
