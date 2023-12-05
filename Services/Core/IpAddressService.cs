@@ -41,7 +41,7 @@ public class IpAddressService : IIpAddressService
 
         try
         {
-            var IpAddresses = _dbContext.IpAddresses
+            var ipAddresses = _dbContext.IpAddresses
                 .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
                 .Where(delegate (IpAddress x)
@@ -50,12 +50,12 @@ public class IpAddressService : IIpAddressService
                 })
                 .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, IpAddresses.Count());
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddresses.Count());
 
-            IpAddresses = IpAddresses.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            IpAddresses = IpAddresses.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            ipAddresses = ipAddresses.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            ipAddresses = ipAddresses.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.Map<List<IpAddressModel>>(IpAddresses.ToList());
+            paging.Data = _mapper.Map<List<IpAddressModel>>(ipAddresses.ToList());
 
             result.Data = paging;
             result.Succeed = true;

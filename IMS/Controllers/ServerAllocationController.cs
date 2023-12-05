@@ -154,7 +154,7 @@ public class ServerAllocationController : ControllerBase
     [HttpGet("MainDoc")]
     public async Task<ActionResult> GetMainDoc(int id, [FromQuery] MainDocModel model)
     {
-        var result = await _serverAllocationService.GenerateMainDoc(id, model);
+        var result = await _serverAllocationService.GetMainDoc(id, model);
         if (result.Succeed)
         {
             var path = result.Data as string;

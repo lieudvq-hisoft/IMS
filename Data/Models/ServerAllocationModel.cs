@@ -116,4 +116,7 @@ public class MainDocModel
 {
     [Required]
     public string CustomerName { get; set; }
+
+    [Required]
+    public string CustomerPosition { get; set; }
 }

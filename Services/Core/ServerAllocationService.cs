@@ -31,7 +31,7 @@ public interface IServerAllocationService
     Task<ResultModel> Delete(int serverAllocationId);
     Task<ResultModel> AssignMasterIp(int serverAllocationId, ServerAllocationMasterIpAssignmentModel model);
     Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model);
-    Task<ResultModel> GenerateMainDoc(int serverAllocationId, MainDocModel model);
+    Task<ResultModel> GetMainDoc(int serverAllocationId, MainDocModel model);
 }
 
 public class ServerAllocationService : IServerAllocationService
@@ -301,11 +301,15 @@ public class ServerAllocationService : IServerAllocationService
             }
             else
             {
-                var ipAddresses = serverAllocation.IpAssignments?.Select(x => x.IpAddress)
+                var ipAddresses = _dbContext.IpAddresses
+                    .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                    .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+                    .Where(x => x.IpAssignments.Any(x => x.ServerAllocationId == id))
                     .Where(delegate (IpAddress x)
                     {
                         return x.Filter(searchModel);
-                    }).AsQueryable();
+                    })
+                    .AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddresses.Count());
 
                 ipAddresses = ipAddresses.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
@@ -663,7 +667,7 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> GenerateMainDoc(int serverAllocationId, MainDocModel model)
+    public async Task<ResultModel> GetMainDoc(int serverAllocationId, MainDocModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -684,11 +688,13 @@ public class ServerAllocationService : IServerAllocationService
             }
             else
             {
-                using (DocX document = DocX.Load(inputPath))
-                {
-                    ReplaceText(document, "__CustomerName__", model.CustomerName);
-                    document.SaveAs(outputPath);
-                }
+                using DocX document = DocX.Load(inputPath);
+                ReplaceText(document, "__CustomerName__", model.CustomerName);
+                ReplaceText(document, "__CompanyName__", serverAllocation.Customer.CompanyName);
+                ReplaceText(document, "__Position__", model.CustomerPosition);
+                ReplaceText(document, "__CustomerAddress__", serverAllocation.Customer.Address);
+                ReplaceText(document, "__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
+                document.SaveAs(outputPath);
 
                 result.Succeed = true;
                 result.Data = outputPath;
@@ -701,6 +707,11 @@ public class ServerAllocationService : IServerAllocationService
 
         return result;
     }
+
+    //private void GenerateMainDoc()
+    //{
+
+    //}
 
     private void ReplaceText(DocX document, string dest, string text)
     {
