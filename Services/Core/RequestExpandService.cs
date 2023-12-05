@@ -20,7 +20,7 @@ public interface IRequestExpandService
     Task<ResultModel> Delete(int requestExpandId);
     Task<ResultModel> Reject(int requestExpandId, RequestExpandRejectModel modell);
     Task<ResultModel> FailRemoval(int requestExpandId);
-    Task<ResultModel> Accept(int requestExpandId, Guid userId, UserAssignModel model);
+    Task<ResultModel> Accept(int requestExpandId, Guid userId);
     Task<ResultModel> Deny(int requestExpandId, Guid userId, DenyModel model);
     Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
     Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model);
@@ -332,7 +332,7 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
-    public async Task<ResultModel> Accept(int requestExpandId, Guid userId, UserAssignModel model)
+    public async Task<ResultModel> Accept(int requestExpandId, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -353,26 +353,10 @@ public class RequestExpandService : IRequestExpandService
             }
 
             var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
-            User executor = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
             if (user == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-
-            if (executor == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-                if (!roles.Contains(RoleType.Tech.ToString()))
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "User assigned is not a tech";
-                }
             }
 
             if (validPrecondition)
@@ -385,13 +369,6 @@ public class RequestExpandService : IRequestExpandService
                     UserId = userId
                 });
                 _dbContext.SaveChanges();
-
-                _dbContext.RequestExpandUsers.Add(new RequestExpandUser
-                {
-                    Action = RequestUserAction.Execute,
-                    RequestExpandId = requestExpandId,
-                    UserId = executor.Id,
-                });
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestHostModel>(requestExpand);
             }

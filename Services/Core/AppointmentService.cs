@@ -750,6 +750,13 @@ public class AppointmentService : IAppointmentService
                         RequestUpgradeId = requestUpgrade.Id,
                         UserId = userId
                     });
+
+                    _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
+                    {
+                        Action = RequestUserAction.Execute,
+                        RequestUpgradeId = requestUpgrade.Id,
+                        UserId = executor.Id
+                    });
                 }
 
                 foreach (var requestExpand in appointment.RequestExpandAppointments.Select(x => x.RequestExpand))
@@ -767,6 +774,13 @@ public class AppointmentService : IAppointmentService
                         Action = RequestUserAction.Evaluate,
                         RequestExpandId = requestExpand.Id,
                         UserId = userId
+                    });
+
+                    _dbContext.RequestExpandUsers.Add(new RequestExpandUser
+                    {
+                        Action = RequestUserAction.Execute,
+                        RequestExpandId = requestExpand.Id,
+                        UserId = executor.Id
                     });
                 }
 
@@ -1006,7 +1020,6 @@ public class AppointmentService : IAppointmentService
             if (validPrecondition)
             {
                 appointment.Status = RequestStatus.Failed;
-                appointment.SaleNote = model.SaleNote;
                 appointment.TechNote = model.TechNote;
                 _dbContext.SaveChanges();
                 result.Succeed = true;

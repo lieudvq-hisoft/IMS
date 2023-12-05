@@ -126,8 +126,6 @@ public class AppointmentUpdateModel
 
 public class AppointmentFailModel
 {
-    public string? SaleNote { get; set; }
-
     public string? TechNote { get; set; }
 }
 

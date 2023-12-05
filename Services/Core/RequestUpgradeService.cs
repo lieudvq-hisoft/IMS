@@ -23,7 +23,7 @@ public interface IRequestUpgradeService
     Task<ResultModel> Delete(int requestUpgradeId);
     Task<ResultModel> Reject(int requestUpgradeId, RequestUpgradeRejectModel model);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
-    Task<ResultModel> Accept(int requestUpgradeId, Guid userId, UserAssignModel model);
+    Task<ResultModel> Accept(int requestUpgradeId, Guid userId);
     Task<ResultModel> Deny(int requestUpgradeId, Guid userId, DenyModel model);
     //Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status, Guid userId);
     Task<ResultModel> CheckCompletability(int requestUpgradeId);
@@ -386,7 +386,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> Accept(int requestUpgradeId, Guid userId, UserAssignModel model)
+    public async Task<ResultModel> Accept(int requestUpgradeId, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -407,26 +407,10 @@ public class RequestUpgradeService : IRequestUpgradeService
             }
 
             var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
-            User executor = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
             if (user == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-
-            if (executor == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-                if (!roles.Contains(RoleType.Tech.ToString()))
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "User assigned is not a tech";
-                }
             }
 
             if (validPrecondition)
@@ -439,13 +423,6 @@ public class RequestUpgradeService : IRequestUpgradeService
                     UserId = userId
                 });
                 _dbContext.SaveChanges();
-
-                _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
-                {
-                    Action = RequestUserAction.Execute,
-                    RequestUpgradeId = requestUpgradeId,
-                    UserId = executor.Id,
-                });
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
             }

@@ -81,10 +81,10 @@ public class RequestExpandController : ControllerBase
 
     [HttpPut("{id}/Accept")]
     [SwaggerOperation(Summary = "Accept a waiting request expand")]
-    public async Task<ActionResult> Accept(int id, [FromBody] UserAssignModel model)
+    public async Task<ActionResult> Accept(int id)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestExpandService.Accept(id, new Guid(userId), model);
+        var result = await _requestExpandService.Accept(id, new Guid(userId));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

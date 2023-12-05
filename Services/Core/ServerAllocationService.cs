@@ -7,11 +7,13 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
+using DocumentFormat.OpenXml.Packaging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using NPOI.XWPF.UserModel;
+using Services.Utilities;
 using System.Reflection.Metadata;
-using Xceed.Document.NET;
-using Xceed.Words.NET;
+
 
 namespace Services.Core;
 public interface IServerAllocationService
@@ -688,13 +690,21 @@ public class ServerAllocationService : IServerAllocationService
             }
             else
             {
-                using DocX document = DocX.Load(inputPath);
-                ReplaceText(document, "__CustomerName__", model.CustomerName);
-                ReplaceText(document, "__CompanyName__", serverAllocation.Customer.CompanyName);
-                ReplaceText(document, "__Position__", model.CustomerPosition);
-                ReplaceText(document, "__CustomerAddress__", serverAllocation.Customer.Address);
-                ReplaceText(document, "__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
-                document.SaveAs(outputPath);
+                WordprocessingDocument document = WordprocessingDocument.Open(inputPath, true);
+                document.RenderText("__CustomerName__", model.CustomerName);
+                document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName);
+                document.RenderText("__Position__", model.CustomerPosition);
+                document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
+                document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
+                if (model.NewAllocation)
+                {
+                    document.TickCheckBoxInDocx("Allocation");
+                }
+                else
+                {
+                    document.TickCheckBoxInDocx("Service");
+                }
+                document.MainDocumentPart.Document.Save();
 
                 result.Succeed = true;
                 result.Data = outputPath;
@@ -706,43 +716,5 @@ public class ServerAllocationService : IServerAllocationService
         }
 
         return result;
-    }
-
-    //private void GenerateMainDoc()
-    //{
-
-    //}
-
-    private void ReplaceText(DocX document, string dest, string text)
-    {
-        // Iterate through paragraphs in the document
-        foreach (var paragraph in document.Paragraphs)
-        {
-            if (paragraph.Text.Contains(dest))
-            {
-                // Replace oldText with newText in the paragraph
-                paragraph.ReplaceText(new StringReplaceTextOptions
-                {
-                    SearchValue = dest,
-                    NewValue = text
-                });
-            }
-        }
-
-        //// Iterate through tables in the document
-        //foreach (var table in document.Tables)
-        //{
-        //    foreach (var row in table.Rows)
-        //    {
-        //        foreach (var cell in row.Cells)
-        //        {
-        //            if (cell.Text.Contains(oldText))
-        //            {
-        //                // Replace oldText with newText in the cell
-        //                cell.ReplaceText(oldText, newText);
-        //            }
-        //        }
-        //    }
-        //}
     }
 }

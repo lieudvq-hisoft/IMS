@@ -119,4 +119,7 @@ public class MainDocModel
 
     [Required]
     public string CustomerPosition { get; set; }
+
+    [Required]
+    public bool NewAllocation { get; set; }
 }
