@@ -650,6 +650,8 @@ public class RequestExpandService : IRequestExpandService
                 });
                 serverAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
+                serverAllocation.ServerLocation = serverAllocation.GetServerLocation();
+
                 if (serverAllocation.LocationAssignments.Any() && serverAllocation.IpAssignments.Any())
                 {
                     serverAllocation.Status = ServerAllocationStatus.Working;

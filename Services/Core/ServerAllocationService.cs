@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using NPOI.XWPF.UserModel;
 using Services.Utilities;
+using System.Net;
 using System.Reflection.Metadata;
 
 
@@ -679,8 +680,7 @@ public class ServerAllocationService : IServerAllocationService
             string inputPath = Path.Combine(_env.WebRootPath, "Report", "Template1.docx");
             string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
             var serverAllocation = _dbContext.ServerAllocations
-               .Include(x => x.IpAssignments)
-               .ThenInclude(x => x.IpAddress)
+               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                .Include(x => x.Customer)
                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                .FirstOrDefault(x => x.Id == serverAllocationId);
@@ -688,9 +688,14 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
+            else if (serverAllocation.Status == ServerAllocationStatus.Pausing)
+            {
+                result.ErrorMessage = "Server dont have enough information";
+            }
             else
             {
-                WordprocessingDocument document = WordprocessingDocument.Open(inputPath, true);
+                File.Copy(inputPath, outputPath, true);
+                using WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true);
                 document.RenderText("__CustomerName__", model.CustomerName);
                 document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName);
                 document.RenderText("__Position__", model.CustomerPosition);
@@ -704,6 +709,33 @@ public class ServerAllocationService : IServerAllocationService
                 {
                     document.TickCheckBoxInDocx("Service");
                 }
+                document.RenderText("__ServerName__", serverAllocation.Name);
+                document.RenderText("__ServerLocation__", serverAllocation.ServerLocation);
+                document.RenderText("__SerialNumber__", serverAllocation.SerialNumber);
+                document.RenderText("__Power__", serverAllocation.Power.ToString());
+                document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
+                document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.Select(x => x.IpAddress)?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
+                document.RenderText("__SubnetMask__", GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
+                document.RenderText("__Website__", model.Website);
+                document.RenderText("__Username__", model.Username);
+                document.RenderText("__Password__", model.Password);
+                if (model.Good)
+                {
+                    document.TickCheckBoxInDocx("Evaluate");
+                }
+                document.RenderText("__Note__", model.Note);
+                var dnss = serverAllocation.IpAssignments.Select(x => x.IpAddress).Where(x => x.Purpose == IpPurpose.Dns).ToList();
+                string dnsString = "";
+                for (int i = 0; i < dnss.Count(); i++)
+                {
+                    dnsString += dnss[i].Address;
+                    if (i != dnss.Count - 1)
+                    {
+                        dnsString += ", ";
+                    }
+                }
+                document.RenderText("__DNSs__", dnsString);
+
                 document.MainDocumentPart.Document.Save();
 
                 result.Succeed = true;
@@ -716,5 +748,51 @@ public class ServerAllocationService : IServerAllocationService
         }
 
         return result;
+    }
+
+    private string GetDefaultSubnetMask(string ipAddressString)
+    {
+        IPAddress ipAddress;
+        if (IPAddress.TryParse(ipAddressString, out ipAddress) && ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+        {
+            byte[] addressBytes = ipAddress.GetAddressBytes();
+            int firstByte = addressBytes[0];
+
+            if (IsClassA(firstByte))
+            {
+                return "255.0.0.0";
+            }
+            else if (IsClassB(firstByte))
+            {
+                return "255.255.0.0";
+            }
+            else if (IsClassC(firstByte))
+            {
+                return "255.255.255.0";
+            }
+            else
+            {
+                return "Unknown";
+            }
+        }
+        else
+        {
+            throw new Exception("Invalid IPv4 Address");
+        }
+    }
+
+    static bool IsClassA(int firstByte)
+    {
+        return firstByte >= 1 && firstByte <= 126;
+    }
+
+    static bool IsClassB(int firstByte)
+    {
+        return firstByte >= 128 && firstByte <= 191;
+    }
+
+    static bool IsClassC(int firstByte)
+    {
+        return firstByte >= 192 && firstByte <= 223;
     }
 }

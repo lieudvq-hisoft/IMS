@@ -33,6 +33,7 @@ public class ServerAllocationResultModel
     public string? Note { get; set; }
     public string? TechNote { get; set; }
     public string? SaleNote { get; set; }
+    public string? ServerLocation { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdated { get; set; }
     public int CustomerId { get; set; }
@@ -114,12 +115,27 @@ public class ServerAllocationImportModel
 
 public class MainDocModel
 {
-    [Required]
-    public string CustomerName { get; set; }
+    //[Required]
+    public string CustomerName { get; set; } = "CustomerName";
 
-    [Required]
-    public string CustomerPosition { get; set; }
+    //[Required]
+    public string CustomerPosition { get; set; } = "CustomerPosition";
 
-    [Required]
-    public bool NewAllocation { get; set; }
+    //[Required]
+    public bool NewAllocation { get; set; } = true;
+
+    //[Required]
+    [Url]
+    public string Website { get; set; } = "https://superuser.com/questions/278260/how-do-i-see-the-xml-of-my-docx-document";
+
+    //[Required]
+    public string Username { get; set; } = "Username";
+
+    //[Required]
+    public string Password { get; set; } = "Password";
+
+    //[Required]
+    public bool Good { get; set; } = true;
+
+    public string Note { get; set; } = "Note";
 }
