@@ -44,9 +44,9 @@ public class ServerAllocationService : IServerAllocationService
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly IHostingEnvironment _env;
-    private readonly CloudinaryHelper _cloudinaryHelper;
+    private readonly ICloudinaryHelper _cloudinaryHelper;
 
-    public ServerAllocationService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env, CloudinaryHelper cloudinaryHelper)
+    public ServerAllocationService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env, ICloudinaryHelper cloudinaryHelper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
