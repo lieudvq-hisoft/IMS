@@ -28,6 +28,9 @@ public interface IUserService
     Task<ResultModel> Delete(Guid id);
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, UserSearchModel searchModel);
     Task<ResultModel> GetDetail(string id);
+    Task<ResultModel> GetAssignedRequestExpand(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel);
+    Task<ResultModel> GetAssignedRequestUpgrade(string userId, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
+    Task<ResultModel> GetAssignedRequestHost(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel);
 }
 public class UserService : IUserService
 {
@@ -428,7 +431,7 @@ public class UserService : IUserService
         return result;
     }
 
-    public async Task<ResultModel> GetAssignRequestExpand(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel)
+    public async Task<ResultModel> GetAssignedRequestExpand(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -470,7 +473,7 @@ public class UserService : IUserService
         return result;
     }
 
-    public async Task<ResultModel> GetAssignRequestUpgrade(string userId, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel)
+    public async Task<ResultModel> GetAssignedRequestUpgrade(string userId, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -503,6 +506,50 @@ public class UserService : IUserService
                 requestUpgrades = requestUpgrades.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
                 paging.Data = _mapper.Map<List<RequestUpgradeModel>>(requestUpgrades.ToList());
+
+                result.Data = paging;
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetAssignedRequestHost(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var user = _dbContext.User
+                .FirstOrDefault(x => x.Id == new Guid(userId));
+            if (user == null)
+            {
+                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var requestHosts = _dbContext.RequestHosts
+                    .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
+                    .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                    .Include(x => x.RequestHostUsers).ThenInclude(x => x.User)
+                    .Where(x => x.RequestHostUsers.Any(x => x.UserId == new Guid(userId) && x.Action == RequestUserAction.Execute))
+                    .Where(delegate (RequestHost x)
+                    {
+                        return x.FilterRequestHost(searchModel);
+                    })
+                    .AsQueryable();
+
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestHosts.Count());
+
+                requestHosts = requestHosts.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                requestHosts = requestHosts.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+                paging.Data = _mapper.Map<List<RequestHostModel>>(requestHosts.ToList());
 
                 result.Data = paging;
                 result.Succeed = true;
