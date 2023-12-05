@@ -7,6 +7,7 @@ namespace Services.Utilities;
 public interface ICloudinaryHelper
 {
     string UploadFile(IFormFile file);
+    string UploadFile(string filePath);
 }
 
 public class CloudinaryHelper : ICloudinaryHelper
@@ -26,6 +27,19 @@ public class CloudinaryHelper : ICloudinaryHelper
         var uploadParams = new RawUploadParams()
         {
             File = new FileDescription(file.FileName, file.OpenReadStream()),
+        };
+        var uploadResult = _cloudinary.Upload(uploadParams);
+
+        //return _cloudinary.DownloadArchiveUrl(uploadResult.PublicId);
+        return _cloudinary.Api.UrlImgUp.ResourceType(uploadResult.ResourceType).Version(uploadResult.Version).BuildUrl(uploadResult.PublicId);
+    }
+
+    public string UploadFile(string filePath)
+    {
+        var file = File.OpenRead(filePath);
+        var uploadParams = new RawUploadParams()
+        {
+            File = new FileDescription(file.Name, file),
         };
         var uploadResult = _cloudinary.Upload(uploadParams);
 

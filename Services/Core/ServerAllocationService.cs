@@ -711,49 +711,50 @@ public class ServerAllocationService : IServerAllocationService
             else
             {
                 File.Copy(inputPath, outputPath, true);
-                using WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true);
-                document.RenderText("__CustomerName__", model.CustomerName);
-                document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName);
-                document.RenderText("__Position__", model.CustomerPosition);
-                document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
-                document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
-                if (model.NewAllocation)
+                using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
                 {
-                    document.TickCheckBoxInDocx("Allocation");
-                }
-                else
-                {
-                    document.TickCheckBoxInDocx("Service");
-                }
-                document.RenderText("__ServerName__", serverAllocation.Name);
-                document.RenderText("__ServerLocation__", serverAllocation.ServerLocation);
-                document.RenderText("__SerialNumber__", serverAllocation.SerialNumber);
-                document.RenderText("__Power__", serverAllocation.Power.ToString());
-                document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
-                document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.Select(x => x.IpAddress)?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
-                document.RenderText("__SubnetMask__", GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
-                document.RenderText("__Website__", model.Website);
-                document.RenderText("__Username__", model.Username);
-                document.RenderText("__Password__", model.Password);
-                if (model.Good)
-                {
-                    document.TickCheckBoxInDocx("Evaluate");
-                }
-                document.RenderText("__Note__", model.Note);
-                var dnss = serverAllocation.IpAssignments.Select(x => x.IpAddress).Where(x => x.Purpose == IpPurpose.Dns).ToList();
-                string dnsString = "";
-                for (int i = 0; i < dnss.Count(); i++)
-                {
-                    dnsString += dnss[i].Address;
-                    if (i != dnss.Count - 1)
+                    document.RenderText("__CustomerName__", model.CustomerName);
+                    document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName);
+                    document.RenderText("__Position__", model.CustomerPosition);
+                    document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
+                    document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
+                    if (model.NewAllocation)
                     {
-                        dnsString += ", ";
+                        document.TickCheckBoxInDocx("Allocation");
                     }
+                    else
+                    {
+                        document.TickCheckBoxInDocx("Service");
+                    }
+                    document.RenderText("__ServerName__", serverAllocation.Name);
+                    document.RenderText("__ServerLocation__", serverAllocation.ServerLocation);
+                    document.RenderText("__SerialNumber__", serverAllocation.SerialNumber);
+                    document.RenderText("__Power__", serverAllocation.Power.ToString());
+                    document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
+                    document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.Select(x => x.IpAddress)?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
+                    document.RenderText("__SubnetMask__", GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
+                    document.RenderText("__Website__", model.Website);
+                    document.RenderText("__Username__", model.Username);
+                    document.RenderText("__Password__", model.Password);
+                    if (model.Good)
+                    {
+                        document.TickCheckBoxInDocx("Evaluate");
+                    }
+                    document.RenderText("__Note__", model.Note);
+                    var dnss = serverAllocation.IpAssignments.Select(x => x.IpAddress).Where(x => x.Purpose == IpPurpose.Dns).ToList();
+                    string dnsString = "";
+                    for (int i = 0; i < dnss.Count(); i++)
+                    {
+                        dnsString += dnss[i].Address;
+                        if (i != dnss.Count - 1)
+                        {
+                            dnsString += ", ";
+                        }
+                    }
+                    document.RenderText("__DNSs__", dnsString);
+                    document.MainDocumentPart.Document.Save();
                 }
-                document.RenderText("__DNSs__", dnsString);
-                document.MainDocumentPart.Document.Save();
-                var formfile = document.ConvertToIFormFile(outputPath);
-                string inspectionReportFileName = _cloudinaryHelper.UploadFile(formfile);
+                string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
                 serverAllocation.InspectionRecordFilePath = inspectionReportFileName;
 
                 if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)
@@ -857,10 +858,12 @@ public class ServerAllocationService : IServerAllocationService
             else
             {
                 File.Copy(inputPath, outputPath, true);
-                using WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true);
-                document.MainDocumentPart.Document.Save();
-                var formfile = document.ConvertToIFormFile(outputPath);
-                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(formfile);
+                using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
+                {
+                    document.MainDocumentPart.Document.Save();
+                }
+                //var formfile = document.ConvertToIFormFile(outputPath);
+                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
                 serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
 
                 if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)

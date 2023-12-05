@@ -55,14 +55,13 @@ public static class DocumentHelper
 
     public static IFormFile ConvertToIFormFile(this WordprocessingDocument wordDocument, string fileName)
     {
-        using (MemoryStream stream = new MemoryStream())
-        {
-            // Copy the Word document content to the MemoryStream
-            wordDocument.MainDocumentPart.Document.Save(stream);
-            stream.Position = 0;
+        MemoryStream stream = new MemoryStream();
 
-            // Create an IFormFile from the MemoryStream
-            return new FormFile(stream, 0, stream.Length, "document", fileName);
-        }
+        // Copy the Word document content to the MemoryStream
+        wordDocument.MainDocumentPart.Document.Save(stream);
+        stream.Position = 0;
+
+        // Create an IFormFile from the MemoryStream
+        return new FormFile(stream, 0, stream.Length, "document", fileName);
     }
 }
