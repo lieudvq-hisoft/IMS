@@ -2,6 +2,8 @@
 using DocumentFormat.OpenXml.Office2010.Word;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
+using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.AspNetCore.Http;
 
 namespace Services.Utilities;
 public static class DocumentHelper
@@ -51,6 +53,17 @@ public static class DocumentHelper
             }
         }
     }
+
+    public static IFormFile ConvertToIFormFile(this WordprocessingDocument wordDocument, string fileName)
+    {
+        using (MemoryStream stream = new MemoryStream())
+        {
+            // Copy the Word document content to the MemoryStream
+            wordDocument.MainDocumentPart.Document.Save(stream);
+            stream.Position = 0;
+
+            // Create an IFormFile from the MemoryStream
+            return new FormFile(stream, 0, stream.Length, "document", fileName);
+        }
+    }
 }
-
-

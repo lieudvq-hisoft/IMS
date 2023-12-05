@@ -75,7 +75,9 @@ public enum RequestType
 {
     Upgrade,
     Expand,
+    RemoveLocation,
     Host,
+    RemoveIp,
     Other
 }
 

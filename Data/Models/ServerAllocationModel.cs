@@ -16,9 +16,13 @@ public class ServerAllocationModel
     public string? SaleNote { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdated { get; set; }
-    public int CustomerId { get; set; }
+    public string? InspectionRecordFilePath { get; set; }
+    public string? ReceiptOfRecipientFilePath { get; set; }
+    public string? RemovalFilePath { get; set; }
+
     public string Location { get; set; }
     public int IpCount { get; set; }
+    public int CustomerId { get; set; }
     public CustomerModel? Customer { get; set; }
 }
 
@@ -36,6 +40,9 @@ public class ServerAllocationResultModel
     public string? ServerLocation { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdated { get; set; }
+    public string? InspectionRecordFilePath { get; set; }
+    public string? ReceiptOfRecipientFilePath { get; set; }
+    public string? RemovalFilePath { get; set; }
     public int CustomerId { get; set; }
 }
 

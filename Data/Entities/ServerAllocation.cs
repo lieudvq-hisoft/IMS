@@ -13,8 +13,9 @@ public class ServerAllocation : BaseEntity
     public string? SaleNote { get; set; }
     public string? MasterIpAddress { get; set; }
     public string? ServerLocation { get; set; }
-    //public string? InspectionRecordFilePath { get; set; }
-    //public string? ReceiptOfRecipientFilePath { get; set; }
+    public string? InspectionRecordFilePath { get; set; }
+    public string? ReceiptOfRecipientFilePath { get; set; }
+    public string? RemovalFilePath { get; set; }
 
     public int CustomerId { get; set; }
     public Customer? Customer { get; set; }

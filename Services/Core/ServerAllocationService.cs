@@ -9,6 +9,8 @@ using Data.Utils.Common;
 using Data.Utils.Paging;
 using DocumentFormat.OpenXml.Packaging;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http.Internal;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using NPOI.XWPF.UserModel;
 using Services.Utilities;
@@ -42,12 +44,14 @@ public class ServerAllocationService : IServerAllocationService
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly IHostingEnvironment _env;
+    private readonly CloudinaryHelper _cloudinaryHelper;
 
-    public ServerAllocationService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env)
+    public ServerAllocationService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env, CloudinaryHelper cloudinaryHelper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _env = env;
+        _cloudinaryHelper = cloudinaryHelper;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel)
@@ -589,11 +593,6 @@ public class ServerAllocationService : IServerAllocationService
                 serverAllocation.MasterIpAddress = ipAddress.Address;
                 _dbContext.IpAssignments.Add(ipAssignment);
                 _dbContext.SaveChanges();
-                if (serverAllocation.LocationAssignments.Any() && serverAllocation.IpAssignments.Any())
-                {
-                    serverAllocation.Status = ServerAllocationStatus.Working;
-                    _dbContext.SaveChanges();
-                }
                 result.Succeed = true;
                 result.Data = _mapper.Map<IpAssignmentResultModel>(ipAssignment);
             }
@@ -688,9 +687,21 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
-            else if (serverAllocation.Status == ServerAllocationStatus.Pausing)
+            else if (serverAllocation.Status != ServerAllocationStatus.Pausing)
             {
-                result.ErrorMessage = "Server dont have enough information";
+                result.ErrorMessage = "Cannot create document to a not pausing server";
+            }
+            else if (serverAllocation.InspectionRecordFilePath == null && serverAllocation.ReceiptOfRecipientFilePath == null)
+            {
+                result.ErrorMessage = "Server have document already";
+            }
+            else if (!serverAllocation.LocationAssignments.Any())
+            {
+                result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+            }
+            else if (!serverAllocation.IpAssignments.Select(x => x.IpAddress).Any(x => x.Purpose == IpPurpose.Gateway) || !serverAllocation.IpAssignments.Select(x => x.IpAddress).Any(x => x.Purpose == IpPurpose.Dns))
+            {
+                result.ErrorMessage = "Server need dns and gateway";
             }
             else
             {
@@ -735,8 +746,16 @@ public class ServerAllocationService : IServerAllocationService
                     }
                 }
                 document.RenderText("__DNSs__", dnsString);
-
                 document.MainDocumentPart.Document.Save();
+                var formfile = document.ConvertToIFormFile(outputPath);
+                string inspectionReportFileName = _cloudinaryHelper.UploadFile(formfile);
+                serverAllocation.InspectionRecordFilePath = inspectionReportFileName;
+
+                if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)
+                {
+                    serverAllocation.Status = ServerAllocationStatus.Working;
+                }
+                _dbContext.SaveChanges();
 
                 result.Succeed = true;
                 result.Data = outputPath;

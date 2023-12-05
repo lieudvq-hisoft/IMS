@@ -642,21 +642,10 @@ public class RequestExpandService : IRequestExpandService
                 }
                 _dbContext.LocationAssignments.AddRange(locationAssignments);
                 requestExpand.Status = RequestStatus.Success;
-                _dbContext.RequestExpandUsers.Add(new RequestExpandUser
-                {
-                    Action = RequestUserAction.Execute,
-                    RequestExpandId = requestExpand.Id,
-                    UserId = userId
-                });
                 serverAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
                 serverAllocation.ServerLocation = serverAllocation.GetServerLocation();
-
-                if (serverAllocation.LocationAssignments.Any() && serverAllocation.IpAssignments.Any())
-                {
-                    serverAllocation.Status = ServerAllocationStatus.Working;
-                    _dbContext.SaveChanges();
-                }
+                _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
             }
