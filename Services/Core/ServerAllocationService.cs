@@ -9,8 +9,6 @@ using Data.Utils.Common;
 using Data.Utils.Paging;
 using DocumentFormat.OpenXml.Packaging;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http.Internal;
-using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using NPOI.XWPF.UserModel;
 using Services.Utilities;
