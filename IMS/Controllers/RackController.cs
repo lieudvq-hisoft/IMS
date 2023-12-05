@@ -84,7 +84,8 @@ public class RackController : ControllerBase
     }
 
     [HttpPost]
-    [SwaggerOperation(Summary = "Create an arae")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]: Create an arae")]
     public async Task<ActionResult> Create([FromBody] RackCreateModel model)
     {
         var result = await _RackService.Create(model);
@@ -93,7 +94,8 @@ public class RackController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-    [SwaggerOperation(Summary = "Delete an Rack")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]: Delete an Rack")]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _RackService.Delete(id);

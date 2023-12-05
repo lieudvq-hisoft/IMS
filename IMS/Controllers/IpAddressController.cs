@@ -4,6 +4,7 @@ using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace IMS.Controllers;
 
@@ -76,6 +77,8 @@ public class IpAddressController : ControllerBase
     }
 
     [HttpPut("Block")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Block([FromBody] IpAddressIdListModel model)
     {
         var result = await _ipAddressService.ChangeBlockingStatus(model, true);
@@ -84,6 +87,8 @@ public class IpAddressController : ControllerBase
     }
 
     [HttpPut("Unblock")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Unblock([FromBody] IpAddressIdListModel model)
     {
         var result = await _ipAddressService.ChangeBlockingStatus(model, false);
@@ -92,6 +97,8 @@ public class IpAddressController : ControllerBase
     }
 
     [HttpPut("Purpose")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Purpose([FromBody] IpAddressChangePurposeModel model)
     {
         var result = await _ipAddressService.ChangePurpose(model);

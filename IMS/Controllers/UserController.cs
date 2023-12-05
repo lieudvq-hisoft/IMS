@@ -80,6 +80,8 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{id}/AssignedRequestExpand")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> GetAssignedRequestExpand(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestExpandSearchModel searchModel)
     {
         var result = await _userService.GetAssignedRequestExpand(id, pagingParam, searchModel);
@@ -88,6 +90,8 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{id}/AssignedRequestUpgrade")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> GetAssignedRequestUpgrade(string id, [FromQuery] PagingParam<RequestUpgradeSortCriteria> paginationModel, [FromQuery] RequestUpgradeSearchModel searchModel)
     {
         var result = await _userService.GetAssignedRequestUpgrade(id, paginationModel, searchModel);
@@ -96,6 +100,8 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{id}/AssignedRequestHost")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> GetAssignedRequestHost(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestHostSearchModel searchModel)
     {
         var result = await _userService.GetAssignedRequestHost(id, pagingParam, searchModel);

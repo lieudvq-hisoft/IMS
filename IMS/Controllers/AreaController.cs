@@ -4,6 +4,7 @@ using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace IMS.Controllers;
 
@@ -62,6 +63,8 @@ public class AreaController : ControllerBase
 
 
     [HttpPost]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Create([FromBody] AreaCreateModel model)
     {
         var result = await _areaService.Create(model);
@@ -70,6 +73,8 @@ public class AreaController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Update([FromBody] AreaUpdateModel model)
     {
         var result = await _areaService.Update(model);
@@ -78,6 +83,8 @@ public class AreaController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _areaService.Delete(id);

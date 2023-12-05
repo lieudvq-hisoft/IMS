@@ -13,14 +13,10 @@ namespace IMS.Controllers;
 public class RequestUpgradeController : ControllerBase
 {
     private readonly IRequestUpgradeService _requestUpgradeService;
-    private readonly IWebHostEnvironment _environment;
-    private readonly IFileService _fileService;
 
-    public RequestUpgradeController(IRequestUpgradeService requestUpgradeService, IWebHostEnvironment environment, IFileService fileService)
+    public RequestUpgradeController(IRequestUpgradeService requestUpgradeService)
     {
         this._requestUpgradeService = requestUpgradeService;
-        _environment = environment;
-        _fileService = fileService;
     }
 
     [HttpGet]
@@ -48,7 +44,8 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPost]
-    [SwaggerOperation(Summary = "Create new request upgrade, state is waiting")]
+    [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "[Customer]: Create new request upgrade, state is waiting")]
     public async Task<ActionResult> Create([FromBody] RequestUpgradeCreateModel model)
     {
         var result = await _requestUpgradeService.Create(model);
@@ -57,7 +54,8 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPost("Bulk")]
-    [SwaggerOperation(Summary = "Create many request upgrade for server, state is accepted")]
+    [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "[Customer]: Create many request upgrade for server, state is accepted")]
     public async Task<ActionResult> CreateBulk([FromBody] RequestUpgradeCreateBulkModel model)
     {
         var result = await _requestUpgradeService.CreateBulk(model);
@@ -66,6 +64,8 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = "Customer," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Customer, Tech, Sale]")]
     public async Task<ActionResult> Update([FromBody] RequestUpgradeUpdateModel model)
     {
         var result = await _requestUpgradeService.Update(model);
@@ -74,6 +74,8 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "[Customer]")]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _requestUpgradeService.Delete(id);
@@ -82,6 +84,8 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPut("{id}/Reject")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Reject(int id, RequestUpgradeRejectModel model)
     {
         var result = await _requestUpgradeService.Reject(id, model);
@@ -90,7 +94,8 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPut("{id}/Accept")]
-    [SwaggerOperation(Summary = "Accept a waiting request upgrade")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Sale]: Accept a waiting request upgrade")]
     public async Task<ActionResult> Accept(int id)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -110,7 +115,8 @@ public class RequestUpgradeController : ControllerBase
     //}
 
     [HttpPut("{id}/Deny")]
-    [SwaggerOperation(Summary = "Deny a waiting request upgrade")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Sale]: Deny a waiting request upgrade")]
     public async Task<ActionResult> Deny(int id, [FromBody] DenyModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -129,17 +135,18 @@ public class RequestUpgradeController : ControllerBase
     //    return BadRequest(result.ErrorMessage);
     //}
 
-    [HttpGet("{id}/Completability")]
-    [SwaggerOperation(Summary = "True if any appointment success and have inspection record")]
-    public async Task<ActionResult> GetCompletability(int id)
-    {
-        var result = await _requestUpgradeService.CheckCompletability(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/Completability")]
+    //[SwaggerOperation(Summary = "True if any appointment success and have inspection record")]
+    //public async Task<ActionResult> GetCompletability(int id)
+    //{
+    //    var result = await _requestUpgradeService.CheckCompletability(id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPut("{id}/Complete")]
-    [SwaggerOperation(Summary = "Complete a completable accepted request upgrade. Change serverHardwareconfig")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]: Complete a completable accepted request upgrade. Change serverHardwareconfig")]
     public async Task<ActionResult> Complete(int id)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -149,7 +156,8 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPut("Complete/Bulk")]
-    [SwaggerOperation(Summary = "Complete many completable accepted request upgrade. Change serverHardwareconfig")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]: Complete many completable accepted request upgrade. Change serverHardwareconfig")]
     public async Task<ActionResult> CompleteBulk(RequestUpgradeCompleteBulkModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;

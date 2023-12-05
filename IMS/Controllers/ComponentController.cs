@@ -4,6 +4,7 @@ using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace IMS.Controllers;
 [Route("api/[controller]")]
@@ -43,6 +44,8 @@ public class ComponentController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Create([FromBody] ComponentCreateModel model)
     {
         var result = await _componentService.Create(model);
@@ -51,6 +54,8 @@ public class ComponentController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Update([FromBody] ComponentUpdateModel model)
     {
         var result = await _componentService.Update(model);
@@ -59,6 +64,8 @@ public class ComponentController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _componentService.Delete(id);

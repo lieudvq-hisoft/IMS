@@ -112,6 +112,8 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "[Customer]")]
     public async Task<ActionResult> Create([FromBody] ServerAllocationCreateModel model)
     {
         var result = await _serverAllocationService.Create(model);
@@ -120,6 +122,8 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = "Customer," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Customer, Tech, Sale]")]
     public async Task<ActionResult> Update([FromBody] ServerAllocationUpdateModel model)
     {
         var result = await _serverAllocationService.Update(model);
@@ -128,6 +132,8 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "[Customer]")]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _serverAllocationService.Delete(id);
@@ -136,6 +142,8 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpPost("{id}/MasterIp")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> AssignMasterIp(int id, [FromBody] ServerAllocationMasterIpAssignmentModel model)
     {
         var result = await _serverAllocationService.AssignMasterIp(id, model);
@@ -144,6 +152,8 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpPost("{id}/ServerLocation")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> AssignServerLocation(int id, [FromBody] ServerAllocationAssignLocationModel model)
     {
         var result = await _serverAllocationService.AssignLocation(id, model);
@@ -152,6 +162,8 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpPost("{id}/InspectionReport")]
+    [Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Tech, Sale]")]
     public async Task<ActionResult> CreateInspectionReport(int id, [FromBody] ServerAllocationCreateInspectionReportModel model)
     {
         var result = await _serverAllocationService.CreateInspectionReport(id, model);
@@ -171,6 +183,8 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpPost("{id}/ReceiptOfRecipient")]
+    [Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Tech, Sale]")]
     public async Task<ActionResult> CreateReceiptOfRecipient(int id)
     {
         var result = await _serverAllocationService.CreateReceiptReport(id);

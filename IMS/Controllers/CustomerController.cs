@@ -47,7 +47,8 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPost]
-    [SwaggerOperation(Summary = "Create a customer and associate user")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Sale]: Create a customer and associate user")]
     public async Task<ActionResult> Create([FromBody] CustomerCreateModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -57,7 +58,8 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPut]
-    [SwaggerOperation(Summary = "[Sale]: Update a customer")]
+    [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "[Customer]: Update a customer")]
     public async Task<ActionResult> Update([FromBody] CustomerUpdateModel model)
     {
         var result = await _customerService.Update(model);
@@ -67,6 +69,7 @@ public class CustomerController : ControllerBase
 
     [HttpPut("Password")]
     [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "[Customer]")]
     public async Task<ActionResult> ChangePassword([FromBody] CustomerChangePasswordModel model)
     {
         var customerId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -76,6 +79,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "[Sale]: Delete a customer")]
     public async Task<ActionResult> Delete(int id)
     {

@@ -14,14 +14,10 @@ namespace IMS.Controllers;
 public class RequestExpandController : ControllerBase
 {
     private readonly IRequestExpandService _requestExpandService;
-    private readonly IWebHostEnvironment _environment;
-    private readonly IFileService _fileService;
 
-    public RequestExpandController(IRequestExpandService requestExpandService, IWebHostEnvironment environment, IFileService fileService)
+    public RequestExpandController(IRequestExpandService requestExpandService)
     {
         _requestExpandService = requestExpandService;
-        _environment = environment;
-        _fileService = fileService;
     }
 
     [HttpGet]
@@ -39,6 +35,7 @@ public class RequestExpandController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
     [HttpGet("{id}/Appointment")]
     public async Task<ActionResult> GetAppointment(int id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] AppointmentSearchModel searchModel)
     {
@@ -47,15 +44,19 @@ public class RequestExpandController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpPost]
-    //public async Task<ActionResult> Create([FromBody] RequestExpandCreateModel model)
-    //{
-    //    var result = await _requestExpandService.Create(model);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
+    [HttpPost]
+    [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "[Customer]")]
+    public async Task<ActionResult> Create([FromBody] RequestExpandCreateModel model)
+    {
+        var result = await _requestExpandService.Create(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 
     [HttpPut]
+    [Authorize(Roles = "Customer," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Customer, Tech, Sale]")]
     public async Task<ActionResult> Update([FromBody] RequestExpandUpdateModel model)
     {
         var result = await _requestExpandService.Update(model);
@@ -64,6 +65,8 @@ public class RequestExpandController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "[Customer]")]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _requestExpandService.Delete(id);
@@ -72,6 +75,8 @@ public class RequestExpandController : ControllerBase
     }
 
     [HttpPut("{id}/Reject")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Reject(int id, RequestExpandRejectModel model)
     {
         var result = await _requestExpandService.Reject(id, model);
@@ -80,7 +85,8 @@ public class RequestExpandController : ControllerBase
     }
 
     [HttpPut("{id}/Accept")]
-    [SwaggerOperation(Summary = "Accept a waiting request expand")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Sale]: Accept a waiting request expand")]
     public async Task<ActionResult> Accept(int id)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -90,7 +96,8 @@ public class RequestExpandController : ControllerBase
     }
 
     [HttpPut("{id}/Deny")]
-    [SwaggerOperation(Summary = "Deny a waiting request expand")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Sale]: Deny a waiting request expand")]
     public async Task<ActionResult> Deny(int id, [FromBody] DenyModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -100,6 +107,8 @@ public class RequestExpandController : ControllerBase
     }
 
     [HttpDelete("{id}/RequestExpandLocation")]
+    [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "[Customer]")]
     public async Task<ActionResult> DeleteRequestExpandLocation(int id)
     {
         var result = await _requestExpandService.DeleteRequestExpandLocation(id);
@@ -108,6 +117,8 @@ public class RequestExpandController : ControllerBase
     }
 
     [HttpDelete("Removal/{id}")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> FailRequestRemoval(int id)
     {
         var result = await _requestExpandService.FailRemoval(id);
@@ -116,6 +127,8 @@ public class RequestExpandController : ControllerBase
     }
 
     [HttpPost("{id}/RequestExpandLocation")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> AssignRequestExpandLocation(int id, RequestExpandAssignLocationModel model)
     {
         var result = await _requestExpandService.AssignLocation(id, model);
@@ -124,7 +137,8 @@ public class RequestExpandController : ControllerBase
     }
 
     [HttpPut("{id}/Complete")]
-    [SwaggerOperation(Summary = "Complete a completable accepted request expand")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]: Complete a completable accepted request expand")]
     public async Task<ActionResult> Complete(int id)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -134,7 +148,8 @@ public class RequestExpandController : ControllerBase
     }
 
     [HttpPut("Complete/Bulk")]
-    [SwaggerOperation(Summary = "Complete many completable accepted request expand")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]: Complete many completable accepted request expand")]
     public async Task<ActionResult> CompleteBulk(RequestExpandCompleteBulkModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -144,6 +159,8 @@ public class RequestExpandController : ControllerBase
     }
 
     [HttpPut("Removal/{id}/Complete")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> CompleteRemoval(int id)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -153,6 +170,8 @@ public class RequestExpandController : ControllerBase
     }
 
     [HttpPut("CompleteRemoval/Bulk")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> CompleteRemovalBulk(RequestExpandCompleteBulkModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;

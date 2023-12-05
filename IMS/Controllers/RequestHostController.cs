@@ -44,6 +44,8 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "[Customer]")]
     public async Task<ActionResult> Create([FromBody] RequestHostCreateModel model)
     {
         var result = await _requestHostService.Create(model);
@@ -52,6 +54,8 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = "Customer," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Customer, Tech, Sale]")]
     public async Task<ActionResult> Update([FromBody] RequestHostUpdateModel model)
     {
         var result = await _requestHostService.Update(model);
@@ -60,6 +64,8 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "[Customer]")]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _requestHostService.Delete(id);
@@ -68,6 +74,8 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpPut("{id}/IpAddress")]
+    [Authorize(Roles = "Customer," + nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Customer, Tech]")]
     public async Task<ActionResult> AssignIp(int id, [FromBody] RequestHostIpAssignmentModel model)
     {
         var result = await _requestHostService.AssignAdditionalIp(id, model);
@@ -76,7 +84,8 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpPut("{id}/Accept")]
-    [SwaggerOperation(Summary = "Accept a waiting request host")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]: Accept a waiting request host")]
     public async Task<ActionResult> Accept(int id, [FromBody] UserAssignModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -96,7 +105,8 @@ public class RequestHostController : ControllerBase
     //}
 
     [HttpPut("{id}/Deny")]
-    [SwaggerOperation(Summary = "Deny a waiting request host")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]: Deny a waiting request host")]
     public async Task<ActionResult> Deny(int id, [FromBody] DenyModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -116,6 +126,8 @@ public class RequestHostController : ControllerBase
     //}
 
     [HttpPost("{id}/Document")]
+    [Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Tech, Sale]")]
     public async Task<ActionResult> UploadDocument(int id, [FromForm] RequestHostDocumentFileUploadModel model)
     {
         var result = await _requestHostService.AssignInspectionReport(id, model);
@@ -133,6 +145,8 @@ public class RequestHostController : ControllerBase
     //}
 
     [HttpPut("{id}/Complete")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Complete(int id)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;

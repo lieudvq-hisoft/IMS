@@ -23,6 +23,8 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpGet]
+    [Authorize(Roles = nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Sale]")]
     public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] AppointmentSearchModel searchModel)
     {
         var result = await _appointmentService.Get(pagingParam, searchModel);
@@ -39,6 +41,7 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpGet("{id}/RequestExpand")]
+
     public async Task<ActionResult> GetRequestExpand([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
     {
         var result = await _appointmentService.GetRequestExpand(pagingParam, id);
@@ -63,6 +66,9 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "[Customer]")]
+
     public async Task<ActionResult> Create([FromBody] AppointmentCreateModel model)
     {
         var result = await _appointmentService.Create(model);
@@ -71,6 +77,8 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = "Customer," + nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Customer, Sale]")]
     public async Task<ActionResult> Update([FromBody] AppointmentUpdateModel model)
     {
         var result = await _appointmentService.Update(model);
@@ -79,6 +87,8 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = "Customer")]
+    [SwaggerOperation(Summary = "[Customer]")]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _appointmentService.Delete(id);
@@ -87,7 +97,8 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPut("{id}/Accept")]
-    [SwaggerOperation(Summary = "Accept a waiting appointment")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Sale]: Accept a waiting appointment")]
     public async Task<ActionResult> Accept(int id, [FromBody] UserAssignModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -97,7 +108,8 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPut("{id}/Deny")]
-    [SwaggerOperation(Summary = "Deny a waiting appointment")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Sale]: Deny a waiting appointment")]
     public async Task<ActionResult> Deny(int id, [FromBody] DenyModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -107,6 +119,8 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPut("{id}/Executor")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Sale]")]
     public async Task<ActionResult> AssignExecutor(int id, [FromBody] UserAssignModel model)
     {
         var result = await _appointmentService.AssignTech(id, model);
@@ -115,6 +129,8 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPut("{id}/Complete")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Complete(int id, [FromBody] AppointmentCompleteModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -124,6 +140,8 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPut("{id}/Fail")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Fail(int id, AppointmentFailModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -133,6 +151,8 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPost("{id}/Document")]
+    [Authorize(Roles = nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    [SwaggerOperation(Summary = "[Tech, Sale]")]
     public async Task<ActionResult> UploadInspectionReport(int id, [FromForm] DocumentFileUploadModel model)
     {
         var result = await _appointmentService.AssignInspectionReport(id, model);

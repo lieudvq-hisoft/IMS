@@ -4,6 +4,7 @@ using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
+using Swashbuckle.AspNetCore.Annotations;
 
 namespace IMS.Controllers;
 
@@ -76,6 +77,8 @@ public class IpSubnetController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> CreateIpRange([FromBody] IpRangeCreateModel model)
     {
         var result = await _ipSubnetService.CreateIpRange(model);
@@ -84,6 +87,8 @@ public class IpSubnetController : ControllerBase
     }
 
     [HttpPost("{id}/Subnet")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> CreateIpSubnet(int id, [FromBody] CreateSubnetModel model)
     {
         var result = await _ipSubnetService.Create(id, model.IpSubnets);
@@ -100,6 +105,8 @@ public class IpSubnetController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    [SwaggerOperation(Summary = "[Tech]")]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _ipSubnetService.Delete(id);
