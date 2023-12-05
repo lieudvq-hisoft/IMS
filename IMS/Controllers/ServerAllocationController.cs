@@ -151,7 +151,7 @@ public class ServerAllocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("MainDoc")]
+    [HttpGet("{id}/InspectionReport")]
     public async Task<ActionResult> GetMainDoc(int id, [FromQuery] MainDocModel model)
     {
         var result = await _serverAllocationService.GetMainDoc(id, model);
