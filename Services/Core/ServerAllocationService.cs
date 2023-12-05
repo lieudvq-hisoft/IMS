@@ -487,7 +487,6 @@ public class ServerAllocationService : IServerAllocationService
     {
         var result = new ResultModel();
         result.Succeed = false;
-        bool validPrecondition = true;
 
         try
         {
@@ -501,8 +500,15 @@ public class ServerAllocationService : IServerAllocationService
                 .FirstOrDefault(x => x.Id == serverAllocationId);
             if (serverAllocation == null)
             {
-                validPrecondition = false;
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (serverAllocation.MasterIpAddress != null)
+            {
+                result.ErrorMessage = "Must remove master ip";
+            }
+            else if (serverAllocation.ServerLocation != null)
+            {
+                result.ErrorMessage = "Must remove server from rack";
             }
             else
             {
