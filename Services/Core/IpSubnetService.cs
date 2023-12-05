@@ -263,7 +263,7 @@ public class IpSubnetService : IIpSubnetService
                 }
                 else
                 {
-                    result.Data = $"{octets[0]}.{octets[1]}.{octets[3]}.{newFourthOctet}";
+                    result.Data = $"{octets[0]}.{octets[1]}.{octets[2]}.{newFourthOctet}";
                     result.Succeed = true;
                 }
             }
