@@ -683,8 +683,8 @@ public class AppointmentService : IAppointmentService
         try
         {
             var appointment = _dbContext.Appointments
-                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade)
-                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand)
+                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.RequestUpgradeUsers)
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandUsers)
                 .FirstOrDefault(x => x.Id == appointmentId);
             if (appointment == null)
             {
@@ -1010,16 +1010,39 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
+            var appointment = _dbContext.Appointments
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandUsers)
+                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.RequestUpgradeUsers)
+                .FirstOrDefault(x => x.Id == appointmentId);
+            AppointmentUser executor = null;
             if (appointment == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
+            else
+            {
+                executor = _dbContext.AppointmentUsers.FirstOrDefault(x => x.AppointmentId == appointment.Id && x.Action == RequestUserAction.Execute);
+                if (executor == null)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = AppointmentUserErrorMessage.NOT_EXISTED;
+                }
+            }
 
             if (validPrecondition)
             {
+
                 appointment.Status = RequestStatus.Failed;
+                foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
+                {
+                    _dbContext.RequestUpgradeUsers.Remove(requestUpgrade.RequestUpgradeUsers.FirstOrDefault(x => x.UserId == executor.UserId && x.Action == RequestUserAction.Execute));
+                }
+
+                foreach (var requestExpand in appointment.RequestExpandAppointments.Select(x => x.RequestExpand))
+                {
+                    _dbContext.RequestExpandUsers.Remove(requestExpand.RequestExpandUsers.FirstOrDefault(x => x.UserId == executor.UserId && x.Action == RequestUserAction.Execute));
+                }
                 appointment.TechNote = model.TechNote;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
