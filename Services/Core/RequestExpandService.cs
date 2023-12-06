@@ -25,10 +25,10 @@ public interface IRequestExpandService
     Task<ResultModel> Deny(int requestExpandId, Guid userId, DenyModel model);
     Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
     Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model);
-    Task<ResultModel> Complete(int requestExpandId, Guid userId);
-    Task<ResultModel> CompleteBulk(RequestExpandCompleteBulkModel model, Guid userId);
-    Task<ResultModel> CompleteRemoval(int requestExpandId, Guid userId);
-    Task<ResultModel> CompleteRemovalBulk(RequestExpandCompleteBulkModel model, Guid userId);
+    //Task<ResultModel> Complete(int requestExpandId, Guid userId);
+    //Task<ResultModel> CompleteBulk(RequestExpandCompleteBulkModel model, Guid userId);
+    //Task<ResultModel> CompleteRemoval(int requestExpandId, Guid userId);
+    //Task<ResultModel> CompleteRemovalBulk(RequestExpandCompleteBulkModel model, Guid userId);
     Task<ResultModel> GetChosenLocation(int requestExpandId);
     Task<ResultModel> GetRackChoiceSuggestionBySize(int requestExpandId);
 }
@@ -570,264 +570,264 @@ public class RequestExpandService : IRequestExpandService
         return allValidLocation;
     }
 
-    public async Task<ResultModel> Complete(int requestExpandId, Guid userId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-        bool validPrecondition = true;
+    //public async Task<ResultModel> Complete(int requestExpandId, Guid userId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+    //    bool validPrecondition = true;
 
-        try
-        {
-            var requestExpand = _dbContext.RequestExpands
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Accepted);
-            ServerAllocation serverAllocation = null;
-            var requiredComponents = _dbContext.Components.Where(x => x.IsRequired);
-            if (requestExpand == null)
-            {
-                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
-                validPrecondition = false;
-            }
-            else
-            {
-                serverAllocation = requestExpand.ServerAllocation;
-                foreach (var component in requiredComponents)
-                {
-                    if (serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == component.Id) == null)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = "Cannot allocate server missing config for required component";
-                    }
+    //    try
+    //    {
+    //        var requestExpand = _dbContext.RequestExpands
+    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+    //            .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Accepted);
+    //        ServerAllocation serverAllocation = null;
+    //        var requiredComponents = _dbContext.Components.Where(x => x.IsRequired);
+    //        if (requestExpand == null)
+    //        {
+    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+    //            validPrecondition = false;
+    //        }
+    //        else
+    //        {
+    //            serverAllocation = requestExpand.ServerAllocation;
+    //            foreach (var component in requiredComponents)
+    //            {
+    //                if (serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == component.Id) == null)
+    //                {
+    //                    validPrecondition = false;
+    //                    result.ErrorMessage = "Cannot allocate server missing config for required component";
+    //                }
 
-                    if (serverAllocation.SerialNumber == null || serverAllocation.Power == null)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = "Server must have serial number and power";
-                    }
-                }
-            }
+    //                if (serverAllocation.SerialNumber == null || serverAllocation.Power == null)
+    //                {
+    //                    validPrecondition = false;
+    //                    result.ErrorMessage = "Server must have serial number and power";
+    //                }
+    //            }
+    //        }
 
-            if (!IsCompletable(requestExpandId, false))
-            {
-                result.ErrorMessage = RequestExpandErrorMessage.NOT_COMPLETABLE;
-                validPrecondition = false;
-            }
+    //        if (!IsCompletable(requestExpandId, false))
+    //        {
+    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_COMPLETABLE;
+    //            validPrecondition = false;
+    //        }
 
-            List<Location> locations = null;
-            if (validPrecondition)
-            {
-                locations = requestExpand.RequestExpandLocations.Select(x => x.Location).ToList();
-                if (!locations.Any())
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "Request dont have target location";
-                }
-                else
-                {
-                    validPrecondition = CheckValidLocation(locations, requestExpandId, result);
-                }
-            }
+    //        List<Location> locations = null;
+    //        if (validPrecondition)
+    //        {
+    //            locations = requestExpand.RequestExpandLocations.Select(x => x.Location).ToList();
+    //            if (!locations.Any())
+    //            {
+    //                validPrecondition = false;
+    //                result.ErrorMessage = "Request dont have target location";
+    //            }
+    //            else
+    //            {
+    //                validPrecondition = CheckValidLocation(locations, requestExpandId, result);
+    //            }
+    //        }
 
-            if (validPrecondition)
-            {
-                var locationAssignments = new List<LocationAssignment>();
-                foreach (var location in locations)
-                {
-                    locationAssignments.Add(new LocationAssignment
-                    {
-                        ServerAllocationId = requestExpand.ServerAllocationId,
-                        LocationId = location.Id
-                    });
-                }
-                _dbContext.LocationAssignments.AddRange(locationAssignments);
-                requestExpand.Status = RequestStatus.Success;
-                requestExpand.SuccessExpandAppointmentId = requestExpand.RequestExpandAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success).Id;
-                serverAllocation.DateUpdated = DateTime.UtcNow;
-                _dbContext.SaveChanges();
+    //        if (validPrecondition)
+    //        {
+    //            var locationAssignments = new List<LocationAssignment>();
+    //            foreach (var location in locations)
+    //            {
+    //                locationAssignments.Add(new LocationAssignment
+    //                {
+    //                    ServerAllocationId = requestExpand.ServerAllocationId,
+    //                    LocationId = location.Id
+    //                });
+    //            }
+    //            _dbContext.LocationAssignments.AddRange(locationAssignments);
+    //            requestExpand.Status = RequestStatus.Success;
+    //            requestExpand.SuccessExpandAppointmentId = requestExpand.RequestExpandAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success).Id;
+    //            serverAllocation.DateUpdated = DateTime.UtcNow;
+    //            _dbContext.SaveChanges();
 
-                serverAllocation = _dbContext.ServerAllocations
-                    .Include(x => x.IpAssignments)
-                    .ThenInclude(x => x.IpAddress)
-                    .Include(x => x.Customer)
-                    .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-                    .FirstOrDefault(x => x.Id == serverAllocation.Id);
-                serverAllocation.ServerLocation = serverAllocation.GetServerLocation();
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //            serverAllocation = _dbContext.ServerAllocations
+    //                .Include(x => x.IpAssignments)
+    //                .ThenInclude(x => x.IpAddress)
+    //                .Include(x => x.Customer)
+    //                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+    //                .FirstOrDefault(x => x.Id == serverAllocation.Id);
+    //            serverAllocation.ServerLocation = serverAllocation.GetServerLocation();
+    //            _dbContext.SaveChanges();
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
-    private bool IsCompletable(int requestExpandId, bool forRemoval)
-    {
-        var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment).FirstOrDefault(x => x.Id == requestExpandId);
-        if (requestExpand == null)
-        {
-            return false;
-        }
+    //private bool IsCompletable(int requestExpandId, bool forRemoval)
+    //{
+    //    var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment).FirstOrDefault(x => x.Id == requestExpandId);
+    //    if (requestExpand == null)
+    //    {
+    //        return false;
+    //    }
 
-        return requestExpand.RequestExpandAppointments.Where(x => x.ForRemoval == forRemoval).Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Success);
-    }
+    //    return requestExpand.RequestExpandAppointments.Where(x => x.ForRemoval == forRemoval).Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Success);
+    //}
 
-    public async Task<ResultModel> CompleteBulk(RequestExpandCompleteBulkModel model, Guid userId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> CompleteBulk(RequestExpandCompleteBulkModel model, Guid userId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            using var transaction = _dbContext.Database.BeginTransaction();
-            var results = new List<ResultModel>();
-            foreach (var requestExpandId in model.RequestExpandIds)
-            {
-                results.Add(await Complete(requestExpandId, userId));
-            }
+    //    try
+    //    {
+    //        using var transaction = _dbContext.Database.BeginTransaction();
+    //        var results = new List<ResultModel>();
+    //        foreach (var requestExpandId in model.RequestExpandIds)
+    //        {
+    //            results.Add(await Complete(requestExpandId, userId));
+    //        }
 
-            if (results.Any(x => !x.Succeed))
-            {
-                result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-                transaction.Rollback();
-            }
-            else
-            {
-                transaction.Commit();
-                result.Succeed = true;
-                result.Data = results.Select(x => x.Data);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //        if (results.Any(x => !x.Succeed))
+    //        {
+    //            result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+    //            transaction.Rollback();
+    //        }
+    //        else
+    //        {
+    //            transaction.Commit();
+    //            result.Succeed = true;
+    //            result.Data = results.Select(x => x.Data);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
-    public async Task<ResultModel> CompleteRemoval(int requestExpandId, Guid userId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-        bool validPrecondition = true;
+    //public async Task<ResultModel> CompleteRemoval(int requestExpandId, Guid userId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+    //    bool validPrecondition = true;
 
-        try
-        {
-            var requestExpand = _dbContext.RequestExpands
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
-                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Success);
-            if (requestExpand == null)
-            {
-                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
-                validPrecondition = false;
-            }
-            else if (requestExpand.RemovalStatus != RemovalStatus.Accepted)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = RequestExpandErrorMessage.REMOVAL_NOT_ACCEPTED;
-            }
+    //    try
+    //    {
+    //        var requestExpand = _dbContext.RequestExpands
+    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
+    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+    //            .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Success);
+    //        if (requestExpand == null)
+    //        {
+    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+    //            validPrecondition = false;
+    //        }
+    //        else if (requestExpand.RemovalStatus != RemovalStatus.Accepted)
+    //        {
+    //            validPrecondition = false;
+    //            result.ErrorMessage = RequestExpandErrorMessage.REMOVAL_NOT_ACCEPTED;
+    //        }
 
-            if (!IsCompletable(requestExpandId, true))
-            {
-                result.ErrorMessage = RequestExpandErrorMessage.NOT_COMPLETABLE;
-                validPrecondition = false;
-            }
+    //        if (!IsCompletable(requestExpandId, true))
+    //        {
+    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_COMPLETABLE;
+    //            validPrecondition = false;
+    //        }
 
-            List<Location> locations = null;
-            if (validPrecondition)
-            {
-                locations = requestExpand.RequestExpandLocations.Select(x => x.Location).ToList();
-                if (!locations.Any())
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "Request dont have target location";
-                }
-            }
+    //        List<Location> locations = null;
+    //        if (validPrecondition)
+    //        {
+    //            locations = requestExpand.RequestExpandLocations.Select(x => x.Location).ToList();
+    //            if (!locations.Any())
+    //            {
+    //                validPrecondition = false;
+    //                result.ErrorMessage = "Request dont have target location";
+    //            }
+    //        }
 
-            var locationAssignments = new List<LocationAssignment>();
-            if (validPrecondition)
-            {
-                foreach (var location in locations)
-                {
-                    var locationAssignment = _dbContext.LocationAssignments.FirstOrDefault(x => x.LocationId == location.Id);
-                    if (locationAssignment == null)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
-                    }
-                    else
-                    {
-                        locationAssignments.Add(locationAssignment);
-                    }
-                }
-            }
+    //        var locationAssignments = new List<LocationAssignment>();
+    //        if (validPrecondition)
+    //        {
+    //            foreach (var location in locations)
+    //            {
+    //                var locationAssignment = _dbContext.LocationAssignments.FirstOrDefault(x => x.LocationId == location.Id);
+    //                if (locationAssignment == null)
+    //                {
+    //                    validPrecondition = false;
+    //                    result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+    //                }
+    //                else
+    //                {
+    //                    locationAssignments.Add(locationAssignment);
+    //                }
+    //            }
+    //        }
 
-            if (validPrecondition)
-            {
-                _dbContext.LocationAssignments.RemoveRange(locationAssignments);
-                requestExpand.RemovalStatus = RemovalStatus.Success;
-                _dbContext.RequestExpandUsers.Add(new RequestExpandUser
-                {
-                    Action = RequestUserAction.Execute,
-                    RequestExpandId = requestExpand.Id,
-                    UserId = userId
-                });
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //        if (validPrecondition)
+    //        {
+    //            _dbContext.LocationAssignments.RemoveRange(locationAssignments);
+    //            requestExpand.RemovalStatus = RemovalStatus.Success;
+    //            _dbContext.RequestExpandUsers.Add(new RequestExpandUser
+    //            {
+    //                Action = RequestUserAction.Execute,
+    //                RequestExpandId = requestExpand.Id,
+    //                UserId = userId
+    //            });
+    //            _dbContext.SaveChanges();
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
-    public async Task<ResultModel> CompleteRemovalBulk(RequestExpandCompleteBulkModel model, Guid userId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> CompleteRemovalBulk(RequestExpandCompleteBulkModel model, Guid userId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            using var transaction = _dbContext.Database.BeginTransaction();
-            var results = new List<ResultModel>();
-            foreach (var requestRemovalId in model.RequestExpandIds)
-            {
-                results.Add(await CompleteRemoval(requestRemovalId, userId));
-            }
+    //    try
+    //    {
+    //        using var transaction = _dbContext.Database.BeginTransaction();
+    //        var results = new List<ResultModel>();
+    //        foreach (var requestRemovalId in model.RequestExpandIds)
+    //        {
+    //            results.Add(await CompleteRemoval(requestRemovalId, userId));
+    //        }
 
-            if (results.Any(x => !x.Succeed))
-            {
-                result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-                transaction.Rollback();
-            }
-            else
-            {
-                transaction.Commit();
-                result.Succeed = true;
-                result.Data = results.Select(x => x.Data);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //        if (results.Any(x => !x.Succeed))
+    //        {
+    //            result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+    //            transaction.Rollback();
+    //        }
+    //        else
+    //        {
+    //            transaction.Commit();
+    //            result.Succeed = true;
+    //            result.Data = results.Select(x => x.Data);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> GetChosenLocation(int requestExpandId)
     {

@@ -983,9 +983,15 @@ public class AppointmentService : IAppointmentService
                 }
 
                 var requestExpandResults = new List<ResultModel>();
-                foreach (var requestExpandId in appointment.RequestExpandAppointments.Select(x => x.RequestExpandId))
+                foreach (var requestExpandId in appointment.RequestExpandAppointments.Where(x => !x.ForRemoval).Select(x => x.RequestExpandId))
                 {
                     requestExpandResults.Add(await CompleteRequestExpand(requestExpandId));
+                }
+
+                var requestRemovalResults = new List<ResultModel>();
+                foreach (var requestExpandId in appointment.RequestExpandAppointments.Where(x => x.ForRemoval).Select(x => x.RequestExpandId))
+                {
+                    requestRemovalResults.Add(await CompleteRemoval(requestExpandId));
                 }
 
                 if (requestExpandResults.Any(x => !x.Succeed))
@@ -997,6 +1003,11 @@ public class AppointmentService : IAppointmentService
                 {
                     transaction.Rollback();
                     result.ErrorMessage = requestUpgradeResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                }
+                else if (requestRemovalResults.Any(x => !x.Succeed))
+                {
+                    transaction.Rollback();
+                    result.ErrorMessage = requestRemovalResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
                 }
                 else
                 {
@@ -1334,6 +1345,75 @@ public class AppointmentService : IAppointmentService
                     .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                     .FirstOrDefault(x => x.Id == serverAllocation.Id);
                 serverAllocation.ServerLocation = serverAllocation.GetServerLocation();
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> CompleteRemoval(int requestExpandId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var requestExpand = _dbContext.RequestExpands
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Success);
+            if (requestExpand == null)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+            else if (requestExpand.RemovalStatus != RemovalStatus.Accepted)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = RequestExpandErrorMessage.REMOVAL_NOT_ACCEPTED;
+            }
+
+            List<Location> locations = null;
+            if (validPrecondition)
+            {
+                locations = requestExpand.RequestExpandLocations.Select(x => x.Location).ToList();
+                if (!locations.Any())
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Request dont have target location";
+                }
+            }
+
+            var locationAssignments = new List<LocationAssignment>();
+            if (validPrecondition)
+            {
+                foreach (var location in locations)
+                {
+                    var locationAssignment = _dbContext.LocationAssignments.FirstOrDefault(x => x.LocationId == location.Id);
+                    if (locationAssignment == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+                    }
+                    else
+                    {
+                        locationAssignments.Add(locationAssignment);
+                    }
+                }
+            }
+
+            if (validPrecondition)
+            {
+                _dbContext.LocationAssignments.RemoveRange(locationAssignments);
+                requestExpand.RemovalStatus = RemovalStatus.Success;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
