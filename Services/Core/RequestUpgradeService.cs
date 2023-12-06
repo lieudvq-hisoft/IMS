@@ -213,10 +213,13 @@ public class RequestUpgradeService : IRequestUpgradeService
 
     private bool CheckValidSerialNumber(List<string> serialNumbers, int componentId, int serverAllocationId)
     {
-        var existedSerialNumber = _dbContext.ServerHardwareConfigs.Include(x => x.ServerAllocation)
+        var thisSerialNumber = _dbContext.ServerHardwareConfigs.Include(x => x.ServerAllocation)
+            .FirstOrDefault(x => x.ServerAllocation.Status != ServerAllocationStatus.Removed && x.ServerAllocationId == serverAllocationId && x.ComponentId == componentId);
+        var existingConfig = _dbContext.ServerHardwareConfigs.Include(x => x.ServerAllocation)
             .Where(x => x.ServerAllocation.Status != ServerAllocationStatus.Removed)
-            .ToList()
-            .Where(x => x.ComponentId != componentId && serverAllocationId != 0 ? x.ServerAllocationId != serverAllocationId : true)
+            .ToList();
+        existingConfig.Remove(thisSerialNumber);
+        var existedSerialNumber = existingConfig
             .SelectMany(x => JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(x.Description).Select(x => x.SerialNumber));
         return !serialNumbers.Any(x => existedSerialNumber.Contains(x)) && serialNumbers.Distinct().Count() == serialNumbers.Count();
     }
