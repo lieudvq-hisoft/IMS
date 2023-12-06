@@ -20,6 +20,7 @@ public static class DocumentHelper
             if (textElement != null && textElement.Text.Contains(dest))
             {
                 textElement.Text = textElement.Text.Replace(dest, text);
+                break;
             }
         }
     }

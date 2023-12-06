@@ -28,12 +28,6 @@ public static class ModelBuilderExtentions
         });
         builder.Entity<Component>().HasData(new Component
         {
-            Id = 4,
-            Name = "OS",
-            IsRequired = true
-        });
-        builder.Entity<Component>().HasData(new Component
-        {
             Id = 5,
             Name = "Motherboard",
         });
