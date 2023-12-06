@@ -70,6 +70,16 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("Tech")]
+    [SwaggerOperation(Summary = "Get list of users")]
+    [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    public async Task<ActionResult> GetTech([FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] UserSearchModel searchModel)
+    {
+        var result = await _userService.GetTech(paginationModel, searchModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpGet("{id}")]
     [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
     public async Task<ActionResult> GetDetail(string id)

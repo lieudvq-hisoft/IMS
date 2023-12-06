@@ -27,6 +27,7 @@ public interface IUserService
     Task<ResultModel> UpdateAccountInfo(UserUpdateModel model);
     Task<ResultModel> Delete(Guid id);
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, UserSearchModel searchModel);
+    Task<ResultModel> GetTech(PagingParam<BaseSortCriteria> paginationModel, UserSearchModel searchModel);
     Task<ResultModel> GetDetail(string id);
     Task<ResultModel> GetAssignedRequestExpand(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel);
     Task<ResultModel> GetAssignedRequestUpgrade(string userId, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
@@ -374,6 +375,40 @@ public class UserService : IUserService
         try
         {
             var users = _dbContext.Users
+                .Where(delegate (User x)
+                {
+                    return MatchString(searchModel.SearchValue, x.Email)
+                    || MatchString(searchModel.SearchValue, x.UserName);
+                })
+                .AsQueryable();
+
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, users.Count());
+
+            users = users.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            users = users.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            paging.Data = _mapper.Map<List<UserModel>>(users.ToList());
+
+            result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetTech(PagingParam<BaseSortCriteria> paginationModel, UserSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var users = _dbContext.Users
+                .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Tech"))
                 .Where(delegate (User x)
                 {
                     return MatchString(searchModel.SearchValue, x.Email)
