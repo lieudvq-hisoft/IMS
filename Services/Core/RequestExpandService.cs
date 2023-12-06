@@ -578,9 +578,11 @@ public class RequestExpandService : IRequestExpandService
         try
         {
             var requestExpand = _dbContext.RequestExpands
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                 .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Accepted);
             ServerAllocation serverAllocation = null;
             var requiredComponents = _dbContext.Components.Where(x => x.IsRequired);

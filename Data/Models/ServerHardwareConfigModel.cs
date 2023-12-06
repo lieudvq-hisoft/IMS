@@ -47,6 +47,7 @@ public class ConfigDescriptionModel
     [StringLength(255, MinimumLength = 8)]
     public string Model { get; set; }
 
+    [GreaterThanZero]
     public int Capacity { get; set; }
 
     public string Description { get; set; }

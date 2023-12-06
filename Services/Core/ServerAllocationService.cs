@@ -61,8 +61,7 @@ public class ServerAllocationService : IServerAllocationService
         try
         {
             var serverAllocations = _dbContext.ServerAllocations
-                .Include(x => x.IpAssignments)
-                .ThenInclude(x => x.IpAddress)
+                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                 .Include(x => x.Customer)
                 .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                 .Where(delegate (ServerAllocation x)

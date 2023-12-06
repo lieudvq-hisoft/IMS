@@ -197,7 +197,13 @@ public class AppointmentService : IAppointmentService
     {
         var result = new ResultModel();
         result.Succeed = false;
-        bool validCondition = true;
+        bool validPrecondition = true;
+
+        if (model.RequestRemovalIds.Any() && model.RequestUpgradeIds.Any() || model.RequestExpandIds.Any())
+        {
+            result.ErrorMessage = "Cannot have other request when remove server";
+            return result;
+        }
 
         try
         {
@@ -212,7 +218,6 @@ public class AppointmentService : IAppointmentService
                 var appointment = _mapper.Map<Appointment>(model);
                 _dbContext.Appointments.Add(appointment);
                 _dbContext.SaveChanges();
-                _dbContext.SaveChanges();
 
                 var createRequestUpgradeAppointmentResults = new List<ResultModel>();
                 foreach (var requestUpgradeId in model.RequestUpgradeIds)
@@ -224,11 +229,11 @@ public class AppointmentService : IAppointmentService
                 {
                     result.ErrorMessage = createRequestUpgradeAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
                     transaction.Rollback();
-                    validCondition = false;
+                    validPrecondition = false;
                 }
 
                 var createRequestExpandAppointmentResults = new List<ResultModel>();
-                if (validCondition)
+                if (validPrecondition)
                 {
                     foreach (var requestExpandId in model.RequestExpandIds)
                     {
@@ -239,12 +244,12 @@ public class AppointmentService : IAppointmentService
                     {
                         result.ErrorMessage = createRequestExpandAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
                         transaction.Rollback();
-                        validCondition = false;
+                        validPrecondition = false;
                     }
                 }
 
                 var createRequestRemovalAppointmentResults = new List<ResultModel>();
-                if (validCondition)
+                if (validPrecondition)
                 {
                     foreach (var requestRemovalId in model.RequestRemovalIds)
                     {
@@ -255,11 +260,11 @@ public class AppointmentService : IAppointmentService
                     {
                         result.ErrorMessage = createRequestRemovalAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
                         transaction.Rollback();
-                        validCondition = false;
+                        validPrecondition = false;
                     }
                 }
 
-                if (validCondition)
+                if (validPrecondition)
                 {
                     transaction.Commit();
                     result.Succeed = true;
@@ -286,6 +291,12 @@ public class AppointmentService : IAppointmentService
         var result = new ResultModel();
         result.Succeed = false;
         bool validCondition = true;
+
+        if (model.RequestRemovalIds.Any() && model.RequestUpgradeIds.Any() || model.RequestExpandIds.Any())
+        {
+            result.ErrorMessage = "Cannot have other request when remove server";
+            return result;
+        }
 
         try
         {
