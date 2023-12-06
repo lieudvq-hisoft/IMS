@@ -35,7 +35,7 @@ public interface IServerAllocationService
     Task<ResultModel> Delete(int serverAllocationId);
     Task<ResultModel> AssignMasterIp(int serverAllocationId, ServerAllocationMasterIpAssignmentModel model);
     Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model);
-    Task<ResultModel> CreateInspectionReport(int serverAllocationId, ServerAllocationCreateInspectionReportModel model);
+    Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, ServerAllocationCreateInspectionReportModel model);
     Task<ResultModel> CreateReceiptReport(int serverAllocationId);
 }
 
@@ -674,7 +674,7 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> CreateInspectionReport(int serverAllocationId, ServerAllocationCreateInspectionReportModel model)
+    public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, ServerAllocationCreateInspectionReportModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;

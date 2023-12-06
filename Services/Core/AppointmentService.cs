@@ -925,6 +925,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
+            using var transaction = _dbContext.Database.BeginTransaction();
             var appointment = _dbContext.Appointments.Include(x => x.RequestExpandAppointments).Include(x => x.RequestUpgradeAppointment).FirstOrDefault(x => x.Id == appointmentId);
             if (appointment == null)
             {
@@ -963,8 +964,34 @@ public class AppointmentService : IAppointmentService
                 _mapper.Map<AppointmentCompleteModel, Appointment>(model, appointment);
                 appointment.Status = RequestStatus.Success;
                 _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = _mapper.Map<AppointmentResultModel>(appointment);
+                var requestUpgradeResults = new List<ResultModel>();
+                foreach (var requestUpgradeId in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgradeId))
+                {
+                    requestUpgradeResults.Add(await CompleteRequestUpgrade(requestUpgradeId));
+                }
+
+                var requestExpandResults = new List<ResultModel>();
+                foreach (var requestExpandId in appointment.RequestExpandAppointments.Select(x => x.RequestExpandId))
+                {
+                    requestExpandResults.Add(await CompleteRequestExpand(requestExpandId));
+                }
+
+                if (requestExpandResults.Any(x => !x.Succeed))
+                {
+                    transaction.Rollback();
+                    result.ErrorMessage = requestExpandResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                }
+                else if (requestUpgradeResults.Any(x => !x.Succeed))
+                {
+                    transaction.Rollback();
+                    result.ErrorMessage = requestUpgradeResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                }
+                else
+                {
+                    transaction.Commit();
+                    result.Succeed = true;
+                    result.Data = _mapper.Map<AppointmentResultModel>(appointment);
+                }
             }
         }
         catch (Exception e)
@@ -1011,6 +1038,155 @@ public class AppointmentService : IAppointmentService
         }
 
         return validPrecondition;
+    }
+
+    private async Task<ResultModel> CompleteRequestUpgrade(int requestUpgradeId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var requestUpgrade = _dbContext.RequestUpgrades
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+                .Include(x => x.Component).FirstOrDefault(x => x.Id == requestUpgradeId && x.Status == RequestStatus.Accepted);
+            ServerHardwareConfig serverHardwareConfig = null;
+            if (requestUpgrade == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
+            }
+            else if (!requestUpgrade.ServerAllocation.LocationAssignments.Any())
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Cannot modify unallocated server";
+            }
+            else
+            {
+                serverHardwareConfig = requestUpgrade.ServerAllocation?.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId);
+            }
+
+            if (validPrecondition)
+            {
+                if (serverHardwareConfig == null)
+                {
+                    _dbContext.ServerHardwareConfigs.Add(new ServerHardwareConfig
+                    {
+                        Description = requestUpgrade.Description,
+                        ServerAllocationId = requestUpgrade.ServerAllocationId,
+                        ComponentId = requestUpgrade.ComponentId
+                    });
+                }
+                else
+                {
+                    serverHardwareConfig.Description = requestUpgrade.Description;
+                }
+                requestUpgrade.Status = RequestStatus.Success;
+                requestUpgrade.ServerAllocation.DateUpdated = DateTime.UtcNow;
+                _dbContext.SaveChanges();
+
+
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> CompleteRequestExpand(int requestExpandId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var requestExpand = _dbContext.RequestExpands
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Accepted);
+            ServerAllocation serverAllocation = null;
+            var requiredComponents = _dbContext.Components.Where(x => x.IsRequired);
+            if (requestExpand == null)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+            else
+            {
+                serverAllocation = requestExpand.ServerAllocation;
+                foreach (var component in requiredComponents)
+                {
+                    if (serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == component.Id) == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "Cannot allocate server missing config for required component";
+                    }
+
+                    if (serverAllocation.SerialNumber == null || serverAllocation.Power == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "Server must have serial number and power";
+                    }
+                }
+            }
+
+            List<Location> locations = null;
+            if (validPrecondition)
+            {
+                locations = requestExpand.RequestExpandLocations.Select(x => x.Location).ToList();
+                if (!locations.Any())
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Request dont have target location";
+                }
+            }
+
+            if (validPrecondition)
+            {
+                var locationAssignments = new List<LocationAssignment>();
+                foreach (var location in locations)
+                {
+                    locationAssignments.Add(new LocationAssignment
+                    {
+                        ServerAllocationId = requestExpand.ServerAllocationId,
+                        LocationId = location.Id
+                    });
+                }
+                _dbContext.LocationAssignments.AddRange(locationAssignments);
+                requestExpand.Status = RequestStatus.Success;
+                requestExpand.SuccessExpandAppointmentId = requestExpand.RequestExpandAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success).Id;
+                serverAllocation.DateUpdated = DateTime.UtcNow;
+                _dbContext.SaveChanges();
+
+                serverAllocation = _dbContext.ServerAllocations
+                    .Include(x => x.IpAssignments)
+                    .ThenInclude(x => x.IpAddress)
+                    .Include(x => x.Customer)
+                    .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+                    .FirstOrDefault(x => x.Id == serverAllocation.Id);
+                serverAllocation.ServerLocation = serverAllocation.GetServerLocation();
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
     }
 
     public async Task<ResultModel> Fail(int appointmentId, AppointmentFailModel model)

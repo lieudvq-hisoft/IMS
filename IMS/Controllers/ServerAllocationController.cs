@@ -154,7 +154,7 @@ public class ServerAllocationController : ControllerBase
     [HttpPost("{id}/InspectionReport")]
     public async Task<ActionResult> CreateInspectionReport(int id, [FromBody] ServerAllocationCreateInspectionReportModel model)
     {
-        var result = await _serverAllocationService.CreateInspectionReport(id, model);
+        var result = await _serverAllocationService.CreateUpgradeAndHostInspectionReport(id, model);
         if (result.Succeed)
         {
             var path = result.Data as string;

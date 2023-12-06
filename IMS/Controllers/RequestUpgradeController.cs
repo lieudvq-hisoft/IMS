@@ -138,23 +138,23 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPut("{id}/Complete")]
-    [SwaggerOperation(Summary = "Complete a completable accepted request upgrade. Change serverHardwareconfig")]
-    public async Task<ActionResult> Complete(int id)
-    {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestUpgradeService.Complete(id, new Guid(userId));
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPut("{id}/Complete")]
+    //[SwaggerOperation(Summary = "Complete a completable accepted request upgrade. Change serverHardwareconfig")]
+    //public async Task<ActionResult> Complete(int id)
+    //{
+    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+    //    var result = await _requestUpgradeService.Complete(id, new Guid(userId));
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpPut("Complete/Bulk")]
-    [SwaggerOperation(Summary = "Complete many completable accepted request upgrade. Change serverHardwareconfig")]
-    public async Task<ActionResult> CompleteBulk(RequestUpgradeCompleteBulkModel model)
-    {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestUpgradeService.CompleteBulk(model, new Guid(userId));
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPut("Complete/Bulk")]
+    //[SwaggerOperation(Summary = "Complete many completable accepted request upgrade. Change serverHardwareconfig")]
+    //public async Task<ActionResult> CompleteBulk(RequestUpgradeCompleteBulkModel model)
+    //{
+    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+    //    var result = await _requestUpgradeService.CompleteBulk(model, new Guid(userId));
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 }
