@@ -7,6 +7,7 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -647,6 +648,13 @@ public class RequestExpandService : IRequestExpandService
                 requestExpand.SuccessExpandAppointmentId = requestExpand.RequestExpandAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success).Id;
                 serverAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
+
+                serverAllocation = _dbContext.ServerAllocations
+                    .Include(x => x.IpAssignments)
+                    .ThenInclude(x => x.IpAddress)
+                    .Include(x => x.Customer)
+                    .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+                    .FirstOrDefault(x => x.Id == serverAllocation.Id);
                 serverAllocation.ServerLocation = serverAllocation.GetServerLocation();
                 _dbContext.SaveChanges();
                 result.Succeed = true;
@@ -871,7 +879,7 @@ public class RequestExpandService : IRequestExpandService
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
             }
-            else if (requestExpand.Size == null)
+            else if (requestExpand.Size == null && requestExpand.Size == 0)
             {
                 result.ErrorMessage = "Cannot suggest without size";
             }
