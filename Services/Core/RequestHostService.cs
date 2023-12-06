@@ -497,47 +497,47 @@ public class RequestHostService : IRequestHostService
         return ipAddress;
     }
 
-    public async Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var requestHost = _dbContext.RequestHosts.Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == requestHostId);
-            if (requestHost == null)
-            {
-                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
-            }
-            else if (requestHost.Status != RequestHostStatus.Accepted)
-            {
-                result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
-            }
-            else if (!requestHost.RequestHostIps.Any())
-            {
-                result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
-            }
-            else
-            {
-                string inspectionReportFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
+    //    try
+    //    {
+    //        var requestHost = _dbContext.RequestHosts.Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == requestHostId);
+    //        if (requestHost == null)
+    //        {
+    //            result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+    //        }
+    //        else if (requestHost.Status != RequestHostStatus.Accepted)
+    //        {
+    //            result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
+    //        }
+    //        else if (!requestHost.RequestHostIps.Any())
+    //        {
+    //            result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
+    //        }
+    //        else
+    //        {
+    //            string inspectionReportFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
 
-                requestHost.InspectionReportFilePath = inspectionReportFileName;
-                requestHost.Status = RequestHostStatus.Processed;
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = new RequestHostDocumentFileResultModel
-                {
-                    InspectionReport = inspectionReportFileName,
-                };
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //            requestHost.InspectionReportFilePath = inspectionReportFileName;
+    //            requestHost.Status = RequestHostStatus.Processed;
+    //            _dbContext.SaveChanges();
+    //            result.Succeed = true;
+    //            result.Data = new RequestHostDocumentFileResultModel
+    //            {
+    //                InspectionReport = inspectionReportFileName,
+    //            };
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     //public async Task<ResultModel> Process(int requestHostId, Guid userId)
     //{
@@ -600,13 +600,15 @@ public class RequestHostService : IRequestHostService
                 .FirstOrDefault(x => x.Id == requestHostId);
             if (requestHost == null)
             {
-                validPrecondition = false;
-                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
-            else if (requestHost.Status != RequestHostStatus.Processed)
+            else if (requestHost.Status != RequestHostStatus.Accepted)
             {
-                validPrecondition = false;
-                result.ErrorMessage = RequestHostErrorMessage.NOT_PROCESSED;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
+            }
+            else if (!requestHost.RequestHostIps.Any())
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
             }
             else
             {
