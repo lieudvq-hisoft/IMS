@@ -7,9 +7,13 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
+using DocumentFormat.OpenXml.Packaging;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
+using System.Globalization;
+using System.Text.Json;
 
 namespace Services.Core;
 public interface IAppointmentService
@@ -34,13 +38,15 @@ public class AppointmentService : IAppointmentService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly IHostingEnvironment _env;
     private readonly ICloudinaryHelper _cloudinaryHelper;
     private readonly UserManager<User> _userManager;
 
-    public AppointmentService(AppDbContext dbContext, IMapper mapper, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManage)
+    public AppointmentService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManage)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _env = env;
         _cloudinaryHelper = cloudinaryHelper;
         _userManager = userManage;
     }
@@ -199,7 +205,7 @@ public class AppointmentService : IAppointmentService
         result.Succeed = false;
         bool validPrecondition = true;
 
-        if (model.RequestRemovalIds.Any() && model.RequestUpgradeIds.Any() || model.RequestExpandIds.Any())
+        if (model.RequestRemovalIds.Any() && (model.RequestUpgradeIds.Any() || model.RequestExpandIds.Any()))
         {
             result.ErrorMessage = "Cannot have other request when remove server";
             return result;
@@ -1090,6 +1096,132 @@ public class AppointmentService : IAppointmentService
 
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, ServerAllocationCreateInspectionReportModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            string inputPath = Path.Combine(_env.WebRootPath, "Report", "UpgradeAndHostTemplate.docx");
+            string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
+            var serverAllocation = _dbContext.ServerAllocations
+               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+               .Include(x => x.Customer)
+               .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+               .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+               .FirstOrDefault(x => x.Id == serverAllocationId);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            //else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
+            //{
+            //    result.ErrorMessage = "Cannot create document to a not waiting server";
+            //}
+            //else if (!serverAllocation.LocationAssignments.Any())
+            //{
+            //    result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+            //}
+            //else if (serverAllocation.MasterIpAddress == null)
+            //{
+            //    result.ErrorMessage = "Server need ip master";
+            //}
+            else
+            {
+                File.Copy(inputPath, outputPath, true);
+                using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
+                {
+                    var now = DateTime.UtcNow;
+                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                    document.RenderText("__Date__", $"{now.Day}/{now.Month}/{now.Year}");
+
+                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
+
+                    document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
+
+                    document.RenderText("__Position__", textInfo.ToTitleCase(model.CustomerPosition));
+
+                    document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
+
+                    document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
+                    if (model.NewAllocation)
+                    {
+                        document.TickCheckBoxInDocx("Allocation");
+                    }
+                    else
+                    {
+                        document.TickCheckBoxInDocx("Service");
+                    }
+                    document.RenderText("__ServerName__", serverAllocation.Name);
+
+                    var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
+                    var cpuString = "";
+                    for (int i = 0; i < cpus.Count(); i++)
+                    {
+                        cpuString += cpus[i].Model;
+                        if (i != cpus.Count() - 1)
+                        {
+                            cpuString += ", ";
+                        }
+                    }
+                    document.RenderText("__CPUs__", cpuString);
+
+                    var rams = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description);
+                    var ramCapacity = 0;
+                    for (int i = 0; i < rams.Count(); i++)
+                    {
+                        ramCapacity += rams[i].Capacity;
+                    }
+                    document.RenderText("__Ram__", ramCapacity + "Gb");
+
+                    var hardDisks = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description);
+                    var hardDiskCapacity = 0;
+                    for (int i = 0; i < hardDisks.Count(); i++)
+                    {
+                        hardDiskCapacity += hardDisks[i].Capacity;
+                    }
+                    document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
+
+                    document.RenderText("__ServerLocation__", serverAllocation.ServerLocation);
+
+                    document.RenderText("__SerialNumber__", serverAllocation.SerialNumber);
+
+                    document.RenderText("__Power__", serverAllocation.Power + "W");
+
+                    document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
+
+                    document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
+
+                    document.RenderText("__SubnetMask__", IpAddress.GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
+                    if (model.Good)
+                    {
+                        document.TickCheckBoxInDocx("Evaluate");
+                    }
+                    document.RenderText("__Note__", model.Note);
+                    document.MainDocumentPart.Document.Save();
+                }
+                string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
+                serverAllocation.InspectionRecordFilePath = inspectionReportFileName;
+
+                if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)
+                {
+                    serverAllocation.Status = ServerAllocationStatus.Working;
+                }
+                _dbContext.SaveChanges();
+
+                result.Succeed = true;
+                result.Data = outputPath;
             }
         }
         catch (Exception e)

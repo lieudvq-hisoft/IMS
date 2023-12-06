@@ -3,6 +3,7 @@ using Data.Models;
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Net;
 
 namespace Data.Entities;
 
@@ -41,6 +42,52 @@ public class IpAddress
         var isReserved = searchModel.IsReserved != null ? IsReserved == searchModel.IsReserved : true;
         var blocked = searchModel.IsBlocked != null ? Blocked == searchModel.IsBlocked : true;
         return matchAddress && available && assigned && isReserved && blocked;
+    }
+
+    public static string GetDefaultSubnetMask(string ipAddressString)
+    {
+        IPAddress ipAddress;
+        if (IPAddress.TryParse(ipAddressString, out ipAddress) && ipAddress.AddressFamily == System.Net.Sockets.AddressFamily.InterNetwork)
+        {
+            byte[] addressBytes = ipAddress.GetAddressBytes();
+            int firstByte = addressBytes[0];
+
+            if (IsClassA(firstByte))
+            {
+                return "255.0.0.0";
+            }
+            else if (IsClassB(firstByte))
+            {
+                return "255.255.0.0";
+            }
+            else if (IsClassC(firstByte))
+            {
+                return "255.255.255.0";
+            }
+            else
+            {
+                return "Unknown";
+            }
+        }
+        else
+        {
+            throw new Exception("Invalid IPv4 Address");
+        }
+    }
+
+    static bool IsClassA(int firstByte)
+    {
+        return firstByte >= 1 && firstByte <= 126;
+    }
+
+    static bool IsClassB(int firstByte)
+    {
+        return firstByte >= 128 && firstByte <= 191;
+    }
+
+    static bool IsClassC(int firstByte)
+    {
+        return firstByte >= 192 && firstByte <= 223;
     }
 }
 
