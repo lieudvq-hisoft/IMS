@@ -1249,7 +1249,7 @@ public class AppointmentService : IAppointmentService
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
-                result.Data = outputPath;
+                result.Data = inspectionReportFileName;
             }
         }
         catch (Exception e)
