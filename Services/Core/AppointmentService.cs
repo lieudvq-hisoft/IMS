@@ -943,6 +943,12 @@ public class AppointmentService : IAppointmentService
                 validPrecondition = IsCompletable(appointmentId, result);
             }
 
+            if (appointment.RequestUpgradeAppointment.Any() && appointment.InspectionReportFilePath == null && model.HostAndUpgradeCreateInspectionReportModel == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Need inspection report to complete";
+            }
+
             if (validPrecondition)
             {
                 var executor = _dbContext.AppointmentUsers.FirstOrDefault(x => x.AppointmentId == appointment.Id && x.Action == RequestUserAction.Execute);
@@ -994,9 +1000,29 @@ public class AppointmentService : IAppointmentService
                 }
                 else
                 {
-                    transaction.Commit();
-                    result.Succeed = true;
-                    result.Data = _mapper.Map<AppointmentResultModel>(appointment);
+                    if (appointment.RequestUpgradeAppointment.Any())
+                    {
+                        var createDocResult = await CreateUpgradeAndHostInspectionReport(appointment.ServerAllocationId, model.HostAndUpgradeCreateInspectionReportModel);
+                        if (!createDocResult.Succeed)
+                        {
+                            transaction.Rollback();
+                            result.ErrorMessage = createDocResult.ErrorMessage;
+                        }
+                        else
+                        {
+                            appointment.InspectionReportFilePath = createDocResult.Data as string;
+                            _dbContext.SaveChanges();
+                            transaction.Commit();
+                            result.Succeed = true;
+                            result.Data = _mapper.Map<AppointmentResultModel>(appointment);
+                        }
+                    }
+                    if (appointment.RequestExpandAppointments.Any())
+                    {
+                        transaction.Commit();
+                        result.Succeed = true;
+                        result.Data = _mapper.Map<AppointmentResultModel>(appointment);
+                    }
                 }
             }
         }
@@ -1106,7 +1132,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, ServerAllocationCreateInspectionReportModel model)
+    public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -1212,12 +1238,12 @@ public class AppointmentService : IAppointmentService
                     document.MainDocumentPart.Document.Save();
                 }
                 string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
-                serverAllocation.InspectionRecordFilePath = inspectionReportFileName;
+                //serverAllocation.InspectionRecordFilePath = inspectionReportFileName;
 
-                if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)
-                {
-                    serverAllocation.Status = ServerAllocationStatus.Working;
-                }
+                //if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)
+                //{
+                //    serverAllocation.Status = ServerAllocationStatus.Working;
+                //}
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;

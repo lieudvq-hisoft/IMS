@@ -144,6 +144,8 @@ public class AppointmentCompleteModel
 
     [Required]
     public bool IsCorrectPerson { get; set; }
+
+    public HostAndUpgradeCreateInspectionReportModel HostAndUpgradeCreateInspectionReportModel;
 }
 
 public class AppointmentSearchModel
