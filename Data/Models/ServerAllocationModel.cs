@@ -132,10 +132,6 @@ public class ServerAllocationCreateInspectionReportModel
     public bool NewAllocation { get; set; } = true;
 
     //[Required]
-    [Url]
-    public string Website { get; set; } = "https://superuser.com/questions/278260/how-do-i-see-the-xml-of-my-docx-document";
-
-    //[Required]
     public string Username { get; set; } = "Username";
 
     //[Required]
