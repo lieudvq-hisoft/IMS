@@ -681,7 +681,7 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-            string inputPath = Path.Combine(_env.WebRootPath, "Report", "Template1.docx");
+            string inputPath = Path.Combine(_env.WebRootPath, "Report", "UpgradeAndHostTemplate.docx");
             string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
             var serverAllocation = _dbContext.ServerAllocations
                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)

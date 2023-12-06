@@ -1,5 +1,6 @@
 ﻿using Data.Enums;
 using Data.Models;
+using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -40,5 +41,18 @@ public class IpAddress
         var isReserved = searchModel.IsReserved != null ? IsReserved == searchModel.IsReserved : true;
         var blocked = searchModel.IsBlocked != null ? Blocked == searchModel.IsBlocked : true;
         return matchAddress && available && assigned && isReserved && blocked;
+    }
+}
+
+public class IpAddressComparer : IEqualityComparer<IpAddress>
+{
+    public bool Equals(IpAddress x, IpAddress y)
+    {
+        return x != null && y != null && x.Address == y.Address;
+    }
+
+    public int GetHashCode(IpAddress obj)
+    {
+        return obj.Id.GetHashCode();
     }
 }

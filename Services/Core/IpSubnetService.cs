@@ -299,89 +299,143 @@ public class IpSubnetService : IIpSubnetService
             using var transaction = _dbContext.Database.BeginTransaction();
             var octets = GetIPv4Octets(model.IpAddresss);
             var existedSubnet = _dbContext.IpSubnets.FirstOrDefault(x => x.FirstOctet == octets[0] && x.SecondOctet == octets[1] && x.ThirdOctet == octets[2]);
+            List<IpAddress> ips = new List<IpAddress>();
             if (existedSubnet != null)
             {
+                createIpRangeSuccess = false;
                 result.ErrorMessage = "Subnet existed";
             }
             else if (octets[3] != 0)
             {
+                createIpRangeSuccess = false;
                 result.ErrorMessage = IpSubnetErrorMessage.IP_RANGE_FOURTH_OCTET;
+            }
+            else if (model.PrefixLength > 9 && model.PrefixLength < 24)
+            {
+                createIpRangeSuccess = false;
+                result.ErrorMessage = "Prefix length must be 8 or greater than 23";
             }
             else
             {
-                var ipRange = new IpSubnet
+                //if (model.PrefixLength == 8)
+                //{
+                //    var ipRange = new IpSubnet
+                //    {
+                //        FirstOctet = octets[0],
+                //        SecondOctet = octets[1],
+                //        ThirdOctet = octets[2],
+                //        FourthOctet = octets[3],
+                //        PrefixLength = model.PrefixLength,
+                //        Note = model.Note,
+                //        ParentNetworkId = null
+                //    };
+                //    _dbContext.IpSubnets.Add(ipRange);
+                //    _dbContext.SaveChanges();
+
+                //    while (octets[1] < SUBNET_MAX_SIZE && octets[2] < SUBNET_MAX_SIZE && octets[3] < SUBNET_MAX_SIZE)
+                //    {
+                //        var address = $"{ipRange.FirstOctet}.{octets[1]}.{octets[2]}.{octets[3]}";
+
+                //        IpPurpose purpose = IpPurpose.Host;
+                //        if (octets[3] == 0)
+                //        {
+                //            purpose = IpPurpose.Network;
+                //        }
+                //        if (octets[3] == 255)
+                //        {
+                //            purpose = IpPurpose.Broadcast;
+                //        }
+                //        ips.Add(new IpAddress
+                //        {
+                //            Address = address,
+                //            IsReserved = purpose != IpPurpose.Host,
+                //            Purpose = purpose,
+                //            IpSubnetId = ipRange.Id
+                //        });
+
+                //        octets[3]++;
+                //        if (octets[3] == SUBNET_MAX_SIZE)
+                //        {
+                //            octets[3] = 0;
+                //            octets[2]++;
+                //            if (octets[2] == SUBNET_MAX_SIZE)
+                //            {
+                //                octets[2] = 0;
+                //                octets[1]++;
+                //            }
+                //        }
+                //    }
+                //}
+                //else
+                //{
+                var ipPerSubnet = Math.Pow(2, PREFIX_LENGTH_MAX - model.PrefixLength);
+                int ipCount = 0;
+                IpSubnet currentSubnet = null;
+                while (octets[3] < SUBNET_MAX_SIZE)
                 {
-                    FirstOctet = octets[0],
-                    SecondOctet = octets[1],
-                    ThirdOctet = octets[2],
-                    FourthOctet = octets[3],
-                    PrefixLength = model.PrefixLength,
-                    Note = model.Note,
-                    ParentNetworkId = null
-                };
-                _dbContext.IpSubnets.Add(ipRange);
+                    if (ipCount == 0)
+                    {
+                        currentSubnet = new IpSubnet
+                        {
+                            FirstOctet = octets[0],
+                            SecondOctet = octets[1],
+                            ThirdOctet = octets[2],
+                            FourthOctet = octets[3],
+                            PrefixLength = model.PrefixLength,
+                            Note = model.Note,
+                            ParentNetworkId = null
+                        };
+                        _dbContext.IpSubnets.Add(currentSubnet);
+                        _dbContext.SaveChanges();
+                    }
+
+                    var address = $"{currentSubnet.FirstOctet}.{octets[1]}.{octets[2]}.{octets[3]}";
+
+                    IpPurpose purpose = IpPurpose.Host;
+                    if (ipCount == 0)
+                    {
+                        purpose = IpPurpose.Network;
+                    }
+                    if (ipCount == ipPerSubnet - 1)
+                    {
+                        purpose = IpPurpose.Broadcast;
+                    }
+                    ips.Add(new IpAddress
+                    {
+                        Address = address,
+                        IsReserved = purpose != IpPurpose.Host,
+                        Purpose = purpose,
+                        IpSubnetId = currentSubnet.Id
+                    });
+
+                    octets[3]++;
+                    ipCount++;
+                    if (ipCount == ipPerSubnet)
+                    {
+                        ipCount = 0;
+                    }
+                    //}
+                }
+            }
+
+            var ipAddresses = _dbContext.IpAddresses.ToList();
+            if (ipAddresses.IntersectBy(ips.Select(x => x.Address), x => x.Address).Any())
+            {
+                createIpRangeSuccess = false;
+                result.ErrorMessage = "Ip address existed";
+            }
+
+            if (!createIpRangeSuccess)
+            {
+                transaction.Rollback();
+            }
+            else
+            {
+                _dbContext.IpAddresses.AddRange(ips);
                 _dbContext.SaveChanges();
 
-                double rangeSize = Math.Pow(2, PREFIX_LENGTH_MAX - model.PrefixLength);
-                double subnetIncremental = rangeSize / SUBNET_MAX_SIZE;
-                double ipCreated = 0;
-                List<IpAddress> ips = new List<IpAddress>();
-                for (int i = 0; i < subnetIncremental; i++)
-                {
-                    for (int t = 0; t < SUBNET_MAX_SIZE && ipCreated < rangeSize; t++)
-                    {
-                        ipCreated++;
-                        var address = $"{ipRange.FirstOctet}.{ipRange.SecondOctet}.{ipRange.ThirdOctet + i}.{t}";
-                        var existedIp = _dbContext.IpAddresses.FirstOrDefault(x => x.Address == address);
-                        if (existedIp != null)
-                        {
-                            createIpRangeSuccess = false;
-                            result.ErrorMessage = "Ip address existed";
-                        }
-                        else
-                        {
-                            IpPurpose purpose = IpPurpose.Host;
-                            if (t == 0)
-                            {
-                                purpose = IpPurpose.Network;
-                            }
-                            if (t == 255)
-                            {
-                                purpose = IpPurpose.Broadcast;
-                            }
-                            ips.Add(new IpAddress
-                            {
-                                Address = address,
-                                IsReserved = purpose != IpPurpose.Host,
-                                Purpose = purpose,
-                                IpSubnetId = ipRange.Id
-                            });
-                        }
-                    }
-                }
-
-                if (!createIpRangeSuccess)
-                {
-                    transaction.Rollback();
-                }
-                else
-                {
-                    _dbContext.IpAddresses.AddRange(ips);
-                    _dbContext.SaveChanges();
-
-                    var createSubnetResult = await Create(ipRange.Id, model.IpSubnets);
-                    if (!createSubnetResult.Succeed)
-                    {
-                        result.ErrorMessage = createSubnetResult.ErrorMessage;
-                        transaction.Rollback();
-                    }
-                    else
-                    {
-                        transaction.Commit();
-                        result.Data = _mapper.Map<IpSubnetModel>(ipRange);
-                        result.Succeed = true;
-                    }
-                }
+                transaction.Commit();
+                result.Succeed = true;
             }
         }
         catch (Exception e)

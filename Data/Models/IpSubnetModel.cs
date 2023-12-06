@@ -38,12 +38,10 @@ public class IpRangeCreateModel
     public string IpAddresss { get; set; }
 
     [Required]
-    [Range(16, 24)]
+    [Range(24, 29)]
     public int PrefixLength { get; set; }
 
     public string? Note { get; set; }
-
-    public List<IpSubnetCreateModel?>? IpSubnets { get; set; }
 }
 
 public class CreateSubnetModel
