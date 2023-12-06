@@ -142,3 +142,51 @@ public class HostAndUpgradeCreateInspectionReportModel
 
     public string Note { get; set; } = "Note";
 }
+
+
+public class ServerAllocationCreateRequestExpandInspectionReportModel
+{
+    //[Required]
+    public string Number { get; set; } = "Number";
+
+    //[Required]
+    public string CustomerName { get; set; } = "CustomerName";
+
+    //[Required]
+    public string CustomerPosition { get; set; } = "CustomerPosition";
+
+    //[Required]
+    public string Location { get; set; } = "CustomerPosition";
+
+    //[Required]
+    public string QTName { get; set; } = "QTName";
+
+    //[Required]
+    public string Position { get; set; } = "Position";
+
+    //[Required]
+    public string Username { get; set; } = "Username";
+
+    //[Required]
+    public bool isSendMS { get; set; } = true;
+
+    //[Required]
+    public bool Good { get; set; } = true;
+
+    //[Required]
+    public bool Guid { get; set; } = true;
+
+    public string Note { get; set; } = "Note";
+
+    //[Required]
+    public string PartNumber { get; set; } = "PartNumber";
+
+    //[Required]
+    public string SerialNo { get; set; } = "SerialNo";
+
+    //[Required]
+    public string DNS { get; set; } = "DNS";
+
+    //[Required]
+    public string Size { get; set; } = "Size";
+}

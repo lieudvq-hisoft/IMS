@@ -37,6 +37,8 @@ public interface IServerAllocationService
     Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model);
     Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model);
     Task<ResultModel> CreateReceiptReport(int serverAllocationId);
+    Task<ResultModel> CreateRequestExpandInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model);
+
 }
 
 public class ServerAllocationService : IServerAllocationService
@@ -840,6 +842,164 @@ public class ServerAllocationService : IServerAllocationService
                 //var formfile = document.ConvertToIFormFile(outputPath);
                 string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
                 serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+
+                if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)
+                {
+                    serverAllocation.Status = ServerAllocationStatus.Working;
+                }
+                _dbContext.SaveChanges();
+
+                result.Succeed = true;
+                result.Data = outputPath;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> CreateRequestExpandInspectionReport(int requestExpandId, ServerAllocationCreateRequestExpandInspectionReportModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            string inputPath = Path.Combine(_env.WebRootPath, "Report", "ExpandTemplate.docx");
+            string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
+            var serverAllocation = _dbContext.ServerAllocations
+               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+               .Include(x => x.Customer)
+               .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+               .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+               .FirstOrDefault(x => x.Id == requestExpandId);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            //else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
+            //{
+            //    result.ErrorMessage = "Cannot create document to a not waiting server";
+            //}
+            //else if (!serverAllocation.LocationAssignments.Any())
+            //{
+            //    result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+            //}
+            //else if (serverAllocation.MasterIpAddress == null)
+            //{
+            //    result.ErrorMessage = "Server need ip master";
+            //}
+            else
+            {
+                File.Copy(inputPath, outputPath, true);
+                using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
+                {
+                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+
+                    document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
+
+                    var now = DateTime.UtcNow;
+                    document.RenderText("__Time__", $"{now.Day}/{now.Month}/{now.Year}");
+                    document.RenderText("__Time__", $"{now.Day}/{now.Month}/{now.Year}");
+
+                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
+
+                    document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
+
+                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
+
+                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+
+                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+
+                    document.RenderText("__Location__", model.Location);
+
+                    document.RenderText("__Username__", model.Username);
+
+                    if (model.isSendMS)
+                    {
+                        document.TickCheckBoxInDocx("Password");
+                    }
+
+                    document.TickCheckBoxInDocx("Allocation");
+
+                    var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
+                    var cpuString = "";
+                    for (int i = 0; i < cpus.Count(); i++)
+                    {
+                        cpuString += cpus[i].Model;
+                        if (i != cpus.Count() - 1)
+                        {
+                            cpuString += ", ";
+                        }
+                    }
+                    document.RenderText("__Model__", cpuString);
+
+                    var cpuCpu = "";
+                    for (int i = 0; i < cpus.Count(); i++)
+                    {
+                        cpuString += cpus[i].SerialNumber;
+                        if (i != cpus.Count() - 1)
+                        {
+                            cpuString += ", ";
+                        }
+                    }
+                    document.RenderText("__CPU__", cpuString);
+
+                    var rams = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description);
+                    var ramCapacity = 0;
+                    for (int i = 0; i < rams.Count(); i++)
+                    {
+                        ramCapacity += rams[i].Capacity;
+                    }
+                    document.RenderText("__Memory__", ramCapacity + "Gb");
+
+                    var hardDisks = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description);
+                    var hardDiskCapacity = 0;
+                    for (int i = 0; i < hardDisks.Count(); i++)
+                    {
+                        hardDiskCapacity += hardDisks[i].Capacity;
+                    }
+                    document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
+
+                    document.RenderText("__PartNumber__", model.PartNumber);
+
+                    document.RenderText("__SerialNo__", model.SerialNo);
+
+                    document.RenderText("__Power__", serverAllocation.Power + "W");
+
+                    document.RenderText("__Rack__", serverAllocation.ServerLocation);
+
+                    document.RenderText("__SerialNumber__", serverAllocation.SerialNumber);
+
+                    document.RenderText("__Size__", model.Size);
+
+                    document.RenderText("__DNS__", model.DNS);
+
+                    document.RenderText("__IPAddress__", serverAllocation.MasterIpAddress);
+
+                    document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
+
+                    document.RenderText("__SubnetMask__", IpAddress.GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
+                    
+                    if (model.Good)
+                    {
+                        document.TickCheckBoxInDocx("Evaluate");
+                    }
+
+                    if (model.Guid)
+                    {
+                        document.TickCheckBoxInDocx("Guided");
+                    }
+
+                    document.RenderText("__Note__", model.Note);
+                    document.MainDocumentPart.Document.Save();
+                }
+                string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
+                serverAllocation.InspectionRecordFilePath = inspectionReportFileName;
 
                 if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)
                 {
