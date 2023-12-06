@@ -1065,15 +1065,6 @@ public class AppointmentService : IAppointmentService
             result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
         }
 
-        if (appointment.InspectionReportFilePath == null || appointment.ReceiptOfRecipientFilePath == null)
-        {
-            if (appointment.RequestUpgradeAppointment.Any())
-            {
-                validPrecondition = false;
-                result.ErrorMessage = AppointmentErrorMessage.NOT_COMPLETABLE;
-            }
-        }
-
         if (appointment.RequestExpandAppointments.Select(x => x.RequestExpand).Any(x => !x.RequestExpandLocations.Any()))
         {
             validPrecondition = false;

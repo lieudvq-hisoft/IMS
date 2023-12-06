@@ -123,43 +123,43 @@ public class RequestExpandController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPut("{id}/Complete")]
-    [SwaggerOperation(Summary = "Complete a completable accepted request expand")]
-    public async Task<ActionResult> Complete(int id)
-    {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestExpandService.Complete(id, new Guid(userId));
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPut("{id}/Complete")]
+    //[SwaggerOperation(Summary = "Complete a completable accepted request expand")]
+    //public async Task<ActionResult> Complete(int id)
+    //{
+    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+    //    var result = await _requestExpandService.Complete(id, new Guid(userId));
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpPut("Complete/Bulk")]
-    [SwaggerOperation(Summary = "Complete many completable accepted request expand")]
-    public async Task<ActionResult> CompleteBulk(RequestExpandCompleteBulkModel model)
-    {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestExpandService.CompleteBulk(model, new Guid(userId));
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPut("Complete/Bulk")]
+    //[SwaggerOperation(Summary = "Complete many completable accepted request expand")]
+    //public async Task<ActionResult> CompleteBulk(RequestExpandCompleteBulkModel model)
+    //{
+    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+    //    var result = await _requestExpandService.CompleteBulk(model, new Guid(userId));
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpPut("Removal/{id}/Complete")]
-    public async Task<ActionResult> CompleteRemoval(int id)
-    {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestExpandService.CompleteRemoval(id, new Guid(userId));
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPut("Removal/{id}/Complete")]
+    //public async Task<ActionResult> CompleteRemoval(int id)
+    //{
+    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+    //    var result = await _requestExpandService.CompleteRemoval(id, new Guid(userId));
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpPut("CompleteRemoval/Bulk")]
-    public async Task<ActionResult> CompleteRemovalBulk(RequestExpandCompleteBulkModel model)
-    {
-        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestExpandService.CompleteRemovalBulk(model, new Guid(userId));
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPut("CompleteRemoval/Bulk")]
+    //public async Task<ActionResult> CompleteRemovalBulk(RequestExpandCompleteBulkModel model)
+    //{
+    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+    //    var result = await _requestExpandService.CompleteRemovalBulk(model, new Guid(userId));
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpGet("{id}/ChosenLocation")]
     public async Task<ActionResult> GetChosenLocation(int id)
