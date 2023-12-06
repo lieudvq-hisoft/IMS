@@ -185,7 +185,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 }
             }
 
-            if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), serverAllocation.Id))
+            if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), model.ComponentId, serverAllocation.Id))
             {
                 validPrecondition = false;
                 result.ErrorMessage = "Serial number existed";
@@ -211,12 +211,14 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    private bool CheckValidSerialNumber(List<string> serialNumbers, int serverAllocationId)
+    private bool CheckValidSerialNumber(List<string> serialNumbers, int componentId, int serverAllocationId)
     {
         var existedSerialNumber = _dbContext.ServerHardwareConfigs.Include(x => x.ServerAllocation)
             .Where(x => x.ServerAllocation.Status != ServerAllocationStatus.Removed)
             .Where(x => serverAllocationId != 0 ? x.ServerAllocationId != serverAllocationId : true)
-            .ToList().SelectMany(x => JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(x.Description).Select(x => x.SerialNumber));
+            .ToList()
+            .Where(x => x.ComponentId != componentId)
+            .SelectMany(x => JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(x.Description).Select(x => x.SerialNumber));
         return !serialNumbers.Any(x => existedSerialNumber.Contains(x)) && serialNumbers.Distinct().Count() == serialNumbers.Count();
     }
 
@@ -296,7 +298,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 result.ErrorMessage = "Cannot modify unallocated server";
             }
 
-            if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), serverAllocation.Id))
+            if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), requestUpgrade.ComponentId, serverAllocation.Id))
             {
                 validPrecondition = false;
                 result.ErrorMessage = "Serial number existed";
