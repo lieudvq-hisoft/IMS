@@ -696,10 +696,6 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = "Cannot create document to a not waiting server";
             }
-            else if (serverAllocation.InspectionRecordFilePath != null)
-            {
-                result.ErrorMessage = "Server have document already";
-            }
             else if (!serverAllocation.LocationAssignments.Any())
             {
                 result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
@@ -713,6 +709,8 @@ public class ServerAllocationService : IServerAllocationService
                 File.Copy(inputPath, outputPath, true);
                 using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
                 {
+                    var now = DateTime.UtcNow;
+                    document.RenderText("__Date__", $"{now.Day}/{now.Month}/{now.Year}");
                     document.RenderText("__CustomerName__", model.CustomerName);
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName);
                     document.RenderText("__Position__", model.CustomerPosition);
@@ -731,9 +729,8 @@ public class ServerAllocationService : IServerAllocationService
                     document.RenderText("__SerialNumber__", serverAllocation.SerialNumber);
                     document.RenderText("__Power__", serverAllocation.Power.ToString());
                     document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
-                    document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.Select(x => x.IpAddress)?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
+                    document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
                     document.RenderText("__SubnetMask__", GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
-                    document.RenderText("__Website__", model.Website);
                     document.RenderText("__Username__", model.Username);
                     document.RenderText("__Password__", model.Password);
                     if (model.Good)
@@ -741,17 +738,6 @@ public class ServerAllocationService : IServerAllocationService
                         document.TickCheckBoxInDocx("Evaluate");
                     }
                     document.RenderText("__Note__", model.Note);
-                    var dnss = serverAllocation.IpAssignments.Select(x => x.IpAddress).Where(x => x.Purpose == IpPurpose.Dns).ToList();
-                    string dnsString = "";
-                    for (int i = 0; i < dnss.Count(); i++)
-                    {
-                        dnsString += dnss[i].Address;
-                        if (i != dnss.Count - 1)
-                        {
-                            dnsString += ", ";
-                        }
-                    }
-                    document.RenderText("__DNSs__", dnsString);
                     document.MainDocumentPart.Document.Save();
                 }
                 string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
@@ -842,10 +828,6 @@ public class ServerAllocationService : IServerAllocationService
             else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
             {
                 result.ErrorMessage = "Cannot create document to a not waiting server";
-            }
-            else if (serverAllocation.ReceiptOfRecipientFilePath != null)
-            {
-                result.ErrorMessage = "Server have document already";
             }
             else if (!serverAllocation.LocationAssignments.Any())
             {

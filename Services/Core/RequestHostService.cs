@@ -453,10 +453,10 @@ public class RequestHostService : IRequestHostService
                         }
                     }
                     // validate ips for assignment
-                    else if (requestHost.Type == IpAssignmentTypes.Port && (ipAddress.Purpose == IpPurpose.Dns || ipAddress.Purpose == IpPurpose.Gateway))
+                    else if (ipAddress.Purpose != IpPurpose.Host)
                     {
                         validPrecondition = false;
-                        result.ErrorMessage = "Cannot assign dns or gateway ip to port";
+                        result.ErrorMessage = "Can only assign host ip";
                     }
                 }
             }
