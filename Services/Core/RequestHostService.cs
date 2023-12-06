@@ -24,7 +24,7 @@ public interface IRequestHostService
     Task<ResultModel> Deny(int requestHostId, Guid userId, DenyModel model);
     //Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status, Guid userId);
     Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model);
-    Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model);
+    //Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model);
     //Task<ResultModel> Process(int requestHostId, Guid userId);
     Task<ResultModel> Complete(int requestHostId, Guid userId);
 }
