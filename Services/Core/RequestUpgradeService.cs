@@ -215,9 +215,8 @@ public class RequestUpgradeService : IRequestUpgradeService
     {
         var existedSerialNumber = _dbContext.ServerHardwareConfigs.Include(x => x.ServerAllocation)
             .Where(x => x.ServerAllocation.Status != ServerAllocationStatus.Removed)
-            .Where(x => serverAllocationId != 0 ? x.ServerAllocationId != serverAllocationId : true)
             .ToList()
-            .Where(x => x.ComponentId != componentId)
+            .Where(x => x.ComponentId != componentId && serverAllocationId != 0 ? x.ServerAllocationId != serverAllocationId : true)
             .SelectMany(x => JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(x.Description).Select(x => x.SerialNumber));
         return !serialNumbers.Any(x => existedSerialNumber.Contains(x)) && serialNumbers.Distinct().Count() == serialNumbers.Count();
     }
