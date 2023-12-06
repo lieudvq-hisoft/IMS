@@ -919,6 +919,7 @@ public class RequestExpandService : IRequestExpandService
         }
         return result;
     }
+
     private Location CheckRackAvailabilityLocation(Rack rack, int size)
     {
         Location suggestedStartingLocation = null;

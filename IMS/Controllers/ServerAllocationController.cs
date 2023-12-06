@@ -188,4 +188,23 @@ public class ServerAllocationController : ControllerBase
         }
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPost("{id}/RequestExpandInspection")]
+    public async Task<ActionResult> CreateRequestExpandInspection(int id, [FromBody] ServerAllocationCreateRequestExpandInspectionReportModel model)
+    {
+        var result = await _serverAllocationService.CreateRequestExpandInspectionReport(id, model);
+        if (result.Succeed)
+        {
+            var path = result.Data as string;
+            if (System.IO.File.Exists(path))
+            {
+                return File(System.IO.File.OpenRead(path), "application/vnd.openxmlformats-officedocument.wordprocessingml.document", Path.GetFileName(path));
+            }
+            else
+            {
+                return BadRequest();
+            }
+        }
+        return BadRequest(result.ErrorMessage);
+    }
 }
