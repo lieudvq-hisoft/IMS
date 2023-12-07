@@ -31,6 +31,7 @@ public interface IRequestHostService
     //Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model);
     //Task<ResultModel> Process(int requestHostId, Guid userId);
     Task<ResultModel> Complete(int requestHostId, Guid userId, HostAndUpgradeCreateInspectionReportModel? model);
+    Task<ResultModel> Reject(int requestHostId, RequestHostRejectModel modell);
 }
 
 public class RequestHostService : IRequestHostService
@@ -788,6 +789,50 @@ public class RequestHostService : IRequestHostService
 
                 result.Succeed = true;
                 result.Data = inspectionReportFileName;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Reject(int requestHostId, RequestHostRejectModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var requestHost = _dbContext.RequestHosts.FirstOrDefault(x => x.Id == requestHostId);
+            if (requestHost == null)
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
+            }
+            else if (requestHost.Status != RequestHostStatus.Accepted)
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NOT_ACCEPTED;
+            }
+            else
+            {
+                requestHost.Status = RequestHostStatus.Failed;
+                if (model.Note != null)
+                {
+                    requestHost.Note = model.Note;
+                }
+                if (model.SaleNote != null)
+                {
+                    requestHost.SaleNote = model.SaleNote;
+                }
+                if (model.TechNote != null)
+                {
+                    requestHost.TechNote = model.TechNote;
+                }
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = requestHostId;
             }
         }
         catch (Exception e)

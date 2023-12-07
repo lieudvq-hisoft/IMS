@@ -105,3 +105,12 @@ public class RequestHostEvaluateBulkModel
     [Required]
     public List<int> RequestHostIds { get; set; }
 }
+
+public class RequestHostRejectModel
+{
+    public string? Note { get; set; }
+
+    public string? SaleNote { get; set; }
+
+    public string? TechNote { get; set; }
+}

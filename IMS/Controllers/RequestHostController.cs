@@ -140,4 +140,12 @@ public class RequestHostController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPut("{id}/Reject")]
+    public async Task<ActionResult> Reject(int id, RequestHostRejectModel model)
+    {
+        var result = await _requestHostService.Reject(id, model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }
