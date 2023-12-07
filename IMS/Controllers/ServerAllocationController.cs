@@ -154,18 +154,7 @@ public class ServerAllocationController : ControllerBase
     public async Task<ActionResult> CreateInspectionReport(int id, [FromBody] HostAndUpgradeCreateInspectionReportModel model)
     {
         var result = await _serverAllocationService.CreateUpgradeAndHostInspectionReport(id, model);
-        if (result.Succeed)
-        {
-            var path = result.Data as string;
-            if (System.IO.File.Exists(path))
-            {
-                return File(System.IO.File.OpenRead(path), "application/vnd.openxmlformats-officedocument.wordprocessingml.document", Path.GetFileName(path));
-            }
-            else
-            {
-                return BadRequest();
-            }
-        }
+        if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
@@ -173,18 +162,7 @@ public class ServerAllocationController : ControllerBase
     public async Task<ActionResult> CreateReceiptOfRecipient(int id)
     {
         var result = await _serverAllocationService.CreateReceiptReport(id);
-        if (result.Succeed)
-        {
-            var path = result.Data as string;
-            if (System.IO.File.Exists(path))
-            {
-                return File(System.IO.File.OpenRead(path), "application/vnd.openxmlformats-officedocument.wordprocessingml.document", Path.GetFileName(path));
-            }
-            else
-            {
-                return BadRequest();
-            }
-        }
+        if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
