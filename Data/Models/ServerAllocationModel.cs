@@ -123,6 +123,8 @@ public class ServerAllocationImportModel
 public class HostAndUpgradeCreateInspectionReportModel
 {
     //[Required]
+    public string Number { get; set; } = "Number";
+    //[Required]
     public string CustomerName { get; set; } = "CustomerName";
 
     //[Required]
@@ -177,16 +179,4 @@ public class ServerAllocationCreateRequestExpandInspectionReportModel
     public bool Guid { get; set; } = true;
 
     public string Note { get; set; } = "Note";
-
-    //[Required]
-    public string PartNumber { get; set; } = "PartNumber";
-
-    //[Required]
-    public string SerialNo { get; set; } = "SerialNo";
-
-    //[Required]
-    public string DNS { get; set; } = "DNS";
-
-    //[Required]
-    public string Size { get; set; } = "Size";
 }
