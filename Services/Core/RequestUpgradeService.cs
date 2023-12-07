@@ -9,7 +9,6 @@ using Data.Utils.Common;
 using Data.Utils.Paging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.IdentityModel.Tokens;
 using System.Text.Json;
 
 namespace Services.Core;
@@ -26,7 +25,7 @@ public interface IRequestUpgradeService
     Task<ResultModel> Accept(int requestUpgradeId, Guid userId);
     Task<ResultModel> Deny(int requestUpgradeId, Guid userId, DenyModel model);
     //Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status, Guid userId);
-    Task<ResultModel> CheckCompletability(int requestUpgradeId);
+    //Task<ResultModel> CheckCompletability(int requestUpgradeId);
     //Task<ResultModel> Complete(int requestUpgradeId, Guid userId);
     //Task<ResultModel> CompleteBulk(RequestUpgradeCompleteBulkModel model, Guid userId);
 }
@@ -114,8 +113,10 @@ public class RequestUpgradeService : IRequestUpgradeService
         var result = new ResultModel();
         result.Succeed = false;
 
-        var appointments = _dbContext.Appointments.Include(x => x.ServerAllocation).Include(x => x.RequestUpgradeAppointment)
+        var appointments = _dbContext.Appointments
+            .Include(x => x.ServerAllocation).Include(x => x.RequestUpgradeAppointment)
             .Include(x => x.AppointmentUsers)
+            .Include(x => x.RequestExpandAppointments)
             .Where(x => x.RequestUpgradeAppointment.Any(x => x.RequestUpgradeId == requestUpgradeId))
             .Where(delegate (Appointment x)
             {
@@ -523,34 +524,34 @@ public class RequestUpgradeService : IRequestUpgradeService
     //    return result;
     //}
 
-    public async Task<ResultModel> CheckCompletability(int requestUpgradeId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> CheckCompletability(int requestUpgradeId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            result.Data = IsCompletable(requestUpgradeId);
-            result.Succeed = true;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //    try
+    //    {
+    //        result.Data = IsCompletable(requestUpgradeId);
+    //        result.Succeed = true;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
-    private bool IsCompletable(int requestUpgradeId)
-    {
-        var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment).FirstOrDefault(x => x.Id == requestUpgradeId);
-        if (requestUpgrade == null)
-        {
-            return false;
-        }
+    //private bool IsCompletable(int requestUpgradeId)
+    //{
+    //    var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment).FirstOrDefault(x => x.Id == requestUpgradeId);
+    //    if (requestUpgrade == null)
+    //    {
+    //        return false;
+    //    }
 
-        return requestUpgrade.RequestUpgradeAppointments.Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Success && !x.InspectionReportFilePath.IsNullOrEmpty() && !x.ReceiptOfRecipientFilePath.IsNullOrEmpty());
-    }
+    //    return requestUpgrade.RequestUpgradeAppointments.Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Success && !x.InspectionReportFilePath.IsNullOrEmpty() && !x.ReceiptOfRecipientFilePath.IsNullOrEmpty());
+    //}
 
     //public async Task<ResultModel> Complete(int requestUpgradeId, Guid userId)
     //{

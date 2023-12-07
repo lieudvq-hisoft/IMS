@@ -10,10 +10,7 @@ using Data.Utils.Paging;
 using DocumentFormat.OpenXml.Packaging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using NPOI.XWPF.UserModel;
 using Services.Utilities;
-using System.Net;
-using System.Reflection.Metadata;
 using System.Globalization;
 using System.Text.Json;
 
@@ -29,7 +26,7 @@ public interface IServerAllocationService
     Task<ResultModel> GetLocationAssignment(int id);
     Task<ResultModel> GetIpAddress(int id, PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetLocation(PagingParam<SimpleSortCriteria> paginationModel, int id);
-    Task<ResultModel> GetAppointment(PagingParam<BaseSortCriteria> paginationModel, int id);
+    Task<ResultModel> GetAppointment(int id, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> Create(ServerAllocationCreateModel model);
     Task<ResultModel> Update(ServerAllocationUpdateModel model);
     Task<ResultModel> Delete(int serverAllocationId);
@@ -370,7 +367,7 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> GetAppointment(PagingParam<BaseSortCriteria> paginationModel, int id)
+    public async Task<ResultModel> GetAppointment(int id, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -386,7 +383,18 @@ public class ServerAllocationService : IServerAllocationService
             }
             else
             {
-                var appointments = serverAllocation.Appointments.AsQueryable();
+                var appointments = _dbContext.Appointments
+                    .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                    .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                    .Include(x => x.AppointmentUsers).ThenInclude(x => x.User)
+                    .Include(x => x.RequestExpandAppointments)
+                    .Include(x => x.RequestUpgradeAppointment)
+                    .Where(x => x.ServerAllocationId == id)
+                    .Where(delegate (Appointment x)
+                    {
+                        return x.FilterAppointment(searchModel);
+                    })
+                    .AsQueryable();
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, appointments.Count());
                 appointments = appointments.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
                 appointments = appointments.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
@@ -824,10 +832,10 @@ public class ServerAllocationService : IServerAllocationService
             //{
             //    result.ErrorMessage = "Cannot create document to a not waiting server";
             //}
-            //else if (!serverAllocation.LocationAssignments.Any())
-            //{
-            //    result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
-            //}
+            else if (!serverAllocation.LocationAssignments.Any())
+            {
+                result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+            }
             //else if (serverAllocation.MasterIpAddress == null)
             //{
             //    result.ErrorMessage = "Server need ip master";
@@ -880,18 +888,6 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
-            //else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
-            //{
-            //    result.ErrorMessage = "Cannot create document to a not waiting server";
-            //}
-            //else if (!serverAllocation.LocationAssignments.Any())
-            //{
-            //    result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
-            //}
-            //else if (serverAllocation.MasterIpAddress == null)
-            //{
-            //    result.ErrorMessage = "Server need ip master";
-            //}
             else
             {
                 File.Copy(inputPath, outputPath, true);
@@ -984,7 +980,7 @@ public class ServerAllocationService : IServerAllocationService
                     document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
 
                     document.RenderText("__SubnetMask__", IpAddress.GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
-                    
+
                     if (model.Good)
                     {
                         document.TickCheckBoxInDocx("Evaluate");

@@ -161,6 +161,17 @@ public class MapperProfile : Profile
         CreateMap<RequestUpgradeAppointment, RequestUpgradeAppointmentModel>();
 
         CreateMap<Appointment, AppointmentModel>()
+             .AfterMap((src, dest, context) =>
+             {
+                 if (src.RequestExpandAppointments?.Any() == true)
+                 {
+                     dest.Purpose = "Expand";
+                 }
+                 if (src.RequestUpgradeAppointment?.Any() == true)
+                 {
+                     dest.Purpose = "Upgrade";
+                 }
+             })
             .AfterMap((src, dest, context) =>
             {
                 if (src.ServerAllocation != null)
