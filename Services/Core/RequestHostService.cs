@@ -655,7 +655,7 @@ public class RequestHostService : IRequestHostService
                 requestHost.ServerAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
 
-                var createDocResult = await CreateUpgradeAndHostInspectionReport(requestHost.ServerAllocationId, model);
+                var createDocResult = await CreateUpgradeAndHostInspectionReport(requestHost.Id, model);
                 if (!createDocResult.Succeed)
                 {
                     transaction.Rollback();
@@ -710,6 +710,8 @@ public class RequestHostService : IRequestHostService
                     TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
                     document.RenderText("__Date__", $"{now.Day}/{now.Month}/{now.Year}");
 
+                    document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
+
                     document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
@@ -719,9 +721,15 @@ public class RequestHostService : IRequestHostService
                     document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
 
                     document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
-                    
-                    document.TickCheckBoxInDocx("Service");
-                    
+
+                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+
+                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+
+                    document.RenderText("__Location__", textInfo.ToTitleCase(model.Location));
+
+                    document.TickCheckBoxInDocx("Allocation");
+
                     document.RenderText("__ServerName__", serverAllocation.Name);
 
                     var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
@@ -760,21 +768,11 @@ public class RequestHostService : IRequestHostService
 
                     document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
 
-                    document.RenderText("__Action__", requestHost.IsRemoval ? "Gỡ" : "Thêm");
+                    document.RenderText("__Action__", "");
 
-                    document.RenderText("__RequestHostIpCount__", requestHost.Quantity.ToString());
+                    document.RenderText("__RequestHostIpCount__", "");
 
-                    var ipAddressString = "";
-                    var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress).ToList();
-                    for (int i = 0; i < ipAddresses.Count(); i++)
-                    {
-                        ipAddressString += ipAddresses[i].Address;
-                        if (i < ipAddresses.Count - 1)
-                        {
-                            ipAddressString += ", ";
-                        }
-                    }
-                    document.RenderText("__RequestHostIpAddreses__", ipAddressString);
+                    document.RenderText("__RequestHostIpAddreses__", "");
 
                     document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
 

@@ -153,6 +153,8 @@ public class AppointmentCompleteModel
     public HostAndUpgradeCreateInspectionReportModel HostAndUpgradeCreateInspectionReportModel;
 
     public ServerAllocationCreateRequestExpandInspectionReportModel ExpandCreateInspectionReportModel;
+
+    public ReceiptOfRecipientModel ReceiptOfRecipientModel { get; set; }
 }
 
 public class AppointmentSearchModel

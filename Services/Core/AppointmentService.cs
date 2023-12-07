@@ -1492,7 +1492,7 @@ public class AppointmentService : IAppointmentService
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
-                result.Data = outputPath;
+                result.Data = inspectionReportFileName;
             }
         }
         catch (Exception e)
@@ -1503,7 +1503,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateReceiptReport(int serverAllocationId)
+    public async Task<ResultModel> CreateReceiptReport(int serverAllocationId, ReceiptOfRecipientModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;

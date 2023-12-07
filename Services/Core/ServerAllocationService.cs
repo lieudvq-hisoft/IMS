@@ -821,6 +821,10 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
+            else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
+            {
+                result.ErrorMessage = "Server need to be waiting";
+            }
             else if (!serverAllocation.LocationAssignments.Any())
             {
                 result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
