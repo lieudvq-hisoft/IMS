@@ -1204,14 +1204,11 @@ public class AppointmentService : IAppointmentService
                     document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
 
                     document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
-                    if (model.NewAllocation)
-                    {
-                        document.TickCheckBoxInDocx("Allocation");
-                    }
-                    else
-                    {
-                        document.TickCheckBoxInDocx("Service");
-                    }
+
+                    document.RenderText("__Location__", textInfo.ToTitleCase(model.Location));
+
+                    document.TickCheckBoxInDocx("Allocation");
+
                     document.RenderText("__ServerName__", serverAllocation.Name);
 
                     var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);

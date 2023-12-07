@@ -739,15 +739,11 @@ public class ServerAllocationService : IServerAllocationService
                     document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
                     
                     document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+                    
+                    document.RenderText("__Location__", textInfo.ToTitleCase(model.Location));
 
-                    if (model.NewAllocation)
-                    {
-                        document.TickCheckBoxInDocx("Allocation");
-                    }
-                    else
-                    {
-                        document.TickCheckBoxInDocx("Service");
-                    }
+                    document.TickCheckBoxInDocx("Allocation");
+           
                     document.RenderText("__ServerName__", serverAllocation.Name);
 
                     var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
