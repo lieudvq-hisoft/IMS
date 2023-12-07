@@ -703,18 +703,6 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
-            //else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
-            //{
-            //    result.ErrorMessage = "Cannot create document to a not waiting server";
-            //}
-            //else if (!serverAllocation.LocationAssignments.Any())
-            //{
-            //    result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
-            //}
-            //else if (serverAllocation.MasterIpAddress == null)
-            //{
-            //    result.ErrorMessage = "Server need ip master";
-            //}
             else
             {
                 File.Copy(inputPath, outputPath, true);

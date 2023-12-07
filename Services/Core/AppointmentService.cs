@@ -1003,17 +1003,6 @@ public class AppointmentService : IAppointmentService
                 var requestRemovalResults = new List<ResultModel>();
                 foreach (var requestExpandId in appointment.RequestExpandAppointments.Where(x => x.ForRemoval).Select(x => x.RequestExpandId))
                 {
-                    var createDocResult = await CreateRequestExpandInspectionReport(appointment.ServerAllocationId, model.ExpandCreateInspectionReportModel);
-                    if (!createDocResult.Succeed)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = createDocResult.ErrorMessage;
-                    }
-                    else
-                    {
-                        appointment.ServerAllocation.InspectionRecordFilePath = createDocResult.Data as string;
-                        _dbContext.SaveChanges();
-                    }
                     requestRemovalResults.Add(await CompleteRemoval(requestExpandId));
                 }
 
@@ -1518,6 +1507,115 @@ public class AppointmentService : IAppointmentService
 
                 result.Succeed = true;
                 result.Data = outputPath;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> CreateReceiptReport(int serverAllocationId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            string inputPath = Path.Combine(_env.WebRootPath, "Report", "Template2.docx");
+            string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
+            var serverAllocation = _dbContext.ServerAllocations
+               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+               .Include(x => x.Customer)
+               .Include(x => x.RequestUpgrades).ThenInclude(x => x.Component)
+               .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+               .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+               .FirstOrDefault(x => x.Id == serverAllocationId);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (!serverAllocation.LocationAssignments.Any())
+            {
+                result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+            }
+
+            else
+            {
+                File.Copy(inputPath, outputPath, true);
+                using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
+                {
+                    int counter = 1;
+                    var receiptReportModels = new List<ReceiptReportModel>();
+                    foreach (var requestUpgrade in serverAllocation.RequestUpgrades)
+                    {
+                        var requestUpgradeDescriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(requestUpgrade.Description);
+                        var hardwareDescriptions = new List<ConfigDescriptionModel>();
+                        var hardware = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId);
+                        if (hardware != null)
+                        {
+                            hardwareDescriptions.AddRange(JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(hardware.Description));
+                        }
+                        var unChange = requestUpgradeDescriptions.IntersectBy(hardwareDescriptions.Select(x => x.SerialNumber), x => x.SerialNumber).Select(x => x.SerialNumber);
+                        requestUpgradeDescriptions.RemoveAll(x => unChange.Contains(x.SerialNumber));
+                        hardwareDescriptions.RemoveAll(x => unChange.Contains(x.SerialNumber));
+                        var newConfig = new ReceiptReportModel
+                        {
+                            PartNo = counter++,
+                            Model = requestUpgrade.Component.Name + " - ",
+                            Action = "Thêm",
+                            Quantity = requestUpgradeDescriptions.Count,
+                            Unit = "Cái",
+                            SerialNumber = ""
+                        };
+
+                        for (int i = 0; i < requestUpgradeDescriptions.Count; i++)
+                        {
+                            newConfig.Model += requestUpgradeDescriptions[i].Model;
+                            newConfig.SerialNumber += requestUpgradeDescriptions[i].Model;
+                            if (i < requestUpgradeDescriptions.Count - 1)
+                            {
+                                newConfig.Model += ", ";
+                            }
+                        }
+
+                        if (hardwareDescriptions.Any())
+                        {
+                            var oldConfig = new ReceiptReportModel
+                            {
+                                PartNo = counter++,
+                                Model = hardware.Component.Name + " - ",
+                                Action = "Gỡ",
+                                Quantity = hardwareDescriptions.Count,
+                                Unit = "Cái",
+                                SerialNumber = ""
+                            };
+
+                            for (int i = 0; i < hardwareDescriptions.Count; i++)
+                            {
+                                oldConfig.Model += hardwareDescriptions[i].Model;
+                                oldConfig.SerialNumber += hardwareDescriptions[i].Model;
+                                if (i < hardwareDescriptions.Count - 1)
+                                {
+                                    oldConfig.Model += ", ";
+                                }
+                            }
+                            receiptReportModels.Add(oldConfig);
+                        }
+                        receiptReportModels.Add(newConfig);
+                    }
+                    document.InsertToSingleTable(receiptReportModels);
+                    document.MainDocumentPart.Document.Save();
+                }
+                //var formfile = document.ConvertToIFormFile(outputPath);
+                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
+                serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+                _dbContext.SaveChanges();
+
+                result.Succeed = true;
+                result.Data = receiptOfRecipientFileName;
             }
         }
         catch (Exception e)
