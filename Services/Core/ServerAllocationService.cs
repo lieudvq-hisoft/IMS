@@ -911,6 +911,7 @@ public class ServerAllocationService : IServerAllocationService
 
                     var now = DateTime.UtcNow;
                     document.RenderText("__Time__", $"{now.Day}/{now.Month}/{now.Year}");
+                    document.RenderText("__Time__", $"{now.Day}/{now.Month}/{now.Year}");
 
                     document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
 
