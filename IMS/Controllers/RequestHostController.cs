@@ -133,10 +133,10 @@ public class RequestHostController : ControllerBase
     //}
 
     [HttpPut("{id}/Complete")]
-    public async Task<ActionResult> Complete(int id)
+    public async Task<ActionResult> Complete(int id, [FromBody] HostAndUpgradeCreateInspectionReportModel? model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestHostService.Complete(id, new Guid(userId));
+        var result = await _requestHostService.Complete(id, new Guid(userId), model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

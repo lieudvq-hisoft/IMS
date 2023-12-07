@@ -8,10 +8,12 @@ using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
 using DocumentFormat.OpenXml.Packaging;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
 using System.Globalization;
+using System.Text.Json;
 
 namespace Services.Core;
 public interface IRequestHostService
@@ -28,20 +30,22 @@ public interface IRequestHostService
     Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model);
     //Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model);
     //Task<ResultModel> Process(int requestHostId, Guid userId);
-    Task<ResultModel> Complete(int requestHostId, Guid userId);
+    Task<ResultModel> Complete(int requestHostId, Guid userId, HostAndUpgradeCreateInspectionReportModel? model);
 }
 
 public class RequestHostService : IRequestHostService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly IHostingEnvironment _env;
     private readonly ICloudinaryHelper _cloudinaryHelper;
     private readonly UserManager<User> _userManager;
 
-    public RequestHostService(AppDbContext dbContext, IMapper mapper, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManager)
+    public RequestHostService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManager)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _env = env;
         _cloudinaryHelper = cloudinaryHelper;
         _userManager = userManager;
     }
@@ -586,7 +590,7 @@ public class RequestHostService : IRequestHostService
     //    return result;
     //}
 
-    public async Task<ResultModel> Complete(int requestHostId, Guid userId)
+    public async Task<ResultModel> Complete(int requestHostId, Guid userId, HostAndUpgradeCreateInspectionReportModel? model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -594,6 +598,7 @@ public class RequestHostService : IRequestHostService
 
         try
         {
+            using var transaction = _dbContext.Database.BeginTransaction();
             var requestHost = _dbContext.RequestHosts
                 .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments)
@@ -610,6 +615,10 @@ public class RequestHostService : IRequestHostService
             else if (!requestHost.RequestHostIps.Any())
             {
                 result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
+            }
+            else if (requestHost.InspectionReportFilePath == null && model == null)
+            {
+                result.ErrorMessage = "Need inspection report to complete";
             }
             else
             {
@@ -644,8 +653,21 @@ public class RequestHostService : IRequestHostService
                 requestHost.Status = RequestHostStatus.Success;
                 requestHost.ServerAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = _mapper.Map<List<IpAssignmentResultModel>>(ipAssignments);
+
+                var createDocResult = await CreateUpgradeAndHostInspectionReport(requestHost.ServerAllocationId, model);
+                if (!createDocResult.Succeed)
+                {
+                    transaction.Rollback();
+                    result.ErrorMessage = createDocResult.ErrorMessage;
+                }
+                else
+                {
+                    requestHost.InspectionReportFilePath = createDocResult.Data as string;
+                    _dbContext.SaveChanges();
+                    transaction.Commit();
+                    result.Succeed = true;
+                    result.Data = _mapper.Map<List<IpAssignmentResultModel>>(ipAssignments);
+                }
             }
         }
         catch (Exception e)
@@ -656,129 +678,123 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    //public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
+    public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
 
-    //    try
-    //    {
-    //        string inputPath = Path.Combine(_env.WebRootPath, "Report", "UpgradeAndHostTemplate.docx");
-    //        string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
-    //        var serverAllocation = _dbContext.ServerAllocations
-    //           .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
-    //           .Include(x => x.Customer)
-    //           .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-    //           .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
-    //           .FirstOrDefault(x => x.Id == serverAllocationId);
-    //        if (serverAllocation == null)
-    //        {
-    //            result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-    //        }
-    //        //else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
-    //        //{
-    //        //    result.ErrorMessage = "Cannot create document to a not waiting server";
-    //        //}
-    //        //else if (!serverAllocation.LocationAssignments.Any())
-    //        //{
-    //        //    result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
-    //        //}
-    //        //else if (serverAllocation.MasterIpAddress == null)
-    //        //{
-    //        //    result.ErrorMessage = "Server need ip master";
-    //        //}
-    //        else
-    //        {
-    //            File.Copy(inputPath, outputPath, true);
-    //            using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
-    //            {
-    //                var now = DateTime.UtcNow;
-    //                TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
-    //                document.RenderText("__Date__", $"{now.Day}/{now.Month}/{now.Year}");
+        try
+        {
+            string inputPath = Path.Combine(_env.WebRootPath, "Report", "UpgradeAndHostTemplate.docx");
+            string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
+            var serverAllocation = _dbContext.ServerAllocations
+               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+               .Include(x => x.Customer)
+               .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+               .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+               .FirstOrDefault(x => x.Id == serverAllocationId);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            //else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
+            //{
+            //    result.ErrorMessage = "Cannot create document to a not waiting server";
+            //}
+            //else if (!serverAllocation.LocationAssignments.Any())
+            //{
+            //    result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+            //}
+            //else if (serverAllocation.MasterIpAddress == null)
+            //{
+            //    result.ErrorMessage = "Server need ip master";
+            //}
+            else
+            {
+                File.Copy(inputPath, outputPath, true);
+                using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
+                {
+                    var now = DateTime.UtcNow;
+                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+                    document.RenderText("__Date__", $"{now.Day}/{now.Month}/{now.Year}");
 
-    //                document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
+                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
 
-    //                document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
+                    document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
 
-    //                document.RenderText("__Position__", textInfo.ToTitleCase(model.CustomerPosition));
+                    document.RenderText("__Position__", textInfo.ToTitleCase(model.CustomerPosition));
 
-    //                document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
+                    document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
 
-    //                document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
-    //                if (model.NewAllocation)
-    //                {
-    //                    document.TickCheckBoxInDocx("Allocation");
-    //                }
-    //                else
-    //                {
-    //                    document.TickCheckBoxInDocx("Service");
-    //                }
-    //                document.RenderText("__ServerName__", serverAllocation.Name);
+                    document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
+                    if (model.NewAllocation)
+                    {
+                        document.TickCheckBoxInDocx("Allocation");
+                    }
+                    else
+                    {
+                        document.TickCheckBoxInDocx("Service");
+                    }
+                    document.RenderText("__ServerName__", serverAllocation.Name);
 
-    //                var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
-    //                var cpuString = "";
-    //                for (int i = 0; i < cpus.Count(); i++)
-    //                {
-    //                    cpuString += cpus[i].Model;
-    //                    if (i != cpus.Count() - 1)
-    //                    {
-    //                        cpuString += ", ";
-    //                    }
-    //                }
-    //                document.RenderText("__CPUs__", cpuString);
+                    var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
+                    var cpuString = "";
+                    for (int i = 0; i < cpus.Count(); i++)
+                    {
+                        cpuString += cpus[i].Model;
+                        if (i != cpus.Count() - 1)
+                        {
+                            cpuString += ", ";
+                        }
+                    }
+                    document.RenderText("__CPUs__", cpuString);
 
-    //                var rams = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description);
-    //                var ramCapacity = 0;
-    //                for (int i = 0; i < rams.Count(); i++)
-    //                {
-    //                    ramCapacity += rams[i].Capacity;
-    //                }
-    //                document.RenderText("__Ram__", ramCapacity + "Gb");
+                    var rams = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description);
+                    var ramCapacity = 0;
+                    for (int i = 0; i < rams.Count(); i++)
+                    {
+                        ramCapacity += rams[i].Capacity;
+                    }
+                    document.RenderText("__Ram__", ramCapacity + "Gb");
 
-    //                var hardDisks = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description);
-    //                var hardDiskCapacity = 0;
-    //                for (int i = 0; i < hardDisks.Count(); i++)
-    //                {
-    //                    hardDiskCapacity += hardDisks[i].Capacity;
-    //                }
-    //                document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
+                    var hardDisks = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description);
+                    var hardDiskCapacity = 0;
+                    for (int i = 0; i < hardDisks.Count(); i++)
+                    {
+                        hardDiskCapacity += hardDisks[i].Capacity;
+                    }
+                    document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
 
-    //                document.RenderText("__ServerLocation__", serverAllocation.ServerLocation);
+                    document.RenderText("__ServerLocation__", serverAllocation.ServerLocation);
 
-    //                document.RenderText("__SerialNumber__", serverAllocation.SerialNumber);
+                    document.RenderText("__SerialNumber__", serverAllocation.SerialNumber);
 
-    //                document.RenderText("__Power__", serverAllocation.Power + "W");
+                    document.RenderText("__Power__", serverAllocation.Power + "W");
 
-    //                document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
+                    document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
 
-    //                document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
+                    document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
 
-    //                document.RenderText("__SubnetMask__", IpAddress.GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
-    //                if (model.Good)
-    //                {
-    //                    document.TickCheckBoxInDocx("Evaluate");
-    //                }
-    //                document.RenderText("__Note__", model.Note);
-    //                document.MainDocumentPart.Document.Save();
-    //            }
-    //            string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
-    //            //serverAllocation.InspectionRecordFilePath = inspectionReportFileName;
+                    document.RenderText("__SubnetMask__", IpAddress.GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
+                    if (model.Good)
+                    {
+                        document.TickCheckBoxInDocx("Evaluate");
+                    }
+                    document.RenderText("__Note__", model.Note);
+                    document.MainDocumentPart.Document.Save();
+                }
+                string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
+                _dbContext.SaveChanges();
 
-    //            //if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)
-    //            //{
-    //            //    serverAllocation.Status = ServerAllocationStatus.Working;
-    //            //}
-    //            _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = inspectionReportFileName;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
 
-    //            result.Succeed = true;
-    //            result.Data = inspectionReportFileName;
-    //        }
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
-
-    //    return result;
-    //}
+        return result;
+    }
 }
