@@ -712,6 +712,8 @@ public class ServerAllocationService : IServerAllocationService
                     TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
                     document.RenderText("__Date__", $"{now.Day}/{now.Month}/{now.Year}");
 
+                    document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
+
                     document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
@@ -891,6 +893,7 @@ public class ServerAllocationService : IServerAllocationService
             var serverAllocation = _dbContext.ServerAllocations
                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                .Include(x => x.Customer)
+               .Include(x => x.RequestExpands).ThenInclude(x => x.Size)
                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                .FirstOrDefault(x => x.Id == requestExpandId);
@@ -981,9 +984,7 @@ public class ServerAllocationService : IServerAllocationService
 
                     document.RenderText("__SerialNumber__", serverAllocation.SerialNumber);
 
-                    document.RenderText("__Size__", model.Size);
-
-                    document.RenderText("__DNS__", model.DNS);
+                    document.RenderText("__Size__", );
 
                     document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
                     document.RenderText("__Action__", "");
