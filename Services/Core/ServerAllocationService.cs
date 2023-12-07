@@ -784,6 +784,12 @@ public class ServerAllocationService : IServerAllocationService
 
                     document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
 
+                    document.RenderText("__Action__", "");
+
+                    document.RenderText("__RequestHostIpCount__", "");
+
+                    document.RenderText("__RequestHostIpAddreses__", "");
+
                     document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
 
                     document.RenderText("__SubnetMask__", IpAddress.GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
@@ -991,7 +997,10 @@ public class ServerAllocationService : IServerAllocationService
 
                     document.RenderText("__DNS__", model.DNS);
 
-                    document.RenderText("__IPAddress__", serverAllocation.MasterIpAddress);
+                    document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
+                    document.RenderText("__Action__", "");
+                    document.RenderText("__RequestHostIpCount__", "");
+                    document.RenderText("__RequestHostIpAddreses__", "");
 
                     document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
 
