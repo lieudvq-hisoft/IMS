@@ -376,8 +376,14 @@ public class RequestUpgradeService : IRequestUpgradeService
             else
             {
                 requestUpgrade.Status = RequestStatus.Failed;
-                requestUpgrade.TechNote = model.TechNote;
-                requestUpgrade.SaleNote = model.SaleNote;
+                if (requestUpgrade.TechNote != null)
+                {
+                    requestUpgrade.TechNote = model.TechNote;
+                }
+                if (requestUpgrade.SaleNote != null)
+                {
+                    requestUpgrade.SaleNote = model.SaleNote;
+                }
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = requestUpgradeId;
