@@ -328,14 +328,14 @@ public class RequestHostService : IRequestHostService
                     RequestHostId = requestHost.Id,
                     UserId = userId
                 });
-                _dbContext.SaveChanges();
-
                 _dbContext.RequestHostUsers.Add(new RequestHostUser
                 {
                     Action = RequestUserAction.Execute,
                     RequestHostId = requestHostId,
                     UserId = executor.Id,
                 });
+                _dbContext.SaveChanges();
+
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestHostModel>(requestHost);
             }
