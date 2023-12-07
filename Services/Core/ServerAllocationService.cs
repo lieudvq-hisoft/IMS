@@ -893,7 +893,6 @@ public class ServerAllocationService : IServerAllocationService
             var serverAllocation = _dbContext.ServerAllocations
                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                .Include(x => x.Customer)
-               .Include(x => x.RequestExpands).ThenInclude(x => x.Size)
                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                .FirstOrDefault(x => x.Id == requestExpandId);
@@ -911,7 +910,6 @@ public class ServerAllocationService : IServerAllocationService
                     document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
 
                     var now = DateTime.UtcNow;
-                    document.RenderText("__Time__", $"{now.Day}/{now.Month}/{now.Year}");
                     document.RenderText("__Time__", $"{now.Day}/{now.Month}/{now.Year}");
 
                     document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
@@ -974,17 +972,13 @@ public class ServerAllocationService : IServerAllocationService
                     }
                     document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
 
-                    document.RenderText("__PartNumber__", model.PartNumber);
-
-                    document.RenderText("__SerialNo__", model.SerialNo);
+                    document.RenderText("__SerialNo__", serverAllocation.SerialNumber);
 
                     document.RenderText("__Power__", serverAllocation.Power + "W");
 
                     document.RenderText("__Rack__", serverAllocation.ServerLocation);
 
-                    document.RenderText("__SerialNumber__", serverAllocation.SerialNumber);
-
-                    document.RenderText("__Size__", );
+                    document.RenderText("__Size__", serverAllocation.LocationAssignments.Count() + "U");
 
                     document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
                     document.RenderText("__Action__", "");
@@ -992,8 +986,6 @@ public class ServerAllocationService : IServerAllocationService
                     document.RenderText("__RequestHostIpAddreses__", "");
 
                     document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
-
-                    document.RenderText("__SubnetMask__", IpAddress.GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
 
                     if (model.Good)
                     {
