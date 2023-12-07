@@ -86,7 +86,6 @@ public class IpSubnetService : IIpSubnetService
             ipSubnets = ipSubnets.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
             ipSubnets = ipSubnets.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-
             paging.Data = _mapper.Map<List<IpSubnetModel>>(ipSubnets.Where(x => x.ParentNetworkId == null).ToList());
 
             result.Data = paging;
@@ -317,57 +316,6 @@ public class IpSubnetService : IIpSubnetService
             }
             else
             {
-                //if (model.PrefixLength == 8)
-                //{
-                //    var ipRange = new IpSubnet
-                //    {
-                //        FirstOctet = octets[0],
-                //        SecondOctet = octets[1],
-                //        ThirdOctet = octets[2],
-                //        FourthOctet = octets[3],
-                //        PrefixLength = model.PrefixLength,
-                //        Note = model.Note,
-                //        ParentNetworkId = null
-                //    };
-                //    _dbContext.IpSubnets.Add(ipRange);
-                //    _dbContext.SaveChanges();
-
-                //    while (octets[1] < SUBNET_MAX_SIZE && octets[2] < SUBNET_MAX_SIZE && octets[3] < SUBNET_MAX_SIZE)
-                //    {
-                //        var address = $"{ipRange.FirstOctet}.{octets[1]}.{octets[2]}.{octets[3]}";
-
-                //        IpPurpose purpose = IpPurpose.Host;
-                //        if (octets[3] == 0)
-                //        {
-                //            purpose = IpPurpose.Network;
-                //        }
-                //        if (octets[3] == 255)
-                //        {
-                //            purpose = IpPurpose.Broadcast;
-                //        }
-                //        ips.Add(new IpAddress
-                //        {
-                //            Address = address,
-                //            IsReserved = purpose != IpPurpose.Host,
-                //            Purpose = purpose,
-                //            IpSubnetId = ipRange.Id
-                //        });
-
-                //        octets[3]++;
-                //        if (octets[3] == SUBNET_MAX_SIZE)
-                //        {
-                //            octets[3] = 0;
-                //            octets[2]++;
-                //            if (octets[2] == SUBNET_MAX_SIZE)
-                //            {
-                //                octets[2] = 0;
-                //                octets[1]++;
-                //            }
-                //        }
-                //    }
-                //}
-                //else
-                //{
                 var ipPerSubnet = Math.Pow(2, PREFIX_LENGTH_MAX - model.PrefixLength);
                 int ipCount = 0;
                 IpSubnet currentSubnet = null;
@@ -399,6 +347,10 @@ public class IpSubnetService : IIpSubnetService
                     if (ipCount == ipPerSubnet - 1)
                     {
                         purpose = IpPurpose.Broadcast;
+                    }
+                    if (ipCount == ipPerSubnet - 2)
+                    {
+                        purpose = IpPurpose.Gateway;
                     }
                     ips.Add(new IpAddress
                     {
