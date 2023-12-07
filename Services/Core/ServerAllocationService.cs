@@ -825,7 +825,6 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
             }
-
             else
             {
                 File.Copy(inputPath, outputPath, true);

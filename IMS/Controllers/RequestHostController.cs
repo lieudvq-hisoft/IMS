@@ -115,13 +115,13 @@ public class RequestHostController : ControllerBase
     //    return BadRequest(result.ErrorMessage);
     //}
 
-    //[HttpPost("{id}/Document")]
-    //public async Task<ActionResult> UploadDocument(int id, [FromForm] RequestHostDocumentFileUploadModel model)
-    //{
-    //    var result = await _requestHostService.AssignInspectionReport(id, model);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
+    [HttpPost("{id}/Document")]
+    public async Task<ActionResult> UploadDocument(int id, [FromForm] RequestHostDocumentFileUploadModel model)
+    {
+        var result = await _requestHostService.AssignInspectionReport(id, model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 
     //[HttpPut("{id}/Process")]
     //public async Task<ActionResult> Process(int id)

@@ -28,7 +28,7 @@ public interface IRequestHostService
     Task<ResultModel> Deny(int requestHostId, Guid userId, DenyModel model);
     //Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status, Guid userId);
     Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model);
-    //Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model);
+    Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model);
     //Task<ResultModel> Process(int requestHostId, Guid userId);
     Task<ResultModel> Complete(int requestHostId, Guid userId, HostAndUpgradeCreateInspectionReportModel? model);
     Task<ResultModel> Reject(int requestHostId, RequestHostRejectModel modell);
@@ -516,9 +516,9 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
-            else if (requestHost.Status != RequestHostStatus.Accepted)
+            else if (requestHost.Status != RequestHostStatus.Accepted || requestHost.Status != RequestHostStatus.Success)
             {
-                result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
+                result.ErrorMessage = "Request host must be accept or success";
             }
             else if (!requestHost.RequestHostIps.Any())
             {
