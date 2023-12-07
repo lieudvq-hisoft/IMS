@@ -931,6 +931,8 @@ public class ServerAllocationService : IServerAllocationService
 
                     document.RenderText("__Location__", model.Location);
 
+                    document.RenderText("__Username__", model.Username);
+
                     if (model.isSendMS)
                     {
                         document.TickCheckBoxInDocx("Password");

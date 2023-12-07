@@ -167,6 +167,9 @@ public class ServerAllocationCreateRequestExpandInspectionReportModel
     public string Position { get; set; } = "Position";
 
     //[Required]
+    public string Username { get; set; } = "Username";
+
+    //[Required]
     public bool isSendMS { get; set; } = true;
 
     //[Required]
