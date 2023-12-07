@@ -13,6 +13,7 @@ public class RequestHost : BaseEntity
     public IpAssignmentTypes Type { get; set; }
     public RequestHostStatus Status { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Host;
+    public bool DocumentConfirm { get; set; }
     public string? InspectionReportFilePath { get; set; }
 
     public int ServerAllocationId { get; set; }

@@ -11,6 +11,7 @@ public class ServerAllocationModel
     public string Name { get; set; }
     public string SerialNumber { get; set; }
     public IpAddressResultModel? MasterIp { get; set; }
+    public bool DocumentConfirm { get; set; }
     public string? Note { get; set; }
     public string? TechNote { get; set; }
     public string? SaleNote { get; set; }
@@ -40,6 +41,7 @@ public class ServerAllocationResultModel
     public string? ServerLocation { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdated { get; set; }
+    public bool DocumentConfirm { get; set; }
     public string? InspectionRecordFilePath { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
     public string? RemovalFilePath { get; set; }

@@ -12,6 +12,7 @@ public class ServerAllocation : BaseEntity
     public string? TechNote { get; set; }
     public string? SaleNote { get; set; }
     public string? MasterIpAddress { get; set; }
+    public bool DocumentConfirm { get; set; }
     public string? ServerLocation { get; set; }
     public string? InspectionRecordFilePath { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }

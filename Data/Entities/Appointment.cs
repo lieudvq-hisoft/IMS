@@ -14,6 +14,7 @@ public class Appointment : BaseEntity
     public string? TechNote { get; set; }
     public bool IsCorrectPerson { get; set; }
     public RequestStatus Status { get; set; }
+    public bool DocumentConfirm { get; set; }
     public string? InspectionReportFilePath { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
 

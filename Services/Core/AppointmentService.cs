@@ -976,11 +976,21 @@ public class AppointmentService : IAppointmentService
                 }
             }
 
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
-            if (user == null)
+            if (validPrecondition)
             {
-                validPrecondition = false;
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+                if (appointment.RequestUpgradeAppointment.Any())
+                {
+                    var createDocResult = await CreateReceiptReport(appointment.ServerAllocationId, model.ReceiptOfRecipientModel);
+                    if (!createDocResult.Succeed)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = createDocResult.ErrorMessage;
+                    }
+                    else
+                    {
+                        appointment.ReceiptOfRecipientFilePath = createDocResult.Data as string;
+                    }
+                }
             }
 
             if (validPrecondition)
@@ -989,6 +999,7 @@ public class AppointmentService : IAppointmentService
                 appointment.Status = RequestStatus.Success;
                 _dbContext.SaveChanges();
                 var requestUpgradeResults = new List<ResultModel>();
+                
                 foreach (var requestUpgradeId in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgradeId))
                 {
                     requestUpgradeResults.Add(await CompleteRequestUpgrade(requestUpgradeId));
@@ -1743,7 +1754,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            string inspectionReportFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
+            
             var appointment = _dbContext.Appointments
                 .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade)
                 .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand)
@@ -1752,12 +1763,10 @@ public class AppointmentService : IAppointmentService
             {
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
-            else if (appointment.Status != RequestStatus.Accepted)
-            {
-                result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
-            }
             else
             {
+                string inspectionReportFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
+                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(model.ReceiptOfRecipient);
                 appointment.InspectionReportFilePath = inspectionReportFileName;
                 _dbContext.SaveChanges();
                 result.Succeed = true;

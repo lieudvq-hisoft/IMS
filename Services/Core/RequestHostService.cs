@@ -62,7 +62,7 @@ public class RequestHostService : IRequestHostService
                 .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.RequestHostUsers).ThenInclude(x => x.User)
-                 .Where(delegate (RequestHost x)
+                .Where(delegate (RequestHost x)
                  {
                      return x.FilterRequestHost(searchModel);
                  })
@@ -516,9 +516,13 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
-            else if (requestHost.Status != RequestHostStatus.Accepted || requestHost.Status != RequestHostStatus.Success)
+            else if (requestHost.Status != RequestHostStatus.Success)
             {
                 result.ErrorMessage = "Request host must be accept or success";
+            }
+            else if (requestHost.DocumentConfirm)
+            {
+                result.ErrorMessage = "Request host document confirm";
             }
             else if (!requestHost.RequestHostIps.Any())
             {

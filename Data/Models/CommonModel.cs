@@ -18,11 +18,11 @@ public class DocumentFileUploadModel
     [FileExtensions(Extensions = "pdf,docx,doc,jpeg")]
     public string InspectionReportFileName => InspectionReport?.FileName;
 
-    //[Required]
-    //public IFormFile ReceiptOfRecipient { get; set; }
+    [Required]
+    public IFormFile ReceiptOfRecipient { get; set; }
 
-    //[FileExtensions(Extensions = "pdf,docx,doc,jpeg")]
-    //public string ReceiptOfRecipientFileName => ReceiptOfRecipient?.FileName;
+    [FileExtensions(Extensions = "pdf,docx,doc,jpeg")]
+    public string ReceiptOfRecipientFileName => ReceiptOfRecipient?.FileName;
 }
 
 public class RequestHostDocumentFileUploadModel

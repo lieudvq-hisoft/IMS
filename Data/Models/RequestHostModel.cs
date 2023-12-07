@@ -13,6 +13,7 @@ public class RequestHostModel
     public bool IsRemoval { get; set; }
     public IpAssignmentTypes Type { get; set; }
     public RequestHostStatus Status { get; set; }
+    public bool DocumentConfirm { get; set; }
     public string? InspectionReportFilePath { get; set; }
     //public string? ReceiptOfRecipientFilePath { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Host;
@@ -37,8 +38,8 @@ public class RequestHostResultModel
     public IpAssignmentTypes Type { get; set; }
     public RequestHostStatus Status { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Host;
+    public bool DocumentConfirm { get; set; }
     public string? InspectionReportFilePath { get; set; }
-    //public string? ReceiptOfRecipientFilePath { get; set; }
 
     public int ServerAllocationId { get; set; }
 }
