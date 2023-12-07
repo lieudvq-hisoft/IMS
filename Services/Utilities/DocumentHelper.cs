@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Office2010.Word;
+﻿using Data.Models;
+using DocumentFormat.OpenXml.Office2010.Word;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Http;
@@ -63,5 +64,45 @@ public static class DocumentHelper
 
         // Create an IFormFile from the MemoryStream
         return new FormFile(stream, 0, stream.Length, "document", fileName);
+    }
+
+    public static void InsertToSingleTable(this WordprocessingDocument wordDocument, List<ReceiptReportModel> models)
+    {
+        var tables = wordDocument.MainDocumentPart.Document.Body.Descendants<Table>();
+        Table chosenTable = null;
+        foreach (var table in tables)
+        {
+            IEnumerable<TableProperties> tableProperties = table.Descendants<TableProperties>().Where(tp => tp.TableCaption != null);
+            foreach (TableProperties tProp in tableProperties)
+            {
+                if (tProp.TableCaption.Val.Equals("Hardware")) // see comment, this is actually StringValue
+                {
+                    // do something for table with myCaption
+                    chosenTable = (Table)tProp.Parent;
+                }
+            }
+        }
+
+        if (chosenTable != null)
+        {
+            // Iterate through the list and add a table row for each item
+            foreach (ReceiptReportModel item in models)
+            {
+                TableRow newRow = new TableRow();
+
+                // Add cells for each property
+                TableCell cell1 = new TableCell(new Paragraph(new Run(new Text(item.PartNo.ToString()))));
+                TableCell cell2 = new TableCell(new Paragraph(new Run(new Text(item.Model))));
+                TableCell cell3 = new TableCell(new Paragraph(new Run(new Text(item.Action))));
+                TableCell cell4 = new TableCell(new Paragraph(new Run(new Text(item.Quantity.ToString()))));
+                TableCell cell5 = new TableCell(new Paragraph(new Run(new Text(item.Unit))));
+                TableCell cell6 = new TableCell(new Paragraph(new Run(new Text(item.SerialNumber))));
+
+                newRow.Append(cell1, cell2, cell3, cell4, cell5, cell6);
+
+                // Add the new row to the table
+                chosenTable.Append(newRow);
+            }
+        }
     }
 }

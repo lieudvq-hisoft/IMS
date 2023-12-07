@@ -59,3 +59,13 @@ public class ExcelFileUploadModel
     [FileExtensions(Extensions = "xlsx")]
     public string FileName => File?.FileName;
 }
+
+public class ReceiptReportModel
+{
+    public int PartNo { get; set; }
+    public string Model { get; set; }
+    public string Action { get; set; }
+    public int Quantity { get; set; }
+    public string Unit { get; set; }
+    public string SerialNumber { get; set; }
+}

@@ -822,43 +822,59 @@ public class ServerAllocationService : IServerAllocationService
             var serverAllocation = _dbContext.ServerAllocations
                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                .Include(x => x.Customer)
+               .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                .FirstOrDefault(x => x.Id == serverAllocationId);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
-            //else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
-            //{
-            //    result.ErrorMessage = "Cannot create document to a not waiting server";
-            //}
             else if (!serverAllocation.LocationAssignments.Any())
             {
                 result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
             }
-            //else if (serverAllocation.MasterIpAddress == null)
-            //{
-            //    result.ErrorMessage = "Server need ip master";
-            //}
+
             else
             {
                 File.Copy(inputPath, outputPath, true);
                 using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
                 {
+                    int counter = 1;
+                    var receiptReportModels = new List<ReceiptReportModel>();
+                    foreach (var hardware in serverAllocation.ServerHardwareConfigs)
+                    {
+                        List<ConfigDescriptionModel> descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(hardware.Description);
+                        var receiptReportModel = new ReceiptReportModel
+                        {
+                            PartNo = counter++,
+                            Model = hardware.Component.Name + " - ",
+                            Action = "Thêm",
+                            Quantity = descriptions.Count,
+                            Unit = "Cái",
+                            SerialNumber = ""
+                        };
+
+                        for (int i = 0; i < descriptions.Count; i++)
+                        {
+                            receiptReportModel.Model += descriptions[i].Model;
+                            receiptReportModel.SerialNumber += descriptions[i].Model;
+                            if (i < descriptions.Count - 1)
+                            {
+                                receiptReportModel.Model += ", ";
+                            }
+                        }
+                        receiptReportModels.Add(receiptReportModel);
+                    }
+                    document.InsertToSingleTable(receiptReportModels);
                     document.MainDocumentPart.Document.Save();
                 }
                 //var formfile = document.ConvertToIFormFile(outputPath);
                 string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
                 serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
-
-                if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)
-                {
-                    serverAllocation.Status = ServerAllocationStatus.Working;
-                }
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
-                result.Data = outputPath;
+                result.Data = receiptOfRecipientFileName;
             }
         }
         catch (Exception e)
