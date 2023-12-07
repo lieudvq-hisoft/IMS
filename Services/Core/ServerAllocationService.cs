@@ -825,6 +825,14 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
             }
+            else if (!serverAllocation.IpAssignments.Any())
+            {
+                result.ErrorMessage = IpAssignmentErrorMessage.NOT_EXISTED;
+            }
+            else if (serverAllocation.InspectionRecordFilePath == null)
+            {
+                result.ErrorMessage = "Inspection report is required";
+            }
             else
             {
                 File.Copy(inputPath, outputPath, true);
@@ -862,6 +870,7 @@ public class ServerAllocationService : IServerAllocationService
                 //var formfile = document.ConvertToIFormFile(outputPath);
                 string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
                 serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+                serverAllocation.Status = ServerAllocationStatus.Working;
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
