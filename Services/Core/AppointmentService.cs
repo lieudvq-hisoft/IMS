@@ -1462,19 +1462,13 @@ public class AppointmentService : IAppointmentService
                     }
                     document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
 
-                    document.RenderText("__PartNumber__", model.PartNumber);
-
-                    document.RenderText("__SerialNo__", model.SerialNo);
-
                     document.RenderText("__Power__", serverAllocation.Power + "W");
 
                     document.RenderText("__Rack__", serverAllocation.ServerLocation);
 
-                    document.RenderText("__SerialNumber__", serverAllocation.SerialNumber);
+                    document.RenderText("__SerialNo__", serverAllocation.SerialNumber);
 
-                    document.RenderText("__Size__", model.Size);
-
-                    document.RenderText("__DNS__", model.DNS);
+                    document.RenderText("__Size__", serverAllocation.LocationAssignments.Count() + "U");
 
                     document.RenderText("__IPAddress__", serverAllocation.MasterIpAddress);
 
