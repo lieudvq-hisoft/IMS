@@ -30,7 +30,6 @@ public class RequestHostDocumentFileUploadModel
     [Required]
     public IFormFile InspectionReport { get; set; }
 
-
     [FileExtensions(Extensions = "pdf,docx,doc,jpeg")]
     public string InspectionReportFileName => InspectionReport?.FileName;
 }
