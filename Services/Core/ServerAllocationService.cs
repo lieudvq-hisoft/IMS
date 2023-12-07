@@ -692,7 +692,7 @@ public class ServerAllocationService : IServerAllocationService
         try
         {
             string inputPath = Path.Combine(_env.WebRootPath, "Report", "UpgradeAndHostTemplate.docx");
-            string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
+            string outputPath = Path.Combine(_env.WebRootPath, "Report", "BBNT.docx");
             var serverAllocation = _dbContext.ServerAllocations
                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                .Include(x => x.Customer)
@@ -728,11 +728,16 @@ public class ServerAllocationService : IServerAllocationService
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
 
-                    document.RenderText("__Position__", textInfo.ToTitleCase(model.CustomerPosition));
+                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
 
                     document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
 
                     document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
+
+                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+                    
+                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+
                     if (model.NewAllocation)
                     {
                         document.TickCheckBoxInDocx("Allocation");
@@ -782,6 +787,7 @@ public class ServerAllocationService : IServerAllocationService
                     document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
 
                     document.RenderText("__SubnetMask__", IpAddress.GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
+                    
                     if (model.Good)
                     {
                         document.TickCheckBoxInDocx("Evaluate");
@@ -790,16 +796,10 @@ public class ServerAllocationService : IServerAllocationService
                     document.MainDocumentPart.Document.Save();
                 }
                 string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
-                serverAllocation.InspectionRecordFilePath = inspectionReportFileName;
-
-                if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)
-                {
-                    serverAllocation.Status = ServerAllocationStatus.Working;
-                }
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
-                result.Data = outputPath;
+                result.Data = inspectionReportFileName;
             }
         }
         catch (Exception e)
@@ -877,7 +877,7 @@ public class ServerAllocationService : IServerAllocationService
         try
         {
             string inputPath = Path.Combine(_env.WebRootPath, "Report", "ExpandTemplate.docx");
-            string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
+            string outputPath = Path.Combine(_env.WebRootPath, "Report", "BBNT.docx");
             var serverAllocation = _dbContext.ServerAllocations
                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                .Include(x => x.Customer)

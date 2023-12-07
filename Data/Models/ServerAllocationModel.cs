@@ -129,13 +129,13 @@ public class HostAndUpgradeCreateInspectionReportModel
     public string CustomerPosition { get; set; } = "CustomerPosition";
 
     //[Required]
+    public string QTName { get; set; } = "QTName";
+
+    //[Required]
+    public string Position { get; set; } = "Position";
+
+    //[Required]
     public bool NewAllocation { get; set; } = true;
-
-    //[Required]
-    public string Username { get; set; } = "Username";
-
-    //[Required]
-    public string Password { get; set; } = "Password";
 
     //[Required]
     public bool Good { get; set; } = true;
