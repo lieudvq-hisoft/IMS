@@ -1200,18 +1200,10 @@ public class AppointmentService : IAppointmentService
 
                     document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
 
-                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+                    document.RenderText("__Location__", textInfo.ToTitleCase(model.Location));
 
-                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+                    document.TickCheckBoxInDocx("Allocation");
 
-                    if (model.NewAllocation)
-                    {
-                        document.TickCheckBoxInDocx("Allocation");
-                    }
-                    else
-                    {
-                        document.TickCheckBoxInDocx("Service");
-                    }
                     document.RenderText("__ServerName__", serverAllocation.Name);
 
                     var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);

@@ -137,7 +137,7 @@ public class HostAndUpgradeCreateInspectionReportModel
     public string Position { get; set; } = "Position";
 
     //[Required]
-    public bool NewAllocation { get; set; } = true;
+    public string Location { get; set; } = "Location";
 
     //[Required]
     public bool Good { get; set; } = true;
@@ -158,13 +158,13 @@ public class ServerAllocationCreateRequestExpandInspectionReportModel
     public string CustomerPosition { get; set; } = "CustomerPosition";
 
     //[Required]
-    public string Location { get; set; } = "CustomerPosition";
-
-    //[Required]
     public string QTName { get; set; } = "QTName";
 
     //[Required]
     public string Position { get; set; } = "Position";
+
+    //[Required]
+    public string Location { get; set; } = "Location";
 
     //[Required]
     public string Username { get; set; } = "Username";

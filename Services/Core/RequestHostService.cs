@@ -719,19 +719,9 @@ public class RequestHostService : IRequestHostService
                     document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
 
                     document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
-
-                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
-
-                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
-
-                    if (model.NewAllocation)
-                    {
-                        document.TickCheckBoxInDocx("Allocation");
-                    }
-                    else
-                    {
-                        document.TickCheckBoxInDocx("Service");
-                    }
+                    
+                    document.TickCheckBoxInDocx("Service");
+                    
                     document.RenderText("__ServerName__", serverAllocation.Name);
 
                     var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
