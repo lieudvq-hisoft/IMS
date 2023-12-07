@@ -122,61 +122,90 @@ public class ServerAllocationImportModel
 
 public class HostAndUpgradeCreateInspectionReportModel
 {
-    //[Required]
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
     public string Number { get; set; } = "Number";
-    //[Required]
+
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
     public string CustomerName { get; set; } = "CustomerName";
 
-    //[Required]
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
     public string CustomerPosition { get; set; } = "CustomerPosition";
 
-    //[Required]
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
     public string QTName { get; set; } = "QTName";
 
-    //[Required]
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
     public string Position { get; set; } = "Position";
 
-    //[Required]
+    [Required]
+    [MinLength(6)]
+    [MaxLength(2000)]
     public string Location { get; set; } = "Location";
 
-    //[Required]
+    [Required]
     public bool Good { get; set; } = true;
 
+    [MaxLength(2000)]
     public string Note { get; set; } = "Note";
 }
 
 
 public class ServerAllocationCreateRequestExpandInspectionReportModel
 {
-    //[Required]
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
     public string Number { get; set; } = "Number";
 
-    //[Required]
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
     public string CustomerName { get; set; } = "CustomerName";
 
-    //[Required]
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
     public string CustomerPosition { get; set; } = "CustomerPosition";
 
-    //[Required]
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
     public string QTName { get; set; } = "QTName";
 
-    //[Required]
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
     public string Position { get; set; } = "Position";
 
-    //[Required]
+    [Required]
+    [MinLength(6)]
+    [MaxLength(2000)]
     public string Location { get; set; } = "Location";
 
-    //[Required]
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
     public string Username { get; set; } = "Username";
 
-    //[Required]
+    [Required]
     public bool isSendMS { get; set; } = true;
 
-    //[Required]
+    [Required]
     public bool Good { get; set; } = true;
 
-    //[Required]
+    [Required]
     public bool Guid { get; set; } = true;
 
+    [MaxLength(2000)]
     public string Note { get; set; } = "Note";
 }
