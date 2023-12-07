@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
 using Swashbuckle.AspNetCore.Annotations;
-using System.IO;
 
 namespace IMS.Controllers;
 [Route("api/[controller]")]
@@ -104,9 +103,9 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpGet("{id}/Appointment")]
-    public async Task<ActionResult> GetAppointment([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromRoute] int id)
+    public async Task<ActionResult> GetAppointment([FromRoute] int id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] AppointmentSearchModel searchModel)
     {
-        var result = await _serverAllocationService.GetAppointment(pagingParam, id);
+        var result = await _serverAllocationService.GetAppointment(id, pagingParam, searchModel);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

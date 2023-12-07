@@ -13,14 +13,10 @@ namespace IMS.Controllers;
 public class RequestUpgradeController : ControllerBase
 {
     private readonly IRequestUpgradeService _requestUpgradeService;
-    private readonly IWebHostEnvironment _environment;
-    private readonly IFileService _fileService;
 
-    public RequestUpgradeController(IRequestUpgradeService requestUpgradeService, IWebHostEnvironment environment, IFileService fileService)
+    public RequestUpgradeController(IRequestUpgradeService requestUpgradeService)
     {
-        this._requestUpgradeService = requestUpgradeService;
-        _environment = environment;
-        _fileService = fileService;
+        _requestUpgradeService = requestUpgradeService;
     }
 
     [HttpGet]
@@ -129,14 +125,14 @@ public class RequestUpgradeController : ControllerBase
     //    return BadRequest(result.ErrorMessage);
     //}
 
-    [HttpGet("{id}/Completability")]
-    [SwaggerOperation(Summary = "True if any appointment success and have inspection record")]
-    public async Task<ActionResult> GetCompletability(int id)
-    {
-        var result = await _requestUpgradeService.CheckCompletability(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/Completability")]
+    //[SwaggerOperation(Summary = "True if any appointment success and have inspection record")]
+    //public async Task<ActionResult> GetCompletability(int id)
+    //{
+    //    var result = await _requestUpgradeService.CheckCompletability(id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     //[HttpPut("{id}/Complete")]
     //[SwaggerOperation(Summary = "Complete a completable accepted request upgrade. Change serverHardwareconfig")]

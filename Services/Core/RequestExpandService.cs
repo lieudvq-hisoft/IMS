@@ -7,7 +7,6 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -118,6 +117,7 @@ public class RequestExpandService : IRequestExpandService
         var appointments = _dbContext.Appointments
             .Include(x => x.ServerAllocation)
             .Include(x => x.RequestExpandAppointments)
+            .Include(x => x.RequestUpgradeAppointment)
             .Include(x => x.AppointmentUsers)
             .Where(x => x.RequestExpandAppointments.Any(x => x.RequestExpandId == requestExpandId))
             .Where(delegate (Appointment x)

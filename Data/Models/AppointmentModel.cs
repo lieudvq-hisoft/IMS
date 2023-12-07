@@ -17,8 +17,9 @@ public class AppointmentModel
     public bool IsCorrectPerson { get; set; }
     public RequestStatus Status { get; set; }
     public int ServerAllocationId { get; set; }
+    public string? Purpose { get; set; }
     public string? InspectionReportFilePath { get; set; }
-    public string? ReceiptOfRecipientFilePath { get; set; }
+    //public string? ReceiptOfRecipientFilePath { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
 
@@ -43,7 +44,7 @@ public class AppointmentResultModel
     public RequestStatus Status { get; set; }
     public int ServerAllocationId { get; set; }
     public string? InspectionReportFilePath { get; set; }
-    public string? ReceiptOfRecipientFilePath { get; set; }
+    //public string? ReceiptOfRecipientFilePath { get; set; }
 }
 
 public class AppointmentCreateModel
@@ -146,6 +147,8 @@ public class AppointmentCompleteModel
     public bool IsCorrectPerson { get; set; }
 
     public HostAndUpgradeCreateInspectionReportModel HostAndUpgradeCreateInspectionReportModel;
+
+    public ServerAllocationCreateRequestExpandInspectionReportModel ExpandCreateInspectionReportModel;
 }
 
 public class AppointmentSearchModel
