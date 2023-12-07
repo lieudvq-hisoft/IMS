@@ -934,7 +934,11 @@ public class AppointmentService : IAppointmentService
         try
         {
             using var transaction = _dbContext.Database.BeginTransaction();
-            var appointment = _dbContext.Appointments.Include(x => x.RequestExpandAppointments).Include(x => x.RequestUpgradeAppointment).FirstOrDefault(x => x.Id == appointmentId);
+            var appointment = _dbContext.Appointments
+                .Include(x => x.ServerAllocation)
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.ServerAllocation)
+                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.ServerAllocation)
+                .FirstOrDefault(x => x.Id == appointmentId);
             if (appointment == null)
             {
                 validPrecondition = false;
@@ -1007,7 +1011,7 @@ public class AppointmentService : IAppointmentService
                     }
                     else
                     {
-                        appointment.InspectionReportFilePath = createDocResult.Data as string;
+                        appointment.ServerAllocation.InspectionRecordFilePath = createDocResult.Data as string;
                         _dbContext.SaveChanges();
                     }
                     requestRemovalResults.Add(await CompleteRemoval(requestExpandId));
@@ -1062,6 +1066,7 @@ public class AppointmentService : IAppointmentService
                         else
                         {
                             appointment.InspectionReportFilePath = createDocResult.Data as string;
+                            appointment.ServerAllocation.InspectionRecordFilePath = createDocResult.Data as string;
                             transaction.Commit();
                             result.Succeed = true;
                             result.Data = _mapper.Map<AppointmentResultModel>(appointment);
@@ -1169,13 +1174,14 @@ public class AppointmentService : IAppointmentService
 
     public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model)
     {
+
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
             string inputPath = Path.Combine(_env.WebRootPath, "Report", "UpgradeAndHostTemplate.docx");
-            string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
+            string outputPath = Path.Combine(_env.WebRootPath, "Report", "BBNT.docx");
             var serverAllocation = _dbContext.ServerAllocations
                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                .Include(x => x.Customer)
@@ -1199,11 +1205,16 @@ public class AppointmentService : IAppointmentService
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
 
-                    document.RenderText("__Position__", textInfo.ToTitleCase(model.CustomerPosition));
+                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
 
                     document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
 
                     document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
+
+                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+
+                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+
                     if (model.NewAllocation)
                     {
                         document.TickCheckBoxInDocx("Allocation");
@@ -1250,9 +1261,16 @@ public class AppointmentService : IAppointmentService
 
                     document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
 
+                    document.RenderText("__Action__", "");
+
+                    document.RenderText("__RequestHostIpCount__", "");
+
+                    document.RenderText("__RequestHostIpAddreses__", "");
+
                     document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
 
                     document.RenderText("__SubnetMask__", IpAddress.GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
+
                     if (model.Good)
                     {
                         document.TickCheckBoxInDocx("Evaluate");
@@ -1261,12 +1279,6 @@ public class AppointmentService : IAppointmentService
                     document.MainDocumentPart.Document.Save();
                 }
                 string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
-                //serverAllocation.InspectionRecordFilePath = inspectionReportFileName;
-
-                //if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)
-                //{
-                //    serverAllocation.Status = ServerAllocationStatus.Working;
-                //}
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;

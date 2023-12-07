@@ -679,7 +679,7 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model)
+    public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int requestHostId, HostAndUpgradeCreateInspectionReportModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -687,29 +687,20 @@ public class RequestHostService : IRequestHostService
         try
         {
             string inputPath = Path.Combine(_env.WebRootPath, "Report", "UpgradeAndHostTemplate.docx");
-            string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
+            string outputPath = Path.Combine(_env.WebRootPath, "Report", "BBNT.docx");
+            var requestHost = _dbContext.RequestHosts
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).ThenInclude(x => x.IpSubnet)
+                .FirstOrDefault(x => x.Id == requestHostId);
             var serverAllocation = _dbContext.ServerAllocations
                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                .Include(x => x.Customer)
                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
-               .FirstOrDefault(x => x.Id == serverAllocationId);
+               .FirstOrDefault(x => x.Id == requestHost.ServerAllocationId);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
-            //else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
-            //{
-            //    result.ErrorMessage = "Cannot create document to a not waiting server";
-            //}
-            //else if (!serverAllocation.LocationAssignments.Any())
-            //{
-            //    result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
-            //}
-            //else if (serverAllocation.MasterIpAddress == null)
-            //{
-            //    result.ErrorMessage = "Server need ip master";
-            //}
             else
             {
                 File.Copy(inputPath, outputPath, true);
@@ -723,11 +714,16 @@ public class RequestHostService : IRequestHostService
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
 
-                    document.RenderText("__Position__", textInfo.ToTitleCase(model.CustomerPosition));
+                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
 
                     document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
 
                     document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
+
+                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+
+                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+
                     if (model.NewAllocation)
                     {
                         document.TickCheckBoxInDocx("Allocation");
@@ -774,9 +770,26 @@ public class RequestHostService : IRequestHostService
 
                     document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
 
+                    document.RenderText("__Action__", requestHost.IsRemoval ? "Gỡ" : "Thêm");
+
+                    document.RenderText("__RequestHostIpCount__", requestHost.Quantity.ToString());
+
+                    var ipAddressString = "";
+                    var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress).ToList();
+                    for (int i = 0; i < ipAddresses.Count(); i++)
+                    {
+                        ipAddressString += ipAddresses[i].Address;
+                        if (i < ipAddresses.Count - 1)
+                        {
+                            ipAddressString += ", ";
+                        }
+                    }
+                    document.RenderText("__RequestHostIpAddreses__", ipAddressString);
+
                     document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
 
                     document.RenderText("__SubnetMask__", IpAddress.GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
+
                     if (model.Good)
                     {
                         document.TickCheckBoxInDocx("Evaluate");
