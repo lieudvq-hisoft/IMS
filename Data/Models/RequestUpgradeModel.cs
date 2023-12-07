@@ -90,10 +90,10 @@ public class RequestUpgradeUpdateModel
 
 public class RequestUpgradeRejectModel
 {
-    [Required]
+    [StringLength(2000)]
     public string? TechNote { get; set; }
 
-    [Required]
+    [StringLength(2000)]
     public string? SaleNote { get; set; }
 }
 

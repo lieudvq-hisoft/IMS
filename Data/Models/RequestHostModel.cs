@@ -108,9 +108,12 @@ public class RequestHostEvaluateBulkModel
 
 public class RequestHostRejectModel
 {
+    [StringLength(2000)]
     public string? Note { get; set; }
 
+    [StringLength(2000)]
     public string? SaleNote { get; set; }
 
+    [StringLength(2000)]
     public string? TechNote { get; set; }
 }

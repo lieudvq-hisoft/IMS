@@ -92,8 +92,10 @@ public class RequestExpandUpdateModel
 
 public class RequestExpandRejectModel
 {
+    [StringLength(2000)]
     public string? SaleNote { get; set; }
 
+    [StringLength(2000)]
     public string? TechNote { get; set; }
 }
 

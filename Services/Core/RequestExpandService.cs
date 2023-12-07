@@ -281,8 +281,14 @@ public class RequestExpandService : IRequestExpandService
             else
             {
                 requestExpand.Status = RequestStatus.Failed;
-                requestExpand.SaleNote = model.SaleNote;
-                requestExpand.TechNote = model.TechNote;
+                if (model.SaleNote != null)
+                {
+                    requestExpand.SaleNote = model.SaleNote;
+                }
+                if (model.TechNote != null)
+                {
+                    requestExpand.TechNote = model.TechNote;
+                }
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = requestExpandId;

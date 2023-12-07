@@ -127,6 +127,8 @@ public class AppointmentUpdateModel
 
 public class AppointmentFailModel
 {
+    [Required]
+    [StringLength(2000)]
     public string? TechNote { get; set; }
 }
 
@@ -139,8 +141,10 @@ public class AppointmentCompleteModel
     [SameDateAndLaterThan("DateCheckedIn")]
     public DateTime DateCheckedOut { get; set; }
 
+    [StringLength(2000)]
     public string? SaleNote { get; set; }
 
+    [StringLength(2000)]
     public string? TechNote { get; set; }
 
     [Required]
