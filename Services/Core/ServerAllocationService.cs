@@ -917,6 +917,7 @@ public class ServerAllocationService : IServerAllocationService
 
                     var now = DateTime.UtcNow;
                     document.RenderText("__Time__", $"{now.Day}/{now.Month}/{now.Year}");
+                    document.RenderText("__Time__", $"{now.Day}/{now.Month}/{now.Year}");
 
                     document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
 
@@ -929,8 +930,6 @@ public class ServerAllocationService : IServerAllocationService
                     document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
 
                     document.RenderText("__Location__", model.Location);
-
-                    document.RenderText("__Username__", model.Username);
 
                     if (model.isSendMS)
                     {
@@ -986,7 +985,7 @@ public class ServerAllocationService : IServerAllocationService
 
                     document.RenderText("__Size__", serverAllocation.LocationAssignments.Count() + "U");
 
-                    document.RenderText("__IPAddress__", serverAllocation.MasterIpAddress);
+                    document.RenderText("__MasterIp__", serverAllocation.MasterIpAddress);
 
                     document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
 
