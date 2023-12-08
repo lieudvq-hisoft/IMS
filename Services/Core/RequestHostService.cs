@@ -771,7 +771,7 @@ public class RequestHostService : IRequestHostService
 
                     document.RenderText("__Power__", serverAllocation.Power + "W");
 
-                    document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
+                    document.RenderText("__MasterIp__", serverAllocation.MasterIpAddress);
 
                     document.RenderText("__Action__", "");
 
