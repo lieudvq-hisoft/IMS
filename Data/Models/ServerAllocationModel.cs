@@ -214,5 +214,48 @@ public class ServerAllocationCreateRequestExpandInspectionReportModel
 
 public class ReceiptOfRecipientModel
 {
+    [Required]
+    [MinLength(6)]
+    [MaxLength(2000)]
+    public string Location { get; set; } = "Location";
 
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
+    public string CustomerName { get; set; } = "CustomerName";
+
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
+    public string CustomerPosition { get; set; } = "CustomerPosition";
+
+    [Required]
+    [MinLength(6)]
+    [MaxLength(2000)]
+    public string Address { get; set; } = "Address";
+
+
+    [Required]
+    [MinLength(8)]
+    [MaxLength(12)]
+    public string PhoneNumber { get; set; } = "PhoneNumber";
+
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
+    public string Email { get; set; } = "Email";
+
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
+    public string QTName { get; set; } = "QTName";
+
+    [Required]
+    [MinLength(6)]
+    [MaxLength(255)]
+    public string Position { get; set; } = "Position";
+
+    [MinLength(2)]
+    [MaxLength(255)]
+    public string DeviceCondition { get; set; } = "DeviceCondition";
 }

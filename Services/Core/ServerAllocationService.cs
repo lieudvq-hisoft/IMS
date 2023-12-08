@@ -34,7 +34,7 @@ public interface IServerAllocationService
     Task<ResultModel> AssignMasterIp(int serverAllocationId, ServerAllocationMasterIpAssignmentModel model);
     Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model);
     Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model);
-    Task<ResultModel> CreateReceiptReport(int serverAllocationId);
+    Task<ResultModel> CreateReceiptReport(int serverAllocationId, ReceiptOfRecipientModel model);
     Task<ResultModel> Confirm(int serverAllocationId);
     Task<ResultModel> CreateRequestExpandInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model);
     Task<ResultModel> AssignInspectionRecordAndReceiptOfRecipientReport(int serverAllocationId, DocumentFileUploadModel model);
@@ -808,7 +808,7 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> CreateReceiptReport(int serverAllocationId)
+    public async Task<ResultModel> CreateReceiptReport(int serverAllocationId, ReceiptOfRecipientModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -848,6 +848,26 @@ public class ServerAllocationService : IServerAllocationService
                 File.Copy(inputPath, outputPath, true);
                 using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
                 {
+                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+
+                    var now = DateTime.UtcNow;
+                    document.RenderText("__Time__", $"{now.Hour} Giờ {now.Minute} Phút");
+                    document.RenderText("__Date__", $"ngày {now.Date} tháng {now.Month} Năm {now.Year}");
+                    document.RenderText("__Location__", model.Location);
+
+                    document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
+                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
+                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
+                    document.RenderText("__Address__", model.Address);
+                    document.RenderText("__PhoneNumber__", model.PhoneNumber);
+                    document.RenderText("__Email__", model.Email);
+
+                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+
+                    document.RenderText("__DeviceCondition__", model.DeviceCondition);
+                    document.RenderText("__QTNameSignature__", textInfo.ToTitleCase(model.QTName));
+
                     int counter = 1;
                     var receiptReportModels = new List<ReceiptReportModel>();
                     foreach (var hardware in serverAllocation.ServerHardwareConfigs)
