@@ -1579,10 +1579,11 @@ public class AppointmentService : IAppointmentService
                         for (int i = 0; i < requestUpgradeDescriptions.Count; i++)
                         {
                             newConfig.Model += requestUpgradeDescriptions[i].Model;
-                            newConfig.SerialNumber += requestUpgradeDescriptions[i].Model;
+                            newConfig.SerialNumber += requestUpgradeDescriptions[i].SerialNumber;
                             if (i < requestUpgradeDescriptions.Count - 1)
                             {
                                 newConfig.Model += ", ";
+                                newConfig.SerialNumber += ", ";
                             }
                         }
 
