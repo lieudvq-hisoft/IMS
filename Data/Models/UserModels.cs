@@ -1,21 +1,16 @@
 ﻿using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
-namespace Data.Model;
+namespace Data.Models;
 
-public class UserModel 
+public class UserModel
 {
     public Guid Id { get; set; }
     public string PhoneNumber { get; set; }
     public string UserName { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
+    public string Fullname { get; set; }
     public string Email { get; set; }
     public string Address { get; set; }
-    public string? UserAva { get; set; }
-    public string FcmToken { get; set; }
-    public int CurrenNoticeCount { get; set; }
-    public List<UserRoleModel>? userRoles { get; set; }
 }
 
 public class UserViewModel
@@ -23,75 +18,86 @@ public class UserViewModel
     public Guid Id { get; set; }
     public string PhoneNumber { get; set; }
     public string UserName { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
+    public string Fullname { get; set; }
     public string Email { get; set; }
     public string Address { get; set; }
-    public string FcmToken { get; set; }
-
-    [JsonProperty("userAva")]
-    public string? UserAva { get; set; }
 }
 
-public class UserPostModel
+public class UserAssignModel
 {
-    public Guid Id { get; set; }
-    public string PhoneNumber { get; set; }
-    public string UserName { get; set; }
-    public string FirstName { get; set; }
-    public string LastName { get; set; }
-    public string Email { get; set; }
-    public string Address { get; set; }
-    public string? UserAva { get; set; }
+    [Required]
+    public string UserId { get; set; }
+}
+
+public class DenyModel
+{
+    [Required]
+    public string SaleNote { get; set; }
 }
 
 public class UserRoleModel
 {
     public RoleModel role { get; set; }
 }
+
 public class UserCreateModel
 {
-    public string UserName { get; set; }
     [Required]
+    public string UserName { get; set; }
+
+    [Required]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$", ErrorMessage = "Password must be atleast 8 character and have lowercase, uppercase and special character")]
     public string Password { get; set; }
+
     [Required]
     public string Email { get; set; }
-    [Required]
-    public string FirstName { get; set; }
 
-    public string? LastName { get; set; }
+    [Required]
+    public string Fullname { get; set; }
+
     [Required]
     public string Address { get; set; }
-    
+
+    [Required]
     public string PhoneNumber { get; set; }
 
-    public string Age { get; set; }
-    public string IdenficationNumber { get; set; }
-
+    [Required]
+    public List<string> Roles { get; set; }
 }
+
+public class UserChangePasswordModel
+{
+    [Required]
+    [DataType(DataType.Password)]
+    public string Password { get; set; }
+}
+
 public class UserUpdateModel
 {
+    [Required]
     public Guid Id { get; set; }
-    public string FirstName { get; set; }
-    public string? LastName { get; set; }
+
+    //[Required]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$")]
+    public string? Password { get; set; }
+
+    [Required]
+    public string Email { get; set; }
+
+    [Required]
+    public string Fullname { get; set; }
+
+    [Required]
     public string Address { get; set; }
+
+    [Required]
     public string PhoneNumber { get; set; }
-    public string Age { get; set; }
 }
-public class UserUpdateModelAdm
-{
-    public Guid Id { get; set; }
-    public string RoleName { get; set; }
-    public string IdenficationNumber { get; set; }
-    public bool IdenficationConfirm { get; set; }
-    public bool isBlock { get; set; }
-    public bool isDelete { get; set; }
 
 
-}
 public class LoginModel
 {
-    public string Email { get; set; }
+    public string Username { get; set; }
     public string Password { get; set; }
 }
 

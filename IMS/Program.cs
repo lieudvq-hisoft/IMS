@@ -1,5 +1,4 @@
-using IMS.Extensions;
-using Microsoft.Extensions.FileProviders;
+using IMS.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -40,7 +39,7 @@ if (app.Environment.IsDevelopment())
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(c => c.DisplayRequestDuration());
 }
 
 app.UseHttpsRedirection();
@@ -53,8 +52,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseStaticFiles();
-
-app.MapControllers();
 
 app.MapControllers();
 

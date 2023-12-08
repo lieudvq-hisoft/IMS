@@ -1,87 +1,120 @@
-﻿using System;
-namespace Data.Enums;
+﻿namespace Data.Enums;
 
 public enum RoleType
 {
-    Admin = 1,
-    Member = 2,
-}
-public enum NotificationSortCriteria
-{
-    DateCreated
-}
-public enum UserSortCriteria
-{
-    Email
+    Tech = 1,
+    Sale = 2,
+    Manager = 3,
+    Admin = 4
 }
 
-public enum PostSortCriteria
+public enum ComponentType
 {
-    DateCreated
+    Upgrade,
+    Change
 }
 
-public enum CategorySortCriteria
+public enum ServerAllocationStatus
 {
-    DateCreated
+    Working,
+    Pausing,
+    Removed,
+    Waiting,
 }
 
-public enum TradingSortCriteria
+public enum IpPurpose
 {
-    DateCreated
+    Host,
+    Network,
+    Broadcast,
+    Dns,
+    Gateway,
 }
 
-public enum ReportSortCriteria
+public enum RequestUserAction
 {
-    DateCreated
+    Evaluate,
+    Execute,
+    Process
 }
 
-public enum TradingUserChatSortCriteria
+public enum IpAssignmentTypes
 {
-    DateCreated
-}
-
-public enum MessageSortCriteria
-{
-    DateCreated
-}
-
-public enum TradingStatus
-{
-    Pending = 0,
-    Processing = 1,
-    Accept = 2,
-    Deny = 3,
-    Finish = 4
-}
-
-public enum PostType
-{
-    Trade = 0,
-    Sell = 1,
-    Free = 2
+    Additional,
+    Port,
+    Master,
 }
 
 public enum RequestStatus
 {
-    Pending = 0,
-    Processing = 1,
-    Accept = 2,
-    Deny = 3,
-    Finish = 4
+    Waiting,
+    Accepted,
+    Denied,
+    Success,
+    Failed
 }
 
-public enum ReportStatus
+public enum RequestHostStatus
 {
-    Pending = 0,
-    Processing = 1,
-    Accept = 2,
-    Deny = 3,
-    Finish = 4
+    Waiting,
+    Accepted,
+    Denied,
+    Processed,
+    Success,
+    Failed
 }
 
-public enum MessageStatus
+public enum RemovalStatus
 {
-    Text = 0,
-    Image = 1,
+    Accepted,
+    Success,
+    Failed
 }
 
+public enum RequestType
+{
+    Upgrade,
+    Expand,
+    RemoveLocation,
+    Host,
+    RemoveIp,
+    Other
+}
+
+public enum LocationAssignmentSortingCriteria
+{
+    Id,
+    ServiceId
+}
+
+public enum BaseSortCriteria
+{
+    Id,
+    DateCreated
+}
+
+public enum SimpleSortCriteria
+{
+    Id
+}
+
+public enum RequestSortCriteria
+{
+    Id,
+    OrderId,
+    ServiceId
+}
+
+public enum ServerHardwareConfigSortCriteria
+{
+    Id,
+    ServerAllocationId,
+    ComponentId
+}
+
+public enum RequestUpgradeSortCriteria
+{
+    Id,
+    CustomerId,
+    ComponentId
+}

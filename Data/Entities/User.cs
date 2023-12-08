@@ -7,20 +7,18 @@ namespace Data.Entities;
 public class User : IdentityUser<Guid>
 {
     [Column(TypeName = "varchar(1000)")]
-    public string FirstName { get; set; }
-    [Column(TypeName = "varchar(1000)")]
-    public string? LastName { get; set; }
+    public string Fullname { get; set; }
     public string Address { get; set; }
-    public bool Gender { get; set; }
-    public string Age { get; set; }
-    public string IdenficationNumber { get; set; }
-    public string? UserAva { get; set; }
-    public bool IdenficationConfirm { get; set; }
-    public bool IsGoogle { get; set; }
-    public bool isBlock { get; set; } 
-    public bool isDelete { get; set; }
     public int CurrenNoticeCount { get; set; } = 0;
-    public string? FcmToken { get; set; }
+    public DateTime DateCreated { get; set; } = DateTime.Now;
+    public DateTime DateUpdated { get; set; } = DateTime.Now;
+    public bool IsDeleted { get; set; }
 
-    public virtual ICollection<UserRole> UserRoles { get; set; }
+    public ICollection<UserRole> UserRoles { get; set; }
+
+    public ICollection<RequestUpgradeUser> RequestUpgradeUsers { get; set; }
+    public ICollection<AppointmentUser> AppointmentUsers { get; set; }
+    public ICollection<RequestExpandUser> RequestExpandUsers { get; set; }
+    public ICollection<RequestHostUser> RequestHostUsers { get; set; }
+    public ICollection<UserCustomer> UserCustomers { get; set; }
 }

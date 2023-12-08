@@ -1,31 +1,29 @@
-﻿using Microsoft.AspNetCore.Identity;
-using Microsoft.OpenApi.Models;
-using System.ComponentModel.Design;
-using System.Data;
-using System;
-using Microsoft.EntityFrameworkCore;
-using System.Reflection;
-using AutoMapper;
-using Newtonsoft.Json.Converters;
+﻿using AutoMapper;
 using Data.DataAccess;
 using Data.Entities;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using Newtonsoft.Json.Converters;
+using Services.Core;
+using Services.Mapping;
+using Services.Utilities;
+using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using Services.Mapping;
-using Services.Core;
 
-namespace IMS.Extensions;
+namespace IMS.Utilities;
 
 public static class StartupExtension
 {
-    public static void AddDbContext(this IServiceCollection services, IConfiguration configuration)
+    public static void AddDbContext(this IServiceCollection services, IConfiguration config)
     {
         AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         services.AddDbContext<AppDbContext>(opt =>
         {
-            opt.UseNpgsql(configuration.GetConnectionString("Dev"),
+            opt.UseNpgsql(config.GetConnectionString(SettingHelper.GetEnvironment()),
                 b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name));
         });
     }
@@ -54,7 +52,36 @@ public static class StartupExtension
 
     public static void AddBussinessService(this IServiceCollection services, IConfiguration configuration)
     {
+        services.AddScoped<IAreaService, AreaService>();
+
+        services.AddScoped<IComponentService, ComponentService>();
+        services.AddScoped<ICustomerService, CustomerService>();
+        services.AddScoped<IFileService, FileService>();
+        services.AddScoped<ILocationService, LocationService>();
+        services.AddScoped<IRackService, RackService>();
+        services.AddScoped<IRequestUpgradeService, RequestUpgradeService>();
+        services.AddScoped<IServerAllocationService, ServerAllocationService>();
+        services.AddScoped<IServerHardwareConfigService, ServerHardwareConfigService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IAppointmentService, AppointmentService>();
+        services.AddScoped<IRequestExpandService, RequestExpandService>();
+        services.AddScoped<IIpAddressService, IpAddressService>();
+        services.AddScoped<IIpSubnetService, IpSubnetService>();
+        services.AddScoped<IRequestHostService, RequestHostService>();
+
+        //services.AddScoped<IIpAssignmentService, IpAssignmentService>();
+        //services.AddScoped<ICompanyTypeService, CompanyTypeService>();
+        //services.AddScoped<IIpService, IpService>();
+        //services.AddScoped<IAppointmentUserService, AppointmentUserService>();
+        //services.AddScoped<ILocationAssignmentService, LocationAssignmentService>();
+        //services.AddScoped<IRequestExpandAppointmentService, RequestExpandAppointmentService>();
+        //services.AddScoped<IRequestExpandLocationService, RequestExpandLocationService>();
+        //services.AddScoped<IRequestExpandUserService, RequestExpandUserService>();
+        //services.AddScoped<IRequestUpgradeAppointmentService, RequestUpgradeAppointmentService>();
+        //services.AddScoped<IRequestUpgradeUserService, RequestUpgradeUserService>();
+
+        services.AddSingleton<ICloudinaryHelper, CloudinaryHelper>();
+        services.AddScoped<IEmailHelper, EmailHelper>();
     }
 
     public static void ConfigIdentityService(this IServiceCollection services)
@@ -62,16 +89,14 @@ public static class StartupExtension
         var build = services.AddIdentityCore<User>(option =>
         {
             option.SignIn.RequireConfirmedAccount = false;
-            option.User.RequireUniqueEmail = false;
-            option.Password.RequireDigit = false;
+            option.User.RequireUniqueEmail = true;
+            option.Password.RequireDigit = true;
             option.Password.RequiredLength = 6;
-            option.Password.RequireNonAlphanumeric = false;
-            option.Password.RequireUppercase = false;
-            option.Password.RequireLowercase = false;
+            option.Password.RequireNonAlphanumeric = true;
+            option.Password.RequireUppercase = true;
+            option.Password.RequireLowercase = true;
 
             option.User.AllowedUserNameCharacters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-            option.User.RequireUniqueEmail = true;
-            option.SignIn.RequireConfirmedAccount = false;
         });
 
         build.AddRoles<Role>().AddEntityFrameworkStores<AppDbContext>().AddDefaultTokenProviders();
@@ -84,7 +109,6 @@ public static class StartupExtension
         services.AddAuthorization();
 
         //services.AddControllers().AddNewtonsoftJson(x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Serialize);
-
     }
 
     public static void AddJWTAuthentication(this IServiceCollection services, string key, string issuer)
@@ -100,7 +124,7 @@ public static class StartupExtension
                     ValidateAudience = false,
                     ValidIssuer = issuer,
                     ValidateIssuer = true,
-                    ValidateLifetime = false,
+                    ValidateLifetime = true,
                     RequireAudience = false,
                 };
                 jwtconfig.Events = new JwtBearerEvents()
@@ -163,9 +187,9 @@ public static class StartupExtension
         {
             c.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "OnlineMarketplaceSystem",
+                Title = "IMS",
                 Version = "v1.1.k8s",
-                Description = "Online Marketplace System",
+                Description = "Information Management System API",
             });
             c.UseInlineDefinitionsForEnums();
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -192,6 +216,7 @@ public static class StartupExtension
                     new List<string>()
                 }
             });
+            c.EnableAnnotations();
         });
 
         services.AddControllersWithViews().AddNewtonsoftJson(options =>
