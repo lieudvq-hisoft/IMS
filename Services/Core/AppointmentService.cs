@@ -1603,10 +1603,11 @@ public class AppointmentService : IAppointmentService
                             for (int i = 0; i < hardwareDescriptions.Count; i++)
                             {
                                 oldConfig.Model += hardwareDescriptions[i].Model;
-                                oldConfig.SerialNumber += hardwareDescriptions[i].Model;
+                                oldConfig.SerialNumber += hardwareDescriptions[i].SerialNumber;
                                 if (i < hardwareDescriptions.Count - 1)
                                 {
                                     oldConfig.Model += ", ";
+                                    oldConfig.SerialNumber += ", ";
                                 }
                             }
                             receiptReportModels.Add(oldConfig);
