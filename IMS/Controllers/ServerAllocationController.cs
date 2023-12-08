@@ -158,9 +158,9 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpPost("{id}/ReceiptOfRecipient")]
-    public async Task<ActionResult> CreateReceiptOfRecipient(int id)
+    public async Task<ActionResult> CreateReceiptOfRecipient(int id, [FromBody] ReceiptOfRecipientModel model)
     {
-        var result = await _serverAllocationService.CreateReceiptReport(id);
+        var result = await _serverAllocationService.CreateReceiptReport(id, model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
