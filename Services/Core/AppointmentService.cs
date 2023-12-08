@@ -1000,7 +1000,7 @@ public class AppointmentService : IAppointmentService
                 appointment.Status = RequestStatus.Success;
                 _dbContext.SaveChanges();
                 var requestUpgradeResults = new List<ResultModel>();
-                
+
                 foreach (var requestUpgradeId in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgradeId))
                 {
                     requestUpgradeResults.Add(await CompleteRequestUpgrade(requestUpgradeId));
@@ -1202,6 +1202,8 @@ public class AppointmentService : IAppointmentService
                     TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
                     document.RenderText("__Date__", $"{now.Day}/{now.Month}/{now.Year}");
 
+                    document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
+
                     document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
@@ -1211,6 +1213,10 @@ public class AppointmentService : IAppointmentService
                     document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
 
                     document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
+
+                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+
+                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
 
                     document.RenderText("__Location__", textInfo.ToTitleCase(model.Location));
 
@@ -1823,7 +1829,7 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
-                
+
                 appointment.DocumentConfirm = true;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
