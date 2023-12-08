@@ -981,7 +981,7 @@ public class AppointmentService : IAppointmentService
             {
                 if (appointment.RequestUpgradeAppointment.Any())
                 {
-                    var createDocResult = await CreateReceiptReport(appointment.ServerAllocationId, model.ReceiptOfRecipientModel);
+                    var createDocResult = await CreateReceiptReport(appointment.Id, model.ReceiptOfRecipientModel);
                     if (!createDocResult.Succeed)
                     {
                         validPrecondition = false;
@@ -1515,7 +1515,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateReceiptReport(int serverAllocationId, ReceiptOfRecipientModel model)
+    public async Task<ResultModel> CreateReceiptReport(int appointmentId, ReceiptOfRecipientModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -1524,13 +1524,14 @@ public class AppointmentService : IAppointmentService
         {
             string inputPath = Path.Combine(_env.WebRootPath, "Report", "Template2.docx");
             string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
+            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
             var serverAllocation = _dbContext.ServerAllocations
                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                .Include(x => x.Customer)
                .Include(x => x.RequestUpgrades).ThenInclude(x => x.Component)
                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-               .FirstOrDefault(x => x.Id == serverAllocationId);
+               .FirstOrDefault(x => x.Id == appointment.ServerAllocationId);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
@@ -1547,7 +1548,7 @@ public class AppointmentService : IAppointmentService
                 {
                     int counter = 1;
                     var receiptReportModels = new List<ReceiptReportModel>();
-                    foreach (var requestUpgrade in serverAllocation.RequestUpgrades)
+                    foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
                     {
                         var requestUpgradeDescriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(requestUpgrade.Description);
                         var hardwareDescriptions = new List<ConfigDescriptionModel>();
