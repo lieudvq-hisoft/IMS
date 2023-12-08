@@ -32,6 +32,8 @@ public interface IAppointmentService
     Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model, Guid userId);
     Task<ResultModel> Fail(int appointmentId, AppointmentFailModel model);
     Task<ResultModel> AssignInspectionReport(int appointmentId, DocumentFileUploadModel model);
+    Task<ResultModel> AssignInspectionRecordAndReceiptOfRecipientReport(int appointmentId, DocumentFileUploadModel model);
+    Task<ResultModel> DocumentConfirmTrue(int appointmentId);
 }
 
 public class AppointmentService : IAppointmentService
@@ -1774,6 +1776,95 @@ public class AppointmentService : IAppointmentService
                 {
                     InspectionReport = inspectionReportFileName
                 };
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> AssignInspectionRecordAndReceiptOfRecipientReport(int appointmentId, DocumentFileUploadModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+
+            var appointment = _dbContext.Appointments
+                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade)
+                .FirstOrDefault(x => x.Id == appointmentId);
+            if (appointment == null)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+            }
+            else if (appointment.RequestUpgradeAppointment == null)
+            {
+                result.ErrorMessage = "Appointment does not have request upgrade!";
+            }
+            else if (appointment.Status != RequestStatus.Success)
+            {
+                result.ErrorMessage = "Appointment's status is not successed!";
+            }
+            else if (appointment.DocumentConfirm)
+            {
+                result.ErrorMessage = "Document already confirmed!";
+            }
+            else
+            {
+                string inspectionRecordFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
+                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(model.ReceiptOfRecipient);
+                appointment.InspectionReportFilePath = inspectionRecordFileName;
+                appointment.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = new DocumentFileResultModel
+                {
+                    InspectionReport = inspectionRecordFileName,
+                    ReceiptOfRecipient = receiptOfRecipientFileName,
+                };
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> DocumentConfirmTrue(int appointmentId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+
+            var appointment = _dbContext.Appointments
+                .FirstOrDefault(x => x.Id == appointmentId);
+            if (appointment == null)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+            }
+            else if (appointment.Status != RequestStatus.Success)
+            {
+                result.ErrorMessage = "Appointment's status is not successed!";
+            }
+            else if (appointment.DocumentConfirm == true)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.ALREADY_CONFIRM;
+            }
+            else
+            {
+                
+                appointment.DocumentConfirm = true;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = appointment.Id;
             }
         }
         catch (Exception e)

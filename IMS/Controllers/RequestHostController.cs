@@ -148,4 +148,12 @@ public class RequestHostController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPut("{id}/DocumentConfirmation/True")]
+    public async Task<ActionResult> DocumentConfirmationTrue(int id)
+    {
+        var result = await _requestHostService.DocumentConfirmTrue(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }

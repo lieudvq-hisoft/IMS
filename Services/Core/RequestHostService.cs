@@ -32,6 +32,7 @@ public interface IRequestHostService
     //Task<ResultModel> Process(int requestHostId, Guid userId);
     Task<ResultModel> Complete(int requestHostId, Guid userId, HostAndUpgradeCreateInspectionReportModel? model);
     Task<ResultModel> Reject(int requestHostId, RequestHostRejectModel modell);
+    Task<ResultModel> DocumentConfirmTrue(int appointmentId);
 }
 
 public class RequestHostService : IRequestHostService
@@ -838,6 +839,45 @@ public class RequestHostService : IRequestHostService
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = requestHostId;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> DocumentConfirmTrue(int requestHostId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+
+            var requestHost = _dbContext.RequestHosts
+                .FirstOrDefault(x => x.Id == requestHostId);
+            if (requestHost == null)
+            {
+                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
+            }
+            else if (requestHost.Status != RequestHostStatus.Success)
+            {
+                result.ErrorMessage = "Request host's status is not success";
+            }
+            else if (requestHost.DocumentConfirm == true)
+            {
+                result.ErrorMessage = RequestHostErrorMessage.ALREADY_CONFIRM;
+            }
+            else
+            {
+
+                requestHost.DocumentConfirm = true;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = requestHost.Id;
             }
         }
         catch (Exception e)

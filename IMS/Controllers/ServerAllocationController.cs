@@ -184,4 +184,12 @@ public class ServerAllocationController : ControllerBase
         }
         return BadRequest(result.ErrorMessage);
     }
+
+    [HttpPost("{id}/Document")]
+    public async Task<ActionResult> UploadInspectionRecordAndReceiptOfRecipientReport(int id, [FromForm] DocumentFileUploadModel model)
+    {
+        var result = await _serverAllocationService.AssignInspectionRecordAndReceiptOfRecipientReport(id, model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 }

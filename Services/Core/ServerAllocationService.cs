@@ -9,6 +9,7 @@ using Data.Utils.Common;
 using Data.Utils.Paging;
 using DocumentFormat.OpenXml.Packaging;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
 using System.Globalization;
@@ -35,7 +36,7 @@ public interface IServerAllocationService
     Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model);
     Task<ResultModel> CreateReceiptReport(int serverAllocationId);
     Task<ResultModel> CreateRequestExpandInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model);
-
+    Task<ResultModel> AssignInspectionRecordAndReceiptOfRecipientReport(int serverAllocationId, DocumentFileUploadModel model);
 }
 
 public class ServerAllocationService : IServerAllocationService
@@ -1020,6 +1021,55 @@ public class ServerAllocationService : IServerAllocationService
 
                 result.Succeed = true;
                 result.Data = outputPath;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> AssignInspectionRecordAndReceiptOfRecipientReport(int serverAllocationId, DocumentFileUploadModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+
+            var serverAllocation = _dbContext.ServerAllocations
+                .FirstOrDefault(x => x.Id == serverAllocationId);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (serverAllocation.InspectionRecordFilePath == null)
+            {
+                result.ErrorMessage = "Inspection Record File Path not existed";
+            }
+            else if (serverAllocation.ReceiptOfRecipientFilePath == null)
+            {
+                result.ErrorMessage = "Receipt Of Recipient File Path not existed";
+            }
+            else if (serverAllocation.DocumentConfirm)
+            {
+                result.ErrorMessage = "Document already confirmed";
+            }
+            else
+            {
+                string inspectionRecordFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
+                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(model.ReceiptOfRecipient);
+                serverAllocation.InspectionRecordFilePath = inspectionRecordFileName;
+                serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = new DocumentFileResultModel
+                {
+                    InspectionReport = inspectionRecordFileName,
+                   ReceiptOfRecipient = receiptOfRecipientFileName,
+                };
             }
         }
         catch (Exception e)
