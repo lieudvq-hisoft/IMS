@@ -34,6 +34,15 @@ public class RequestHostDocumentFileUploadModel
     public string InspectionReportFileName => InspectionReport?.FileName;
 }
 
+public class ServerAllocationRemovalReportFileUploadModel
+{
+    [Required]
+    public IFormFile RemovalReport { get; set; }
+
+    [FileExtensions(Extensions = "pdf,docx,doc,jpeg")]
+    public string RemovalReporttFileName => RemovalReport?.FileName;
+}
+
 public class DocumentFileResultModel
 {
     public string InspectionReport { get; set; }

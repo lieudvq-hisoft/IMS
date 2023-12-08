@@ -35,6 +35,7 @@ public interface IServerAllocationService
     Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model);
     Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model);
     Task<ResultModel> CreateReceiptReport(int serverAllocationId);
+    Task<ResultModel> Confirm(int serverAllocationId);
     Task<ResultModel> CreateRequestExpandInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model);
     Task<ResultModel> AssignInspectionRecordAndReceiptOfRecipientReport(int serverAllocationId, DocumentFileUploadModel model);
 }
@@ -511,13 +512,17 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
-            else if (serverAllocation.MasterIpAddress != null)
+            else if (serverAllocation.IpAssignments.Any())
             {
                 result.ErrorMessage = "Must remove master ip";
             }
-            else if (serverAllocation.ServerLocation != null)
+            else if (serverAllocation.LocationAssignments.Any())
             {
                 result.ErrorMessage = "Must remove server from rack";
+            }
+            else if (serverAllocation.RemovalFilePath == null)
+            {
+                result.ErrorMessage = "Need document for removal";
             }
             else
             {
@@ -726,13 +731,13 @@ public class ServerAllocationService : IServerAllocationService
                     document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
 
                     document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
-                    
+
                     document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
-                    
+
                     document.RenderText("__Location__", textInfo.ToTitleCase(model.Location));
 
                     document.TickCheckBoxInDocx("Allocation");
-           
+
                     document.RenderText("__ServerName__", serverAllocation.Name);
 
                     var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
@@ -780,7 +785,7 @@ public class ServerAllocationService : IServerAllocationService
                     document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
 
                     document.RenderText("__SubnetMask__", IpAddress.GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
-                    
+
                     if (model.Good)
                     {
                         document.TickCheckBoxInDocx("Evaluate");
@@ -875,7 +880,6 @@ public class ServerAllocationService : IServerAllocationService
                 //var formfile = document.ConvertToIFormFile(outputPath);
                 string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
                 serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
-                serverAllocation.Status = ServerAllocationStatus.Working;
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
@@ -1012,15 +1016,10 @@ public class ServerAllocationService : IServerAllocationService
                 }
                 string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
                 serverAllocation.InspectionRecordFilePath = inspectionReportFileName;
-
-                if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)
-                {
-                    serverAllocation.Status = ServerAllocationStatus.Working;
-                }
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
-                result.Data = outputPath;
+                result.Data = inspectionReportFileName;
             }
         }
         catch (Exception e)
@@ -1053,9 +1052,9 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = "Receipt Of Recipient File Path not existed";
             }
-            else if (serverAllocation.DocumentConfirm)
+            else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
             {
-                result.ErrorMessage = "Document already confirmed";
+                result.ErrorMessage = "Server must be waiting";
             }
             else
             {
@@ -1068,7 +1067,89 @@ public class ServerAllocationService : IServerAllocationService
                 result.Data = new DocumentFileResultModel
                 {
                     InspectionReport = inspectionRecordFileName,
-                   ReceiptOfRecipient = receiptOfRecipientFileName,
+                    ReceiptOfRecipient = receiptOfRecipientFileName,
+                };
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Confirm(int serverAllocationId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == serverAllocationId && x.Status == ServerAllocationStatus.Removed);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
+            {
+                result.ErrorMessage = "Server need to be waiting";
+            }
+            else if (serverAllocation.ServerLocation == null || serverAllocation.MasterIpAddress == null)
+            {
+                result.ErrorMessage = "Server need master ip and location";
+            }
+            else if (serverAllocation.InspectionRecordFilePath == null || serverAllocation.ReceiptOfRecipientFilePath == null)
+            {
+                result.ErrorMessage = "Server need document";
+            }
+            else
+            {
+                serverAllocation.Status = ServerAllocationStatus.Working;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = serverAllocationId;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> AssignRemovalReport(int serverAllocationId, ServerAllocationRemovalReportFileUploadModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+
+            var serverAllocation = _dbContext.ServerAllocations
+                .FirstOrDefault(x => x.Id == serverAllocationId);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (serverAllocation.IpAssignments.Any())
+            {
+                result.ErrorMessage = "Must remove master ip";
+            }
+            else if (serverAllocation.LocationAssignments.Any())
+            {
+                result.ErrorMessage = "Must remove server from rack";
+            }
+            else
+            {
+                string removalReportFilePath = _cloudinaryHelper.UploadFile(model.RemovalReport);
+                serverAllocation.RemovalFilePath = removalReportFilePath;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = new DocumentFileResultModel
+                {
+                    ReceiptOfRecipient = removalReportFilePath,
                 };
             }
         }

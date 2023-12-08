@@ -12,20 +12,11 @@ namespace IMS.Controllers;
 [Authorize(AuthenticationSchemes = "Bearer")]
 public class ServerAllocationController : ControllerBase
 {
-    private readonly ICustomerService _customerService;
-    private readonly IWebHostEnvironment _environment;
     private readonly IServerAllocationService _serverAllocationService;
-    private readonly IFileService _fileService;
 
-    public ServerAllocationController(ICustomerService customerService,
-        IWebHostEnvironment environment,
-        IServerAllocationService serverAllocationService,
-        IFileService fileService)
+    public ServerAllocationController(IServerAllocationService serverAllocationService)
     {
-        _customerService = customerService;
-        _environment = environment;
         _serverAllocationService = serverAllocationService;
-        _fileService = fileService;
     }
 
     [HttpGet]
@@ -126,6 +117,14 @@ public class ServerAllocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPut("{id}/Confirm")]
+    public async Task<ActionResult> Confirm(int id)
+    {
+        var result = await _serverAllocationService.Confirm(id);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {
@@ -170,18 +169,7 @@ public class ServerAllocationController : ControllerBase
     public async Task<ActionResult> CreateRequestExpandInspection(int id, [FromBody] ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
         var result = await _serverAllocationService.CreateRequestExpandInspectionReport(id, model);
-        if (result.Succeed)
-        {
-            var path = result.Data as string;
-            if (System.IO.File.Exists(path))
-            {
-                return File(System.IO.File.OpenRead(path), "application/vnd.openxmlformats-officedocument.wordprocessingml.document", Path.GetFileName(path));
-            }
-            else
-            {
-                return BadRequest();
-            }
-        }
+        if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 

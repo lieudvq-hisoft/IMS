@@ -32,7 +32,6 @@ public interface IAppointmentService
     Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model, Guid userId);
     Task<ResultModel> Fail(int appointmentId, AppointmentFailModel model);
     Task<ResultModel> AssignInspectionReport(int appointmentId, DocumentFileUploadModel model);
-    Task<ResultModel> AssignInspectionRecordAndReceiptOfRecipientReport(int appointmentId, DocumentFileUploadModel model);
     Task<ResultModel> DocumentConfirmTrue(int appointmentId);
 }
 
@@ -1756,43 +1755,6 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            
-            var appointment = _dbContext.Appointments
-                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade)
-                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand)
-                .FirstOrDefault(x => x.Id == appointmentId);
-            if (appointment == null)
-            {
-                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                string inspectionReportFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
-                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(model.ReceiptOfRecipient);
-                appointment.InspectionReportFilePath = inspectionReportFileName;
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = new DocumentFileResultModel
-                {
-                    InspectionReport = inspectionReportFileName
-                };
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
-
-    public async Task<ResultModel> AssignInspectionRecordAndReceiptOfRecipientReport(int appointmentId, DocumentFileUploadModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
 
             var appointment = _dbContext.Appointments
                 .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade)
@@ -1801,7 +1763,7 @@ public class AppointmentService : IAppointmentService
             {
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
-            else if (appointment.RequestUpgradeAppointment == null)
+            else if (!appointment.RequestUpgradeAppointment.Any())
             {
                 result.ErrorMessage = "Appointment does not have request upgrade!";
             }

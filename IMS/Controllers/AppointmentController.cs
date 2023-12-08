@@ -140,14 +140,6 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPost("{id}/Document/AssignInspectionRecordAndReceiptOfRecipientReport")]
-    public async Task<ActionResult> UploadAssignInspectionRecordAndReceiptOfRecipientReport(int id, [FromForm] DocumentFileUploadModel model)
-    {
-        var result = await _appointmentService.AssignInspectionRecordAndReceiptOfRecipientReport(id, model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
     [HttpPut("{id}/DocumentConfirmation/True")]
     public async Task<ActionResult> DocumentConfirmationTrue(int id)
     {
