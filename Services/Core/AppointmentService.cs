@@ -981,7 +981,7 @@ public class AppointmentService : IAppointmentService
             {
                 if (appointment.RequestUpgradeAppointment.Any())
                 {
-                    var createDocResult = await CreateReceiptReport(appointment.Id, model.ReceiptOfRecipientModel);
+                    var createDocResult = await CreateUpgradeReceiptReport(appointment.Id, model.ReceiptOfRecipientModel);
                     if (!createDocResult.Succeed)
                     {
                         validPrecondition = false;
@@ -1058,7 +1058,7 @@ public class AppointmentService : IAppointmentService
                     }
                     if (appointment.RequestExpandAppointments.Any())
                     {
-                        var createDocResult = await CreateRequestExpandInspectionReport(appointment.ServerAllocationId, model.ExpandCreateInspectionReportModel);
+                        var createDocResult = await CreateExpandInspectionReport(appointment.ServerAllocationId, model.ExpandCreateInspectionReportModel);
                         if (!createDocResult.Succeed)
                         {
                             transaction.Rollback();
@@ -1381,7 +1381,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateRequestExpandInspectionReport(int requestExpandId, ServerAllocationCreateRequestExpandInspectionReportModel model)
+    public async Task<ResultModel> CreateExpandInspectionReport(int requestExpandId, ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -1521,7 +1521,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateReceiptReport(int appointmentId, ReceiptOfRecipientModel model)
+    public async Task<ResultModel> CreateUpgradeReceiptReport(int appointmentId, ReceiptOfRecipientModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
