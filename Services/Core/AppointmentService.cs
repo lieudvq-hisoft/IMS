@@ -1586,6 +1586,7 @@ public class AppointmentService : IAppointmentService
                                 newConfig.SerialNumber += ", ";
                             }
                         }
+                        receiptReportModels.Add(newConfig);
 
                         if (hardwareDescriptions.Any())
                         {
@@ -1610,7 +1611,6 @@ public class AppointmentService : IAppointmentService
                             }
                             receiptReportModels.Add(oldConfig);
                         }
-                        receiptReportModels.Add(newConfig);
                     }
                     document.InsertToSingleTable(receiptReportModels);
                     document.MainDocumentPart.Document.Save();
