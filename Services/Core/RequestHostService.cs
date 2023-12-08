@@ -185,6 +185,10 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.HAVE_IP_MASTER_ALREADY;
             }
+            else if (serverAllocation.Status != ServerAllocationStatus.Working)
+            {
+                result.ErrorMessage = "Server need to be working";
+            }
             else
             {
                 var requestHost = _mapper.Map<RequestHost>(model);
@@ -737,7 +741,7 @@ public class RequestHostService : IRequestHostService
 
                     document.RenderText("__ServerName__", serverAllocation.Name);
 
-                    var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
+                    var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.Component.Name == "CPU")?.Description);
                     var cpuString = "";
                     for (int i = 0; i < cpus.Count(); i++)
                     {
@@ -749,7 +753,7 @@ public class RequestHostService : IRequestHostService
                     }
                     document.RenderText("__CPUs__", cpuString);
 
-                    var rams = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description);
+                    var rams = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.Component.Name == "RAM")?.Description);
                     var ramCapacity = 0;
                     for (int i = 0; i < rams.Count(); i++)
                     {
@@ -757,7 +761,7 @@ public class RequestHostService : IRequestHostService
                     }
                     document.RenderText("__Ram__", ramCapacity + "Gb");
 
-                    var hardDisks = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description);
+                    var hardDisks = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.Component.Name == "Harddisk")?.Description);
                     var hardDiskCapacity = 0;
                     for (int i = 0; i < hardDisks.Count(); i++)
                     {
@@ -773,11 +777,21 @@ public class RequestHostService : IRequestHostService
 
                     document.RenderText("__MasterIp__", serverAllocation.MasterIpAddress);
 
-                    document.RenderText("__Action__", "");
+                    document.RenderText("__Action__", requestHost.IsRemoval ? "Gỡ" : "Thêm");
 
-                    document.RenderText("__RequestHostIpCount__", "");
+                    document.RenderText("__RequestHostIpCount__", requestHost.Quantity.ToString());
 
-                    document.RenderText("__RequestHostIpAddreses__", "");
+                    var ipAddressString = "";
+                    var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress).ToList();
+                    for (int i = 0; i < ipAddresses.Count(); i++)
+                    {
+                        ipAddressString += ipAddresses[i].Address;
+                        if (i < ipAddresses.Count - 1)
+                        {
+                            ipAddressString += ", ";
+                        }
+                    }
+                    document.RenderText("__RequestHostIpAddreses__", ipAddressString);
 
                     document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
 
