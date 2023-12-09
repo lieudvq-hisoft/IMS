@@ -853,7 +853,7 @@ public class ServerAllocationService : IServerAllocationService
 
                     var now = DateTime.UtcNow;
                     document.RenderText("__Time__", $"{now.Hour} Giờ {now.Minute} Phút");
-                    document.RenderText("__Date__", $"ngày {now.Date} tháng {now.Month} Năm {now.Year}");
+                    document.RenderText("__Date__", $"ngày {now.Day} tháng {now.Month} Năm {now.Year}");
                     document.RenderText("__Location__", model.Location);
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
