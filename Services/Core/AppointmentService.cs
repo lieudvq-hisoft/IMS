@@ -945,10 +945,16 @@ public class AppointmentService : IAppointmentService
                 validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
+            else if (appointment.ServerAllocation.MasterIpAddress == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Server need master ip to be allocated";
+            }
             else
             {
                 validPrecondition = IsCompletable(appointmentId, result);
             }
+
 
             if ((appointment.ReceiptOfRecipientFilePath == null ||
                 appointment.InspectionReportFilePath == null) && model.DocumentModel == null)
@@ -1469,6 +1475,8 @@ public class AppointmentService : IAppointmentService
                     document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
 
                     document.RenderText("__Power__", serverAllocation.Power + "W");
+
+                    document.RenderText("__MasterIp__", serverAllocation.MasterIpAddress);
 
                     document.RenderText("__Rack__", serverAllocation.ServerLocation);
 
