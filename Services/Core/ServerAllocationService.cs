@@ -464,18 +464,19 @@ public class ServerAllocationService : IServerAllocationService
 
     public async Task<ResultModel> Update(ServerAllocationUpdateModel model)
     {
-
         var result = new ResultModel();
         result.Succeed = false;
-        bool validPrecondition = true;
 
         try
         {
             var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.Id);
             if (serverAllocation == null)
             {
-                validPrecondition = false;
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
+            {
+                result.ErrorMessage = "Can only update waiting server";
             }
             else
             {

@@ -28,12 +28,12 @@ public static class ModelBuilderExtentions
         });
         builder.Entity<Component>().HasData(new Component
         {
-            Id = 5,
+            Id = 4,
             Name = "Motherboard",
         });
         builder.Entity<Component>().HasData(new Component
         {
-            Id = 6,
+            Id = 5,
             Name = "Harddisk",
             IsRequired = true
         });
@@ -104,36 +104,6 @@ public static class ModelBuilderExtentions
         }
         #endregion
 
-        #region IP
-        //builder.Entity<Network>().HasData(new Network
-        //{
-        //    Id = 1,
-        //    FirstOctet = 192,
-        //    SecondOctet = 112,
-        //    ThirdOctet = 121,
-        //    SubnetMask = 24
-        //});
-        //builder.Entity<Network>().HasData(new Network
-        //{
-        //    Id = 2,
-        //    FirstOctet = 193,
-        //    SecondOctet = 122,
-        //    ThirdOctet = 111,
-        //    SubnetMask = 25
-        //});
-
-        //for (int i = 1; i <= 200; i++)
-        //{
-        //    builder.Entity<Ip>().HasData(new Ip
-        //    {
-        //        Id = i,
-        //        Address = i,
-        //        IsReserved = false,
-        //        NetworkId = i % 2 == 0 ? 1 : 2,
-        //    });
-        //}
-        #endregion
-
         #region User
         var hasher = new PasswordHasher<User>();
 
@@ -164,13 +134,6 @@ public static class ModelBuilderExtentions
         builder.Entity<Role>().HasData(new Role
         {
             Id = seedGuids[2],
-            Name = "Manager",
-            Description = "Manager",
-            isDeactive = false,
-        });
-        builder.Entity<Role>().HasData(new Role
-        {
-            Id = seedGuids[3],
             Name = "Admin",
             Description = "Admin",
             isDeactive = false,
@@ -180,22 +143,38 @@ public static class ModelBuilderExtentions
         for (var i = 1; i <= 5; i++)
         {
             var username = "";
+            var address = "";
+            var fullname = "";
+            var phoneNumber = "";
             switch (i)
             {
                 case 1:
-                    username = "super";
+                    // super
+                    username = "khacnhien.dao";
+                    address = "Đ. Mạc Đĩnh Chi, Khu phố Tân Hòa, Dĩ An, Bình Dương";
+                    fullname = "Đào Khắc Nhiên";
+                    phoneNumber = "0866445139";
                     break;
                 case 2:
-                    username = "tech";
+                    // tech
+                    username = "caovy.tran";
+                    address = "24/5 Lê Trọng Tấn, P.Tây Thạnh, Q.Tân Phú, TPHCM";
+                    fullname = "Trần Cao Vỹ";
+                    phoneNumber = "0985097145";
                     break;
                 case 3:
-                    username = "sale";
+                    // sale
+                    username = "nhatha.pham";
+                    address = "Origami Tòa S10.03, Vinhomes Grand Park, Long Bình, Quận 9, TP.HCM";
+                    fullname = "Phạm Nhật Hạ";
+                    phoneNumber = "0834666630";
                     break;
                 case 4:
-                    username = "manager";
-                    break;
-                case 5:
-                    username = "admin";
+                    // admin
+                    username = "anhtuan.tran";
+                    address = "Tòa S106 Vinhomes Grand Park, TP. Thủ Đức, TP. Hồ Chí Minh";
+                    fullname = "Trần Anh Tuấn";
+                    phoneNumber = "0682716278";
                     break;
             }
 
@@ -207,11 +186,11 @@ public static class ModelBuilderExtentions
                 Email = username + "@gmail.com",
                 NormalizedEmail = username + "@gmail.com",
                 EmailConfirmed = true,
-                PasswordHash = hasher.HashPassword(null, "12345678"),
+                PasswordHash = hasher.HashPassword(null, "P@ssword123"),
                 SecurityStamp = string.Empty,
-                Fullname = "Fullname" + i,
-                Address = "Address" + i,
-                PhoneNumber = "000000000" + i,
+                Fullname = fullname,
+                Address = address,
+                PhoneNumber = phoneNumber,
                 CurrenNoticeCount = 0,
                 IsDeleted = false,
             });
@@ -219,7 +198,7 @@ public static class ModelBuilderExtentions
             #region UserRole
             if (i == 1)
             {
-                for (int j = 1; j <= 4; j++)
+                for (int j = 1; j <= 3; j++)
                 {
                     builder.Entity<UserRole>().HasData(new UserRole
                     {
@@ -238,63 +217,6 @@ public static class ModelBuilderExtentions
             }
             #endregion
         }
-        #endregion
-
-        #region Service
-        //builder.Entity<Service>().HasData(new Service
-        //{
-        //    Id = 1,
-        //    Name = "Location",
-        //    Type = ServiceType.Location,
-        //});
-        //builder.Entity<Service>().HasData(new Service
-        //{
-        //    Id = 2,
-        //    Name = "Expand",
-        //    Type = ServiceType.Expand,
-        //});
-        //builder.Entity<Service>().HasData(new Service
-        //{
-        //    Id = 3,
-        //    Name = "Ip",
-        //    Type = ServiceType.Ip,
-        //});
-        //builder.Entity<Service>().HasData(new Service
-        //{
-        //    Id = 4,
-        //    Name = "MasterIp",
-        //    Type = ServiceType.MasterIp,
-        //});
-        //builder.Entity<Service>().HasData(new Service
-        //{
-        //    Id = 5,
-        //    Name = "Port",
-        //    Type = ServiceType.Port,
-        //});
-        //builder.Entity<Service>().HasData(new Service
-        //{
-        //    Id = 6,
-        //    Name = "PortPower",
-        //    Type = ServiceType.PortPower,
-        //});
-        //builder.Entity<Service>().HasData(new Service
-        //{
-        //    Id = 7,
-        //    Name = "Power",
-        //    Type = ServiceType.Power,
-        //});
-        //builder.Entity<Service>().HasData(new Service
-        //{
-        //    Id = 8,
-        //    Name = "Component",
-        //    Type = ServiceType.Component,
-        //});
-        //builder.Entity<Service>().HasData(new Service
-        //{
-        //    Id = 9,
-        //    Name = "Appointment",
-        //    Type = ServiceType.Appointment,
-        //});
         #endregion
     }
 
