@@ -727,7 +727,7 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
-                var roles = await _userManager.GetRolesAsync(user);
+                var roles = await _userManager.GetRolesAsync(executor);
                 if (!roles.Contains(RoleType.Tech.ToString()))
                 {
                     validPrecondition = false;
