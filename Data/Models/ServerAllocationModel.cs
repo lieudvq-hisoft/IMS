@@ -210,6 +210,9 @@ public class ServerAllocationCreateRequestExpandInspectionReportModel
 
     [MaxLength(2000)]
     public string Note { get; set; } = "Note";
+
+    [Required]
+    public string DeviceCondition { get; set; }
 }
 
 public class ReceiptOfRecipientModel

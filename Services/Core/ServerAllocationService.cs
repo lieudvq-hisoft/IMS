@@ -865,7 +865,7 @@ public class ServerAllocationService : IServerAllocationService
                     document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
                     document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
 
-                    document.RenderText("__DeviceCondition__", model.Note);
+                    document.RenderText("__DeviceCondition__", model.DeviceCondition);
                     document.RenderText("__QTNameSignature__", textInfo.ToTitleCase(model.QTName));
 
                     int counter = 1;
