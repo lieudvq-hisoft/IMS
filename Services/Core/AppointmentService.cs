@@ -951,7 +951,7 @@ public class AppointmentService : IAppointmentService
             }
 
             if ((appointment.ReceiptOfRecipientFilePath == null ||
-                appointment.InspectionReportFilePath == null) && model.ExpandCreateInspectionReportModel == null)
+                appointment.InspectionReportFilePath == null) && model.DocumentModel == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = "Need inspection report to complete";
@@ -976,7 +976,7 @@ public class AppointmentService : IAppointmentService
             {
                 if (appointment.RequestUpgradeAppointment.Any())
                 {
-                    var createDocResult = await CreateUpgradeReceiptReport(appointment.Id, model.ExpandCreateInspectionReportModel);
+                    var createDocResult = await CreateUpgradeReceiptReport(appointment.Id, model.DocumentModel);
                     if (!createDocResult.Succeed)
                     {
                         validPrecondition = false;
@@ -1036,7 +1036,7 @@ public class AppointmentService : IAppointmentService
                 {
                     if (appointment.RequestUpgradeAppointment.Any())
                     {
-                        var createDocResult = await CreateUpgradeAndHostInspectionReport(appointment.ServerAllocationId, model.ExpandCreateInspectionReportModel);
+                        var createDocResult = await CreateUpgradeAndHostInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
                         if (!createDocResult.Succeed)
                         {
                             transaction.Rollback();
@@ -1053,7 +1053,7 @@ public class AppointmentService : IAppointmentService
                     }
                     if (appointment.RequestExpandAppointments.Any())
                     {
-                        var createDocResult = await CreateExpandInspectionReport(appointment.ServerAllocationId, model.ExpandCreateInspectionReportModel);
+                        var createDocResult = await CreateExpandInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
                         if (!createDocResult.Succeed)
                         {
                             transaction.Rollback();
