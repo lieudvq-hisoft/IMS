@@ -32,11 +32,11 @@ public interface IServerAllocationService
     Task<ResultModel> Update(ServerAllocationUpdateModel model);
     Task<ResultModel> Delete(int serverAllocationId);
     Task<ResultModel> AssignMasterIp(int serverAllocationId, ServerAllocationMasterIpAssignmentModel model);
-    Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model);
-    Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model);
-    Task<ResultModel> CreateReceiptReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model);
+    //Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model);
+    //Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model);
+    //Task<ResultModel> CreateReceiptReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model);
     Task<ResultModel> Confirm(int serverAllocationId);
-    Task<ResultModel> CreateRequestExpandInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model);
+    //Task<ResultModel> CreateRequestExpandInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model);
     Task<ResultModel> AssignInspectionRecordAndReceiptOfRecipientReport(int serverAllocationId, DocumentFileUploadModel model);
 }
 
@@ -626,325 +626,323 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-        bool validPrecondition = true;
+    //public async Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+    //    bool validPrecondition = true;
 
-        try
-        {
-            var serverAllocation = _dbContext.ServerAllocations.Include(x => x.LocationAssignments).ThenInclude(x => x.Location).Include(x => x.RequestExpands).FirstOrDefault(x => x.Id == serverAllocationId);
-            if (serverAllocation == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                if (serverAllocation.LocationAssignments.Any())
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "Server have location already";
-                }
-            }
+    //    try
+    //    {
+    //        var serverAllocation = _dbContext.ServerAllocations.Include(x => x.LocationAssignments).ThenInclude(x => x.Location).Include(x => x.RequestExpands).FirstOrDefault(x => x.Id == serverAllocationId);
+    //        if (serverAllocation == null)
+    //        {
+    //            validPrecondition = false;
+    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+    //        }
+    //        else
+    //        {
+    //            if (serverAllocation.LocationAssignments.Any())
+    //            {
+    //                validPrecondition = false;
+    //                result.ErrorMessage = "Server have location already";
+    //            }
+    //        }
 
-            List<Location> locations = null;
-            if (validPrecondition)
-            {
-                locations = _dbContext.Locations
-                    .Include(x => x.LocationAssignments)
-                    .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandLocations)
-                    .Where(delegate (Location x)
-                    {
-                        return x.RackId == model.RackId && x.Position >= model.StartPosition && x.Position < model.StartPosition + model.Size && x.IsAvailable();
-                    })
-                    .ToList();
-                if (locations.Count != model.Size)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = RequestExpandLocationErrorMessage.INVALID_LOCATION;
-                }
-            }
+    //        List<Location> locations = null;
+    //        if (validPrecondition)
+    //        {
+    //            locations = _dbContext.Locations
+    //                .Include(x => x.LocationAssignments)
+    //                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandLocations)
+    //                .Where(delegate (Location x)
+    //                {
+    //                    return x.RackId == model.RackId && x.Position >= model.StartPosition && x.Position < model.StartPosition + model.Size && x.IsAvailable();
+    //                })
+    //                .ToList();
+    //            if (locations.Count != model.Size)
+    //            {
+    //                validPrecondition = false;
+    //                result.ErrorMessage = RequestExpandLocationErrorMessage.INVALID_LOCATION;
+    //            }
+    //        }
 
-            if (validPrecondition)
-            {
-                foreach (var location in locations)
-                {
-                    _dbContext.LocationAssignments.Add(new LocationAssignment
-                    {
-                        IsServer = true,
-                        LocationId = location.Id,
-                        ServerAllocationId = serverAllocation.Id,
-                    });
-                }
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //        if (validPrecondition)
+    //        {
+    //            foreach (var location in locations)
+    //            {
+    //                _dbContext.LocationAssignments.Add(new LocationAssignment
+    //                {
+    //                    IsServer = true,
+    //                    LocationId = location.Id,
+    //                    ServerAllocationId = serverAllocation.Id,
+    //                });
+    //            }
+    //            _dbContext.SaveChanges();
+    //            result.Succeed = true;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
-    public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            string inputPath = Path.Combine(_env.WebRootPath, "Report", "UpgradeAndHostTemplate.docx");
-            string outputPath = Path.Combine(_env.WebRootPath, "Report", "BBNT.docx");
-            var serverAllocation = _dbContext.ServerAllocations
-               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
-               .Include(x => x.Customer)
-               .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-               .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
-               .FirstOrDefault(x => x.Id == serverAllocationId);
-            if (serverAllocation == null)
-            {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                File.Copy(inputPath, outputPath, true);
-                using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
-                {
-                    var now = DateTime.UtcNow;
-                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
-                    document.RenderText("__Date__", $"{now.Day}/{now.Month}/{now.Year}");
+    //    try
+    //    {
+    //        string inputPath = Path.Combine(_env.WebRootPath, "Report", "UpgradeAndHostTemplate.docx");
+    //        string outputPath = Path.Combine(_env.WebRootPath, "Report", "BBNT.docx");
+    //        var serverAllocation = _dbContext.ServerAllocations
+    //           .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+    //           .Include(x => x.Customer)
+    //           .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+    //           .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+    //           .FirstOrDefault(x => x.Id == serverAllocationId);
+    //        if (serverAllocation == null)
+    //        {
+    //            result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+    //        }
+    //        else
+    //        {
+    //            File.Copy(inputPath, outputPath, true);
+    //            using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
+    //            {
+    //                var now = DateTime.UtcNow;
+    //                TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+    //                document.RenderText("__Date__", $"{now.Day}/{now.Month}/{now.Year}");
 
-                    document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
+    //                document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
 
-                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
+    //                document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
 
-                    document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
+    //                document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
 
-                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
+    //                document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
 
-                    document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
+    //                document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
 
-                    document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
+    //                document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
 
-                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+    //                document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
 
-                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+    //                document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
 
-                    document.RenderText("__Location__", textInfo.ToTitleCase(model.Location));
+    //                document.RenderText("__Location__", textInfo.ToTitleCase(model.Location));
 
-                    document.TickCheckBoxInDocx("Allocation");
+    //                document.TickCheckBoxInDocx("Allocation");
 
-                    document.RenderText("__ServerName__", serverAllocation.Name);
+    //                document.RenderText("__ServerName__", serverAllocation.Name);
 
-                    var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
-                    var cpuString = "";
-                    for (int i = 0; i < cpus.Count(); i++)
-                    {
-                        cpuString += cpus[i].Model;
-                        if (i != cpus.Count() - 1)
-                        {
-                            cpuString += ", ";
-                        }
-                    }
-                    document.RenderText("__CPUs__", cpuString);
+    //                var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
+    //                var cpuString = "";
+    //                for (int i = 0; i < cpus.Count(); i++)
+    //                {
+    //                    cpuString += cpus[i].Model;
+    //                    if (i != cpus.Count() - 1)
+    //                    {
+    //                        cpuString += ", ";
+    //                    }
+    //                }
+    //                document.RenderText("__CPUs__", cpuString);
 
-                    var rams = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description);
-                    var ramCapacity = 0;
-                    for (int i = 0; i < rams.Count(); i++)
-                    {
-                        ramCapacity += rams[i].Capacity;
-                    }
-                    document.RenderText("__Ram__", ramCapacity + "Gb");
+    //                var rams = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description);
+    //                var ramCapacity = 0;
+    //                for (int i = 0; i < rams.Count(); i++)
+    //                {
+    //                    ramCapacity += rams[i].Capacity;
+    //                }
+    //                document.RenderText("__Ram__", ramCapacity + "Gb");
 
-                    var hardDisks = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description);
-                    var hardDiskCapacity = 0;
-                    for (int i = 0; i < hardDisks.Count(); i++)
-                    {
-                        hardDiskCapacity += hardDisks[i].Capacity;
-                    }
-                    document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
+    //                var hardDisks = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description);
+    //                var hardDiskCapacity = 0;
+    //                for (int i = 0; i < hardDisks.Count(); i++)
+    //                {
+    //                    hardDiskCapacity += hardDisks[i].Capacity;
+    //                }
+    //                document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
 
-                    document.RenderText("__ServerLocation__", serverAllocation.ServerLocation);
+    //                document.RenderText("__ServerLocation__", serverAllocation.ServerLocation);
 
-                    document.RenderText("__SerialNumber__", serverAllocation.SerialNumber);
+    //                document.RenderText("__SerialNumber__", serverAllocation.SerialNumber);
 
-                    document.RenderText("__Power__", serverAllocation.Power + "W");
+    //                document.RenderText("__Power__", serverAllocation.Power + "W");
 
-                    document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
+    //                document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
 
-                    document.RenderText("__Action__", "");
+    //                document.RenderText("__Action__", "");
 
-                    document.RenderText("__RequestHostIpCount__", "");
+    //                document.RenderText("__RequestHostIpCount__", "");
 
-                    document.RenderText("__RequestHostIpAddreses__", "");
+    //                document.RenderText("__RequestHostIpAddreses__", "");
 
-                    document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
+    //                document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
 
-                    document.RenderText("__SubnetMask__", IpAddress.GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
+    //                document.RenderText("__SubnetMask__", IpAddress.GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
 
-                    if (model.Good)
-                    {
-                        document.TickCheckBoxInDocx("Evaluate");
-                    }
-                    document.RenderText("__Note__", model.Note);
-                    document.MainDocumentPart.Document.Save();
-                }
-                string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
-                _dbContext.SaveChanges();
+    //                if (model.Good)
+    //                {
+    //                    document.TickCheckBoxInDocx("Evaluate");
+    //                }
+    //                document.RenderText("__Note__", model.Note);
+    //                document.MainDocumentPart.Document.Save();
+    //            }
+    //            string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
+    //            _dbContext.SaveChanges();
 
-                result.Succeed = true;
-                result.Data = inspectionReportFileName;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //            result.Succeed = true;
+    //            result.Data = inspectionReportFileName;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
-    
+    //public async Task<ResultModel> CreateRequestExpandInspectionReport(int requestExpandId, ServerAllocationCreateRequestExpandInspectionReportModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-    public async Task<ResultModel> CreateRequestExpandInspectionReport(int requestExpandId, ServerAllocationCreateRequestExpandInspectionReportModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //    try
+    //    {
+    //        string inputPath = Path.Combine(_env.WebRootPath, "Report", "ExpandTemplate.docx");
+    //        string outputPath = Path.Combine(_env.WebRootPath, "Report", "BBNT.docx");
+    //        var serverAllocation = _dbContext.ServerAllocations
+    //           .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+    //           .Include(x => x.Customer)
+    //           .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+    //           .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+    //           .FirstOrDefault(x => x.Id == requestExpandId);
+    //        if (serverAllocation == null)
+    //        {
+    //            result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+    //        }
+    //        else
+    //        {
+    //            File.Copy(inputPath, outputPath, true);
+    //            using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
+    //            {
+    //                TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
 
-        try
-        {
-            string inputPath = Path.Combine(_env.WebRootPath, "Report", "ExpandTemplate.docx");
-            string outputPath = Path.Combine(_env.WebRootPath, "Report", "BBNT.docx");
-            var serverAllocation = _dbContext.ServerAllocations
-               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
-               .Include(x => x.Customer)
-               .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
-               .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-               .FirstOrDefault(x => x.Id == requestExpandId);
-            if (serverAllocation == null)
-            {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                File.Copy(inputPath, outputPath, true);
-                using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
-                {
-                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+    //                document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
 
-                    document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
+    //                var now = DateTime.UtcNow;
+    //                document.RenderText("__Time__", $"{now.Day}/{now.Month}/{now.Year}");
+    //                document.RenderText("__Time__", $"{now.Day}/{now.Month}/{now.Year}");
 
-                    var now = DateTime.UtcNow;
-                    document.RenderText("__Time__", $"{now.Day}/{now.Month}/{now.Year}");
-                    document.RenderText("__Time__", $"{now.Day}/{now.Month}/{now.Year}");
+    //                document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
 
-                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
+    //                document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
 
-                    document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
+    //                document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
 
-                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
+    //                document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
 
-                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+    //                document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
 
-                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+    //                document.RenderText("__Location__", model.Location);
 
-                    document.RenderText("__Location__", model.Location);
+    //                document.RenderText("__Username__", model.Username);
 
-                    document.RenderText("__Username__", model.Username);
+    //                if (model.isSendMS)
+    //                {
+    //                    document.TickCheckBoxInDocx("Password");
+    //                }
 
-                    if (model.isSendMS)
-                    {
-                        document.TickCheckBoxInDocx("Password");
-                    }
+    //                document.TickCheckBoxInDocx("Allocation");
 
-                    document.TickCheckBoxInDocx("Allocation");
+    //                var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
+    //                var cpuString = "";
+    //                for (int i = 0; i < cpus.Count(); i++)
+    //                {
+    //                    cpuString += cpus[i].Model;
+    //                    if (i != cpus.Count() - 1)
+    //                    {
+    //                        cpuString += ", ";
+    //                    }
+    //                }
+    //                document.RenderText("__Model__", cpuString);
 
-                    var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
-                    var cpuString = "";
-                    for (int i = 0; i < cpus.Count(); i++)
-                    {
-                        cpuString += cpus[i].Model;
-                        if (i != cpus.Count() - 1)
-                        {
-                            cpuString += ", ";
-                        }
-                    }
-                    document.RenderText("__Model__", cpuString);
+    //                var cpuCpu = "";
+    //                for (int i = 0; i < cpus.Count(); i++)
+    //                {
+    //                    cpuString += cpus[i].SerialNumber;
+    //                    if (i != cpus.Count() - 1)
+    //                    {
+    //                        cpuString += ", ";
+    //                    }
+    //                }
+    //                document.RenderText("__CPU__", cpuString);
 
-                    var cpuCpu = "";
-                    for (int i = 0; i < cpus.Count(); i++)
-                    {
-                        cpuString += cpus[i].SerialNumber;
-                        if (i != cpus.Count() - 1)
-                        {
-                            cpuString += ", ";
-                        }
-                    }
-                    document.RenderText("__CPU__", cpuString);
+    //                var rams = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description);
+    //                var ramCapacity = 0;
+    //                for (int i = 0; i < rams.Count(); i++)
+    //                {
+    //                    ramCapacity += rams[i].Capacity;
+    //                }
+    //                document.RenderText("__Memory__", ramCapacity + "Gb");
 
-                    var rams = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description);
-                    var ramCapacity = 0;
-                    for (int i = 0; i < rams.Count(); i++)
-                    {
-                        ramCapacity += rams[i].Capacity;
-                    }
-                    document.RenderText("__Memory__", ramCapacity + "Gb");
+    //                var hardDisks = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description);
+    //                var hardDiskCapacity = 0;
+    //                for (int i = 0; i < hardDisks.Count(); i++)
+    //                {
+    //                    hardDiskCapacity += hardDisks[i].Capacity;
+    //                }
+    //                document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
 
-                    var hardDisks = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description);
-                    var hardDiskCapacity = 0;
-                    for (int i = 0; i < hardDisks.Count(); i++)
-                    {
-                        hardDiskCapacity += hardDisks[i].Capacity;
-                    }
-                    document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
+    //                document.RenderText("__SerialNo__", serverAllocation.SerialNumber);
 
-                    document.RenderText("__SerialNo__", serverAllocation.SerialNumber);
+    //                document.RenderText("__Power__", serverAllocation.Power + "W");
 
-                    document.RenderText("__Power__", serverAllocation.Power + "W");
+    //                document.RenderText("__Rack__", serverAllocation.ServerLocation);
 
-                    document.RenderText("__Rack__", serverAllocation.ServerLocation);
+    //                document.RenderText("__Size__", serverAllocation.LocationAssignments.Count() + "U");
 
-                    document.RenderText("__Size__", serverAllocation.LocationAssignments.Count() + "U");
+    //                document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
+    //                document.RenderText("__Action__", "");
+    //                document.RenderText("__RequestHostIpCount__", "");
+    //                document.RenderText("__RequestHostIpAddreses__", "");
 
-                    document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
-                    document.RenderText("__Action__", "");
-                    document.RenderText("__RequestHostIpCount__", "");
-                    document.RenderText("__RequestHostIpAddreses__", "");
+    //                document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
 
-                    document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
+    //                if (model.Good)
+    //                {
+    //                    document.TickCheckBoxInDocx("Evaluate");
+    //                }
 
-                    if (model.Good)
-                    {
-                        document.TickCheckBoxInDocx("Evaluate");
-                    }
+    //                if (model.Guid)
+    //                {
+    //                    document.TickCheckBoxInDocx("Guided");
+    //                }
 
-                    if (model.Guid)
-                    {
-                        document.TickCheckBoxInDocx("Guided");
-                    }
+    //                document.RenderText("__Note__", model.Note);
+    //                document.MainDocumentPart.Document.Save();
+    //            }
+    //            string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
+    //            serverAllocation.InspectionRecordFilePath = inspectionReportFileName;
+    //            _dbContext.SaveChanges();
 
-                    document.RenderText("__Note__", model.Note);
-                    document.MainDocumentPart.Document.Save();
-                }
-                string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
-                serverAllocation.InspectionRecordFilePath = inspectionReportFileName;
-                _dbContext.SaveChanges();
+    //            result.Succeed = true;
+    //            result.Data = inspectionReportFileName;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-                result.Succeed = true;
-                result.Data = inspectionReportFileName;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> AssignInspectionRecordAndReceiptOfRecipientReport(int serverAllocationId, DocumentFileUploadModel model)
     {

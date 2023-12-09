@@ -141,37 +141,37 @@ public class ServerAllocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPost("{id}/ServerLocation")]
-    public async Task<ActionResult> AssignServerLocation(int id, [FromBody] ServerAllocationAssignLocationModel model)
-    {
-        var result = await _serverAllocationService.AssignLocation(id, model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPost("{id}/ServerLocation")]
+    //public async Task<ActionResult> AssignServerLocation(int id, [FromBody] ServerAllocationAssignLocationModel model)
+    //{
+    //    var result = await _serverAllocationService.AssignLocation(id, model);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpPost("{id}/InspectionReport")]
-    public async Task<ActionResult> CreateInspectionReport(int id, [FromBody] HostAndUpgradeCreateInspectionReportModel model)
-    {
-        var result = await _serverAllocationService.CreateUpgradeAndHostInspectionReport(id, model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPost("{id}/InspectionReport")]
+    //public async Task<ActionResult> CreateInspectionReport(int id, [FromBody] HostAndUpgradeCreateInspectionReportModel model)
+    //{
+    //    var result = await _serverAllocationService.CreateUpgradeAndHostInspectionReport(id, model);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpPost("{id}/ReceiptOfRecipient")]
-    public async Task<ActionResult> CreateReceiptOfRecipient(int id, [FromBody] ServerAllocationCreateRequestExpandInspectionReportModel model)
-    {
-        var result = await _serverAllocationService.CreateReceiptReport(id, model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPost("{id}/ReceiptOfRecipient")]
+    //public async Task<ActionResult> CreateReceiptOfRecipient(int id, [FromBody] ServerAllocationCreateRequestExpandInspectionReportModel model)
+    //{
+    //    var result = await _serverAllocationService.CreateReceiptReport(id, model);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpPost("{id}/RequestExpandInspection")]
-    public async Task<ActionResult> CreateRequestExpandInspection(int id, [FromBody] ServerAllocationCreateRequestExpandInspectionReportModel model)
-    {
-        var result = await _serverAllocationService.CreateRequestExpandInspectionReport(id, model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPost("{id}/RequestExpandInspection")]
+    //public async Task<ActionResult> CreateRequestExpandInspection(int id, [FromBody] ServerAllocationCreateRequestExpandInspectionReportModel model)
+    //{
+    //    var result = await _serverAllocationService.CreateRequestExpandInspectionReport(id, model);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPost("{id}/Document")]
     public async Task<ActionResult> UploadInspectionRecordAndReceiptOfRecipientReport(int id, [FromForm] DocumentFileUploadModel model)
