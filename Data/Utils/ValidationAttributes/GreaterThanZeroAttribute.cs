@@ -6,6 +6,10 @@ public class GreaterThanZeroAttribute : ValidationAttribute
 {
     protected override ValidationResult IsValid(object value, ValidationContext validationContext)
     {
+        if (value == null)
+        {
+            return ValidationResult.Success;
+        }
         if (value is int intValue && intValue > 0)
         {
             return ValidationResult.Success;
