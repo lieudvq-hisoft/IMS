@@ -50,7 +50,7 @@ public class ConfigDescriptionModel
     [GreaterThanZero]
     public int? Capacity { get; set; }
 
-    public string Description { get; set; }
+    public string? Description { get; set; }
 }
 
 public class ServerHardwareConfigCreateBulkModel
