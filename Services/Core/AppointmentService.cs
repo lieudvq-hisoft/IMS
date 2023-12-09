@@ -950,13 +950,8 @@ public class AppointmentService : IAppointmentService
                 validPrecondition = IsCompletable(appointmentId, result);
             }
 
-            if (appointment.RequestUpgradeAppointment.Any() && appointment.InspectionReportFilePath == null && model.HostAndUpgradeCreateInspectionReportModel == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = "Need inspection report to complete";
-            }
-
-            if (appointment.RequestExpandAppointments.Any() && appointment.InspectionReportFilePath == null && model.ExpandCreateInspectionReportModel == null)
+            if ((appointment.ReceiptOfRecipientFilePath == null ||
+                appointment.InspectionReportFilePath == null) && model.ExpandCreateInspectionReportModel == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = "Need inspection report to complete";
@@ -981,7 +976,7 @@ public class AppointmentService : IAppointmentService
             {
                 if (appointment.RequestUpgradeAppointment.Any())
                 {
-                    var createDocResult = await CreateUpgradeReceiptReport(appointment.Id, model.ReceiptOfRecipientModel);
+                    var createDocResult = await CreateUpgradeReceiptReport(appointment.Id, model.ExpandCreateInspectionReportModel);
                     if (!createDocResult.Succeed)
                     {
                         validPrecondition = false;
@@ -1041,7 +1036,7 @@ public class AppointmentService : IAppointmentService
                 {
                     if (appointment.RequestUpgradeAppointment.Any())
                     {
-                        var createDocResult = await CreateUpgradeAndHostInspectionReport(appointment.ServerAllocationId, model.HostAndUpgradeCreateInspectionReportModel);
+                        var createDocResult = await CreateUpgradeAndHostInspectionReport(appointment.ServerAllocationId, model.ExpandCreateInspectionReportModel);
                         if (!createDocResult.Succeed)
                         {
                             transaction.Rollback();
@@ -1173,7 +1168,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model)
+    public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
 
         var result = new ResultModel();
@@ -1521,7 +1516,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateUpgradeReceiptReport(int appointmentId, ReceiptOfRecipientModel model)
+    public async Task<ResultModel> CreateUpgradeReceiptReport(int appointmentId, ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;

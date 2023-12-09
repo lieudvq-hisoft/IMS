@@ -152,11 +152,11 @@ public class AppointmentCompleteModel
     [Required]
     public bool IsCorrectPerson { get; set; }
 
-    public HostAndUpgradeCreateInspectionReportModel HostAndUpgradeCreateInspectionReportModel;
+    //public HostAndUpgradeCreateInspectionReportModel HostAndUpgradeCreateInspectionReportModel;
 
     public ServerAllocationCreateRequestExpandInspectionReportModel ExpandCreateInspectionReportModel;
 
-    public ReceiptOfRecipientModel ReceiptOfRecipientModel { get; set; }
+    //public ReceiptOfRecipientModel ReceiptOfRecipientModel { get; set; }
 }
 
 public class AppointmentSearchModel
