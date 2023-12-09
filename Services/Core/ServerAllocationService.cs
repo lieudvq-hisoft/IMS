@@ -34,7 +34,7 @@ public interface IServerAllocationService
     Task<ResultModel> AssignMasterIp(int serverAllocationId, ServerAllocationMasterIpAssignmentModel model);
     Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model);
     Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model);
-    Task<ResultModel> CreateReceiptReport(int serverAllocationId, ReceiptOfRecipientModel model);
+    Task<ResultModel> CreateReceiptReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model);
     Task<ResultModel> Confirm(int serverAllocationId);
     Task<ResultModel> CreateRequestExpandInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model);
     Task<ResultModel> AssignInspectionRecordAndReceiptOfRecipientReport(int serverAllocationId, DocumentFileUploadModel model);
@@ -808,7 +808,7 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> CreateReceiptReport(int serverAllocationId, ReceiptOfRecipientModel model)
+    public async Task<ResultModel> CreateReceiptReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -858,14 +858,14 @@ public class ServerAllocationService : IServerAllocationService
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
                     document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
                     document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
-                    document.RenderText("__Address__", model.Address);
-                    document.RenderText("__PhoneNumber__", model.PhoneNumber);
-                    document.RenderText("__Email__", model.Email);
+                    document.RenderText("__Address__", serverAllocation.Customer.Address);
+                    document.RenderText("__PhoneNumber__", serverAllocation.Customer.PhoneNumber);
+                    document.RenderText("__Email__", serverAllocation.Customer.Email);
 
                     document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
                     document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
 
-                    document.RenderText("__DeviceCondition__", model.DeviceCondition);
+                    document.RenderText("__DeviceCondition__", model.Note);
                     document.RenderText("__QTNameSignature__", textInfo.ToTitleCase(model.QTName));
 
                     int counter = 1;
