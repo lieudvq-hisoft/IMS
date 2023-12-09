@@ -244,7 +244,8 @@ public class ServerAllocationService : IServerAllocationService
                     .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
                     .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                     .Include(x => x.RequestHostUsers).ThenInclude(x => x.User)
-                     .Where(delegate (RequestHost x)
+                    .Where(x => x.ServerAllocationId == id)
+                    .Where(delegate (RequestHost x)
                      {
                          return x.FilterRequestHost(searchModel);
                      })
