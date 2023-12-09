@@ -1691,6 +1691,7 @@ public class AppointmentService : IAppointmentService
             if (validPrecondition)
             {
                 _dbContext.LocationAssignments.RemoveRange(locationAssignments);
+                requestExpand.ServerAllocation.ServerLocation = null;
                 requestExpand.RemovalStatus = RemovalStatus.Success;
                 _dbContext.SaveChanges();
                 result.Succeed = true;

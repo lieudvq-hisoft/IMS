@@ -509,19 +509,18 @@ public class ServerAllocationService : IServerAllocationService
                 .Include(x => x.RequestHosts)
                 .Include(x => x.IpAssignments)
                 .FirstOrDefault(x => x.Id == serverAllocationId);
+            var locations = _dbContext.LocationAssignments
+                .IgnoreQueryFilters()
+                .Where(x => x.ServerAllocationId == serverAllocationId);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else if (serverAllocation.IpAssignments.Any())
-            {
-                result.ErrorMessage = "Must remove master ip";
             }
             else if (serverAllocation.LocationAssignments.Any())
             {
                 result.ErrorMessage = "Must remove server from rack";
             }
-            else if (serverAllocation.RemovalFilePath == null)
+            else if (locations.Any() && serverAllocation.RemovalFilePath == null)
             {
                 result.ErrorMessage = "Need document for removal";
             }
