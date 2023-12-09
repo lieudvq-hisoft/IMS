@@ -808,111 +808,7 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> CreateReceiptReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-
-        try
-        {
-            string inputPath = Path.Combine(_env.WebRootPath, "Report", "Template2.docx");
-            string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
-            var serverAllocation = _dbContext.ServerAllocations
-               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
-               .Include(x => x.Customer)
-               .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
-               .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-               .FirstOrDefault(x => x.Id == serverAllocationId);
-            if (serverAllocation == null)
-            {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
-            {
-                result.ErrorMessage = "Server need to be waiting";
-            }
-            else if (!serverAllocation.LocationAssignments.Any())
-            {
-                result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
-            }
-            else if (!serverAllocation.IpAssignments.Any())
-            {
-                result.ErrorMessage = IpAssignmentErrorMessage.NOT_EXISTED;
-            }
-            else if (serverAllocation.InspectionRecordFilePath == null)
-            {
-                result.ErrorMessage = "Inspection report is required";
-            }
-            else
-            {
-                File.Copy(inputPath, outputPath, true);
-                using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
-                {
-                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
-
-                    var now = DateTime.UtcNow;
-                    document.RenderText("__Time__", $"{now.Hour} Giờ {now.Minute} Phút");
-                    document.RenderText("__Date__", $"ngày {now.Day} tháng {now.Month} Năm {now.Year}");
-                    document.RenderText("__Location__", model.Location);
-
-                    document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
-                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
-                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
-                    document.RenderText("__Address__", serverAllocation.Customer.Address);
-                    document.RenderText("__PhoneNumber__", serverAllocation.Customer.PhoneNumber);
-                    document.RenderText("__Email__", serverAllocation.Customer.Email);
-
-                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
-                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
-
-                    document.RenderText("__DeviceCondition__", model.DeviceCondition);
-                    document.RenderText("__QTNameSignature__", textInfo.ToTitleCase(model.QTName));
-
-                    int counter = 1;
-                    var receiptReportModels = new List<ReceiptReportModel>();
-                    foreach (var hardware in serverAllocation.ServerHardwareConfigs)
-                    {
-                        List<ConfigDescriptionModel> descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(hardware.Description);
-                        var receiptReportModel = new ReceiptReportModel
-                        {
-                            PartNo = counter++,
-                            Model = hardware.Component.Name + " - ",
-                            Action = "Thêm",
-                            Quantity = descriptions.Count,
-                            Unit = "Cái",
-                            SerialNumber = ""
-                        };
-
-                        for (int i = 0; i < descriptions.Count; i++)
-                        {
-                            receiptReportModel.Model += descriptions[i].Model;
-                            receiptReportModel.SerialNumber += descriptions[i].Model;
-                            if (i < descriptions.Count - 1)
-                            {
-                                receiptReportModel.Model += ", ";
-                            }
-                        }
-                        receiptReportModels.Add(receiptReportModel);
-                    }
-                    document.InsertToSingleTable(receiptReportModels);
-                    document.MainDocumentPart.Document.Save();
-                }
-                //var formfile = document.ConvertToIFormFile(outputPath);
-                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
-                serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
-                _dbContext.SaveChanges();
-
-                result.Succeed = true;
-                result.Data = receiptOfRecipientFileName;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
+    
 
     public async Task<ResultModel> CreateRequestExpandInspectionReport(int requestExpandId, ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
@@ -1057,7 +953,6 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-
             var serverAllocation = _dbContext.ServerAllocations
                 .FirstOrDefault(x => x.Id == serverAllocationId);
             if (serverAllocation == null)
@@ -1152,10 +1047,6 @@ public class ServerAllocationService : IServerAllocationService
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else if (serverAllocation.IpAssignments.Any())
-            {
-                result.ErrorMessage = "Must remove master ip";
             }
             else if (serverAllocation.LocationAssignments.Any())
             {

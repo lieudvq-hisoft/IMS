@@ -980,43 +980,92 @@ public class AppointmentService : IAppointmentService
 
             if (validPrecondition)
             {
-                if (appointment.RequestUpgradeAppointment.Any())
-                {
-                    var createDocResult = await CreateUpgradeReceiptReport(appointment.Id, model.DocumentModel);
-                    if (!createDocResult.Succeed)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = createDocResult.ErrorMessage;
-                    }
-                    else
-                    {
-                        appointment.ReceiptOfRecipientFilePath = createDocResult.Data as string;
-                    }
-                }
-            }
-
-            if (validPrecondition)
-            {
                 _mapper.Map<AppointmentCompleteModel, Appointment>(model, appointment);
                 appointment.Status = RequestStatus.Success;
                 _dbContext.SaveChanges();
-                var requestUpgradeResults = new List<ResultModel>();
 
-                foreach (var requestUpgradeId in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgradeId))
+                var requestUpgradeResults = new List<ResultModel>();
+                if (appointment.RequestUpgradeAppointment.Any())
                 {
-                    requestUpgradeResults.Add(await CompleteRequestUpgrade(requestUpgradeId));
+                    var createReceiptResult = await CreateUpgradeReceiptReport(appointment.Id, model.DocumentModel);
+                    if (!createReceiptResult.Succeed)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = createReceiptResult.ErrorMessage;
+                    }
+                    else
+                    {
+                        appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
+                        foreach (var requestUpgradeId in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgradeId))
+                        {
+                            requestUpgradeResults.Add(await CompleteRequestUpgrade(requestUpgradeId));
+                        }
+                        var createInspectionResult = await CreateUpgradeInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
+                        if (!createInspectionResult.Succeed)
+                        {
+                            validPrecondition = false;
+                            result.ErrorMessage = createInspectionResult.ErrorMessage;
+                        }
+                        else
+                        {
+                            appointment.InspectionReportFilePath = createInspectionResult.Data as string;
+                            _dbContext.SaveChanges();
+                        }
+                    }
                 }
 
                 var requestExpandResults = new List<ResultModel>();
-                foreach (var requestExpandId in appointment.RequestExpandAppointments.Where(x => !x.ForRemoval).Select(x => x.RequestExpandId))
+                if (appointment.RequestExpandAppointments.Any(x => !x.ForRemoval))
                 {
+                    var requestExpandId = appointment.RequestExpandAppointments.FirstOrDefault(x => !x.ForRemoval).RequestExpand.Id;
                     requestExpandResults.Add(await CompleteRequestExpand(requestExpandId));
+                    var createInspectionResult = await CreateExpandInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
+                    var createReceiptResult = await CreateExpandReceiptReport(appointment.ServerAllocationId, model.DocumentModel);
+                    if (!createInspectionResult.Succeed)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = createInspectionResult.ErrorMessage;
+                    }
+                    else if (!createReceiptResult.Succeed)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = createReceiptResult.ErrorMessage;
+                    }
+                    else
+                    {
+                        appointment.InspectionReportFilePath = createInspectionResult.Data as string;
+                        appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
+                        appointment.ServerAllocation.InspectionRecordFilePath = createInspectionResult.Data as string;
+                        appointment.ServerAllocation.ReceiptOfRecipientFilePath = createInspectionResult.Data as string;
+                        _dbContext.SaveChanges();
+                    }
                 }
 
                 var requestRemovalResults = new List<ResultModel>();
-                foreach (var requestExpandId in appointment.RequestExpandAppointments.Where(x => x.ForRemoval).Select(x => x.RequestExpandId))
+                if (appointment.RequestExpandAppointments.Any(x => x.ForRemoval))
                 {
-                    requestRemovalResults.Add(await CompleteRemoval(requestExpandId));
+                    var createInspectionResult = await CreateExpandInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
+                    var createReceiptResult = await CreateExpandReceiptReport(appointment.ServerAllocationId, model.DocumentModel);
+                    if (!createInspectionResult.Succeed)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = createInspectionResult.ErrorMessage;
+                    }
+                    else if (!createReceiptResult.Succeed)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = createReceiptResult.ErrorMessage;
+                    }
+                    else
+                    {
+                        var requestExpandId = appointment.RequestExpandAppointments.FirstOrDefault(x => x.ForRemoval).RequestExpand.Id;
+                        requestRemovalResults.Add(await CompleteRemoval(requestExpandId));
+                        appointment.InspectionReportFilePath = createInspectionResult.Data as string;
+                        appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
+                        appointment.ServerAllocation.InspectionRecordFilePath = createInspectionResult.Data as string;
+                        appointment.ServerAllocation.ReceiptOfRecipientFilePath = createInspectionResult.Data as string;
+                        _dbContext.SaveChanges();
+                    }
                 }
 
                 if (requestExpandResults.Any(x => !x.Succeed))
@@ -1040,40 +1089,7 @@ public class AppointmentService : IAppointmentService
                 }
                 else
                 {
-                    if (appointment.RequestUpgradeAppointment.Any())
-                    {
-                        var createDocResult = await CreateUpgradeAndHostInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
-                        if (!createDocResult.Succeed)
-                        {
-                            transaction.Rollback();
-                            result.ErrorMessage = createDocResult.ErrorMessage;
-                        }
-                        else
-                        {
-                            appointment.InspectionReportFilePath = createDocResult.Data as string;
-                            _dbContext.SaveChanges();
-                            transaction.Commit();
-                            result.Succeed = true;
-                            result.Data = _mapper.Map<AppointmentResultModel>(appointment);
-                        }
-                    }
-                    if (appointment.RequestExpandAppointments.Any())
-                    {
-                        var createDocResult = await CreateExpandInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
-                        if (!createDocResult.Succeed)
-                        {
-                            transaction.Rollback();
-                            result.ErrorMessage = createDocResult.ErrorMessage;
-                        }
-                        else
-                        {
-                            appointment.InspectionReportFilePath = createDocResult.Data as string;
-                            appointment.ServerAllocation.InspectionRecordFilePath = createDocResult.Data as string;
-                            transaction.Commit();
-                            result.Succeed = true;
-                            result.Data = _mapper.Map<AppointmentResultModel>(appointment);
-                        }
-                    }
+                    transaction.Commit();
                 }
             }
         }
@@ -1174,7 +1190,96 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model)
+    public async Task<ResultModel> CompleteRequestExpand(int requestExpandId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+
+        try
+        {
+            var requestExpand = _dbContext.RequestExpands
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Accepted);
+            ServerAllocation serverAllocation = null;
+            var requiredComponents = _dbContext.Components.Where(x => x.IsRequired);
+            if (requestExpand == null)
+            {
+                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+                validPrecondition = false;
+            }
+            else
+            {
+                serverAllocation = requestExpand.ServerAllocation;
+                foreach (var component in requiredComponents)
+                {
+                    if (serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == component.Id) == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "Cannot allocate server missing config for required component";
+                    }
+
+                    if (serverAllocation.SerialNumber == null || serverAllocation.Power == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "Server must have serial number and power";
+                    }
+                }
+            }
+
+            List<Location> locations = null;
+            if (validPrecondition)
+            {
+                locations = requestExpand.RequestExpandLocations.Select(x => x.Location).ToList();
+                if (!locations.Any())
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Request dont have target location";
+                }
+            }
+
+            if (validPrecondition)
+            {
+                var locationAssignments = new List<LocationAssignment>();
+                foreach (var location in locations)
+                {
+                    locationAssignments.Add(new LocationAssignment
+                    {
+                        ServerAllocationId = requestExpand.ServerAllocationId,
+                        LocationId = location.Id
+                    });
+                }
+                _dbContext.LocationAssignments.AddRange(locationAssignments);
+                requestExpand.Status = RequestStatus.Success;
+                requestExpand.SuccessExpandAppointmentId = requestExpand.RequestExpandAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success).Id;
+                serverAllocation.DateUpdated = DateTime.UtcNow;
+                _dbContext.SaveChanges();
+
+                serverAllocation = _dbContext.ServerAllocations
+                    .Include(x => x.IpAssignments)
+                    .ThenInclude(x => x.IpAddress)
+                    .Include(x => x.Customer)
+                    .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+                    .FirstOrDefault(x => x.Id == serverAllocation.Id);
+                serverAllocation.ServerLocation = serverAllocation.GetServerLocation();
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> CreateUpgradeInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
 
         var result = new ResultModel();
@@ -1293,96 +1398,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CompleteRequestExpand(int requestExpandId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-        bool validPrecondition = true;
-
-        try
-        {
-            var requestExpand = _dbContext.RequestExpands
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Accepted);
-            ServerAllocation serverAllocation = null;
-            var requiredComponents = _dbContext.Components.Where(x => x.IsRequired);
-            if (requestExpand == null)
-            {
-                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
-                validPrecondition = false;
-            }
-            else
-            {
-                serverAllocation = requestExpand.ServerAllocation;
-                foreach (var component in requiredComponents)
-                {
-                    if (serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == component.Id) == null)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = "Cannot allocate server missing config for required component";
-                    }
-
-                    if (serverAllocation.SerialNumber == null || serverAllocation.Power == null)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = "Server must have serial number and power";
-                    }
-                }
-            }
-
-            List<Location> locations = null;
-            if (validPrecondition)
-            {
-                locations = requestExpand.RequestExpandLocations.Select(x => x.Location).ToList();
-                if (!locations.Any())
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "Request dont have target location";
-                }
-            }
-
-            if (validPrecondition)
-            {
-                var locationAssignments = new List<LocationAssignment>();
-                foreach (var location in locations)
-                {
-                    locationAssignments.Add(new LocationAssignment
-                    {
-                        ServerAllocationId = requestExpand.ServerAllocationId,
-                        LocationId = location.Id
-                    });
-                }
-                _dbContext.LocationAssignments.AddRange(locationAssignments);
-                requestExpand.Status = RequestStatus.Success;
-                requestExpand.SuccessExpandAppointmentId = requestExpand.RequestExpandAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success).Id;
-                serverAllocation.DateUpdated = DateTime.UtcNow;
-                _dbContext.SaveChanges();
-
-                serverAllocation = _dbContext.ServerAllocations
-                    .Include(x => x.IpAssignments)
-                    .ThenInclude(x => x.IpAddress)
-                    .Include(x => x.Customer)
-                    .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-                    .FirstOrDefault(x => x.Id == serverAllocation.Id);
-                serverAllocation.ServerLocation = serverAllocation.GetServerLocation();
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-
-        return result;
-    }
-
-    public async Task<ResultModel> CreateExpandInspectionReport(int requestExpandId, ServerAllocationCreateRequestExpandInspectionReportModel model)
+    public async Task<ResultModel> CreateExpandInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -1396,7 +1412,7 @@ public class AppointmentService : IAppointmentService
                .Include(x => x.Customer)
                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-               .FirstOrDefault(x => x.Id == requestExpandId);
+               .FirstOrDefault(x => x.Id == serverAllocationId);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
@@ -1555,6 +1571,25 @@ public class AppointmentService : IAppointmentService
                 File.Copy(inputPath, outputPath, true);
                 using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
                 {
+                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+
+                    var now = DateTime.UtcNow;
+                    document.RenderText("__Time__", $"{now.Hour} Giờ {now.Minute} Phút");
+                    document.RenderText("__Date__", $"ngày {now.Day} tháng {now.Month} Năm {now.Year}");
+                    document.RenderText("__Location__", model.Location);
+
+                    document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
+                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
+                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
+                    document.RenderText("__Address__", serverAllocation.Customer.Address);
+                    document.RenderText("__PhoneNumber__", serverAllocation.Customer.PhoneNumber);
+                    document.RenderText("__Email__", serverAllocation.Customer.Email);
+
+                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+
+                    document.RenderText("__DeviceCondition__", model.DeviceCondition);
+
                     int counter = 1;
                     var receiptReportModels = new List<ReceiptReportModel>();
                     foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
@@ -1615,6 +1650,110 @@ public class AppointmentService : IAppointmentService
                             }
                             receiptReportModels.Add(oldConfig);
                         }
+                    }
+                    document.InsertToSingleTable(receiptReportModels);
+                    document.MainDocumentPart.Document.Save();
+                }
+                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
+                serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+                _dbContext.SaveChanges();
+
+                result.Succeed = true;
+                result.Data = receiptOfRecipientFileName;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> CreateExpandReceiptReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            string inputPath = Path.Combine(_env.WebRootPath, "Report", "Template2.docx");
+            string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
+            var serverAllocation = _dbContext.ServerAllocations
+               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+               .Include(x => x.Customer)
+               .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+               .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+               .FirstOrDefault(x => x.Id == serverAllocationId);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
+            {
+                result.ErrorMessage = "Server need to be waiting";
+            }
+            else if (!serverAllocation.LocationAssignments.Any())
+            {
+                result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+            }
+            else if (!serverAllocation.IpAssignments.Any())
+            {
+                result.ErrorMessage = IpAssignmentErrorMessage.NOT_EXISTED;
+            }
+            else if (serverAllocation.InspectionRecordFilePath == null)
+            {
+                result.ErrorMessage = "Inspection report is required";
+            }
+            else
+            {
+                File.Copy(inputPath, outputPath, true);
+                using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
+                {
+                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+
+                    var now = DateTime.UtcNow;
+                    document.RenderText("__Time__", $"{now.Hour} Giờ {now.Minute} Phút");
+                    document.RenderText("__Date__", $"ngày {now.Day} tháng {now.Month} Năm {now.Year}");
+                    document.RenderText("__Location__", model.Location);
+
+                    document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
+                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
+                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
+                    document.RenderText("__Address__", serverAllocation.Customer.Address);
+                    document.RenderText("__PhoneNumber__", serverAllocation.Customer.PhoneNumber);
+                    document.RenderText("__Email__", serverAllocation.Customer.Email);
+
+                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+
+                    document.RenderText("__DeviceCondition__", model.DeviceCondition);
+
+                    int counter = 1;
+                    var receiptReportModels = new List<ReceiptReportModel>();
+                    foreach (var hardware in serverAllocation.ServerHardwareConfigs)
+                    {
+                        List<ConfigDescriptionModel> descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(hardware.Description);
+                        var receiptReportModel = new ReceiptReportModel
+                        {
+                            PartNo = counter++,
+                            Model = hardware.Component.Name + " - ",
+                            Action = "Thêm",
+                            Quantity = descriptions.Count,
+                            Unit = "Cái",
+                            SerialNumber = ""
+                        };
+
+                        for (int i = 0; i < descriptions.Count; i++)
+                        {
+                            receiptReportModel.Model += descriptions[i].Model;
+                            receiptReportModel.SerialNumber += descriptions[i].Model;
+                            if (i < descriptions.Count - 1)
+                            {
+                                receiptReportModel.Model += ", ";
+                            }
+                        }
+                        receiptReportModels.Add(receiptReportModel);
                     }
                     document.InsertToSingleTable(receiptReportModels);
                     document.MainDocumentPart.Document.Save();
