@@ -91,6 +91,10 @@ public class ServerAllocationUpdateModel
     public int Id { get; set; }
 
     [Required]
+    [StringLength(255, MinimumLength = 6)]
+    public string? SerialNumber { get; set; }
+
+    [Required]
     public string Name { get; set; }
 
     [Required]
