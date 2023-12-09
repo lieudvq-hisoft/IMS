@@ -717,7 +717,7 @@ public class RequestHostService : IRequestHostService
                 {
                     var now = DateTime.UtcNow;
                     TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
-                    document.RenderText("__Date__", $"{now.Day}/{now.Month}/{now.Year}");
+                    document.RenderText("__Date__", $"{now.Day:dd}/{now.Month:MM}/{now.Year}");
 
                     document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
 
@@ -775,7 +775,7 @@ public class RequestHostService : IRequestHostService
 
                     document.RenderText("__Power__", serverAllocation.Power + "W");
 
-                    document.RenderText("__MasterIp__", serverAllocation.MasterIpAddress);
+                    document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
 
                     document.RenderText("__Action__", requestHost.IsRemoval ? "Gỡ" : "Thêm");
 
