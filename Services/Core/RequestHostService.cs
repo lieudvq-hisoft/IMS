@@ -757,7 +757,7 @@ public class RequestHostService : IRequestHostService
                     var ramCapacity = 0;
                     for (int i = 0; i < rams.Count(); i++)
                     {
-                        ramCapacity += rams[i].Capacity;
+                        ramCapacity += rams[i].Capacity.Value;
                     }
                     document.RenderText("__Ram__", ramCapacity + "Gb");
 
@@ -765,7 +765,7 @@ public class RequestHostService : IRequestHostService
                     var hardDiskCapacity = 0;
                     for (int i = 0; i < hardDisks.Count(); i++)
                     {
-                        hardDiskCapacity += hardDisks[i].Capacity;
+                        hardDiskCapacity += hardDisks[i].Capacity.Value;
                     }
                     document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
 

@@ -48,7 +48,7 @@ public class ConfigDescriptionModel
     public string Model { get; set; }
 
     [GreaterThanZero]
-    public int Capacity { get; set; }
+    public int? Capacity { get; set; }
 
     public string Description { get; set; }
 }
