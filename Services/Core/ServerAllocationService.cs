@@ -479,6 +479,10 @@ public class ServerAllocationService : IServerAllocationService
             {
                 result.ErrorMessage = "Can only update waiting server";
             }
+            else if (_dbContext.ServerAllocations.Any(x => x.SerialNumber == model.SerialNumber && x.Id != model.Id))
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.EXISTED;
+            }
             else
             {
                 _mapper.Map<ServerAllocationUpdateModel, ServerAllocation>(model, serverAllocation);
