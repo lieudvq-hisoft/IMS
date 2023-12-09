@@ -1,4 +1,7 @@
-﻿namespace Data.Entities;
+﻿using Data.Models;
+using Data.Utils.Common;
+
+namespace Data.Entities;
 
 public class Customer : BaseEntity
 {
@@ -15,4 +18,11 @@ public class Customer : BaseEntity
 
     public ICollection<ServerAllocation> ServerAllocations { get; set; }
     public ICollection<UserCustomer> UserCustomers { get; set; }
+
+    public bool Filter(CustomerSearchModel searchModel)
+    {
+        var matchCompanyName = searchModel.CompanyName != null ? MyFunction.MatchString(searchModel.CompanyName, CompanyName) : true;
+        var isDeleted = searchModel.IsDeleted != null ? IsDeleted == searchModel.IsDeleted : true;
+        return matchCompanyName && isDeleted;
+    }
 }

@@ -59,9 +59,10 @@ public class CustomerService : ICustomerService
         try
         {
             var customers = _dbContext.Customers
+                .IgnoreQueryFilters()
                 .Where(delegate (Customer x)
                 {
-                    return MyFunction.MatchString(searchModel.CompanyName, x.CompanyName);
+                    return x.Filter(searchModel);
                 })
                 .AsQueryable();
 

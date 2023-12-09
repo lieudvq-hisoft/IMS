@@ -9,6 +9,7 @@ public class CustomerModel
     public string? TaxNumber { get; set; }
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
+    public bool IsDeleted { get; set; }
     //public string? CustomerName { get; set; }
 
     //public int? CompanyTypeId { get; set; }
@@ -93,7 +94,8 @@ public class CustomerChangePasswordModel
 
 public class CustomerSearchModel
 {
-    public string? CompanyName { get; set; } = "";
+    public string? CompanyName { get; set; }
+    public bool? IsDeleted { get; set; }
 }
 
 public class CustomerLoginModel
