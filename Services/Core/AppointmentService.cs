@@ -945,11 +945,11 @@ public class AppointmentService : IAppointmentService
                 validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
-            else if (appointment.ServerAllocation.MasterIpAddress == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = "Server need master ip to be allocated";
-            }
+            //else if (appointment.ServerAllocation.MasterIpAddress == null)
+            //{
+            //    validPrecondition = false;
+            //    result.ErrorMessage = "Server need master ip to be allocated";
+            //}
             else
             {
                 validPrecondition = IsCompletable(appointmentId, result);
@@ -1036,7 +1036,7 @@ public class AppointmentService : IAppointmentService
                         appointment.InspectionReportFilePath = createInspectionResult.Data as string;
                         appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
                         appointment.ServerAllocation.InspectionRecordFilePath = createInspectionResult.Data as string;
-                        appointment.ServerAllocation.ReceiptOfRecipientFilePath = createInspectionResult.Data as string;
+                        appointment.ServerAllocation.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
                         _dbContext.SaveChanges();
                     }
                 }
@@ -1063,7 +1063,7 @@ public class AppointmentService : IAppointmentService
                         appointment.InspectionReportFilePath = createInspectionResult.Data as string;
                         appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
                         appointment.ServerAllocation.InspectionRecordFilePath = createInspectionResult.Data as string;
-                        appointment.ServerAllocation.ReceiptOfRecipientFilePath = createInspectionResult.Data as string;
+                        appointment.ServerAllocation.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
                         _dbContext.SaveChanges();
                     }
                 }
@@ -1089,6 +1089,7 @@ public class AppointmentService : IAppointmentService
                 }
                 else
                 {
+                    result.Succeed = true;
                     transaction.Commit();
                 }
             }
@@ -1306,7 +1307,7 @@ public class AppointmentService : IAppointmentService
                 {
                     var now = DateTime.UtcNow;
                     TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
-                    document.RenderText("__Date__", $"{now.Day}/{now.Month}/{now.Year}");
+                    document.RenderText("__Date__", now.ToString("dd/MM/yyyy"));
 
                     document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
 
@@ -1364,7 +1365,10 @@ public class AppointmentService : IAppointmentService
 
                     document.RenderText("__Power__", serverAllocation.Power + "W");
 
-                    document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
+                    if (serverAllocation.MasterIpAddress != null)
+                    {
+                        document.RenderText("__MasterIP__", serverAllocation.MasterIpAddress);
+                    }
 
                     document.RenderText("__Action__", "");
 
@@ -1427,8 +1431,8 @@ public class AppointmentService : IAppointmentService
                     document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
 
                     var now = DateTime.UtcNow;
-                    document.RenderText("__Time__", $"{now.Day}/{now.Month}/{now.Year}");
-                    document.RenderText("__Time__", $"{now.Day}/{now.Month}/{now.Year}");
+                    document.RenderText("__Time__", now.ToString("dd/MM/yyyy"));
+                    document.RenderText("__Time__", now.ToString("dd/MM/yyyy"));
 
                     document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
 
@@ -1492,7 +1496,10 @@ public class AppointmentService : IAppointmentService
 
                     document.RenderText("__Power__", serverAllocation.Power + "W");
 
-                    document.RenderText("__MasterIp__", serverAllocation.MasterIpAddress);
+                    if (serverAllocation.MasterIpAddress != null)
+                    {
+                        document.RenderText("__MasterIp__", serverAllocation.MasterIpAddress);
+                    }
 
                     document.RenderText("__Rack__", serverAllocation.ServerLocation);
 
@@ -1575,7 +1582,7 @@ public class AppointmentService : IAppointmentService
 
                     var now = DateTime.UtcNow;
                     document.RenderText("__Time__", $"{now.Hour} Giờ {now.Minute} Phút");
-                    document.RenderText("__Date__", $"ngày {now.Day} tháng {now.Month} Năm {now.Year}");
+                    document.RenderText("__Date__", $"ngày {now.Day:dd} tháng {now.Month:MM} Năm {now.Year}");
                     document.RenderText("__Location__", model.Location);
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
@@ -1714,7 +1721,7 @@ public class AppointmentService : IAppointmentService
 
                     var now = DateTime.UtcNow;
                     document.RenderText("__Time__", $"{now.Hour} Giờ {now.Minute} Phút");
-                    document.RenderText("__Date__", $"ngày {now.Day} tháng {now.Month} Năm {now.Year}");
+                    document.RenderText("__Date__", $"ngày {now.Day:dd)} tháng {now.Month:MM} Năm {now.Year}");
                     document.RenderText("__Location__", model.Location);
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
