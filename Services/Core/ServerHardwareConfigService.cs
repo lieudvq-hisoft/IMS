@@ -247,11 +247,11 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
                 result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
             }
 
-            if (serverAllocation.ServerHardwareConfigs.Any(x => x.ComponentId == component.Id))
-            {
-                validPrecondition = false;
-                result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
-            }
+            //if (serverAllocation.ServerHardwareConfigs.Any(x => x.ComponentId == component.Id))
+            //{
+            //    validPrecondition = false;
+            //    result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
+            //}
 
             if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), serverAllocationId: serverAllocation.Id))
             {
