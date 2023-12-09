@@ -22,7 +22,7 @@ public class Customer : BaseEntity
     public bool Filter(CustomerSearchModel searchModel)
     {
         var matchCompanyName = searchModel.CompanyName != null ? MyFunction.MatchString(searchModel.CompanyName, CompanyName) : true;
-        var isDeleted = searchModel.IsDeleted != null ? IsDeleted == searchModel.IsDeleted : true;
+        var isDeleted = searchModel.IsDeleted != null ? IsDeleted == searchModel.IsDeleted : !IsDeleted;
         return matchCompanyName && isDeleted;
     }
 }
