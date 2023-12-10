@@ -14,6 +14,7 @@ public class ServerAllocationModel
     public string? Note { get; set; }
     public string? TechNote { get; set; }
     public string? SaleNote { get; set; }
+    public bool LocationRemoved { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdated { get; set; }
     public string? InspectionRecordFilePath { get; set; }
@@ -38,6 +39,7 @@ public class ServerAllocationResultModel
     public string? TechNote { get; set; }
     public string? SaleNote { get; set; }
     public string? ServerLocation { get; set; }
+    public bool LocationRemoved { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdated { get; set; }
     public string? InspectionRecordFilePath { get; set; }

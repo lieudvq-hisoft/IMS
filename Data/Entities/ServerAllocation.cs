@@ -10,6 +10,7 @@ public class ServerAllocation : BaseEntity
     public string? Note { get; set; }
     public string? TechNote { get; set; }
     public string? SaleNote { get; set; }
+    public bool LocationRemoved { get; set; }
     public string? MasterIpAddress { get; set; }
     public string? ServerLocation { get; set; }
     public string? InspectionRecordFilePath { get; set; }

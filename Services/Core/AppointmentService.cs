@@ -1754,10 +1754,11 @@ public class AppointmentService : IAppointmentService
                         for (int i = 0; i < descriptions.Count; i++)
                         {
                             receiptReportModel.Model += descriptions[i].Model;
-                            receiptReportModel.SerialNumber += descriptions[i].Model;
+                            receiptReportModel.SerialNumber += descriptions[i].SerialNumber;
                             if (i < descriptions.Count - 1)
                             {
                                 receiptReportModel.Model += ", ";
+                                receiptReportModel.SerialNumber += ", ";
                             }
                         }
                         receiptReportModels.Add(receiptReportModel);
