@@ -1062,8 +1062,7 @@ public class AppointmentService : IAppointmentService
                         requestRemovalResults.Add(await CompleteRemoval(requestExpandId));
                         appointment.InspectionReportFilePath = createInspectionResult.Data as string;
                         appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
-                        appointment.ServerAllocation.InspectionRecordFilePath = createInspectionResult.Data as string;
-                        appointment.ServerAllocation.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
+                        appointment.ServerAllocation.RemovalFilePath = createReceiptResult.Data as string;
                         _dbContext.SaveChanges();
                     }
                 }
