@@ -98,7 +98,7 @@ public static class RequestExpandErrorMessage
     public const string NOT_WAITING = "Request expand is not waiting";
     public const string NOT_SUCCESS = "Request expand is not success";
     public const string NOT_COMPLETABLE = "Request expand is not completable";
-    public const string REMOVAL_NOT_ACCEPTED = "Non success removal request";
+    public const string REMOVAL_NOT_ACCEPTED = "Non accepted removal request";
 }
 
 public static class RequestExpandAppointmentErrorMessage

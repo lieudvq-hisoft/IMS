@@ -1020,7 +1020,7 @@ public class AppointmentService : IAppointmentService
                     var requestExpandId = appointment.RequestExpandAppointments.FirstOrDefault(x => !x.ForRemoval).RequestExpand.Id;
                     requestExpandResults.Add(await CompleteRequestExpand(requestExpandId));
                     var createInspectionResult = await CreateExpandInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
-                    var createReceiptResult = await CreateExpandReceiptReport(appointment.ServerAllocationId, model.DocumentModel);
+                    var createReceiptResult = await CreateExpandReceiptReport(requestExpandId, model.DocumentModel);
                     if (!createInspectionResult.Succeed)
                     {
                         validPrecondition = false;
@@ -1044,8 +1044,9 @@ public class AppointmentService : IAppointmentService
                 var requestRemovalResults = new List<ResultModel>();
                 if (appointment.RequestExpandAppointments.Any(x => x.ForRemoval))
                 {
+                    var requestExpandId = appointment.RequestExpandAppointments.FirstOrDefault(x => x.ForRemoval).RequestExpand.Id;
                     var createInspectionResult = await CreateExpandInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
-                    var createReceiptResult = await CreateExpandReceiptReport(appointment.ServerAllocationId, model.DocumentModel);
+                    var createReceiptResult = await CreateExpandReceiptReport(requestExpandId, model.DocumentModel);
                     if (!createInspectionResult.Succeed)
                     {
                         validPrecondition = false;
@@ -1058,7 +1059,6 @@ public class AppointmentService : IAppointmentService
                     }
                     else
                     {
-                        var requestExpandId = appointment.RequestExpandAppointments.FirstOrDefault(x => x.ForRemoval).RequestExpand.Id;
                         requestRemovalResults.Add(await CompleteRemoval(requestExpandId));
                         appointment.InspectionReportFilePath = createInspectionResult.Data as string;
                         appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
@@ -1677,7 +1677,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateExpandReceiptReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model)
+    public async Task<ResultModel> CreateExpandReceiptReport(int requestExpandId, ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -1686,17 +1686,18 @@ public class AppointmentService : IAppointmentService
         {
             string inputPath = Path.Combine(_env.WebRootPath, "Report", "Template2.docx");
             string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
+            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
             var serverAllocation = _dbContext.ServerAllocations
                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                .Include(x => x.Customer)
                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-               .FirstOrDefault(x => x.Id == serverAllocationId);
+               .FirstOrDefault(x => x.Id == requestExpand.ServerAllocationId);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
-            else if (serverAllocation.Status != ServerAllocationStatus.Waiting)
+            else if (requestExpand.Status == RequestStatus.Accepted && serverAllocation.Status != ServerAllocationStatus.Waiting)
             {
                 result.ErrorMessage = "Server need to be waiting";
             }
