@@ -4,7 +4,6 @@ namespace Data.Entities;
 public class ServerAllocation : BaseEntity
 {
     public ServerAllocationStatus Status { get; set; }
-    //public int ExpectedSize { get; set; }
     public string? Name { get; set; }
     public string? SerialNumber { get; set; }
     public int? Power { get; set; }
@@ -12,7 +11,6 @@ public class ServerAllocation : BaseEntity
     public string? TechNote { get; set; }
     public string? SaleNote { get; set; }
     public string? MasterIpAddress { get; set; }
-    public bool DocumentConfirm { get; set; }
     public string? ServerLocation { get; set; }
     public string? InspectionRecordFilePath { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
