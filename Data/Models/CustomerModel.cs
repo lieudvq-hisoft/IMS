@@ -3,31 +3,29 @@
 namespace Data.Models;
 public class CustomerModel
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string? CompanyName { get; set; }
     public string? Address { get; set; }
     public string? TaxNumber { get; set; }
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
     public bool IsDeleted { get; set; }
-    //public string? CustomerName { get; set; }
-
-    //public int? CompanyTypeId { get; set; }
+    public int CurrenNoticeCount { get; set; }
+    public List<string>? FcmTokens { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
 }
 
 public class CustomerResultModel
 {
-    public int Id { get; set; }
+    public Guid Id { get; set; }
     public string? CompanyName { get; set; }
     public string? Address { get; set; }
     public string? TaxNumber { get; set; }
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
-    //public string? CustomerName { get; set; }
-
-    //public int? CompanyTypeId { get; set; }
+    public int CurrenNoticeCount { get; set; }
+    public List<string>? FcmTokens { get; set; }
 }
 
 public class CustomerCreateModel
@@ -57,7 +55,7 @@ public class CustomerCreateModel
 public class CustomerUpdateModel
 {
     [Required]
-    public int Id { get; set; }
+    public string Id { get; set; }
 
     [Required]
     public string CompanyName { get; set; }

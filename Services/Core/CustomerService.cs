@@ -21,13 +21,16 @@ namespace Services.Core;
 public interface ICustomerService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel);
-    Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> GetServerAllocation(PagingParam<BaseSortCriteria> paginationModel, int id);
+    Task<ResultModel> GetDetail(Guid id);
+    Task<ResultModel> GetServerAllocation(PagingParam<BaseSortCriteria> paginationModel, Guid id);
     Task<ResultModel> Create(CustomerCreateModel model, Guid userId);
-    Task<ResultModel> Delete(int id);
+    Task<ResultModel> Delete(Guid id);
     Task<ResultModel> Update(CustomerUpdateModel model);
-    Task<ResultModel> ChangePassword(CustomerChangePasswordModel model, int customerId);
+    Task<ResultModel> ChangePassword(CustomerChangePasswordModel model, Guid customerId);
     Task<ResultModel> Login(CustomerLoginModel model);
+    Task<ResultModel> BindFcmtoken(BindFcmtokenModel model, Guid customerId);
+    Task<ResultModel> DeleteFcmToken(string fcmToken, Guid customerId);
+    Task<ResultModel> SeenCurrenNoticeCount(Guid customerId);
 }
 
 public class CustomerService : ICustomerService
@@ -37,18 +40,21 @@ public class CustomerService : ICustomerService
     private readonly IEmailHelper _emailService;
     private readonly IConfiguration _config;
     private readonly PasswordHasher<Customer> _passwordHasher;
+    private readonly INotificationService _notiService;
 
     public CustomerService(
         AppDbContext dbContext,
         IMapper mapper,
         IEmailHelper emailService,
-        IConfiguration config)
+        IConfiguration config,
+        INotificationService notiService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _emailService = emailService;
         _config = config;
         _passwordHasher = new PasswordHasher<Customer>();
+        _notiService = notiService;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel)
@@ -83,7 +89,7 @@ public class CustomerService : ICustomerService
         return result;
     }
 
-    public async Task<ResultModel> GetDetail(int id)
+    public async Task<ResultModel> GetDetail(Guid id)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -110,7 +116,7 @@ public class CustomerService : ICustomerService
         return result;
     }
 
-    public async Task<ResultModel> GetServerAllocation(PagingParam<BaseSortCriteria> paginationModel, int id)
+    public async Task<ResultModel> GetServerAllocation(PagingParam<BaseSortCriteria> paginationModel, Guid id)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -181,6 +187,19 @@ public class CustomerService : ICustomerService
                     UserId = userId,
                     CustomerId = customer.Id
                 });
+                _dbContext.SaveChanges();
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = customer.Id,
+                    Action = "Action",
+                    Title = "Title",
+                    Body = "Body",
+                    Data = new NotificationData
+                    {
+                        Key = "string",
+                        Value = "string"
+                    }
+                });
 
                 result.Succeed = true;
                 result.Data = _mapper.Map<CustomerModel>(customer);
@@ -194,7 +213,7 @@ public class CustomerService : ICustomerService
         return result;
     }
 
-    public async Task<ResultModel> Delete(int id)
+    public async Task<ResultModel> Delete(Guid id)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -234,14 +253,14 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == model.Id);
+            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == new Guid(model.Id));
             if (customer == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = CustomerErrorMessage.UPDATE_FAILED;
             }
 
-            var existingCustomer = _dbContext.Customers.FirstOrDefault(x => ((x.CompanyName == model.CompanyName) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber) && x.Id != model.Id);
+            var existingCustomer = _dbContext.Customers.FirstOrDefault(x => ((x.CompanyName == model.CompanyName) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber) && x.Id != new Guid(model.Id));
             if (existingCustomer != null)
             {
                 validPrecondition = false;
@@ -264,7 +283,7 @@ public class CustomerService : ICustomerService
         return result;
     }
 
-    public async Task<ResultModel> ChangePassword(CustomerChangePasswordModel model, int customerId)
+    public async Task<ResultModel> ChangePassword(CustomerChangePasswordModel model, Guid customerId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -376,5 +395,84 @@ public class CustomerService : ICustomerService
 
         if (!string.IsNullOrEmpty(customer.PhoneNumber)) claims.Add(new Claim("PhoneNumber", customer.PhoneNumber));
         return claims;
+    }
+    public async Task<ResultModel> BindFcmtoken(BindFcmtokenModel model, Guid customerId)
+    {
+        var result = new ResultModel();
+        try
+        {
+            var customer = _dbContext.Customers.Where(_ => _.Id == customerId).FirstOrDefault();
+            if (customer == null)
+            {
+                result.Succeed = false;
+                result.ErrorMessage = "User not found";
+                return result;
+            }
+            if (!customer.FcmTokens!.Contains(model.FcmToken))
+            {
+                customer.FcmTokens.Add(model.FcmToken);
+                customer.DateUpdated = DateTime.Now;
+                _dbContext.Customers.Update(customer);
+                _dbContext.SaveChanges();
+            }
+            result.Data = model.FcmToken;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> DeleteFcmToken(string fcmToken, Guid customerId)
+    {
+        var result = new ResultModel();
+        try
+        {
+            var customer = _dbContext.Customers.Where(x => x.Id == customerId).FirstOrDefault();
+            if (customer != null && customer.FcmTokens!.Contains(fcmToken))
+            {
+                customer.FcmTokens.Remove(fcmToken);
+                _dbContext.Customers.Update(customer);
+                _dbContext.SaveChanges();
+                result.Data = "Delete successful!";
+            }
+            if (result.Data == null)
+            {
+                result.Data = "Delete failed!";
+            }
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> SeenCurrenNoticeCount(Guid customerId)
+    {
+        var result = new ResultModel();
+        try
+        {
+            var customer = _dbContext.Customers.Where(_ => _.Id == customerId).FirstOrDefault();
+            if (customer == null)
+            {
+                result.Succeed = false;
+                result.ErrorMessage = "User not found";
+                return result;
+            }
+            customer.CurrenNoticeCount = 0;
+            _dbContext.Customers.Update(customer);
+            _dbContext.SaveChanges();
+            result.Data = customer.Id;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
+        }
+        return result;
     }
 }

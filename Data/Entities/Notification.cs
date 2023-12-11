@@ -20,4 +20,3 @@ namespace Data.Entities
         public string Value { get; set; }
     }
 }
-

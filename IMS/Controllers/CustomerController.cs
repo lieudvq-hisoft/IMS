@@ -3,6 +3,7 @@ using Data.Enums;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.ClaimExtensions;
 using Services.Core;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -31,17 +32,17 @@ public class CustomerController : ControllerBase
 
     [HttpGet("{id}")]
     [SwaggerOperation(Summary = "Get detail information of a customer")]
-    public async Task<ActionResult> GetDetail(int id)
+    public async Task<ActionResult> GetDetail(string id)
     {
-        var result = await _customerService.GetDetail(id);
+        var result = await _customerService.GetDetail(new Guid(id));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpGet("{id}/ServerAllocation")]
-    public async Task<ActionResult> GetServerAllocation([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
+    public async Task<ActionResult> GetServerAllocation([FromQuery] PagingParam<BaseSortCriteria> pagingParam, string id)
     {
-        var result = await _customerService.GetServerAllocation(pagingParam, id);
+        var result = await _customerService.GetServerAllocation(pagingParam, new Guid(id));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -70,16 +71,16 @@ public class CustomerController : ControllerBase
     public async Task<ActionResult> ChangePassword([FromBody] CustomerChangePasswordModel model)
     {
         var customerId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _customerService.ChangePassword(model, int.Parse(customerId));
+        var result = await _customerService.ChangePassword(model, new Guid(customerId));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpDelete("{id}")]
     [SwaggerOperation(Summary = "[Sale]: Delete a customer")]
-    public async Task<ActionResult> Delete(int id)
+    public async Task<ActionResult> Delete(string id)
     {
-        var result = await _customerService.Delete(id);
+        var result = await _customerService.Delete(new Guid(id));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -90,6 +91,31 @@ public class CustomerController : ControllerBase
     public async Task<ActionResult> Login([FromBody] CustomerLoginModel model)
     {
         var result = await _customerService.Login(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPost("FcmToken")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public async Task<IActionResult> BindFcmToken([FromBody] BindFcmtokenModel model)
+    {
+        var rs = await _customerService.BindFcmtoken(model, Guid.Parse(User.GetId()));
+        if (rs.Succeed) return Ok(rs.Data);
+        return BadRequest(rs.ErrorMessage);
+    }
+
+    [HttpDelete("FcmToken")]
+    public async Task<IActionResult> DeleteFcmToken([FromBody] DeleteFcmtokenModel model)
+    {
+        var rs = await _customerService.DeleteFcmToken(model.FcmToken, Guid.Parse(User.GetId()));
+        if (rs.Succeed) return Ok(rs.Data);
+        return BadRequest(rs.ErrorMessage);
+    }
+
+    [HttpPost("SeenCurrenNoticeCount")]
+    public async Task<ActionResult> SeenCurrenNoticeCount()
+    {
+        var result = await _customerService.SeenCurrenNoticeCount(Guid.Parse(User.GetId()));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

@@ -423,7 +423,7 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == customerId);
+            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == new Guid(customerId));
             if (customer == null)
             {
                 validPrecondition = false;

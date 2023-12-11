@@ -82,7 +82,7 @@ public class ServerAllocationCreateModel
     public string? SaleNote { get; set; }
 
     [Required]
-    public int CustomerId { get; set; }
+    public string CustomerId { get; set; }
 }
 
 public class ServerAllocationUpdateModel

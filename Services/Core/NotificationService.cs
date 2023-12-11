@@ -43,8 +43,12 @@ public class NotificationService : INotificationService
             var data = _mapper.Map<Notification>(notification);
             _dbContext.Notifications.Add(data);
             await _notificationHub.NewNotification(_mapper.Map<Notification, NotificationModel>(data), notification.UserId.ToString());
-            var userReceive = _dbContext.Users.Where(_ => _.Id == notification.UserId && !_.IsDeleted).FirstOrDefault();
-            userReceive!.FcmTokens = await SendNotifyFcm(userReceive, data, notification.Title, notification.Body);
+            dynamic userReceive = _dbContext.Users.Where(_ => _.Id == notification.UserId && !_.IsDeleted).FirstOrDefault();
+            if (userReceive == null)
+            {
+                userReceive = _dbContext.Customers.FirstOrDefault(x => x.Id == notification.UserId);
+            }
+            userReceive!.FcmTokens = await SendNotifyFcm(notification.UserId, data, notification.Title, notification.Body);
             _dbContext.Update(userReceive);
             _dbContext.SaveChanges();
             result.Succeed = true;
@@ -150,8 +154,13 @@ public class NotificationService : INotificationService
         return result;
     }
 
-    private async Task<List<string>> SendNotifyFcm(User userReceive, Notification data, string title, string body)
+    private async Task<List<string>> SendNotifyFcm(Guid userId, Notification data, string title, string body)
     {
+        dynamic userReceive = _dbContext.User.FirstOrDefault(x => x.Id == userId);
+        if (userReceive == null)
+        {
+            userReceive = _dbContext.Customers.FirstOrDefault(x => x.Id == userId);
+        }
         var fcmTokens = userReceive.FcmTokens;
 
         try
@@ -198,8 +207,5 @@ public class NotificationService : INotificationService
             var er = ex;
         }
         return fcmTokens;
-
     }
-
 }
-

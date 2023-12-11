@@ -54,7 +54,6 @@ namespace Services.Core
                     var content = new StringContent(json, Encoding.UTF8, "application/json");
 
                     result = await httpClient.PostAsync("send", content);
-
                 }
                 catch (Exception ex)
                 {
