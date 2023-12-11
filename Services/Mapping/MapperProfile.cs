@@ -163,9 +163,13 @@ public class MapperProfile : Profile
         CreateMap<Appointment, AppointmentModel>()
              .AfterMap((src, dest, context) =>
              {
-                 if (src.RequestExpandAppointments?.Any() == true)
+                 if (src.RequestExpandAppointments?.Any(x => !x.ForRemoval) == true)
                  {
                      dest.Purpose = "Expand";
+                 }
+                 if (src.RequestExpandAppointments?.Any(x => x.ForRemoval) == true)
+                 {
+                     dest.Purpose = "Removal";
                  }
                  if (src.RequestUpgradeAppointment?.Any() == true)
                  {
