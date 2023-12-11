@@ -1,4 +1,5 @@
 using IMS.Utilities;
+using Services.SignalR;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,15 +16,15 @@ builder.Services.ConfigIdentityService();
 builder.Services.AddBussinessService(builder.Configuration);
 builder.Services.ConfigureSwagger();
 builder.Services.AddJWTAuthentication(builder.Configuration["Jwt:Key"], builder.Configuration["Jwt:Issuer"]);
-
 builder.Services.AddCors(o => o.AddPolicy("CorsPolicy", builder =>
 {
     builder
         .AllowAnyMethod()
         .AllowAnyHeader()
-        .AllowAnyOrigin();
+        .AllowCredentials()
+        .WithOrigins("http://localhost:3000", "https://ims.hisoft.vn"
+        );
 }));
-
 builder.Services.AddSignalR();
 
 
@@ -50,6 +51,13 @@ app.UseRouting();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllers();
+
+    endpoints.MapHub<NotificationHub>("/notificationHub");
+});
 
 app.UseStaticFiles();
 

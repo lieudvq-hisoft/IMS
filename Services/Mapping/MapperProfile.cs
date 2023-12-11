@@ -379,5 +379,10 @@ public class MapperProfile : Profile
         CreateMap<AppointmentUser, AppointmentUserResultModel>();
         CreateMap<Appointment, AppointmentResultModel>();
         #endregion
+
+        #region Notification
+        CreateMap<Notification, NotificationModel>().ReverseMap();
+        CreateMap<NotificationCreateModel, Notification>().ReverseMap();
+        #endregion
     }
 }
