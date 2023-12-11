@@ -87,9 +87,9 @@ public static class StartupExtension
         services.AddSingleton<ICloudinaryHelper, CloudinaryHelper>();
         services.AddScoped<IEmailHelper, EmailHelper>();
 
-        services.AddSingleton<INotificationService, NotificationService>();
-        services.AddSingleton<INotificationHub, NotificationHub>();
-        services.AddSingleton<IFireBaseNotificationService, FireBaseNotificationService>();
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<INotificationHub, NotificationHub>();
+        services.AddScoped<IFireBaseNotificationService, FireBaseNotificationService>();
         services.AddHttpClient<FcmSender>();
         services.AddHttpClient<ApnSender>();
         var appSettingsSection = configuration.GetSection("FcmNotification");
