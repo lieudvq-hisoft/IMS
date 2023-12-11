@@ -180,7 +180,7 @@ public class CustomerService : ICustomerService
                 customer.Password = _passwordHasher.HashPassword(customer, password);
                 _dbContext.Customers.Add(customer);
                 _dbContext.SaveChanges();
-                await SendActivationEmail(customer);
+                SendActivationEmail(customer);
 
                 _dbContext.UserCustomers.Add(new UserCustomer
                 {
