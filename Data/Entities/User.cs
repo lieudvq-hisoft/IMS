@@ -14,6 +14,8 @@ public class User : IdentityUser<Guid>
     public DateTime DateUpdated { get; set; } = DateTime.Now;
     public bool IsDeleted { get; set; }
 
+    //public string[]? FcmTokens { get; set; }
+    public List<string>? FcmTokens { get; set; } = new List<string>();
     public ICollection<UserRole> UserRoles { get; set; }
 
     public ICollection<RequestUpgradeUser> RequestUpgradeUsers { get; set; }

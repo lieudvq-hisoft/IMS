@@ -3,6 +3,7 @@ using Data.Enums;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.ClaimExtensions;
 using Services.Core;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -109,6 +110,31 @@ public class UserController : ControllerBase
     public async Task<ActionResult> GetAssignedRequestHost(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestHostSearchModel searchModel)
     {
         var result = await _userService.GetAssignedRequestHost(id, pagingParam, searchModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPost("FcmToken")]
+    [Authorize(AuthenticationSchemes = "Bearer")]
+    public async Task<IActionResult> BindFcmToken([FromBody] BindFcmtokenModel model)
+    {
+        var rs = await _userService.BindFcmtoken(model, Guid.Parse(User.GetId()));
+        if (rs.Succeed) return Ok(rs.Data);
+        return BadRequest(rs.ErrorMessage);
+    }
+
+    [HttpDelete("FcmToken")]
+    public async Task<IActionResult> DeleteFcmToken([FromBody] DeleteFcmtokenModel model)
+    {
+        var rs = await _userService.DeleteFcmToken(model.FcmToken, Guid.Parse(User.GetId()));
+        if (rs.Succeed) return Ok(rs.Data);
+        return BadRequest(rs.ErrorMessage);
+    }
+
+    [HttpPost("SeenCurrenNoticeCount")]
+    public async Task<ActionResult> SeenCurrenNoticeCount()
+    {
+        var result = await _userService.SeenCurrenNoticeCount(Guid.Parse(User.GetId()));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

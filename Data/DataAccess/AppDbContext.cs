@@ -3,7 +3,10 @@ using Data.Extensions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Newtonsoft.Json;
 using System.Reflection;
+using System.Reflection.Emit;
 
 namespace Data.DataAccess;
 
@@ -50,6 +53,10 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        builder.Entity<Notification>()
+            .Property(n => n.Data)
+            .HasColumnType("jsonb");
+
         base.OnModelCreating(builder);
         builder.ConfigModel();
 
@@ -87,4 +94,6 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<User> User { get; set; }
     public DbSet<UserCustomer> UserCustomers { get; set; }
     public DbSet<UserRole> UserRole { get; set; }
+    public DbSet<Notification> Notifications { get; set; }
+
 }

@@ -32,6 +32,9 @@ public interface IUserService
     Task<ResultModel> GetAssignedRequestExpand(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel);
     Task<ResultModel> GetAssignedRequestUpgrade(string userId, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
     Task<ResultModel> GetAssignedRequestHost(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel);
+    Task<ResultModel> BindFcmtoken(BindFcmtokenModel model, Guid userId);
+    Task<ResultModel> DeleteFcmToken(string fcmToken, Guid userId);
+    Task<ResultModel> SeenCurrenNoticeCount(Guid userId);
 }
 public class UserService : IUserService
 {
@@ -622,4 +625,85 @@ public class UserService : IUserService
 
         return result;
     }
+
+    public async Task<ResultModel> BindFcmtoken(BindFcmtokenModel model, Guid userId)
+    {
+        var result = new ResultModel();
+        try
+        {
+            var user = _dbContext.Users.Where(_ => _.Id == userId && !_.IsDeleted).FirstOrDefault();
+            if (user == null)
+            {
+                result.Succeed = false;
+                result.ErrorMessage = "User not found";
+                return result;
+            }
+            if (!user.FcmTokens!.Contains(model.FcmToken))
+            {
+                user.FcmTokens.Add(model.FcmToken);
+                user.DateUpdated = DateTime.Now;
+                _dbContext.Users.Update(user);
+                _dbContext.SaveChanges();
+            }
+            result.Data = model.FcmToken;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> DeleteFcmToken(string fcmToken, Guid userId)
+    {
+        var result = new ResultModel();
+        try
+        {
+            var user = _dbContext.Users.Where(_ => _.Id == userId && !_.IsDeleted).FirstOrDefault();
+            if (user != null && user.FcmTokens!.Contains(fcmToken))
+            {
+                user.FcmTokens.Remove(fcmToken);
+                _dbContext.Users.Update(user);
+                _dbContext.SaveChanges();
+                result.Data = "Delete successful!";
+            }
+            if (result.Data == null)
+            {
+                result.Data = "Delete failed!";
+            }
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> SeenCurrenNoticeCount(Guid userId)
+    {
+        var result = new ResultModel();
+        try
+        {
+            var user = _dbContext.Users.Where(_ => _.Id == userId && !_.IsDeleted).FirstOrDefault();
+            if (user == null)
+            {
+                result.Succeed = false;
+                result.ErrorMessage = "User not found";
+                return result;
+            }
+            user.CurrenNoticeCount = 0;
+            _dbContext.Users.Update(user);
+            _dbContext.SaveChanges();
+            result.Data = user.Id;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
+        }
+        return result;
+    }
+
 }

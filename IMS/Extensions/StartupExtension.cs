@@ -1,6 +1,9 @@
 ﻿using AutoMapper;
+using CorePush.Apple;
+using CorePush.Google;
 using Data.DataAccess;
 using Data.Entities;
+using Data.Models;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +12,7 @@ using Microsoft.OpenApi.Models;
 using Newtonsoft.Json.Converters;
 using Services.Core;
 using Services.Mapping;
+using Services.SignalR;
 using Services.Utilities;
 using System.Reflection;
 using System.Text;
@@ -82,6 +86,14 @@ public static class StartupExtension
 
         services.AddSingleton<ICloudinaryHelper, CloudinaryHelper>();
         services.AddScoped<IEmailHelper, EmailHelper>();
+
+        services.AddScoped<INotificationService, NotificationService>();
+        services.AddScoped<INotificationHub, NotificationHub>();
+        services.AddScoped<IFireBaseNotificationService, FireBaseNotificationService>();
+        services.AddHttpClient<FcmSender>();
+        services.AddHttpClient<ApnSender>();
+        var appSettingsSection = configuration.GetSection("FcmNotification");
+        services.Configure<FcmNotificationSetting>(appSettingsSection);
     }
 
     public static void ConfigIdentityService(this IServiceCollection services)

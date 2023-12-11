@@ -118,3 +118,9 @@ public enum RequestUpgradeSortCriteria
     CustomerId,
     ComponentId
 }
+
+public enum NotificationSortCriteria
+{
+    Id,
+    DateCreated
+}
