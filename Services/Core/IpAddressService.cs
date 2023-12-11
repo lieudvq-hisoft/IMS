@@ -116,7 +116,7 @@ public class IpAddressService : IIpAddressService
                     .Where(delegate (ServerAllocation x)
                     {
                         var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(x.Status) : true;
-                        var matchCustomerId = searchModel.CustomerId != null ? x.Id == searchModel.CustomerId : true;
+                        var matchCustomerId = searchModel.CustomerId != null ? x.CustomerId == searchModel.CustomerId : true;
                         return matchStatus;
                     })
                     .AsQueryable();

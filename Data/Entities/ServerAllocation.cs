@@ -17,7 +17,7 @@ public class ServerAllocation : BaseEntity
     public string? ReceiptOfRecipientFilePath { get; set; }
     public string? RemovalFilePath { get; set; }
 
-    public int CustomerId { get; set; }
+    public Guid CustomerId { get; set; }
     public Customer? Customer { get; set; }
 
     public ICollection<ServerHardwareConfig>? ServerHardwareConfigs { get; set; }

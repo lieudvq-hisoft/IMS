@@ -23,7 +23,7 @@ public class ServerAllocationModel
 
     public string Location { get; set; }
     public int IpCount { get; set; }
-    public int CustomerId { get; set; }
+    public Guid CustomerId { get; set; }
     public CustomerModel? Customer { get; set; }
 }
 
@@ -45,7 +45,7 @@ public class ServerAllocationResultModel
     public string? InspectionRecordFilePath { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
     public string? RemovalFilePath { get; set; }
-    public int CustomerId { get; set; }
+    public Guid CustomerId { get; set; }
 }
 
 public class ServerAllocationAssignLocationModel
@@ -110,7 +110,7 @@ public class ServerAllocationMasterIpAssignmentModel
 
 public class ServerAllocationSearchModel
 {
-    public int? CustomerId { get; set; }
+    public Guid? CustomerId { get; set; }
     public List<ServerAllocationStatus>? Status { get; set; }
 }
 
