@@ -30,7 +30,7 @@ public interface IServerAllocationService
     Task<ResultModel> GetAppointment(int id, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> Create(ServerAllocationCreateModel model);
     Task<ResultModel> Update(ServerAllocationUpdateModel model);
-    Task<ResultModel> Delete(int serverAllocationId);
+    //Task<ResultModel> Delete(int serverAllocationId);
     Task<ResultModel> AssignMasterIp(int serverAllocationId, ServerAllocationMasterIpAssignmentModel model);
     //Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model);
     //Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model);
@@ -499,68 +499,68 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> Delete(int serverAllocationId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> Delete(int serverAllocationId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var serverAllocation = _dbContext.ServerAllocations
-                .Include(x => x.RequestExpands)
-                .Include(x => x.RequestUpgrades)
-                .Include(x => x.LocationAssignments)
-                .Include(x => x.Appointments)
-                .Include(x => x.RequestHosts)
-                .Include(x => x.IpAssignments)
-                .FirstOrDefault(x => x.Id == serverAllocationId);
-            var locations = _dbContext.LocationAssignments
-                .IgnoreQueryFilters()
-                .Where(x => x.ServerAllocationId == serverAllocationId);
-            if (serverAllocation == null)
-            {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else if (serverAllocation.LocationAssignments.Any())
-            {
-                result.ErrorMessage = "Must remove server from rack";
-            }
-            else if (locations.Any() && serverAllocation.RemovalFilePath == null)
-            {
-                result.ErrorMessage = "Need document for removal";
-            }
-            else
-            {
-                serverAllocation.Status = ServerAllocationStatus.Removed;
-                foreach (var appointment in serverAllocation.Appointments.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
-                {
-                    appointment.Status = RequestStatus.Failed;
-                }
-                foreach (var requestExpand in serverAllocation.RequestExpands.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
-                {
-                    requestExpand.Status = RequestStatus.Failed;
-                }
-                foreach (var requestHost in serverAllocation.RequestHosts.Where(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
-                {
-                    requestHost.Status = RequestHostStatus.Failed;
-                }
-                foreach (var requestUpgrade in serverAllocation.RequestUpgrades.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
-                {
-                    requestUpgrade.Status = RequestStatus.Failed;
-                }
-                _dbContext.IpAssignments.RemoveRange(serverAllocation.IpAssignments);
-                _dbContext.LocationAssignments.RemoveRange(serverAllocation.LocationAssignments);
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //    try
+    //    {
+    //        var serverAllocation = _dbContext.ServerAllocations
+    //            .Include(x => x.RequestExpands)
+    //            .Include(x => x.RequestUpgrades)
+    //            .Include(x => x.LocationAssignments)
+    //            .Include(x => x.Appointments)
+    //            .Include(x => x.RequestHosts)
+    //            .Include(x => x.IpAssignments)
+    //            .FirstOrDefault(x => x.Id == serverAllocationId);
+    //        var locations = _dbContext.LocationAssignments
+    //            .IgnoreQueryFilters()
+    //            .Where(x => x.ServerAllocationId == serverAllocationId);
+    //        if (serverAllocation == null)
+    //        {
+    //            result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+    //        }
+    //        else if (serverAllocation.LocationAssignments.Any())
+    //        {
+    //            result.ErrorMessage = "Must remove server from rack";
+    //        }
+    //        else if (locations.Any() && serverAllocation.RemovalFilePath == null)
+    //        {
+    //            result.ErrorMessage = "Need document for removal";
+    //        }
+    //        else
+    //        {
+    //            serverAllocation.Status = ServerAllocationStatus.Removed;
+    //            foreach (var appointment in serverAllocation.Appointments.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+    //            {
+    //                appointment.Status = RequestStatus.Failed;
+    //            }
+    //            foreach (var requestExpand in serverAllocation.RequestExpands.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+    //            {
+    //                requestExpand.Status = RequestStatus.Failed;
+    //            }
+    //            foreach (var requestHost in serverAllocation.RequestHosts.Where(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
+    //            {
+    //                requestHost.Status = RequestHostStatus.Failed;
+    //            }
+    //            foreach (var requestUpgrade in serverAllocation.RequestUpgrades.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+    //            {
+    //                requestUpgrade.Status = RequestStatus.Failed;
+    //            }
+    //            _dbContext.IpAssignments.RemoveRange(serverAllocation.IpAssignments);
+    //            _dbContext.LocationAssignments.RemoveRange(serverAllocation.LocationAssignments);
+    //            _dbContext.SaveChanges();
+    //            result.Succeed = true;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> AssignMasterIp(int serverAllocationId, ServerAllocationMasterIpAssignmentModel model)
     {

@@ -19,12 +19,14 @@ public static class ModelBuilderExtentions
         {
             Id = 2,
             Name = "GPU",
+            RequireCapacity = true
         });
         builder.Entity<Component>().HasData(new Component
         {
             Id = 3,
             Name = "RAM",
-            IsRequired = true
+            IsRequired = true,
+            RequireCapacity = true
         });
         builder.Entity<Component>().HasData(new Component
         {
@@ -35,7 +37,8 @@ public static class ModelBuilderExtentions
         {
             Id = 5,
             Name = "Harddisk",
-            IsRequired = true
+            IsRequired = true,
+            RequireCapacity = true
         });
         #endregion
 

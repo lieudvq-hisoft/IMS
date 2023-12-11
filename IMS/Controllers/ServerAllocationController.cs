@@ -125,13 +125,13 @@ public class ServerAllocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(int id)
-    {
-        var result = await _serverAllocationService.Delete(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpDelete("{id}")]
+    //public async Task<ActionResult> Delete(int id)
+    //{
+    //    var result = await _serverAllocationService.Delete(id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPost("{id}/MasterIp")]
     public async Task<ActionResult> AssignMasterIp(int id, [FromBody] ServerAllocationMasterIpAssignmentModel model)

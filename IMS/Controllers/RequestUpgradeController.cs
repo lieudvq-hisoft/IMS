@@ -52,14 +52,14 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPost("Bulk")]
-    [SwaggerOperation(Summary = "Create many request upgrade for server, state is accepted")]
-    public async Task<ActionResult> CreateBulk([FromBody] RequestUpgradeCreateBulkModel model)
-    {
-        var result = await _requestUpgradeService.CreateBulk(model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPost("Bulk")]
+    //[SwaggerOperation(Summary = "Create many request upgrade for server, state is accepted")]
+    //public async Task<ActionResult> CreateBulk([FromBody] RequestUpgradeCreateBulkModel model)
+    //{
+    //    var result = await _requestUpgradeService.CreateBulk(model);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPut]
     public async Task<ActionResult> Update([FromBody] RequestUpgradeUpdateModel model)

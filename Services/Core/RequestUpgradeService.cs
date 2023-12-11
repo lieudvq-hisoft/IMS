@@ -18,7 +18,7 @@ public interface IRequestUpgradeService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetAppointment(int requestUpgradeId, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
-    Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model);
+    //Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model);
     Task<ResultModel> Delete(int requestUpgradeId);
     Task<ResultModel> Reject(int requestUpgradeId, RequestUpgradeRejectModel model);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
@@ -34,13 +34,11 @@ public class RequestUpgradeService : IRequestUpgradeService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly UserManager<User> _userManager;
 
-    public RequestUpgradeService(AppDbContext dbContext, IMapper mapper, UserManager<User> userManager)
+    public RequestUpgradeService(AppDbContext dbContext, IMapper mapper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _userManager = userManager;
     }
 
     public async Task<ResultModel> Get(PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel)
@@ -151,6 +149,12 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
             }
 
+            if (component.RequireCapacity && model.Descriptions.Any(x => x.Capacity == null))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Config for component require capacity";
+            }
+
             var serverAllocation = _dbContext.ServerAllocations
                 .Include(x => x.LocationAssignments)
                 .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
@@ -225,39 +229,39 @@ public class RequestUpgradeService : IRequestUpgradeService
         return !serialNumbers.Any(x => existedSerialNumber.Contains(x)) && serialNumbers.Distinct().Count() == serialNumbers.Count();
     }
 
-    public async Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            using var transaction = _dbContext.Database.BeginTransaction();
-            var results = new List<ResultModel>();
-            foreach (var requestUpgradeRequestModel in model.RequestUpgradeCreateModels)
-            {
-                results.Add(await Create(requestUpgradeRequestModel));
-            }
+    //    try
+    //    {
+    //        using var transaction = _dbContext.Database.BeginTransaction();
+    //        var results = new List<ResultModel>();
+    //        foreach (var requestUpgradeRequestModel in model.RequestUpgradeCreateModels)
+    //        {
+    //            results.Add(await Create(requestUpgradeRequestModel));
+    //        }
 
-            if (results.Any(x => !x.Succeed))
-            {
-                result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-                transaction.Rollback();
-            }
-            else
-            {
-                transaction.Commit();
-                result.Succeed = true;
-                result.Data = results.Select(x => x.Data);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //        if (results.Any(x => !x.Succeed))
+    //        {
+    //            result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+    //            transaction.Rollback();
+    //        }
+    //        else
+    //        {
+    //            transaction.Commit();
+    //            result.Succeed = true;
+    //            result.Data = results.Select(x => x.Data);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> Update(RequestUpgradeUpdateModel model)
     {
@@ -287,6 +291,12 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
+            }
+
+            if (component.RequireCapacity && model.Descriptions.Any(x => x.Capacity == null))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Config for component require capacity";
             }
 
             var serverAllocation = requestUpgrade?.ServerAllocation;

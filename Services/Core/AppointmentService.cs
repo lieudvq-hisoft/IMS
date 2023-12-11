@@ -1795,6 +1795,14 @@ public class AppointmentService : IAppointmentService
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
                 .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Success);
+            var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.RequestExpands)
+                .Include(x => x.RequestUpgrades)
+                .Include(x => x.LocationAssignments)
+                .Include(x => x.Appointments)
+                .Include(x => x.RequestHosts)
+                .Include(x => x.IpAssignments)
+                .FirstOrDefault(x => x.RequestExpands.Any(x => x.Id == requestExpandId));
             if (requestExpand == null)
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
@@ -1840,6 +1848,25 @@ public class AppointmentService : IAppointmentService
                 _dbContext.LocationAssignments.RemoveRange(locationAssignments);
                 requestExpand.ServerAllocation.ServerLocation = null;
                 requestExpand.RemovalStatus = RemovalStatus.Success;
+                serverAllocation.Status = ServerAllocationStatus.Removed;
+                foreach (var appointment in serverAllocation.Appointments.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                {
+                    appointment.Status = RequestStatus.Failed;
+                }
+                foreach (var expandRequest in serverAllocation.RequestExpands.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                {
+                    expandRequest.Status = RequestStatus.Failed;
+                }
+                foreach (var requestHost in serverAllocation.RequestHosts.Where(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
+                {
+                    requestHost.Status = RequestHostStatus.Failed;
+                }
+                foreach (var requestUpgrade in serverAllocation.RequestUpgrades.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                {
+                    requestUpgrade.Status = RequestStatus.Failed;
+                }
+                _dbContext.IpAssignments.RemoveRange(serverAllocation.IpAssignments);
+                _dbContext.LocationAssignments.RemoveRange(serverAllocation.LocationAssignments);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
