@@ -41,10 +41,12 @@ public class NotificationService : INotificationService
         try
         {
             var data = _mapper.Map<Notification>(notification);
-            await _dbContext.Notifications.AddAsync(data);
+            _dbContext.Notifications.Add(data);
             await _notificationHub.NewNotification(_mapper.Map<Notification, NotificationModel>(data), notification.UserId.ToString());
-            SendNotifyFcm(notification.UserId, data, notification.Title, notification.Body);
-            await _dbContext.SaveChangesAsync();
+            var userReceive = _dbContext.Users.Where(_ => _.Id == notification.UserId && !_.IsDeleted).FirstOrDefault();
+            userReceive!.FcmTokens = await SendNotifyFcm(userReceive, data, notification.Title, notification.Body);
+            _dbContext.Update(userReceive);
+            _dbContext.SaveChanges();
             result.Succeed = true;
             result.Data = notification;
         }
@@ -148,16 +150,16 @@ public class NotificationService : INotificationService
         return result;
     }
 
-    private async void SendNotifyFcm(Guid userReceiveId, Notification data, string title, string body)
+    private async Task<List<string>> SendNotifyFcm(User userReceive, Notification data, string title, string body)
     {
+        var fcmTokens = userReceive.FcmTokens;
+
         try
         {
-            var userReceive = _dbContext.Users.Where(_ => _.Id == userReceiveId && !_.IsDeleted).FirstOrDefault();
             if (userReceive != null)
             {
                 userReceive.CurrenNoticeCount++;
-                _dbContext.Users.Update(userReceive);
-                if (userReceive != null && userReceive.FcmTokens.ToList().Count > 0)
+                if (userReceive.FcmTokens.Count > 0)
                 {
                     var result = new NotificationFcmModel
                     {
@@ -165,17 +167,37 @@ public class NotificationService : INotificationService
                         Body = body,
                         Data = data,
                         RegistrationIds = userReceive.FcmTokens.ToList(),
-                        UserId = userReceiveId,
+                        UserId = userReceive.Id,
                     };
-                    await _fireBaseNotificationService.SendNotification(result);
+                    var response = await _fireBaseNotificationService.SendNotification(result);
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    var fcmResponse = Newtonsoft.Json.JsonConvert.DeserializeObject<FcmResponse>(responseContent);
+                    if (response.IsSuccessStatusCode)
+                    {
+                        if (fcmResponse.Failure != 0)
+                        {
+                            for (int i = 0; i < fcmResponse.Results.Count; i++)
+                            {
+                                if (fcmResponse.Results[i].Error != null)
+                                {
+                                    if (userReceive.FcmTokens.Contains(result.RegistrationIds[i]))
+                                    {
+                                        fcmTokens.Remove(result.RegistrationIds[i]);
+                                    }
+                                }
+                            }
+
+                        }
+                    }
                 }
             }
 
         }
         catch (Exception ex)
         {
-
+            var er = ex;
         }
+        return fcmTokens;
 
     }
 
