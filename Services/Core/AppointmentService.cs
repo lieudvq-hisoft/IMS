@@ -1037,6 +1037,7 @@ public class AppointmentService : IAppointmentService
                         appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
                         appointment.ServerAllocation.InspectionRecordFilePath = createInspectionResult.Data as string;
                         appointment.ServerAllocation.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
+                        appointment.ServerAllocation.Status = ServerAllocationStatus.Working;
                         _dbContext.SaveChanges();
                     }
                 }
@@ -1526,12 +1527,6 @@ public class AppointmentService : IAppointmentService
                     document.MainDocumentPart.Document.Save();
                 }
                 string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
-                serverAllocation.InspectionRecordFilePath = inspectionReportFileName;
-
-                if (serverAllocation.InspectionRecordFilePath != null && serverAllocation.ReceiptOfRecipientFilePath != null)
-                {
-                    serverAllocation.Status = ServerAllocationStatus.Working;
-                }
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;

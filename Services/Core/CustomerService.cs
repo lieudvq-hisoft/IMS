@@ -306,7 +306,7 @@ public class CustomerService : ICustomerService
                 {
                     customer.Password = _passwordHasher.HashPassword(customer, model.Password);
                     _dbContext.SaveChanges();
-                    await SendActivationEmail(customer);
+                    SendActivationEmail(customer);
                     result.Succeed = true;
                     result.Data = _mapper.Map<CustomerResultModel>(customer);
                 }
@@ -327,7 +327,7 @@ public class CustomerService : ICustomerService
         var password = "Password@123";
         var mailMessage = _emailService.GetActivationMessage(password, email);
         mailMessage.To.Add(email);
-        await smtpClient.SendMailAsync(mailMessage);
+        smtpClient.SendMailAsync(mailMessage);
     }
 
     public async Task<ResultModel> Login(CustomerLoginModel model)
