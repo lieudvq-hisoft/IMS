@@ -53,11 +53,6 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        //builder.Entity<User>()
-        //  .Property(e => e.FcmTokens)
-        //  .HasConversion(
-        //    v => string.Join(',', v),
-        //    v => v.Split(',', StringSplitOptions.None));
         builder.Entity<Notification>()
             .Property(n => n.Data)
             .HasColumnType("jsonb");

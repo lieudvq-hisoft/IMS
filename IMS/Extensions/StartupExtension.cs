@@ -29,7 +29,7 @@ public static class StartupExtension
         {
             opt.UseNpgsql(config.GetConnectionString(SettingHelper.GetEnvironment()),
                 b => b.MigrationsAssembly(Assembly.GetExecutingAssembly().GetName().Name));
-        }, ServiceLifetime.Singleton);
+        });
     }
 
     public static void ApplyPendingMigrations(this IServiceProvider provider)
