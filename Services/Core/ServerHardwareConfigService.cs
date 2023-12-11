@@ -16,7 +16,7 @@ public interface IServerHardwareConfigService
     Task<ResultModel> Get(PagingParam<ServerHardwareConfigSortCriteria> paginationModel, ServerHardwareConfigSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(ServerHardwareConfigCreateModel model);
-    Task<ResultModel> CreateBulk(ServerHardwareConfigCreateBulkModel model);
+    //Task<ResultModel> CreateBulk(ServerHardwareConfigCreateBulkModel model);
     Task<ResultModel> Update(ServerHardwareConfigUpdateModel model);
     Task<ResultModel> Delete(int serverHardwareConfigId);
 }
@@ -129,6 +129,12 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
                 result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
             }
 
+            if (component.RequireCapacity && model.Descriptions.Any(x => x.Capacity == null))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Config for component require capacity";
+            }
+
             if (serverAllocation.ServerHardwareConfigs.Any(x => x.ComponentId == component.Id))
             {
                 validPrecondition = false;
@@ -176,39 +182,39 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
         return !serialNumbers.Any(x => existedSerialNumber.Contains(x)) && serialNumbers.Distinct().Count() == serialNumbers.Count();
     }
 
-    public async Task<ResultModel> CreateBulk(ServerHardwareConfigCreateBulkModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> CreateBulk(ServerHardwareConfigCreateBulkModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            using var transaction = _dbContext.Database.BeginTransaction();
-            var results = new List<ResultModel>();
-            foreach (var serverHardwareConfigModel in model.ServerHardwareConfigCreateModels)
-            {
-                results.Add(await Create(serverHardwareConfigModel));
-            }
+    //    try
+    //    {
+    //        using var transaction = _dbContext.Database.BeginTransaction();
+    //        var results = new List<ResultModel>();
+    //        foreach (var serverHardwareConfigModel in model.ServerHardwareConfigCreateModels)
+    //        {
+    //            results.Add(await Create(serverHardwareConfigModel));
+    //        }
 
-            if (results.Any(x => !x.Succeed))
-            {
-                result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-                transaction.Rollback();
-            }
-            else
-            {
-                transaction.Commit();
-                result.Succeed = true;
-                result.Data = results.Select(x => x.Data);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //        if (results.Any(x => !x.Succeed))
+    //        {
+    //            result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+    //            transaction.Rollback();
+    //        }
+    //        else
+    //        {
+    //            transaction.Commit();
+    //            result.Succeed = true;
+    //            result.Data = results.Select(x => x.Data);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> Update(ServerHardwareConfigUpdateModel model)
     {
@@ -238,6 +244,12 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
             {
                 validPrecondition = false;
                 result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
+            }
+
+            if (component.RequireCapacity && model.Descriptions.Any(x => x.Capacity == null))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Config for component require capacity";
             }
 
             var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault(x => x.Id == model.Id);
