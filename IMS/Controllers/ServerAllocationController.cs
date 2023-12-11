@@ -3,6 +3,7 @@ using Data.Enums;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.ClaimExtensions;
 using Services.Core;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -104,7 +105,8 @@ public class ServerAllocationController : ControllerBase
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] ServerAllocationCreateModel model)
     {
-        var result = await _serverAllocationService.Create(model);
+        var result = await _serverAllocationService.Create(model, new Guid
+            (User.GetId()));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

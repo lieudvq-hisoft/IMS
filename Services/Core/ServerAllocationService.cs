@@ -28,7 +28,7 @@ public interface IServerAllocationService
     Task<ResultModel> GetIpAddress(int id, PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetLocation(PagingParam<SimpleSortCriteria> paginationModel, int id);
     Task<ResultModel> GetAppointment(int id, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
-    Task<ResultModel> Create(ServerAllocationCreateModel model);
+    Task<ResultModel> Create(ServerAllocationCreateModel model, Guid customerId);
     Task<ResultModel> Update(ServerAllocationUpdateModel model);
     //Task<ResultModel> Delete(int serverAllocationId);
     Task<ResultModel> AssignMasterIp(int serverAllocationId, ServerAllocationMasterIpAssignmentModel model);
@@ -414,16 +414,15 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> Create(ServerAllocationCreateModel model)
+    public async Task<ResultModel> Create(ServerAllocationCreateModel model, Guid customerId)
     {
         var result = new ResultModel();
         result.Succeed = false;
         bool validPrecondition = true;
-        var customerId = model.CustomerId;
 
         try
         {
-            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == new Guid(customerId));
+            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == customerId);
             if (customer == null)
             {
                 validPrecondition = false;

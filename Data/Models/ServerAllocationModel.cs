@@ -80,9 +80,6 @@ public class ServerAllocationCreateModel
     public string? TechNote { get; set; }
 
     public string? SaleNote { get; set; }
-
-    [Required]
-    public string CustomerId { get; set; }
 }
 
 public class ServerAllocationUpdateModel
