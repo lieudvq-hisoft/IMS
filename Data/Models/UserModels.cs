@@ -11,6 +11,8 @@ public class UserModel
     public string Fullname { get; set; }
     public string Email { get; set; }
     public string Address { get; set; }
+    public int CurrenNoticeCount { get; set; }
+    public List<string>? FcmTokens { get; set; }
 }
 
 public class UserViewModel
@@ -21,6 +23,9 @@ public class UserViewModel
     public string Fullname { get; set; }
     public string Email { get; set; }
     public string Address { get; set; }
+    public int CurrenNoticeCount { get; set; }
+    public List<string>? FcmTokens { get; set; }
+
 }
 
 public class UserAssignModel
@@ -111,4 +116,14 @@ public class AssignRoleModel
 public class UserSearchModel
 {
     public string? SearchValue { get; set; } = "";
+}
+
+public class BindFcmtokenModel
+{
+    public string FcmToken { get; set; }
+}
+
+public class DeleteFcmtokenModel
+{
+    public string FcmToken { get; set; }
 }
