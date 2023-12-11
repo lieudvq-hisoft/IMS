@@ -103,6 +103,7 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = "Customer")]
     public async Task<ActionResult> Create([FromBody] ServerAllocationCreateModel model)
     {
         var result = await _serverAllocationService.Create(model, new Guid
