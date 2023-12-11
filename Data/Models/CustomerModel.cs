@@ -37,7 +37,7 @@ public class CustomerCreateModel
     public string Address { get; set; }
 
     [Required]
-    [RegularExpression(@"^\d{10}$|^\d{13}$", ErrorMessage = "Tax number must be a string of 10 or 13 number")]
+    [RegularExpression(@"^\d{10}(-\d{3,4})?$", ErrorMessage = "Tax number must be a string of 10 or 13 number")]
     public string TaxNumber { get; set; }
 
     [Required]
