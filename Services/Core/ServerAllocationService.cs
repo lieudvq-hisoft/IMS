@@ -440,7 +440,9 @@ public class ServerAllocationService : IServerAllocationService
                     ServerAllocationId = serverAllocation.Id
                 };
                 _dbContext.RequestExpands.Add(requestExpand);
-                var sales = (await _userManager.GetUsersInRoleAsync(RoleType.Sale.ToString()));
+                var sales = _dbContext.Users
+                    .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                    .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale"));
                 var requestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestExpandResultModel>(requestExpand));
                 foreach (var sale in sales)
                 {
