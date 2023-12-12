@@ -49,6 +49,7 @@ public class NotificationService : INotificationService
                 userReceive = _dbContext.Customers.FirstOrDefault(x => x.Id == notification.UserId);
             }
             userReceive!.FcmTokens = await SendNotifyFcm(notification.UserId, data, notification.Title, notification.Body);
+            await _notificationHub.NewNotificationCount(userReceive.CurrenNoticeCount, userReceive.Id.ToString());
             _dbContext.Update(userReceive);
             _dbContext.SaveChanges();
             result.Succeed = true;
