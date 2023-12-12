@@ -1037,7 +1037,6 @@ public class AppointmentService : IAppointmentService
                         appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
                         appointment.ServerAllocation.InspectionRecordFilePath = createInspectionResult.Data as string;
                         appointment.ServerAllocation.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
-                        appointment.ServerAllocation.Status = ServerAllocationStatus.Working;
                         _dbContext.SaveChanges();
                     }
                 }

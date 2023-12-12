@@ -10,6 +10,7 @@ using Data.Utils.Paging;
 using DocumentFormat.OpenXml.Packaging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
 using System.Globalization;
@@ -30,13 +31,8 @@ public interface IServerAllocationService
     Task<ResultModel> GetAppointment(int id, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> Create(ServerAllocationCreateModel model, Guid customerId);
     Task<ResultModel> Update(ServerAllocationUpdateModel model);
-    //Task<ResultModel> Delete(int serverAllocationId);
     Task<ResultModel> AssignMasterIp(int serverAllocationId, ServerAllocationMasterIpAssignmentModel model);
-    //Task<ResultModel> AssignLocation(int serverAllocationId, ServerAllocationAssignLocationModel model);
-    //Task<ResultModel> CreateUpgradeAndHostInspectionReport(int serverAllocationId, HostAndUpgradeCreateInspectionReportModel model);
-    //Task<ResultModel> CreateReceiptReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model);
     Task<ResultModel> Confirm(int serverAllocationId);
-    //Task<ResultModel> CreateRequestExpandInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model);
     Task<ResultModel> AssignInspectionRecordAndReceiptOfRecipientReport(int serverAllocationId, DocumentFileUploadModel model);
 }
 
@@ -44,15 +40,17 @@ public class ServerAllocationService : IServerAllocationService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
-    private readonly IHostingEnvironment _env;
     private readonly ICloudinaryHelper _cloudinaryHelper;
+    private readonly UserManager<User> _userManager;
+    private readonly INotificationService _notiService;
 
-    public ServerAllocationService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env, ICloudinaryHelper cloudinaryHelper)
+    public ServerAllocationService(AppDbContext dbContext, IMapper mapper, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManager, INotificationService notiService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
-        _env = env;
         _cloudinaryHelper = cloudinaryHelper;
+        _userManager = userManager;
+        _notiService = notiService;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel)
@@ -418,25 +416,16 @@ public class ServerAllocationService : IServerAllocationService
     {
         var result = new ResultModel();
         result.Succeed = false;
-        bool validPrecondition = true;
 
         try
         {
             var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == customerId);
-            if (customer == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
-            }
-
             var existingServerAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.SerialNumber == model.SerialNumber);
             if (existingServerAllocation != null)
             {
-                validPrecondition = false;
                 result.ErrorMessage = ServerAllocationErrorMessage.EXISTED;
             }
-
-            if (validPrecondition)
+            else
             {
                 var serverAllocation = _mapper.Map<ServerAllocation>(model);
                 serverAllocation.CustomerId = customerId;
@@ -450,6 +439,22 @@ public class ServerAllocationService : IServerAllocationService
                     Note = model.Note,
                     ServerAllocationId = serverAllocation.Id
                 });
+                var sales = (await _userManager.GetUsersInRoleAsync(RoleType.Sale.ToString()));
+                foreach (var sale in sales)
+                {
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = sale.Id,
+                        Action = "Action",
+                        Title = "Title",
+                        Body = "Body",
+                        Data = new NotificationData
+                        {
+                            Key = "Key",
+                            Value = JsonSerializer.Serialize(serverAllocation)
+                        }
+                    });
+                }
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<ServerAllocationModel>(serverAllocation);
