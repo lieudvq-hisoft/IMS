@@ -433,13 +433,15 @@ public class ServerAllocationService : IServerAllocationService
 
                 _dbContext.ServerAllocations.Add(serverAllocation);
                 _dbContext.SaveChanges();
-                _dbContext.RequestExpands.Add(new RequestExpand
+                var requestExpand = new RequestExpand
                 {
                     Size = 0,
                     Note = model.Note,
                     ServerAllocationId = serverAllocation.Id
-                });
+                };
+                _dbContext.RequestExpands.Add(requestExpand);
                 var sales = (await _userManager.GetUsersInRoleAsync(RoleType.Sale.ToString()));
+                var requestExpandModel = _mapper.Map<RequestExpandResultModel>(requestExpand);
                 foreach (var sale in sales)
                 {
                     await _notiService.Add(new NotificationCreateModel
@@ -451,7 +453,7 @@ public class ServerAllocationService : IServerAllocationService
                         Data = new NotificationData
                         {
                             Key = "Key",
-                            Value = JsonSerializer.Serialize(serverAllocation)
+                            Value = JsonSerializer.Serialize(requestExpandModel)
                         }
                     });
                 }
