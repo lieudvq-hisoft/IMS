@@ -42,16 +42,16 @@ public class NotificationService : INotificationService
         {
             var data = _mapper.Map<Notification>(notification);
             _dbContext.Notifications.Add(data);
-            await _notificationHub.NewNotification(_mapper.Map<Notification, NotificationModel>(data), notification.UserId.ToString());
             dynamic userReceive = _dbContext.Users.Where(_ => _.Id == notification.UserId && !_.IsDeleted).FirstOrDefault();
             if (userReceive == null)
             {
                 userReceive = _dbContext.Customers.FirstOrDefault(x => x.Id == notification.UserId);
             }
             userReceive!.FcmTokens = await SendNotifyFcm(notification.UserId, data, notification.Title, notification.Body);
-            await _notificationHub.NewNotificationCount(userReceive.CurrenNoticeCount, userReceive.Id.ToString());
             _dbContext.Update(userReceive);
             _dbContext.SaveChanges();
+            await _notificationHub.NewNotification(_mapper.Map<Notification, NotificationModel>(data), notification.UserId.ToString());
+            await _notificationHub.NewNotificationCount(userReceive.CurrenNoticeCount, userReceive.Id.ToString());
             result.Succeed = true;
             result.Data = notification;
         }
