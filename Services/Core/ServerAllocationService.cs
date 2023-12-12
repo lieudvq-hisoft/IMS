@@ -441,7 +441,7 @@ public class ServerAllocationService : IServerAllocationService
                 };
                 _dbContext.RequestExpands.Add(requestExpand);
                 var sales = (await _userManager.GetUsersInRoleAsync(RoleType.Sale.ToString()));
-                var requestExpandModel = _mapper.Map<RequestExpandResultModel>(requestExpand);
+                var requestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestExpandResultModel>(requestExpand));
                 foreach (var sale in sales)
                 {
                     await _notiService.Add(new NotificationCreateModel
@@ -453,7 +453,7 @@ public class ServerAllocationService : IServerAllocationService
                         Data = new NotificationData
                         {
                             Key = "Key",
-                            Value = JsonSerializer.Serialize(requestExpandModel)
+                            Value = requestExpandModelString
                         }
                     });
                 }
