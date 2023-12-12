@@ -442,7 +442,7 @@ public class ServerAllocationService : IServerAllocationService
                 _dbContext.RequestExpands.Add(requestExpand);
                 var sales = _dbContext.Users
                     .Include(x => x.UserRoles).ThenInclude(x => x.Role)
-                    .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale"));
+                    .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
                 var requestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestExpandResultModel>(requestExpand));
                 foreach (var sale in sales)
                 {
