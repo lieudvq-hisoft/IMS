@@ -440,6 +440,8 @@ public class ServerAllocationService : IServerAllocationService
                     ServerAllocationId = serverAllocation.Id
                 };
                 _dbContext.RequestExpands.Add(requestExpand);
+                _dbContext.SaveChanges();
+
                 var sales = _dbContext.Users
                     .Include(x => x.UserRoles).ThenInclude(x => x.Role)
                     .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
@@ -459,7 +461,6 @@ public class ServerAllocationService : IServerAllocationService
                         }
                     });
                 }
-                _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<ServerAllocationModel>(serverAllocation);
             }
