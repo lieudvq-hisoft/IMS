@@ -42,14 +42,16 @@ public class AppointmentService : IAppointmentService
     private readonly IHostingEnvironment _env;
     private readonly ICloudinaryHelper _cloudinaryHelper;
     private readonly UserManager<User> _userManager;
+    private readonly INotificationService _notiService;
 
-    public AppointmentService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManage)
+    public AppointmentService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManage, INotificationService notiService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _env = env;
         _cloudinaryHelper = cloudinaryHelper;
         _userManager = userManage;
+        _notiService = notiService;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel)
@@ -276,6 +278,26 @@ public class AppointmentService : IAppointmentService
                 if (validPrecondition)
                 {
                     transaction.Commit();
+
+                    var sales = _dbContext.Users
+                    .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                    .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
+                    var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(appointment));
+                    foreach (var sale in sales)
+                    {
+                        await _notiService.Add(new NotificationCreateModel
+                        {
+                            UserId = sale.Id,
+                            Action = "Created",
+                            Title = "New appointment",
+                            Body = "There's a new appointment just created",
+                            Data = new NotificationData
+                            {
+                                Key = "Appointment",
+                                Value = appointmentModelString
+                            }
+                        });
+                    }
                     result.Succeed = true;
                     result.Data = new AppointmentCreateResultModel
                     {
@@ -682,6 +704,26 @@ public class AppointmentService : IAppointmentService
                 appointment.Status = RequestStatus.Failed;
                 appointment.Note = "Khách hàng xóa";
                 _dbContext.SaveChanges();
+
+                var sales = _dbContext.Users
+                    .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                    .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
+                var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(appointment));
+                foreach (var sale in sales)
+                {
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = sale.Id,
+                        Action = "Canceled",
+                        Title = "Appointment canceled",
+                        Body = "There's an appointment just canceled by customer",
+                        Data = new NotificationData
+                        {
+                            Key = "Appointment",
+                            Value = appointmentModelString
+                        }
+                    });
+                }
                 result.Succeed = true;
                 result.Data = appointment.Id;
             }
@@ -703,6 +745,7 @@ public class AppointmentService : IAppointmentService
         try
         {
             var appointment = _dbContext.Appointments
+                .Include(x => x.ServerAllocation)
                 .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.RequestUpgradeUsers)
                 .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandUsers)
                 .FirstOrDefault(x => x.Id == appointmentId);
@@ -804,6 +847,31 @@ public class AppointmentService : IAppointmentService
                     });
                 }
 
+                var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(appointment));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = appointment.ServerAllocation.CustomerId,
+                    Action = "Accepted",
+                    Title = "Appointment accepted",
+                    Body = "There's an appointment just accepted",
+                    Data = new NotificationData
+                    {
+                        Key = "Appointment",
+                        Value = appointmentModelString
+                    }
+                });
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = executor.Id,
+                    Action = "Assigned",
+                    Title = "Assigned to appointment",
+                    Body = "There's an appointment just assigned to you",
+                    Data = new NotificationData
+                    {
+                        Key = "Appointment",
+                        Value = appointmentModelString
+                    }
+                });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<AppointmentResultModel>(appointment);
@@ -826,6 +894,7 @@ public class AppointmentService : IAppointmentService
         try
         {
             var appointment = _dbContext.Appointments
+                .Include(x => x.ServerAllocation)
                 .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade)
                 .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand)
                 .FirstOrDefault(x => x.Id == appointmentId);
@@ -859,6 +928,19 @@ public class AppointmentService : IAppointmentService
                     UserId = userId
                 });
 
+                var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(appointment));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = appointment.ServerAllocation.CustomerId,
+                    Action = "Denied",
+                    Title = "Appointment denied",
+                    Body = "There's an appointment just denied",
+                    Data = new NotificationData
+                    {
+                        Key = "Appointment",
+                        Value = appointmentModelString
+                    }
+                });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<AppointmentResultModel>(appointment);
@@ -1088,6 +1170,20 @@ public class AppointmentService : IAppointmentService
                 }
                 else
                 {
+                    var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(appointment));
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = appointment.ServerAllocation.CustomerId,
+                        Action = "Complete",
+                        Title = "Appointment complete",
+                        Body = "There's an appointment and all associated request just complete",
+                        Data = new NotificationData
+                        {
+                            Key = "Appointment",
+                            Value = appointmentModelString
+                        }
+                    });
+
                     result.Succeed = true;
                     transaction.Commit();
                 }
@@ -1883,6 +1979,7 @@ public class AppointmentService : IAppointmentService
         try
         {
             var appointment = _dbContext.Appointments
+                .Include(x => x.ServerAllocation)
                 .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandUsers)
                 .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.RequestUpgradeUsers)
                 .FirstOrDefault(x => x.Id == appointmentId);
@@ -1917,6 +2014,20 @@ public class AppointmentService : IAppointmentService
                 }
                 appointment.TechNote = model.TechNote;
                 _dbContext.SaveChanges();
+
+                var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(appointment));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = appointment.ServerAllocation.CustomerId,
+                    Action = "Reject",
+                    Title = "Appointment failed",
+                    Body = "There's an appointment just failed",
+                    Data = new NotificationData
+                    {
+                        Key = "Appointment",
+                        Value = appointmentModelString
+                    }
+                });
                 result.Succeed = true;
                 result.Data = _mapper.Map<AppointmentResultModel>(appointment);
             }

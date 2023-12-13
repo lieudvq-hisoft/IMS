@@ -629,6 +629,20 @@ public class ServerAllocationService : IServerAllocationService
                 serverAllocation.MasterIpAddress = ipAddress.Address;
                 _dbContext.IpAssignments.Add(ipAssignment);
                 _dbContext.SaveChanges();
+
+                var requestModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(serverAllocation));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = serverAllocation.CustomerId,
+                    Action = "Assign master Ip",
+                    Title = "Assigne master Ip",
+                    Body = "There's an server allocation just been assigned a master ip",
+                    Data = new NotificationData
+                    {
+                        Key = "ServerAllocation",
+                        Value = requestModelString
+                    }
+                });
                 result.Succeed = true;
                 result.Data = _mapper.Map<IpAssignmentResultModel>(ipAssignment);
             }
@@ -1038,6 +1052,20 @@ public class ServerAllocationService : IServerAllocationService
                 serverAllocation.Status = ServerAllocationStatus.Working;
                 serverAllocation.Appointments.FirstOrDefault(x => x.Status == RequestStatus.Success).DocumentConfirm = true;
                 _dbContext.SaveChanges();
+
+                var requestModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(serverAllocation));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = serverAllocation.CustomerId,
+                    Action = "Working",
+                    Title = "Start working",
+                    Body = "There's an server allocation just start working",
+                    Data = new NotificationData
+                    {
+                        Key = "ServerAllocation",
+                        Value = requestModelString
+                    }
+                });
                 result.Succeed = true;
                 result.Data = serverAllocationId;
             }

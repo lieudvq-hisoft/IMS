@@ -173,11 +173,11 @@ public class RequestUpgradeService : IRequestUpgradeService
                     validPrecondition = false;
                     result.ErrorMessage = "Cannot modify unallocated server";
                 }
-                else if (!serverAllocation.ServerHardwareConfigs.Select(x => x.Component).Any(x => x.Id == component.Id))
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
-                }
+                //else if (!serverAllocation.ServerHardwareConfigs.Select(x => x.Component).Any(x => x.Id == component.Id))
+                //{
+                //    validPrecondition = false;
+                //    result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
+                //}
             }
 
             if (validPrecondition)
@@ -363,7 +363,7 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
+            var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == requestUpgradeId);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
@@ -377,6 +377,26 @@ public class RequestUpgradeService : IRequestUpgradeService
                 requestUpgrade.Status = RequestStatus.Failed;
                 requestUpgrade.Note = "Customer deleted";
                 _dbContext.SaveChanges();
+
+                var sales = _dbContext.Users
+                    .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                    .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
+                var reuqestUpgradeModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestUpgrade));
+                foreach (var sale in sales)
+                {
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = sale.Id,
+                        Action = "Canceled",
+                        Title = "Upgrade request canceled",
+                        Body = "There's an upgrade request just canceled by customer",
+                        Data = new NotificationData
+                        {
+                            Key = "RequestUpgrade",
+                            Value = reuqestUpgradeModelString
+                        }
+                    });
+                }
                 result.Succeed = true;
                 result.Data = requestUpgradeId;
             }
@@ -396,7 +416,7 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
+            var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == requestUpgradeId);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
@@ -417,6 +437,20 @@ public class RequestUpgradeService : IRequestUpgradeService
                     requestUpgrade.SaleNote = model.SaleNote;
                 }
                 _dbContext.SaveChanges();
+
+                var reuqestUpgradeModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestUpgrade));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = requestUpgrade.ServerAllocation.CustomerId,
+                    Action = "Failed",
+                    Title = "Upgrade request failed",
+                    Body = "There's an upgrade request just failed",
+                    Data = new NotificationData
+                    {
+                        Key = "RequestUpgrade",
+                        Value = reuqestUpgradeModelString
+                    }
+                });
                 result.Succeed = true;
                 result.Data = requestUpgradeId;
             }
@@ -437,7 +471,7 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.Component).ThenInclude(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == requestUpgradeId);
+            var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.ServerAllocation).Include(x => x.Component).ThenInclude(x => x.ServerHardwareConfigs).FirstOrDefault(x => x.Id == requestUpgradeId);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
@@ -466,6 +500,20 @@ public class RequestUpgradeService : IRequestUpgradeService
                     UserId = userId
                 });
                 _dbContext.SaveChanges();
+
+                var requestModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestUpgrade));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = requestUpgrade.ServerAllocation.CustomerId,
+                    Action = "Accepted",
+                    Title = "Upgrade request accepted",
+                    Body = "There's an upgrade request just accepted",
+                    Data = new NotificationData
+                    {
+                        Key = "RequestUpgrade",
+                        Value = requestModelString
+                    }
+                });
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
             }
@@ -486,7 +534,7 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
+            var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == requestUpgradeId);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
@@ -516,6 +564,20 @@ public class RequestUpgradeService : IRequestUpgradeService
                     UserId = userId
                 });
                 _dbContext.SaveChanges();
+
+                var requestModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestUpgrade));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = requestUpgrade.ServerAllocation.CustomerId,
+                    Action = "Denied",
+                    Title = "Upgrade request denied",
+                    Body = "There's an upgrade request just denied",
+                    Data = new NotificationData
+                    {
+                        Key = "RequestUpgrade",
+                        Value = requestModelString
+                    }
+                });
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestHostModel>(requestUpgrade);
             }

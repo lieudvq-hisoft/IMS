@@ -398,7 +398,7 @@ public class RequestHostService : IRequestHostService
                 {
                     UserId = requestHost.ServerAllocation.CustomerId,
                     Action = "Accepted",
-                    Title = "Ip request Accepted",
+                    Title = "Ip request accepted",
                     Body = "There's an ip request just accepted",
                     Data = new NotificationData
                     {
@@ -957,7 +957,7 @@ public class RequestHostService : IRequestHostService
                 await _notiService.Add(new NotificationCreateModel
                 {
                     UserId = requestHost.ServerAllocation.CustomerId,
-                    Action = "Rejected",
+                    Action = "Failed",
                     Title = "Ip request failed",
                     Body = "There's an ip request just failed",
                     Data = new NotificationData

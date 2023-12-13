@@ -9,6 +9,7 @@ using Data.Utils.Common;
 using Data.Utils.Paging;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace Services.Core;
 public interface IRequestExpandService
@@ -37,12 +38,14 @@ public class RequestExpandService : IRequestExpandService
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly UserManager<User> _userManager;
+    private readonly INotificationService _notiService;
 
-    public RequestExpandService(AppDbContext dbContext, IMapper mapper, UserManager<User> userManager)
+    public RequestExpandService(AppDbContext dbContext, IMapper mapper, UserManager<User> userManager, INotificationService notiService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _userManager = userManager;
+        _notiService = notiService;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel)
@@ -236,7 +239,7 @@ public class RequestExpandService : IRequestExpandService
 
         try
         {
-            var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandLocations).FirstOrDefault(x => x.Id == requestExpandId);
+            var requestExpand = _dbContext.RequestExpands.Include(x => x.ServerAllocation).Include(x => x.RequestExpandLocations).FirstOrDefault(x => x.Id == requestExpandId);
             if (requestExpand == null)
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
@@ -250,6 +253,26 @@ public class RequestExpandService : IRequestExpandService
                 requestExpand.Status = RequestStatus.Failed;
                 _dbContext.RequestExpandLocations.RemoveRange(requestExpand.RequestExpandLocations);
                 _dbContext.SaveChanges();
+
+                var sales = _dbContext.Users
+                    .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                    .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
+                var reuqestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestExpand));
+                foreach (var sale in sales)
+                {
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = sale.Id,
+                        Action = "Canceled",
+                        Title = "Allocation request canceled",
+                        Body = "There's an allocation request just canceled by customer",
+                        Data = new NotificationData
+                        {
+                            Key = "RequestExpand",
+                            Value = reuqestExpandModelString
+                        }
+                    });
+                }
                 result.Succeed = true;
                 result.Data = requestExpand.Id;
             }
@@ -269,7 +292,7 @@ public class RequestExpandService : IRequestExpandService
 
         try
         {
-            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
+            var requestExpand = _dbContext.RequestExpands.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == requestExpandId);
             if (requestExpand == null)
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
@@ -290,6 +313,20 @@ public class RequestExpandService : IRequestExpandService
                     requestExpand.TechNote = model.TechNote;
                 }
                 _dbContext.SaveChanges();
+
+                var reuqestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestExpand));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = requestExpand.ServerAllocation.CustomerId,
+                    Action = "Failed",
+                    Title = "Allocation request failed",
+                    Body = "There's an allocation request just failed",
+                    Data = new NotificationData
+                    {
+                        Key = "RequestExpand",
+                        Value = reuqestExpandModelString
+                    }
+                });
                 result.Succeed = true;
                 result.Data = requestExpandId;
             }
@@ -309,7 +346,7 @@ public class RequestExpandService : IRequestExpandService
 
         try
         {
-            var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandAppointments).FirstOrDefault(x => x.Id == requestExpandId);
+            var requestExpand = _dbContext.RequestExpands.Include(x => x.ServerAllocation).Include(x => x.RequestExpandAppointments).FirstOrDefault(x => x.Id == requestExpandId);
             if (requestExpand == null)
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
@@ -326,6 +363,20 @@ public class RequestExpandService : IRequestExpandService
             {
                 requestExpand.RemovalStatus = RemovalStatus.Failed;
                 _dbContext.RequestExpandAppointments.RemoveRange(requestExpand.RequestExpandAppointments);
+
+                var reuqestHostModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestExpand));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = requestExpand.ServerAllocation.CustomerId,
+                    Action = "Failed",
+                    Title = "Allocation removal request failed",
+                    Body = "There's an allocation removal request just failed",
+                    Data = new NotificationData
+                    {
+                        Key = "RequestExpand",
+                        Value = reuqestHostModelString
+                    }
+                });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = requestExpand.Id;
@@ -347,7 +398,7 @@ public class RequestExpandService : IRequestExpandService
 
         try
         {
-            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
+            var requestExpand = _dbContext.RequestExpands.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == requestExpandId);
             if (requestExpand == null)
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
@@ -376,6 +427,20 @@ public class RequestExpandService : IRequestExpandService
                     UserId = userId
                 });
                 _dbContext.SaveChanges();
+
+                var requestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestExpand));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = requestExpand.ServerAllocation.CustomerId,
+                    Action = "Accepted",
+                    Title = "Allocation request accepted",
+                    Body = "There's an allocation request just accepted",
+                    Data = new NotificationData
+                    {
+                        Key = "RequestExpand",
+                        Value = requestExpandModelString
+                    }
+                });
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestHostModel>(requestExpand);
             }
@@ -396,7 +461,7 @@ public class RequestExpandService : IRequestExpandService
 
         try
         {
-            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
+            var requestExpand = _dbContext.RequestExpands.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == requestExpandId);
             if (requestExpand == null)
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
@@ -426,6 +491,20 @@ public class RequestExpandService : IRequestExpandService
                     UserId = userId
                 });
                 _dbContext.SaveChanges();
+
+                var reuqestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestExpand));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = requestExpand.ServerAllocation.CustomerId,
+                    Action = "Denied",
+                    Title = "Allocaton request denied",
+                    Body = "There's an allocation request just denied",
+                    Data = new NotificationData
+                    {
+                        Key = "RequestExpand",
+                        Value = reuqestExpandModelString
+                    }
+                });
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestHostModel>(requestExpand);
             }
