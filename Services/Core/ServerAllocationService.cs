@@ -451,12 +451,12 @@ public class ServerAllocationService : IServerAllocationService
                     await _notiService.Add(new NotificationCreateModel
                     {
                         UserId = sale.Id,
-                        Action = "Action",
-                        Title = "Title",
-                        Body = "Body",
+                        Action = "Created",
+                        Title = "New Server",
+                        Body = "There's a new server just created",
                         Data = new NotificationData
                         {
-                            Key = "Key",
+                            Key = "RequestExpand",
                             Value = requestExpandModelString
                         }
                     });
