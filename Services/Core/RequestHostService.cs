@@ -298,6 +298,26 @@ public class RequestHostService : IRequestHostService
                 requestHost.Status = RequestHostStatus.Failed;
                 _dbContext.RequestHostIps.RemoveRange(requestHost.RequestHostIps);
                 _dbContext.SaveChanges();
+
+                var sales = _dbContext.Users
+                    .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                    .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
+                var reuqestHostModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestHost));
+                foreach (var sale in sales)
+                {
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = sale.Id,
+                        Action = "Canceled",
+                        Title = "Ip request canceled",
+                        Body = "There's an ip request just canceled by customer",
+                        Data = new NotificationData
+                        {
+                            Key = "RequestHost",
+                            Value = reuqestHostModelString
+                        }
+                    });
+                }
                 result.Succeed = true;
                 result.Data = requestHost.Id;
             }
@@ -318,7 +338,10 @@ public class RequestHostService : IRequestHostService
 
         try
         {
-            var requestHost = _dbContext.RequestHosts.Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == requestHostId);
+            var requestHost = _dbContext.RequestHosts
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation)
+                .FirstOrDefault(x => x.Id == requestHostId);
             if (requestHost == null)
             {
                 result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
@@ -370,6 +393,32 @@ public class RequestHostService : IRequestHostService
                 });
                 _dbContext.SaveChanges();
 
+                var reuqestHostModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestHost));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = requestHost.ServerAllocation.CustomerId,
+                    Action = "Accepted",
+                    Title = "Ip request Accepted",
+                    Body = "There's an ip request just accepted",
+                    Data = new NotificationData
+                    {
+                        Key = "RequestHost",
+                        Value = reuqestHostModelString
+                    }
+                });
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = executor.Id,
+                    Action = "Assigned",
+                    Title = "Assigned to ip request",
+                    Body = "There's an ip request just assigned to you",
+                    Data = new NotificationData
+                    {
+                        Key = "RequestHost",
+                        Value = reuqestHostModelString
+                    }
+                });
+
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestHostModel>(requestHost);
             }
@@ -390,7 +439,9 @@ public class RequestHostService : IRequestHostService
 
         try
         {
-            var requestHost = _dbContext.RequestHosts.FirstOrDefault(x => x.Id == requestHostId);
+            var requestHost = _dbContext.RequestHosts
+                .Include(x => x.ServerAllocation)
+                .FirstOrDefault(x => x.Id == requestHostId);
             if (requestHost == null)
             {
                 result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
@@ -420,6 +471,20 @@ public class RequestHostService : IRequestHostService
                     UserId = userId
                 });
                 _dbContext.SaveChanges();
+
+                var reuqestHostModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestHost));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = requestHost.ServerAllocation.CustomerId,
+                    Action = "Denied",
+                    Title = "Ip request denied",
+                    Body = "There's an ip request just denied",
+                    Data = new NotificationData
+                    {
+                        Key = "RequestHost",
+                        Value = reuqestHostModelString
+                    }
+                });
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestHostModel>(requestHost);
             }
@@ -697,6 +762,20 @@ public class RequestHostService : IRequestHostService
                     requestHost.InspectionReportFilePath = createDocResult.Data as string;
                     _dbContext.SaveChanges();
                     transaction.Commit();
+
+                    var reuqestHostModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestHost));
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = requestHost.ServerAllocation.CustomerId,
+                        Action = "Completed",
+                        Title = "Ip request completed",
+                        Body = "There's an ip request just completed",
+                        Data = new NotificationData
+                        {
+                            Key = "RequestHost",
+                            Value = reuqestHostModelString
+                        }
+                    });
                     result.Succeed = true;
                     result.Data = _mapper.Map<List<IpAssignmentResultModel>>(ipAssignments);
                 }
@@ -710,7 +789,7 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    public async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int requestHostId, HostAndUpgradeCreateInspectionReportModel model)
+    private async Task<ResultModel> CreateUpgradeAndHostInspectionReport(int requestHostId, HostAndUpgradeCreateInspectionReportModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -848,7 +927,7 @@ public class RequestHostService : IRequestHostService
 
         try
         {
-            var requestHost = _dbContext.RequestHosts.FirstOrDefault(x => x.Id == requestHostId);
+            var requestHost = _dbContext.RequestHosts.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == requestHostId);
             if (requestHost == null)
             {
                 result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
@@ -873,6 +952,20 @@ public class RequestHostService : IRequestHostService
                     requestHost.TechNote = model.TechNote;
                 }
                 _dbContext.SaveChanges();
+
+                var reuqestHostModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestHost));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = requestHost.ServerAllocation.CustomerId,
+                    Action = "Rejected",
+                    Title = "Ip request failed",
+                    Body = "There's an ip request just failed",
+                    Data = new NotificationData
+                    {
+                        Key = "RequestHost",
+                        Value = reuqestHostModelString
+                    }
+                });
                 result.Succeed = true;
                 result.Data = requestHostId;
             }
