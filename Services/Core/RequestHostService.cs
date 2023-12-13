@@ -42,14 +42,16 @@ public class RequestHostService : IRequestHostService
     private readonly IHostingEnvironment _env;
     private readonly ICloudinaryHelper _cloudinaryHelper;
     private readonly UserManager<User> _userManager;
+    private readonly INotificationService _notiService;
 
-    public RequestHostService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManager)
+    public RequestHostService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManager, INotificationService notiService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _env = env;
         _cloudinaryHelper = cloudinaryHelper;
         _userManager = userManager;
+        _notiService = notiService;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel)
@@ -195,6 +197,26 @@ public class RequestHostService : IRequestHostService
                 requestHost.Status = RequestHostStatus.Waiting;
                 _dbContext.RequestHosts.Add(requestHost);
                 _dbContext.SaveChanges();
+
+                var sales = _dbContext.Users
+                    .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                    .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
+                var reuqestHostModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestHost));
+                foreach (var sale in sales)
+                {
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = sale.Id,
+                        Action = "Created",
+                        Title = "New ip request",
+                        Body = "There's a new ip request just created",
+                        Data = new NotificationData
+                        {
+                            Key = "RequestHost",
+                            Value = reuqestHostModelString
+                        }
+                    });
+                }
 
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestHostResultModel>(requestHost);

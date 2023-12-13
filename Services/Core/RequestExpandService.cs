@@ -545,6 +545,11 @@ public class RequestExpandService : IRequestExpandService
                     });
                 }
                 _dbContext.SaveChanges();
+                requestExpand = _dbContext.RequestExpands
+                    .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+                    .FirstOrDefault(x => x.Id == requestExpandId);
+                requestExpand.ChosenLocation = GetChosenLocation(requestExpand);
+                _dbContext.SaveChanges();
                 result.Succeed = true;
             }
         }
@@ -554,6 +559,15 @@ public class RequestExpandService : IRequestExpandService
         }
 
         return result;
+    }
+
+    private string GetChosenLocation(RequestExpand requestExpand)
+    {
+        var locations = requestExpand.RequestExpandLocations.Select(x => x.Location);
+        var rack = locations.Select(x => x.Rack).Distinct().FirstOrDefault();
+        var startPosition = locations.Select(x => x.Position).Min();
+        var endPosition = locations.Select(x => x.Position).Max();
+        return $"{rack.Area.Name}{rack.Column}-{rack.Row} U{startPosition + 1}-U{endPosition + 1}";
     }
 
     private bool CheckValidLocation(List<Location> locations, int requestExpandId, ResultModel result)
@@ -885,7 +899,7 @@ public class RequestExpandService : IRequestExpandService
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
             }
-            else if (requestExpand.Size == null && requestExpand.Size == 0)
+            else if (requestExpand.Size == null || requestExpand.Size == 0)
             {
                 result.ErrorMessage = "Cannot suggest without size";
             }

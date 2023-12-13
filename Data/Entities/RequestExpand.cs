@@ -14,6 +14,7 @@ public class RequestExpand : BaseEntity
     public int? SuccessExpandAppointmentId { get; set; }
     public DateTime? RemovalDateCreated { get; set; }
     public DateTime? RemovalDateUpdated { get; set; }
+    public string? ChosenLocation { get; set; }
 
     public int ServerAllocationId { get; set; }
     public ServerAllocation? ServerAllocation { get; set; }

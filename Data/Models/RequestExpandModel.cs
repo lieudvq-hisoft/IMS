@@ -16,6 +16,7 @@ public class RequestExpandModel
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
     public int? Size { get; set; }
+    public string? ChosenLocation { get; set; }
     public int? AppointmentId { get; set; }
     public int? SuccessExpandAppointmentId { get; set; }
 
@@ -34,6 +35,7 @@ public class RequestExpandResultModel
     public int? Size { get; set; }
     public RemovalStatus? RemovalStatus { get; set; }
     public string RequestType { get; set; }
+    public string? ChosenLocation { get; set; }
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }

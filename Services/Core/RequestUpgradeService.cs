@@ -34,11 +34,13 @@ public class RequestUpgradeService : IRequestUpgradeService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly INotificationService _notiService;
 
-    public RequestUpgradeService(AppDbContext dbContext, IMapper mapper)
+    public RequestUpgradeService(AppDbContext dbContext, IMapper mapper, INotificationService notiService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _notiService = notiService;
     }
 
     public async Task<ResultModel> Get(PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel)
@@ -203,6 +205,26 @@ public class RequestUpgradeService : IRequestUpgradeService
 
                 _dbContext.RequestUpgrades.Add(requestUpgrade);
                 _dbContext.SaveChanges();
+
+                var sales = _dbContext.Users
+                    .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                    .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
+                var reuqestUpgradeModelString = JsonSerializer.Serialize(_mapper.Map<RequestUpgradeResultModel>(requestUpgrade));
+                foreach (var sale in sales)
+                {
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = sale.Id,
+                        Action = "Created",
+                        Title = "New upgrade request",
+                        Body = "There's a new upgrade request just created",
+                        Data = new NotificationData
+                        {
+                            Key = "RequestUpgrade",
+                            Value = reuqestUpgradeModelString
+                        }
+                    });
+                }
 
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeResultModel>(requestUpgrade);
