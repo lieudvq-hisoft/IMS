@@ -257,7 +257,7 @@ public class RequestExpandService : IRequestExpandService
                 var sales = _dbContext.Users
                     .Include(x => x.UserRoles).ThenInclude(x => x.Role)
                     .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
-                var reuqestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestExpand));
+                var reuqestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestExpandResultModel>(requestExpand));
                 foreach (var sale in sales)
                 {
                     await _notiService.Add(new NotificationCreateModel
@@ -314,7 +314,7 @@ public class RequestExpandService : IRequestExpandService
                 }
                 _dbContext.SaveChanges();
 
-                var reuqestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestExpand));
+                var reuqestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestExpandResultModel>(requestExpand));
                 await _notiService.Add(new NotificationCreateModel
                 {
                     UserId = requestExpand.ServerAllocation.CustomerId,
@@ -364,7 +364,7 @@ public class RequestExpandService : IRequestExpandService
                 requestExpand.RemovalStatus = RemovalStatus.Failed;
                 _dbContext.RequestExpandAppointments.RemoveRange(requestExpand.RequestExpandAppointments);
 
-                var reuqestHostModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestExpand));
+                var reuqestHostModelString = JsonSerializer.Serialize(_mapper.Map<RequestExpandResultModel>(requestExpand));
                 await _notiService.Add(new NotificationCreateModel
                 {
                     UserId = requestExpand.ServerAllocation.CustomerId,
@@ -428,7 +428,7 @@ public class RequestExpandService : IRequestExpandService
                 });
                 _dbContext.SaveChanges();
 
-                var requestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestExpand));
+                var requestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestExpandResultModel>(requestExpand));
                 await _notiService.Add(new NotificationCreateModel
                 {
                     UserId = requestExpand.ServerAllocation.CustomerId,
@@ -492,7 +492,7 @@ public class RequestExpandService : IRequestExpandService
                 });
                 _dbContext.SaveChanges();
 
-                var reuqestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestExpand));
+                var reuqestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestExpandResultModel>(requestExpand));
                 await _notiService.Add(new NotificationCreateModel
                 {
                     UserId = requestExpand.ServerAllocation.CustomerId,

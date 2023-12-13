@@ -381,7 +381,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 var sales = _dbContext.Users
                     .Include(x => x.UserRoles).ThenInclude(x => x.Role)
                     .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
-                var reuqestUpgradeModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestUpgrade));
+                var requestModelString = JsonSerializer.Serialize(_mapper.Map<RequestUpgradeResultModel>(requestUpgrade));
                 foreach (var sale in sales)
                 {
                     await _notiService.Add(new NotificationCreateModel
@@ -393,7 +393,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                         Data = new NotificationData
                         {
                             Key = "RequestUpgrade",
-                            Value = reuqestUpgradeModelString
+                            Value = requestModelString
                         }
                     });
                 }
@@ -438,7 +438,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 }
                 _dbContext.SaveChanges();
 
-                var reuqestUpgradeModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestUpgrade));
+                var reuqestUpgradeModelString = JsonSerializer.Serialize(_mapper.Map<RequestUpgradeResultModel>(requestUpgrade));
                 await _notiService.Add(new NotificationCreateModel
                 {
                     UserId = requestUpgrade.ServerAllocation.CustomerId,
@@ -501,7 +501,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 });
                 _dbContext.SaveChanges();
 
-                var requestModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestUpgrade));
+                var requestModelString = JsonSerializer.Serialize(_mapper.Map<RequestUpgradeResultModel>(requestUpgrade));
                 await _notiService.Add(new NotificationCreateModel
                 {
                     UserId = requestUpgrade.ServerAllocation.CustomerId,
@@ -565,7 +565,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 });
                 _dbContext.SaveChanges();
 
-                var requestModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestUpgrade));
+                var requestModelString = JsonSerializer.Serialize(_mapper.Map<RequestUpgradeResultModel>(requestUpgrade));
                 await _notiService.Add(new NotificationCreateModel
                 {
                     UserId = requestUpgrade.ServerAllocation.CustomerId,

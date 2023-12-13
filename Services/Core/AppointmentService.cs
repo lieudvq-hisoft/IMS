@@ -282,7 +282,7 @@ public class AppointmentService : IAppointmentService
                     var sales = _dbContext.Users
                     .Include(x => x.UserRoles).ThenInclude(x => x.Role)
                     .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
-                    var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(appointment));
+                    var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<AppointmentResultModel>(appointment));
                     foreach (var sale in sales)
                     {
                         await _notiService.Add(new NotificationCreateModel
@@ -708,7 +708,7 @@ public class AppointmentService : IAppointmentService
                 var sales = _dbContext.Users
                     .Include(x => x.UserRoles).ThenInclude(x => x.Role)
                     .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
-                var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(appointment));
+                var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<AppointmentResultModel>(appointment));
                 foreach (var sale in sales)
                 {
                     await _notiService.Add(new NotificationCreateModel
@@ -847,7 +847,7 @@ public class AppointmentService : IAppointmentService
                     });
                 }
 
-                var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(appointment));
+                var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<AppointmentResultModel>(appointment));
                 await _notiService.Add(new NotificationCreateModel
                 {
                     UserId = appointment.ServerAllocation.CustomerId,
@@ -928,7 +928,7 @@ public class AppointmentService : IAppointmentService
                     UserId = userId
                 });
 
-                var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(appointment));
+                var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<AppointmentResultModel>(appointment));
                 await _notiService.Add(new NotificationCreateModel
                 {
                     UserId = appointment.ServerAllocation.CustomerId,
@@ -1170,7 +1170,7 @@ public class AppointmentService : IAppointmentService
                 }
                 else
                 {
-                    var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(appointment));
+                    var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<AppointmentResultModel>(appointment));
                     await _notiService.Add(new NotificationCreateModel
                     {
                         UserId = appointment.ServerAllocation.CustomerId,
@@ -2015,7 +2015,7 @@ public class AppointmentService : IAppointmentService
                 appointment.TechNote = model.TechNote;
                 _dbContext.SaveChanges();
 
-                var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(appointment));
+                var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<AppointmentResultModel>(appointment));
                 await _notiService.Add(new NotificationCreateModel
                 {
                     UserId = appointment.ServerAllocation.CustomerId,

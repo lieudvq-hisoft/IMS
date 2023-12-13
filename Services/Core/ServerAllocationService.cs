@@ -630,7 +630,7 @@ public class ServerAllocationService : IServerAllocationService
                 _dbContext.IpAssignments.Add(ipAssignment);
                 _dbContext.SaveChanges();
 
-                var requestModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(serverAllocation));
+                var requestModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(serverAllocation));
                 await _notiService.Add(new NotificationCreateModel
                 {
                     UserId = serverAllocation.CustomerId,
@@ -1053,7 +1053,7 @@ public class ServerAllocationService : IServerAllocationService
                 serverAllocation.Appointments.FirstOrDefault(x => x.Status == RequestStatus.Success).DocumentConfirm = true;
                 _dbContext.SaveChanges();
 
-                var requestModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(serverAllocation));
+                var requestModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(serverAllocation));
                 await _notiService.Add(new NotificationCreateModel
                 {
                     UserId = serverAllocation.CustomerId,
