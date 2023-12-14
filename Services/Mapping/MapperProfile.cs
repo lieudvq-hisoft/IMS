@@ -148,7 +148,8 @@ public class MapperProfile : Profile
         #endregion
 
         #region User
-        CreateMap<User, UserModel>();
+        CreateMap<User, UserModel>()
+            .ForMember(dest => dest.Positions, opt => opt.MapFrom(src => src.UserRoles.Select(x => x.Role.Name)));
         CreateMap<AppointmentUser, AppointmentUserModel>();
         CreateMap<RequestUpgradeUser, RequestUpgradeUserModel>();
         CreateMap<RequestExpandUser, RequestExpandUserModel>();

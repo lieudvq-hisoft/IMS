@@ -61,6 +61,22 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPost("Position")]
+    public async Task<ActionResult> AssignRole([FromBody] UserAssignRoleModel model)
+    {
+        var result = await _userService.AssignRole(model, new Guid(User.GetId()));
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpDelete("Position")]
+    public async Task<ActionResult> UnassignRole([FromBody] UserAssignRoleModel model)
+    {
+        var result = await _userService.UnassignRole(model, new Guid(User.GetId()));
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpGet]
     [SwaggerOperation(Summary = "Get list of users")]
     [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]

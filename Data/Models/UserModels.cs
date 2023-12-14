@@ -12,6 +12,7 @@ public class UserModel
     public string Email { get; set; }
     public string Address { get; set; }
     public int CurrenNoticeCount { get; set; }
+    public List<string>? Positions { get; set; }
     public List<string>? FcmTokens { get; set; }
 }
 
@@ -24,6 +25,7 @@ public class UserViewModel
     public string Email { get; set; }
     public string Address { get; set; }
     public int CurrenNoticeCount { get; set; }
+    public List<string>? Positions { get; set; }
     public List<string>? FcmTokens { get; set; }
 
 }
@@ -99,6 +101,14 @@ public class UserUpdateModel
     public string PhoneNumber { get; set; }
 }
 
+public class UserAssignRoleModel
+{
+    [Required]
+    public Guid Id { get; set; }
+
+    [Required]
+    public List<string> Roles { get; set; }
+}
 
 public class LoginModel
 {

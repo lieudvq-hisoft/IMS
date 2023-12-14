@@ -45,8 +45,11 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
             }
             if (entry.State == EntityState.Deleted)
             {
-                entry.Property("IsDeleted").CurrentValue = true;
-                entry.State = EntityState.Modified;
+                if (entry.GetType().GetProperty("IsDeleted") != null)
+                {
+                    entry.Property("IsDeleted").CurrentValue = true;
+                    entry.State = EntityState.Modified;
+                }
             }
         }
     }

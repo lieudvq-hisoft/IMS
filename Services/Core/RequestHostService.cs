@@ -802,7 +802,7 @@ public class RequestHostService : IRequestHostService
                 .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).ThenInclude(x => x.IpSubnet)
                 .FirstOrDefault(x => x.Id == requestHostId);
             var serverAllocation = _dbContext.ServerAllocations
-               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress).ThenInclude(x => x.IpSubnet).ThenInclude(x => x.IpAddresses)
                .Include(x => x.Customer)
                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
