@@ -11,6 +11,7 @@ using DocumentFormat.OpenXml.Packaging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Services.Utilities;
 using System.Globalization;
 using System.Text.Json;
@@ -43,8 +44,9 @@ public class RequestHostService : IRequestHostService
     private readonly ICloudinaryHelper _cloudinaryHelper;
     private readonly UserManager<User> _userManager;
     private readonly INotificationService _notiService;
+    private readonly IConfiguration _config;
 
-    public RequestHostService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManager, INotificationService notiService)
+    public RequestHostService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManager, INotificationService notiService, IConfiguration config)
     {
         _dbContext = dbContext;
         _mapper = mapper;
@@ -52,6 +54,7 @@ public class RequestHostService : IRequestHostService
         _cloudinaryHelper = cloudinaryHelper;
         _userManager = userManager;
         _notiService = notiService;
+        _config = config;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel)
@@ -171,11 +174,7 @@ public class RequestHostService : IRequestHostService
             var serverAllocation = _dbContext.ServerAllocations
                 .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                 .FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
-            if (model.Type == IpAssignmentTypes.Master)
-            {
-                result.ErrorMessage = "Cannot request more master ip";
-            }
-            else if (serverAllocation == null)
+            if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
@@ -224,6 +223,129 @@ public class RequestHostService : IRequestHostService
         }
         catch (Exception e)
         {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> CreatePortUpgrade(RequestHostCreateUpgradeModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+        using var transaction = _dbContext.Database.BeginTransaction();
+
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
+            var ipAssignments = new List<IpAssignment>();
+            if (serverAllocation == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (!serverAllocation.IpAssignments.Any(x => x.Type == IpAssignmentTypes.Master))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = RequestHostErrorMessage.NO_MASTER_IP;
+            }
+            else if (serverAllocation.Status != ServerAllocationStatus.Working)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Server need to be working";
+            }
+            else
+            {
+                foreach (int ipId in model.PortIpIds)
+                {
+                    var ipAssignment = _dbContext.IpAssignments.FirstOrDefault(x => x.IpAddressId == ipId);
+                    if (ipAssignment == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = IpAssignmentErrorMessage.NOT_EXISTED;
+                    }
+                    else
+                    {
+                        ipAssignments.Add(ipAssignment);
+                    }
+                }
+
+                if (ipAssignments.Any(x => x.Type != IpAssignmentTypes.Port))
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Can only upgrade port";
+                }
+
+                if (ipAssignments.Any(x => x.ServerAllocationId != serverAllocation.Id))
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Port not belong to server";
+                }
+            }
+
+
+            if (!validPrecondition)
+            {
+                transaction.Rollback();
+            }
+            else
+            {
+                var requestHost = new RequestHost
+                {
+                    Note = model.Note,
+                    TechNote = model.TechNote,
+                    SaleNote = model.SaleNote,
+                    Quantity = ipAssignments.Count(),
+                    Capacity = model.Capacity,
+                    IsUpgrade = true,
+                    Type = IpAssignmentTypes.Port,
+                    Status = RequestHostStatus.Waiting,
+                    ServerAllocationId = model.ServerAllocationId
+                };
+                _dbContext.RequestHosts.Add(requestHost);
+                _dbContext.SaveChanges();
+
+                foreach (var ipAssignment in ipAssignments)
+                {
+                    _dbContext.RequestHostIps.Add(new RequestHostIp
+                    {
+                        IpAddressId = ipAssignment.IpAddressId,
+                        RequestHostId = requestHost.Id
+                    });
+                }
+                _dbContext.SaveChanges();
+
+                var sales = _dbContext.Users
+                    .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                    .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
+                var reuqestHostModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestHost));
+                foreach (var sale in sales)
+                {
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = sale.Id,
+                        Action = "Created",
+                        Title = "New ip request",
+                        Body = "There's a new ip request just created",
+                        Data = new NotificationData
+                        {
+                            Key = "RequestHost",
+                            Value = reuqestHostModelString
+                        }
+                    });
+                }
+
+                transaction.Commit();
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestHostResultModel>(requestHost);
+            }
+        }
+        catch (Exception e)
+        {
+            transaction.Rollback();
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 
@@ -565,11 +687,23 @@ public class RequestHostService : IRequestHostService
                 var requestHostIps = new List<RequestHostIp>();
                 foreach (var ipAddressId in model.IpAddressIds)
                 {
-                    requestHostIps.Add(new RequestHostIp
+                    var requestHostIp = new RequestHostIp
                     {
                         IpAddressId = ipAddressId,
-                        RequestHostId = requestHost.Id
-                    });
+                        RequestHostId = requestHost.Id,
+                    };
+                    if (requestHost.Type == IpAssignmentTypes.Port)
+                    {
+                        if (requestHost.Capacity != null)
+                        {
+                            requestHostIps.Capacity = requestHost.Capacity.Value;
+                        }
+                        else
+                        {
+                            requestHost.Capacity = int.Parse(_config[$"DefaultPortCapacity"]);
+                        }
+                    }
+                    requestHostIps.Add(requestHostIp);
                 }
                 _dbContext.RequestHostIps.RemoveRange(requestHost.RequestHostIps);
                 _dbContext.RequestHostIps.AddRange(requestHostIps);
@@ -692,10 +826,10 @@ public class RequestHostService : IRequestHostService
         var result = new ResultModel();
         result.Succeed = false;
         bool validPrecondition = true;
+        using var transaction = _dbContext.Database.BeginTransaction();
 
         try
         {
-            using var transaction = _dbContext.Database.BeginTransaction();
             var requestHost = _dbContext.RequestHosts
                 .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments)
@@ -728,6 +862,7 @@ public class RequestHostService : IRequestHostService
                         ipAssignments.Add(new IpAssignment
                         {
                             IpAddressId = ipAddress.Id,
+                            Capacity = requestHost.Capacity,
                             ServerAllocationId = requestHost.ServerAllocationId,
                             Type = requestHost.Type
                         });
@@ -783,6 +918,7 @@ public class RequestHostService : IRequestHostService
         }
         catch (Exception e)
         {
+            transaction.Rollback();
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 

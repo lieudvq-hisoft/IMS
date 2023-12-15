@@ -240,6 +240,7 @@ public class AppointmentService : IAppointmentService
         var result = new ResultModel();
         result.Succeed = false;
         bool validPrecondition = true;
+        using var transaction = _dbContext.Database.BeginTransaction();
 
         if (model.RequestRemovalIds.Any() && (model.RequestUpgradeIds.Any() || model.RequestExpandIds.Any()))
         {
@@ -249,7 +250,6 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            using var transaction = _dbContext.Database.BeginTransaction();
             var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
             if (serverAllocation == null)
             {
@@ -342,6 +342,7 @@ public class AppointmentService : IAppointmentService
         }
         catch (Exception e)
         {
+            transaction.Rollback();
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 
@@ -353,6 +354,7 @@ public class AppointmentService : IAppointmentService
         var result = new ResultModel();
         result.Succeed = false;
         bool validCondition = true;
+        using var transaction = _dbContext.Database.BeginTransaction();
 
         if (model.RequestRemovalIds.Any() && model.RequestUpgradeIds.Any() || model.RequestExpandIds.Any())
         {
@@ -362,7 +364,6 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            using var transaction = _dbContext.Database.BeginTransaction();
             var appointment = _dbContext.Appointments
                 .Include(x => x.ServerAllocation)
                 .Include(x => x.RequestUpgradeAppointment)
@@ -447,6 +448,7 @@ public class AppointmentService : IAppointmentService
         }
         catch (Exception e)
         {
+            transaction.Rollback();
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 
@@ -1044,10 +1046,10 @@ public class AppointmentService : IAppointmentService
         var result = new ResultModel();
         result.Succeed = false;
         bool validPrecondition = true;
+        using var transaction = _dbContext.Database.BeginTransaction();
 
         try
         {
-            using var transaction = _dbContext.Database.BeginTransaction();
             var appointment = _dbContext.Appointments
                 .Include(x => x.ServerAllocation)
                 .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.ServerAllocation)
@@ -1058,16 +1060,10 @@ public class AppointmentService : IAppointmentService
                 validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
-            //else if (appointment.ServerAllocation.MasterIpAddress == null)
-            //{
-            //    validPrecondition = false;
-            //    result.ErrorMessage = "Server need master ip to be allocated";
-            //}
             else
             {
                 validPrecondition = IsCompletable(appointmentId, result);
             }
-
 
             if ((appointment.ReceiptOfRecipientFilePath == null ||
                 appointment.InspectionReportFilePath == null) && model.DocumentModel == null)
@@ -1222,6 +1218,7 @@ public class AppointmentService : IAppointmentService
         }
         catch (Exception e)
         {
+            transaction.Rollback();
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 

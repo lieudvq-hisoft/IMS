@@ -10,7 +10,9 @@ public class RequestHostModel
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
+    public int? Capacity { get; set; }
     public bool IsRemoval { get; set; }
+    public bool IsUpgrade { get; set; }
     public IpAssignmentTypes Type { get; set; }
     public RequestHostStatus Status { get; set; }
     public bool DocumentConfirm { get; set; }
@@ -34,7 +36,9 @@ public class RequestHostResultModel
     public int Quantity { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
+    public int? Capacity { get; set; }
     public bool IsRemoval { get; set; }
+    public bool IsUpgrade { get; set; }
     public IpAssignmentTypes Type { get; set; }
     public RequestHostStatus Status { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Host;
@@ -56,11 +60,34 @@ public class RequestHostCreateModel
     [GreaterThanZero]
     public int Quantity { get; set; }
 
+    [GreaterThanZero]
+    public int? Capactiy { get; set; }
+
     [Required]
     public bool IsRemoval { get; set; }
 
     [Required]
     public IpAssignmentTypes Type { get; set; }
+
+    [Required]
+    [GreaterThanZero]
+    public int ServerAllocationId { get; set; }
+}
+
+public class RequestHostCreateUpgradeModel
+{
+    public string? Note { get; set; }
+
+    public string? SaleNote { get; set; }
+
+    public string? TechNote { get; set; }
+
+    [Required]
+    public int Capacity { get; set; }
+
+    [Required]
+    [EnsureMinimumElements]
+    public List<int> PortIpIds { get; set; }
 
     [Required]
     [GreaterThanZero]

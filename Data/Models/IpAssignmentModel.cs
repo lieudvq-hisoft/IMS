@@ -7,6 +7,7 @@ public class IpAssignmentModel
     public DateTime DateAssign { get; set; }
     public DateTime? DateUnassign { get; set; }
     public IpAssignmentTypes Type { get; set; }
+    public int? Capacity { get; set; }
     public int IpAddressId { get; set; }
     public int ServerAllocationId { get; set; }
 }
@@ -17,6 +18,7 @@ public class IpAssignmentResultModel
     public DateTime DateAssign { get; set; }
     public DateTime? DateUnassign { get; set; }
     public IpAssignmentTypes Type { get; set; }
+    public int? Capacity { get; set; }
     public int IpAddressId { get; set; }
     public int ServerAllocationId { get; set; }
 }

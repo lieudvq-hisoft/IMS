@@ -292,10 +292,10 @@ public class IpSubnetService : IIpSubnetService
         var result = new ResultModel();
         result.Succeed = false;
         var createIpRangeSuccess = true;
+        using var transaction = _dbContext.Database.BeginTransaction();
 
         try
         {
-            using var transaction = _dbContext.Database.BeginTransaction();
             var octets = GetIPv4Octets(model.IpAddresss);
             var existedSubnet = _dbContext.IpSubnets.FirstOrDefault(x => x.FirstOctet == octets[0] && x.SecondOctet == octets[1] && x.ThirdOctet == octets[2]);
             List<IpAddress> ips = new List<IpAddress>();
@@ -392,6 +392,7 @@ public class IpSubnetService : IIpSubnetService
         }
         catch (Exception e)
         {
+            transaction.Rollback();
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 

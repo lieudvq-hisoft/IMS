@@ -9,7 +9,9 @@ public class RequestHost : BaseEntity
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
     public int Quantity { get; set; }
+    public int? Capacity { get; set; }
     public bool IsRemoval { get; set; }
+    public bool IsUpgrade { get; set; }
     public IpAssignmentTypes Type { get; set; }
     public RequestHostStatus Status { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Host;
