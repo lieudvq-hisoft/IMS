@@ -19,6 +19,7 @@ namespace Services.Core;
 public interface IAppointmentService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
+    Task<ResultModel> GetByMonth(AppointmentSearchModel searchModel, int month);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestUpgrade(int id, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
@@ -81,6 +82,36 @@ public class AppointmentService : IAppointmentService
             paging.Data = _mapper.Map<List<AppointmentModel>>(appointments);
 
             result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetByMonth(AppointmentSearchModel searchModel, int month)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var appointments = _dbContext.Appointments
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.AppointmentUsers).ThenInclude(x => x.User)
+                .Include(x => x.RequestExpandAppointments)
+                .Include(x => x.RequestUpgradeAppointment)
+                .Where(x => x.DateAppointed.Month == month)
+                .Where(delegate (Appointment x)
+                {
+                    return x.FilterAppointment(searchModel);
+                })
+                .AsQueryable();
+
+            result.Data = _mapper.Map<List<AppointmentModel>>(appointments);
             result.Succeed = true;
         }
         catch (Exception e)

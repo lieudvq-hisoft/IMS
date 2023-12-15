@@ -30,6 +30,14 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("Month/{month}")]
+    public async Task<ActionResult> Get(int month, [FromQuery] AppointmentSearchModel searchModel)
+    {
+        var result = await _appointmentService.GetByMonth(searchModel, month);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult> GetDetail(int id)
     {
