@@ -220,10 +220,23 @@ public class UserService : IUserService
             if (validPrecondition)
             {
                 var roles = new List<Role>();
-                foreach (string role in model.Roles)
+                foreach (string roleName in model.Roles)
                 {
-                    roles.Add(await _dbContext.Role.FirstOrDefaultAsync(r => r.Name == role));
+                    var role = await _dbContext.Role.FirstOrDefaultAsync(r => r.Name == roleName);
+                    if (role == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "Role not exist";
+                    }
+                    else
+                    {
+                        roles.Add(role);
+                    }
                 }
+            }
+
+            if (validPrecondition)
+            {
 
                 var user = new User
                 {
@@ -315,7 +328,7 @@ public class UserService : IUserService
 
         try
         {
-            
+
             var user = _dbContext.User.Include(x => x.UserRoles).ThenInclude(x => x.Role).FirstOrDefault(x => x.Id == model.Id);
             if (userId == model.Id)
             {
