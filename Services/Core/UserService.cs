@@ -217,9 +217,9 @@ public class UserService : IUserService
                 }
             }
 
+            var roles = new List<Role>();
             if (validPrecondition)
             {
-                var roles = new List<Role>();
                 foreach (string roleName in model.Roles)
                 {
                     var role = await _dbContext.Role.FirstOrDefaultAsync(r => r.Name == roleName);
