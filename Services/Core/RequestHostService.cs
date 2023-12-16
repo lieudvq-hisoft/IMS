@@ -8,6 +8,7 @@ using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
 using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -328,8 +329,8 @@ public class RequestHostService : IRequestHostService
                     {
                         UserId = sale.Id,
                         Action = "Created",
-                        Title = "New ip request",
-                        Body = "There's a new ip request just created",
+                        Title = "New port upgrade request",
+                        Body = "There's a new port upgrade request just created",
                         Data = new NotificationData
                         {
                             Key = "RequestHost",
@@ -520,8 +521,8 @@ public class RequestHostService : IRequestHostService
                 {
                     UserId = requestHost.ServerAllocation.CustomerId,
                     Action = "Accepted",
-                    Title = "Ip request accepted",
-                    Body = "There's an ip request just accepted",
+                    Title = $"{(requestHost.IsUpgrade ? "Port upgrade" : "Ip")} request accepted",
+                    Body = $"There's an {(requestHost.IsUpgrade ? "port upgrade" : "ip")} request just accepted",
                     Data = new NotificationData
                     {
                         Key = "RequestHost",
@@ -599,8 +600,8 @@ public class RequestHostService : IRequestHostService
                 {
                     UserId = requestHost.ServerAllocation.CustomerId,
                     Action = "Denied",
-                    Title = "Ip request denied",
-                    Body = "There's an ip request just denied",
+                    Title = $"{(requestHost.IsUpgrade ? "Port upgrade" : "Ip")} request denied",
+                    Body = $"There's an {(requestHost.IsUpgrade ? "port upgrade" : "ip")} request just denied",
                     Data = new NotificationData
                     {
                         Key = "RequestHost",
@@ -837,19 +838,22 @@ public class RequestHostService : IRequestHostService
                 .FirstOrDefault(x => x.Id == requestHostId);
             if (requestHost == null)
             {
+                validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
-            else if (requestHost.Status != RequestHostStatus.Accepted)
+            else if (requestHost.IsUpgrade)
             {
-                result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
+                validPrecondition = false;
+                result.ErrorMessage = "Cannot complete port upgrade request";
             }
-            else if (!requestHost.RequestHostIps.Any())
+            else
             {
-                result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
+                validPrecondition = IsCompletable(requestHostId, result, model, userId);
             }
-            else if (requestHost.InspectionReportFilePath == null && model == null)
+
+            if (!validPrecondition)
             {
-                result.ErrorMessage = "Need inspection report to complete";
+                transaction.Rollback();
             }
             else
             {
@@ -876,12 +880,6 @@ public class RequestHostService : IRequestHostService
                 {
                     _dbContext.IpAssignments.AddRange(ipAssignments);
                 }
-                _dbContext.RequestHostUsers.Add(new RequestHostUser
-                {
-                    Action = RequestUserAction.Execute,
-                    RequestHostId = requestHost.Id,
-                    UserId = userId,
-                });
                 requestHost.Status = RequestHostStatus.Success;
                 requestHost.ServerAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
@@ -905,6 +903,137 @@ public class RequestHostService : IRequestHostService
                         Action = "Completed",
                         Title = "Ip request completed",
                         Body = "There's an ip request just completed",
+                        Data = new NotificationData
+                        {
+                            Key = "RequestHost",
+                            Value = reuqestHostModelString
+                        }
+                    });
+                    result.Succeed = true;
+                    result.Data = _mapper.Map<List<IpAssignmentResultModel>>(ipAssignments);
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            transaction.Rollback();
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    private bool IsCompletable(int requestHostId, ResultModel result, HostAndUpgradeCreateInspectionReportModel model, Guid userId)
+    {
+        bool validPrecondition = true;
+        var requestHost = _dbContext.RequestHosts
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+                .FirstOrDefault(x => x.Id == requestHostId);
+        if (requestHost == null)
+        {
+            validPrecondition = false;
+            result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+        }
+        else if (requestHost.IsUpgrade)
+        {
+            result.ErrorMessage = "Cannot complete port upgrade";
+        }
+        else if (requestHost.Status != RequestHostStatus.Accepted)
+        {
+            result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
+        }
+        else if (!requestHost.RequestHostIps.Any())
+        {
+            result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
+        }
+        else if (requestHost.InspectionReportFilePath == null && model == null)
+        {
+            result.ErrorMessage = "Need inspection report to complete";
+        }
+        else
+        {
+            var executor = _dbContext.RequestHostUsers.FirstOrDefault(x => x.RequestHostId == requestHost.Id && x.Action == RequestUserAction.Execute);
+            if (executor == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = $"{(requestHost.IsUpgrade ? "Port upgrade" : "Ip")} request must have an assigned tech";
+            }
+            else if (executor.UserId != userId)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Unassigned tech cannot complete this request";
+            }
+        }
+
+        return validPrecondition;
+    }
+
+    public async Task<ResultModel> CompletePortUpgrade(int requestHostId, Guid userId, HostAndUpgradeCreateInspectionReportModel? model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+        using var transaction = _dbContext.Database.BeginTransaction();
+
+        try
+        {
+            var requestHost = _dbContext.RequestHosts
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+                .FirstOrDefault(x => x.Id == requestHostId);
+            if (requestHost == null)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+            }
+            else if (!requestHost.IsUpgrade)
+            {
+                result.ErrorMessage = "Cannot complete non-port upgrade";
+            }
+            else
+            {
+                validPrecondition = IsCompletable(requestHostId, result, model, userId);
+            }
+
+            if (!validPrecondition)
+            {
+                transaction.Rollback();
+            }
+            else
+            {
+                var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress);
+                var ipAssignments = new List<IpAssignment>();
+                foreach (var ipAddress in ipAddresses)
+                {
+                    var ipAssignment = _dbContext.IpAssignments.FirstOrDefault(x => x.IpAddressId == ipAddress.Id && x.ServerAllocationId == requestHost.ServerAllocationId && x.Type == IpAssignmentTypes.Port);
+                    ipAssignment.Capacity += requestHost.Capacity;
+                    ipAssignments.Add(ipAssignment);
+                }
+                requestHost.Status = RequestHostStatus.Success;
+                requestHost.ServerAllocation.DateUpdated = DateTime.UtcNow;
+                _dbContext.SaveChanges();
+
+                var createDocResult = await CreateUpgradeAndHostInspectionReport(requestHost.Id, model);
+                if (!createDocResult.Succeed)
+                {
+                    transaction.Rollback();
+                    result.ErrorMessage = createDocResult.ErrorMessage;
+                }
+                else
+                {
+                    requestHost.InspectionReportFilePath = createDocResult.Data as string;
+                    _dbContext.SaveChanges();
+                    transaction.Commit();
+
+                    var reuqestHostModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestHost));
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = requestHost.ServerAllocation.CustomerId,
+                        Action = "Completed",
+                        Title = "Port upgrade request completed",
+                        Body = "There's an port upgrade request just completed",
                         Data = new NotificationData
                         {
                             Key = "RequestHost",
