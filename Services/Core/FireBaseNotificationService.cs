@@ -1,12 +1,8 @@
-﻿using Microsoft.Extensions.Options;
-using CorePush.Google;
-using System.Text;
-using Data.DataAccess;
+﻿using CorePush.Google;
 using Data.Models;
+using Microsoft.Extensions.Options;
+using System.Text;
 using static Data.Models.GoogleNotification;
-using FcmResponse = Data.Models.FcmResponse;
-using System.Runtime;
-using DocumentFormat.OpenXml.InkML;
 
 namespace Services.Core
 {

@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Data.Utils.ValidationAttributes;
+using Newtonsoft.Json;
 using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models;
@@ -57,6 +58,7 @@ public class UserCreateModel
     public string Password { get; set; }
 
     [Required]
+    [EmailAddress]
     public string Email { get; set; }
 
     [Required]
@@ -69,6 +71,7 @@ public class UserCreateModel
     public string PhoneNumber { get; set; }
 
     [Required]
+    [EnsureMinimumElements]
     public List<string> Roles { get; set; }
 }
 
@@ -89,6 +92,7 @@ public class UserUpdateModel
     public string? Password { get; set; }
 
     [Required]
+    [EmailAddress]
     public string Email { get; set; }
 
     [Required]
@@ -107,12 +111,16 @@ public class UserAssignRoleModel
     public Guid Id { get; set; }
 
     [Required]
+    [EnsureMinimumElements]
     public List<string> Roles { get; set; }
 }
 
 public class LoginModel
 {
+    [Required]
     public string Username { get; set; }
+
+    [Required]
     public string Password { get; set; }
 }
 

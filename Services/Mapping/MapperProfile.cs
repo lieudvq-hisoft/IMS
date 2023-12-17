@@ -309,7 +309,7 @@ public class MapperProfile : Profile
             })
             .AfterMap((src, dest, context) =>
             {
-                if (src.IpAssignments.FirstOrDefault()?.ServerAllocation != null)
+                if (src.IpAssignments.FirstOrDefault() != null)
                 {
                     dest.AssignmentType = src.IpAssignments.FirstOrDefault()?.Type.ToString();
                 }

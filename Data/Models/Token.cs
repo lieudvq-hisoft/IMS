@@ -10,4 +10,5 @@ public class Token
     public string PhoneNumber { get; set; }
     public string UserAva { get; set; }
     public int CurrenNoticeCount { get; set; }
+    public List<string> Roles { get; set; } = new List<string>();
 }

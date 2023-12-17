@@ -132,6 +132,8 @@ public class AppointmentService : IAppointmentService
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.AppointmentUsers).ThenInclude(x => x.User)
+                .Include(x => x.RequestExpandAppointments)
+                .Include(x => x.RequestUpgradeAppointment)
                 .FirstOrDefault(x => x.Id == id);
 
             if (appointment != null)
@@ -1210,6 +1212,22 @@ public class AppointmentService : IAppointmentService
                             Value = appointmentModelString
                         }
                     });
+                    if (appointment.RequestExpandAppointments.Any(x => x.ForRemoval))
+                    {
+                        var serverModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(appointment.ServerAllocation));
+                        await _notiService.Add(new NotificationCreateModel
+                        {
+                            UserId = appointment.ServerAllocation.CustomerId,
+                            Action = "Removed",
+                            Title = "Server removed",
+                            Body = "There's an server just removed",
+                            Data = new NotificationData
+                            {
+                                Key = "ServerAllocation",
+                                Value = serverModelString
+                            }
+                        });
+                    }
 
                     result.Succeed = true;
                     transaction.Commit();
@@ -1825,10 +1843,6 @@ public class AppointmentService : IAppointmentService
             else if (!serverAllocation.IpAssignments.Any())
             {
                 result.ErrorMessage = IpAssignmentErrorMessage.NOT_EXISTED;
-            }
-            else if (serverAllocation.InspectionRecordFilePath == null)
-            {
-                result.ErrorMessage = "Inspection report is required";
             }
             else
             {

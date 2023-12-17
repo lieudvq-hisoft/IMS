@@ -134,7 +134,10 @@ public class IpSubnetService : IIpSubnetService
         {
             var subnetTree = CreateSubnetTree();
             var rootSubnet = GetSubnetTree(subnetId, subnetTree);
-            var ipAddressesQuery = GetAllIpAddress(rootSubnet)
+            var ipAddressesQuery = _dbContext.IpAddresses
+                .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+                .Where(x => x.IpSubnetId == subnetId)
                 .Where(delegate (IpAddress x)
                 {
                     return x.Filter(searchModel);

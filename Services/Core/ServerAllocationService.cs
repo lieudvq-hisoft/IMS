@@ -7,13 +7,9 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
-using DocumentFormat.OpenXml.Packaging;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
-using System.Globalization;
 using System.Text.Json;
 
 namespace Services.Core;
@@ -1053,7 +1049,7 @@ public class ServerAllocationService : IServerAllocationService
                 serverAllocation.Appointments.FirstOrDefault(x => x.Status == RequestStatus.Success).DocumentConfirm = true;
                 _dbContext.SaveChanges();
 
-                var requestModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(serverAllocation));
+                var serverModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(serverAllocation));
                 await _notiService.Add(new NotificationCreateModel
                 {
                     UserId = serverAllocation.CustomerId,
@@ -1063,7 +1059,7 @@ public class ServerAllocationService : IServerAllocationService
                     Data = new NotificationData
                     {
                         Key = "ServerAllocation",
-                        Value = requestModelString
+                        Value = serverModelString
                     }
                 });
                 result.Succeed = true;

@@ -1,5 +1,4 @@
-﻿using System;
-using Data.Entities;
+﻿using Data.Entities;
 using Newtonsoft.Json;
 
 namespace Data.Models

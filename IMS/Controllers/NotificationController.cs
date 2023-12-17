@@ -1,11 +1,10 @@
-﻿using Data.Models;
+﻿using Data.Common.PaginationModel;
+using Data.Enums;
+using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Services.Core;
 using Services.ClaimExtensions;
-using Data.Entities;
-using Data.Common.PaginationModel;
-using Data.Enums;
+using Services.Core;
 
 namespace IMS.Controllers;
 

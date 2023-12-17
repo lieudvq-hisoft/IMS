@@ -1,12 +1,10 @@
-﻿using System;
-using AutoMapper;
+﻿using AutoMapper;
 using Data.Common.PaginationModel;
 using Data.DataAccess;
 using Data.Entities;
 using Data.Enums;
 using Data.Models;
 using Data.Utils.Paging;
-using Microsoft.EntityFrameworkCore;
 using Services.SignalR;
 
 namespace Services.Core;

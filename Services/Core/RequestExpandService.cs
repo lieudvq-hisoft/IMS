@@ -118,11 +118,13 @@ public class RequestExpandService : IRequestExpandService
         result.Succeed = false;
 
         var appointments = _dbContext.Appointments
-            .Include(x => x.ServerAllocation)
+            .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+            .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+            .Include(x => x.AppointmentUsers).ThenInclude(x => x.User)
             .Include(x => x.RequestExpandAppointments)
             .Include(x => x.RequestUpgradeAppointment)
-            .Include(x => x.AppointmentUsers)
             .Where(x => x.RequestExpandAppointments.Any(x => x.RequestExpandId == requestExpandId))
+            .Include(x => x.AppointmentUsers)
             .Where(delegate (Appointment x)
             {
                 return x.FilterAppointment(searchModel);

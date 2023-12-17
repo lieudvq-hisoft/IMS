@@ -1,7 +1,7 @@
 ﻿using Data.Models;
 using Data.Utils.Common;
-using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Data.Entities;
 
