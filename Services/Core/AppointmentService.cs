@@ -132,6 +132,8 @@ public class AppointmentService : IAppointmentService
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.AppointmentUsers).ThenInclude(x => x.User)
+                .Include(x => x.RequestExpandAppointments)
+                .Include(x => x.RequestUpgradeAppointment)
                 .FirstOrDefault(x => x.Id == id);
 
             if (appointment != null)
