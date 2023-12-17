@@ -113,7 +113,7 @@ public class UserService : IUserService
             UserName = user.UserName,
             PhoneNumber = user.PhoneNumber,
             CurrenNoticeCount = user.CurrenNoticeCount,
-            //Role = user.Role
+            Roles = roles
         };
     }
 
