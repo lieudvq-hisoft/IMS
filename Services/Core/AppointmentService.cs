@@ -1826,10 +1826,6 @@ public class AppointmentService : IAppointmentService
             {
                 result.ErrorMessage = IpAssignmentErrorMessage.NOT_EXISTED;
             }
-            else if (serverAllocation.InspectionRecordFilePath == null)
-            {
-                result.ErrorMessage = "Inspection report is required";
-            }
             else
             {
                 File.Copy(inputPath, outputPath, true);
