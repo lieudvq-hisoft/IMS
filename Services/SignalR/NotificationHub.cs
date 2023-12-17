@@ -1,10 +1,9 @@
-﻿using System;
-using System.Collections.Concurrent;
-using System.Diagnostics;
-using Data.Models;
+﻿using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.SignalR;
 using Services.ClaimExtensions;
+using System.Collections.Concurrent;
+using System.Diagnostics;
 
 namespace Services.SignalR;
 

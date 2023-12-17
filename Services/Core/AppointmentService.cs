@@ -1212,6 +1212,22 @@ public class AppointmentService : IAppointmentService
                             Value = appointmentModelString
                         }
                     });
+                    if (appointment.RequestExpandAppointments.Any(x => x.ForRemoval))
+                    {
+                        var serverModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(appointment.ServerAllocation));
+                        await _notiService.Add(new NotificationCreateModel
+                        {
+                            UserId = appointment.ServerAllocation.CustomerId,
+                            Action = "Removed",
+                            Title = "Server removed",
+                            Body = "There's an server just removed",
+                            Data = new NotificationData
+                            {
+                                Key = "ServerAllocation",
+                                Value = serverModelString
+                            }
+                        });
+                    }
 
                     result.Succeed = true;
                     transaction.Commit();
