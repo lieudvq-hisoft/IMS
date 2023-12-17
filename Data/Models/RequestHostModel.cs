@@ -60,8 +60,8 @@ public class RequestHostCreateModel
     [GreaterThanZero]
     public int Quantity { get; set; }
 
-    [GreaterThanZero]
-    public int? Capactiy { get; set; }
+    [EnsureMinimumElements]
+    public List<int>? Capacities { get; set; }
 
     [Required]
     public bool IsRemoval { get; set; }
@@ -83,6 +83,7 @@ public class RequestHostCreateUpgradeModel
     public string? TechNote { get; set; }
 
     [Required]
+    [GreaterThanZero]
     public int Capacity { get; set; }
 
     [Required]

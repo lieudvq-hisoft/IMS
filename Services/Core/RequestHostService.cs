@@ -300,7 +300,7 @@ public class RequestHostService : IRequestHostService
                     TechNote = model.TechNote,
                     SaleNote = model.SaleNote,
                     Quantity = ipAssignments.Count(),
-                    Capacity = model.Capacity,
+                    UpgradeCapacity = model.Capacity,
                     IsUpgrade = true,
                     Type = IpAssignmentTypes.Port,
                     Status = RequestHostStatus.Waiting,
