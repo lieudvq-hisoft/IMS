@@ -72,7 +72,7 @@ public class UserCreateModel
 
     [Required]
     [EnsureMinimumElements]
-    public List<string> Roles { get; set; }
+    public string Role { get; set; }
 }
 
 public class UserChangePasswordModel
