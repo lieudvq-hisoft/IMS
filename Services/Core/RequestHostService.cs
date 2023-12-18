@@ -651,6 +651,11 @@ public class RequestHostService : IRequestHostService
                 validPrecondition = false;
                 result.ErrorMessage = RequestHostErrorMessage.NOT_ACCEPTED;
             }
+            else if (requestHost.RequestHostIps.Any())
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Ip request assigned ip already";
+            }
             else if (requestHost.IsRemoval && requestHost.Status != RequestHostStatus.Waiting)
             {
                 validPrecondition = false;
