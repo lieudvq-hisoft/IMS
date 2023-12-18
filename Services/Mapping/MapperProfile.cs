@@ -11,7 +11,9 @@ public class MapperProfile : Profile
     public MapperProfile()
     {
         #region Customer
-        CreateMap<Customer, CustomerModel>();
+        CreateMap<Customer, CustomerModel>()
+            .AfterMap((src, dest) =>
+                dest.Contacts = JsonSerializer.Deserialize<List<ContactModel>>(src.Contact));
         CreateMap<CustomerCreateModel, Customer>();
         CreateMap<CustomerUpdateModel, Customer>();
         CreateMap<User, UserModel>();
@@ -25,24 +27,24 @@ public class MapperProfile : Profile
         CreateMap<ServerHardwareConfig, ServerHardwareConfigModel>()
             .AfterMap((src, dest, context) =>
                 dest.Component = context.Mapper.Map<Component, ComponentModel>(src.Component))
-            .AfterMap((src, dest, context) =>
+            .AfterMap((src, dest) =>
                 dest.Descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description));
         CreateMap<ServerHardwareConfigCreateModel, ServerHardwareConfig>()
-            .AfterMap((src, dest, context) =>
+            .AfterMap((src, dest) =>
                 dest.Description = JsonSerializer.Serialize(src.Descriptions));
         CreateMap<ServerHardwareConfigUpdateModel, ServerHardwareConfig>()
-            .AfterMap((src, dest, context) =>
+            .AfterMap((src, dest) =>
                 dest.Description = JsonSerializer.Serialize(src.Descriptions));
 
         CreateMap<RequestUpgrade, RequestUpgradeModel>()
-            .AfterMap((src, dest, context) =>
+            .AfterMap((src, dest) =>
             {
                 if (src.RequestUpgradeAppointments?.Any() == true)
                 {
                     dest.AppointmentId = src.RequestUpgradeAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Accepted || x.Status == RequestStatus.Waiting)?.Id;
                 }
             })
-            .AfterMap((src, dest, context) =>
+            .AfterMap((src, dest) =>
                 dest.Descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description))
             .AfterMap((src, dest, context) =>
             {
@@ -90,10 +92,10 @@ public class MapperProfile : Profile
                 }
             });
         CreateMap<RequestUpgradeCreateModel, RequestUpgrade>()
-            .AfterMap((src, dest, context) =>
+            .AfterMap((src, dest) =>
                 dest.Description = JsonSerializer.Serialize(src.Descriptions));
         CreateMap<RequestUpgradeUpdateModel, RequestUpgrade>()
-            .AfterMap((src, dest, context) =>
+            .AfterMap((src, dest) =>
                 dest.Description = JsonSerializer.Serialize(src.Descriptions));
         #endregion
 
@@ -155,7 +157,7 @@ public class MapperProfile : Profile
         CreateMap<RequestUpgradeAppointment, RequestUpgradeAppointmentModel>();
 
         CreateMap<Appointment, AppointmentModel>()
-             .AfterMap((src, dest, context) =>
+             .AfterMap((src, dest) =>
              {
                  if (src.RequestExpandAppointments?.Any(x => !x.ForRemoval) == true)
                  {
@@ -208,7 +210,7 @@ public class MapperProfile : Profile
 
         #region RequestExpand 
         CreateMap<RequestExpand, RequestExpandModel>()
-            .AfterMap((src, dest, context) =>
+            .AfterMap((src, dest) =>
             {
                 if (src.RequestExpandAppointments?.Any() == true)
                 {
@@ -253,7 +255,7 @@ public class MapperProfile : Profile
                     dest.Executor = context.Mapper.Map<User, UserModel>(executor.User);
                 }
             })
-            .AfterMap((src, dest, context) =>
+            .AfterMap((src, dest) =>
             {
                 var requestExpandLocations = src.RequestExpandLocations;
                 if (requestExpandLocations?.Any() == true)
@@ -360,7 +362,9 @@ public class MapperProfile : Profile
         CreateMap<IpSubnet, IpSubnetResultModel>();
         CreateMap<IpAssignment, IpAssignmentModel>();
         CreateMap<IpAddress, IpAddressResultModel>();
-        CreateMap<Customer, CustomerResultModel>();
+        CreateMap<Customer, CustomerResultModel>()
+            .AfterMap((src, dest) =>
+                dest.Contacts = JsonSerializer.Deserialize<List<ContactModel>>(src.Contact));
         CreateMap<Component, ComponentResultModel>();
         CreateMap<Area, AreaResultModel>();
         CreateMap<Appointment, AppointmentResultModel>();
