@@ -537,7 +537,10 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == requestUpgradeId);
+            var requestUpgrade = _dbContext.RequestUpgrades
+                .Include(x => x.ServerAllocation)
+                .Include(x => x.RequestUpgradeAppointments)
+                .FirstOrDefault(x => x.Id == requestUpgradeId);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
@@ -560,6 +563,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 requestUpgrade.Status = RequestStatus.Denied;
                 requestUpgrade.SaleNote = model.SaleNote;
+                _dbContext.RequestUpgradeAppointments.RemoveRange(requestUpgrade.RequestUpgradeAppointments);
                 _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
                 {
                     Action = RequestUserAction.Evaluate,

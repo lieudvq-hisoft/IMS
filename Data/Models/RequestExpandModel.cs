@@ -7,7 +7,7 @@ public class RequestExpandModel
 {
     public int Id { get; set; }
     public RequestStatus Status { get; set; }
-    public RemovalStatus? RemovalStatus { get; set; }
+    public bool ForRemoval { get; set; }
     public string RequestType { get; set; }
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
@@ -33,7 +33,7 @@ public class RequestExpandResultModel
     public int Id { get; set; }
     public RequestStatus Status { get; set; }
     public int? Size { get; set; }
-    public RemovalStatus? RemovalStatus { get; set; }
+    public bool ForRemoval { get; set; }
     public string RequestType { get; set; }
     public string? ChosenLocation { get; set; }
     public string? Note { get; set; }
@@ -51,6 +51,7 @@ public class RequestExpandCompleteBulkModel
 
 public class RequestExpandCreateModel
 {
+    public bool ForRemoval { get; set; }
     public int? Size { get; set; }
 
     [Required]
@@ -114,3 +115,25 @@ public class RequestExpandSearchModel
     public int? ServerAllocationId { get; set; }
     public List<RequestStatus?>? Statuses { get; set; }
 }
+
+public class RequestExpandAppointmentModel
+{
+    public bool ForRemoval { get; set; }
+    public int RequestExpandId { get; set; }
+    public int AppointmentId { get; set; }
+}
+
+public class RequestExpandLocationModel
+{
+    public int Id { get; set; }
+    public int RequestExpandId { get; set; }
+    public int LocationId { get; set; }
+}
+
+//public class LocationAssignmentModel
+//{
+//    public bool IsServer { get; set; }
+//    public int Id { get; set; }
+//    public int ServerAllocationId { get; set; }
+//    public int LocationId { get; set; }
+//}

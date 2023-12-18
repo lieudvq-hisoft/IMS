@@ -244,9 +244,9 @@ public class AppointmentService : IAppointmentService
         bool validPrecondition = true;
         using var transaction = _dbContext.Database.BeginTransaction();
 
-        if (model.RequestRemovalIds.Any() && (model.RequestUpgradeIds.Any() || model.RequestExpandIds.Any()))
+        if (model.RequestUpgradeIds.Any() && model.RequestExpandId != null)
         {
-            result.ErrorMessage = "Cannot have other request when remove server";
+            result.ErrorMessage = "Cannot have both upgrade and expand request";
             return result;
         }
 
@@ -276,33 +276,17 @@ public class AppointmentService : IAppointmentService
                     validPrecondition = false;
                 }
 
-                var createRequestExpandAppointmentResults = new List<ResultModel>();
+                var createRequestExpandAppointmentResult = new ResultModel();
                 if (validPrecondition)
                 {
-                    foreach (var requestExpandId in model.RequestExpandIds)
+                    if (model.RequestExpandId != null)
                     {
-                        createRequestExpandAppointmentResults.Add(await CreateOneRequestExpandAppointment(appointment.Id, requestExpandId));
+                        createRequestExpandAppointmentResult = await CreateOneRequestExpandAppointment(appointment.Id, model.RequestExpandId.Value);
                     }
 
-                    if (createRequestExpandAppointmentResults.Any(x => !x.Succeed))
+                    if (!createRequestExpandAppointmentResult.Succeed)
                     {
-                        result.ErrorMessage = createRequestExpandAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-                        transaction.Rollback();
-                        validPrecondition = false;
-                    }
-                }
-
-                var createRequestRemovalAppointmentResults = new List<ResultModel>();
-                if (validPrecondition)
-                {
-                    foreach (var requestRemovalId in model.RequestRemovalIds)
-                    {
-                        createRequestRemovalAppointmentResults.Add(await CreateOneRequestRemovalAppointment(appointment.Id, requestRemovalId));
-                    }
-
-                    if (createRequestRemovalAppointmentResults.Any(x => !x.Succeed))
-                    {
-                        result.ErrorMessage = createRequestRemovalAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                        result.ErrorMessage = createRequestExpandAppointmentResult.ErrorMessage;
                         transaction.Rollback();
                         validPrecondition = false;
                     }
@@ -335,8 +319,7 @@ public class AppointmentService : IAppointmentService
                     result.Data = new AppointmentCreateResultModel
                     {
                         RequestUpgradeAppointments = createRequestUpgradeAppointmentResults.Select(x => x.Data),
-                        RequestExpandAppointments = createRequestExpandAppointmentResults.Select(x => x.Data),
-                        RequestRemovalAppointments = createRequestRemovalAppointmentResults.Select(x => x.Data),
+                        RequestExpandAppointment = createRequestExpandAppointmentResult.Data,
                         Appointment = _mapper.Map<AppointmentResultModel>(appointment)
                     };
                 }
@@ -355,12 +338,12 @@ public class AppointmentService : IAppointmentService
     {
         var result = new ResultModel();
         result.Succeed = false;
-        bool validCondition = true;
+        bool validPrecondition = true;
         using var transaction = _dbContext.Database.BeginTransaction();
 
-        if (model.RequestRemovalIds.Any() && model.RequestUpgradeIds.Any() || model.RequestExpandIds.Any())
+        if (model.RequestUpgradeIds.Any() && model.RequestExpandId != null)
         {
-            result.ErrorMessage = "Cannot have other request when remove server";
+            result.ErrorMessage = "Cannot have both upgrade and expand request";
             return result;
         }
 
@@ -373,12 +356,12 @@ public class AppointmentService : IAppointmentService
                 .FirstOrDefault(x => x.Id == appointmentId && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
             if (appointment == null)
             {
-                validCondition = false;
+                validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
             else if (appointment.Status != RequestStatus.Waiting)
             {
-                validCondition = false;
+                validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING;
             }
             else
@@ -389,7 +372,7 @@ public class AppointmentService : IAppointmentService
             }
 
             var createRequestUpgradeAppointmentResults = new List<ResultModel>();
-            if (validCondition)
+            if (validPrecondition)
             {
                 foreach (var requestUpgradeId in model.RequestUpgradeIds)
                 {
@@ -400,51 +383,34 @@ public class AppointmentService : IAppointmentService
                 {
                     result.ErrorMessage = createRequestUpgradeAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
                     transaction.Rollback();
-                    validCondition = false;
+                    validPrecondition = false;
                 }
             }
 
-            var createRequestExpandAppointmentResults = new List<ResultModel>();
-            if (validCondition)
+            var createRequestExpandAppointmentResult = new ResultModel();
+            if (validPrecondition)
             {
-                foreach (var requestExpandId in model.RequestExpandIds)
+                if (model.RequestExpandId != null)
                 {
-                    createRequestExpandAppointmentResults.Add(await CreateOneRequestExpandAppointment(appointmentId, requestExpandId));
+                    createRequestExpandAppointmentResult = await CreateOneRequestExpandAppointment(appointment.Id, model.RequestExpandId.Value);
                 }
 
-                if (createRequestExpandAppointmentResults.Any(x => !x.Succeed))
+                if (!createRequestExpandAppointmentResult.Succeed)
                 {
-                    result.ErrorMessage = createRequestExpandAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                    result.ErrorMessage = createRequestExpandAppointmentResult.ErrorMessage;
                     transaction.Rollback();
-                    validCondition = false;
+                    validPrecondition = false;
                 }
             }
 
-            var createRequestRemovalAppointmentResults = new List<ResultModel>();
-            if (validCondition)
-            {
-                foreach (var requestRemovalId in model.RequestRemovalIds)
-                {
-                    createRequestRemovalAppointmentResults.Add(await CreateOneRequestRemovalAppointment(appointmentId, requestRemovalId));
-                }
-
-                if (createRequestRemovalAppointmentResults.Any(x => !x.Succeed))
-                {
-                    result.ErrorMessage = createRequestRemovalAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-                    transaction.Rollback();
-                    validCondition = false;
-                }
-            }
-
-            if (validCondition)
+            if (validPrecondition)
             {
                 transaction.Commit();
                 result.Succeed = true;
                 result.Data = new RequestAppointmentCreateResultModel
                 {
                     RequestUpgradeAppointments = createRequestUpgradeAppointmentResults.Select(x => x.Data),
-                    RequestExpandAppointments = createRequestExpandAppointmentResults.Select(x => x.Data),
-                    RequestRemovealAppointments = createRequestRemovalAppointmentResults.Select(x => x.Data)
+                    RequestExpandAppointment = createRequestExpandAppointmentResult.Data,
                 };
             }
         }
@@ -536,6 +502,7 @@ public class AppointmentService : IAppointmentService
         try
         {
             var existedRequestExpandAppointment = _dbContext.RequestExpandAppointments.Include(x => x.Appointment).FirstOrDefault(x => !x.ForRemoval && x.AppointmentId == appointmentId && x.RequestExpandId == requestExpandId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
+            RequestExpand requestExpand = null;
             if (existedRequestExpandAppointment != null)
             {
                 validPrecondition = false;
@@ -556,7 +523,7 @@ public class AppointmentService : IAppointmentService
                 }
                 else
                 {
-                    var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
+                    requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
                     if (requestExpand == null)
                     {
                         validPrecondition = false;
@@ -579,6 +546,7 @@ public class AppointmentService : IAppointmentService
             {
                 var requestExpandAppointment = new RequestExpandAppointment
                 {
+                    ForRemoval = requestExpand.ForRemoval,
                     RequestExpandId = requestExpandId,
                     AppointmentId = appointmentId,
                 };
@@ -597,81 +565,81 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    private async Task<ResultModel> CreateOneRequestRemovalAppointment(int appointmentId, int requestRemovalId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-        bool validPrecondition = true;
+    //private async Task<ResultModel> CreateOneRequestRemovalAppointment(int appointmentId, int requestRemovalId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+    //    bool validPrecondition = true;
 
-        try
-        {
-            var existedRequestRemovalAppointment = _dbContext.RequestExpandAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.ForRemoval && x.AppointmentId == appointmentId && x.RequestExpandId == requestRemovalId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
-            var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestRemovalId);
-            if (existedRequestRemovalAppointment != null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = RequestExpandErrorMessage.EXISTED;
-            }
-            else
-            {
-                var appoitment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
-                if (appoitment == null)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
-                }
-                else if (appoitment.Status != RequestStatus.Waiting && appoitment.Status != RequestStatus.Accepted)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING + "/" + AppointmentErrorMessage.NOT_ACCEPTED;
-                }
-                else
-                {
-                    if (requestExpand == null)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
-                    }
-                    else if (requestExpand.Status != RequestStatus.Success)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = RequestExpandErrorMessage.NOT_SUCCESS;
-                    }
-                    else if (requestExpand.RemovalStatus != null && requestExpand.RemovalStatus != RemovalStatus.Failed)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = "Request expand removal started";
-                    }
-                    else if (requestExpand.ServerAllocationId != appoitment.ServerAllocationId)
-                    {
-                        result.ErrorMessage = "Request expand and appointment must belong to the same server allocation";
-                        validPrecondition = false;
-                    }
-                }
-            }
+    //    try
+    //    {
+    //        var existedRequestRemovalAppointment = _dbContext.RequestExpandAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.ForRemoval && x.AppointmentId == appointmentId && x.RequestExpandId == requestRemovalId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
+    //        var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestRemovalId);
+    //        if (existedRequestRemovalAppointment != null)
+    //        {
+    //            validPrecondition = false;
+    //            result.ErrorMessage = RequestExpandErrorMessage.EXISTED;
+    //        }
+    //        else
+    //        {
+    //            var appoitment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
+    //            if (appoitment == null)
+    //            {
+    //                validPrecondition = false;
+    //                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+    //            }
+    //            else if (appoitment.Status != RequestStatus.Waiting && appoitment.Status != RequestStatus.Accepted)
+    //            {
+    //                validPrecondition = false;
+    //                result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING + "/" + AppointmentErrorMessage.NOT_ACCEPTED;
+    //            }
+    //            else
+    //            {
+    //                if (requestExpand == null)
+    //                {
+    //                    validPrecondition = false;
+    //                    result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+    //                }
+    //                else if (requestExpand.Status != RequestStatus.Success)
+    //                {
+    //                    validPrecondition = false;
+    //                    result.ErrorMessage = RequestExpandErrorMessage.NOT_SUCCESS;
+    //                }
+    //                else if (requestExpand.RemovalStatus != null && requestExpand.RemovalStatus != RemovalStatus.Failed)
+    //                {
+    //                    validPrecondition = false;
+    //                    result.ErrorMessage = "Request expand removal started";
+    //                }
+    //                else if (requestExpand.ServerAllocationId != appoitment.ServerAllocationId)
+    //                {
+    //                    result.ErrorMessage = "Request expand and appointment must belong to the same server allocation";
+    //                    validPrecondition = false;
+    //                }
+    //            }
+    //        }
 
-            if (validPrecondition)
-            {
-                var requestRemovalAppointment = new RequestExpandAppointment
-                {
-                    ForRemoval = true,
-                    RequestExpandId = requestRemovalId,
-                    AppointmentId = appointmentId,
-                };
-                _dbContext.RequestExpandAppointments.Add(requestRemovalAppointment);
-                _dbContext.SaveChanges();
+    //        if (validPrecondition)
+    //        {
+    //            var requestRemovalAppointment = new RequestExpandAppointment
+    //            {
+    //                ForRemoval = true,
+    //                RequestExpandId = requestRemovalId,
+    //                AppointmentId = appointmentId,
+    //            };
+    //            _dbContext.RequestExpandAppointments.Add(requestRemovalAppointment);
+    //            _dbContext.SaveChanges();
 
-                result.Succeed = true;
-                result.Data = _mapper.Map<RequestExpandAppointmentModel>(requestRemovalAppointment);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<RequestExpandAppointmentModel>(requestRemovalAppointment);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> Update(AppointmentUpdateModel model)
     {
@@ -857,15 +825,13 @@ public class AppointmentService : IAppointmentService
                     });
                 }
 
-                foreach (var requestExpand in appointment.RequestExpandAppointments.Select(x => x.RequestExpand))
+                if (appointment.RequestExpandAppointments.Any())
                 {
-                    if (requestExpand.Status != RequestStatus.Success)
+                    var requestExpand = appointment.RequestExpandAppointments.Select(x => x.RequestExpand).FirstOrDefault();
+                    requestExpand.Status = RequestStatus.Accepted;
+                    if (requestExpand.ForRemoval)
                     {
-                        requestExpand.Status = RequestStatus.Accepted;
-                    }
-                    else
-                    {
-                        requestExpand.RemovalStatus = RemovalStatus.Accepted;
+                        appointment.ServerAllocation.Status = ServerAllocationStatus.Pausing;
                     }
                     _dbContext.RequestExpandUsers.Add(new RequestExpandUser
                     {
@@ -882,6 +848,7 @@ public class AppointmentService : IAppointmentService
                     });
                 }
 
+                _dbContext.SaveChanges();
                 var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<AppointmentResultModel>(appointment));
                 await _notiService.Add(new NotificationCreateModel
                 {
@@ -907,7 +874,22 @@ public class AppointmentService : IAppointmentService
                         Value = appointmentModelString
                     }
                 });
-                _dbContext.SaveChanges();
+                if (appointment.RequestExpandAppointments.Any(x => x.ForRemoval))
+                {
+                    var serverModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(appointment.ServerAllocation));
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = appointment.ServerAllocation.CustomerId,
+                        Action = "Paused",
+                        Title = "Server paused",
+                        Body = "There's an server just paused",
+                        Data = new NotificationData
+                        {
+                            Key = "ServerAllocation",
+                            Value = serverModelString
+                        }
+                    });
+                }
                 result.Succeed = true;
                 result.Data = _mapper.Map<AppointmentResultModel>(appointment);
             }
@@ -1125,13 +1107,17 @@ public class AppointmentService : IAppointmentService
                     }
                 }
 
-                var requestExpandResults = new List<ResultModel>();
-                if (appointment.RequestExpandAppointments.Any(x => !x.ForRemoval))
+                var requestExpandResult = new ResultModel();
+                if (appointment.RequestExpandAppointments.Any())
                 {
-                    var requestExpandId = appointment.RequestExpandAppointments.FirstOrDefault(x => !x.ForRemoval).RequestExpand.Id;
-                    requestExpandResults.Add(await CompleteRequestExpand(requestExpandId));
+                    var requestExpand = appointment.RequestExpandAppointments.FirstOrDefault(x => !x.ForRemoval).RequestExpand;
+
+                    if (!requestExpand.ForRemoval)
+                    {
+                        requestExpandResult = await CompleteRequestExpand(requestExpand.Id);
+                    }
                     var createInspectionResult = await CreateExpandInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
-                    var createReceiptResult = await CreateExpandReceiptReport(requestExpandId, model.DocumentModel);
+                    var createReceiptResult = await CreateExpandReceiptReport(requestExpand.Id, model.DocumentModel);
                     if (!createInspectionResult.Succeed)
                     {
                         validPrecondition = false;
@@ -1144,54 +1130,33 @@ public class AppointmentService : IAppointmentService
                     }
                     else
                     {
+                        var serverAllocation = appointment.ServerAllocation;
+                        if (!requestExpand.ForRemoval)
+                        {
+                            serverAllocation.InspectionRecordFilePath = createInspectionResult.Data as string;
+                            serverAllocation.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
+                        }
+                        else
+                        {
+                            requestExpandResult = await CompleteRemoval(requestExpand.Id);
+                            serverAllocation.RemovalFilePath = createReceiptResult.Data as string;
+                        }
                         appointment.InspectionReportFilePath = createInspectionResult.Data as string;
                         appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
-                        appointment.ServerAllocation.InspectionRecordFilePath = createInspectionResult.Data as string;
-                        appointment.ServerAllocation.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
+
                         _dbContext.SaveChanges();
                     }
                 }
 
-                var requestRemovalResults = new List<ResultModel>();
-                if (appointment.RequestExpandAppointments.Any(x => x.ForRemoval))
-                {
-                    var requestExpandId = appointment.RequestExpandAppointments.FirstOrDefault(x => x.ForRemoval).RequestExpand.Id;
-                    var createInspectionResult = await CreateExpandInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
-                    var createReceiptResult = await CreateExpandReceiptReport(requestExpandId, model.DocumentModel);
-                    if (!createInspectionResult.Succeed)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = createInspectionResult.ErrorMessage;
-                    }
-                    else if (!createReceiptResult.Succeed)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = createReceiptResult.ErrorMessage;
-                    }
-                    else
-                    {
-                        requestRemovalResults.Add(await CompleteRemoval(requestExpandId));
-                        appointment.InspectionReportFilePath = createInspectionResult.Data as string;
-                        appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
-                        appointment.ServerAllocation.RemovalFilePath = createReceiptResult.Data as string;
-                        _dbContext.SaveChanges();
-                    }
-                }
-
-                if (requestExpandResults.Any(x => !x.Succeed))
+                if (!requestExpandResult.Succeed)
                 {
                     transaction.Rollback();
-                    result.ErrorMessage = requestExpandResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                    result.ErrorMessage = requestExpandResult.ErrorMessage;
                 }
                 else if (requestUpgradeResults.Any(x => !x.Succeed))
                 {
                     transaction.Rollback();
                     result.ErrorMessage = requestUpgradeResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-                }
-                else if (requestRemovalResults.Any(x => !x.Succeed))
-                {
-                    transaction.Rollback();
-                    result.ErrorMessage = requestRemovalResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
                 }
                 else if (!validPrecondition)
                 {
@@ -1263,7 +1228,7 @@ public class AppointmentService : IAppointmentService
             result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
         }
 
-        if (appointment.RequestExpandAppointments.Select(x => x.RequestExpand).Any(x => !x.RequestExpandLocations.Any()))
+        if (appointment.RequestExpandAppointments.Select(x => x.RequestExpand).Any(x => !x.RequestExpandLocations.Any() && !x.ForRemoval))
         {
             validPrecondition = false;
             result.ErrorMessage = "Please assign location to all request expand to complete the appointment";
@@ -1410,7 +1375,7 @@ public class AppointmentService : IAppointmentService
                 serverAllocation.ServerLocation = serverAllocation.GetServerLocation();
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
+                //result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
             }
         }
         catch (Exception e)
@@ -1926,7 +1891,8 @@ public class AppointmentService : IAppointmentService
             var requestExpand = _dbContext.RequestExpands
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
-                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments).FirstOrDefault(x => x.Id == requestExpandId && x.Status == RequestStatus.Success);
+                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.LocationAssignments)
+                .FirstOrDefault(x => x.Id == requestExpandId);
             var serverAllocation = _dbContext.ServerAllocations
                 .Include(x => x.RequestExpands)
                 .Include(x => x.RequestUpgrades)
@@ -1940,46 +1906,16 @@ public class AppointmentService : IAppointmentService
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
-            else if (requestExpand.RemovalStatus != RemovalStatus.Accepted)
+            else if (requestExpand.Status != RequestStatus.Accepted)
             {
                 validPrecondition = false;
                 result.ErrorMessage = RequestExpandErrorMessage.REMOVAL_NOT_ACCEPTED;
             }
 
-            List<Location> locations = null;
             if (validPrecondition)
             {
-                locations = requestExpand.RequestExpandLocations.Select(x => x.Location).ToList();
-                if (!locations.Any())
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "Request dont have target location";
-                }
-            }
-
-            var locationAssignments = new List<LocationAssignment>();
-            if (validPrecondition)
-            {
-                foreach (var location in locations)
-                {
-                    var locationAssignment = _dbContext.LocationAssignments.FirstOrDefault(x => x.LocationId == location.Id);
-                    if (locationAssignment == null)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
-                    }
-                    else
-                    {
-                        locationAssignments.Add(locationAssignment);
-                    }
-                }
-            }
-
-            if (validPrecondition)
-            {
-                _dbContext.LocationAssignments.RemoveRange(locationAssignments);
                 requestExpand.ServerAllocation.ServerLocation = null;
-                requestExpand.RemovalStatus = RemovalStatus.Success;
+                requestExpand.Status = RequestStatus.Success;
                 serverAllocation.Status = ServerAllocationStatus.Removed;
                 foreach (var appointment in serverAllocation.Appointments.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
                 {
@@ -2001,7 +1937,6 @@ public class AppointmentService : IAppointmentService
                 _dbContext.LocationAssignments.RemoveRange(serverAllocation.LocationAssignments);
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
             }
         }
         catch (Exception e)

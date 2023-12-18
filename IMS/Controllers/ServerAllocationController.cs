@@ -70,13 +70,13 @@ public class ServerAllocationController : ControllerBase
     }
 
 
-    [HttpGet("{id}/LocationAssignment")]
-    public async Task<ActionResult> GetLocationAssignment([FromRoute] int id)
-    {
-        var result = await _serverAllocationService.GetLocationAssignment(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/LocationAssignment")]
+    //public async Task<ActionResult> GetLocationAssignment([FromRoute] int id)
+    //{
+    //    var result = await _serverAllocationService.GetLocationAssignment(id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpGet("{id}/IpAddress")]
     public async Task<ActionResult> GetIpAddress([FromRoute] int id, [FromQuery] PagingParam<SimpleSortCriteria> paginationModel, [FromQuery] IpAddressSearchModel searchModel)

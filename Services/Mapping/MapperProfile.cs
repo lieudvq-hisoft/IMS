@@ -143,21 +143,14 @@ public class MapperProfile : Profile
                     dest.IsServer = src.LocationAssignments.FirstOrDefault()?.IsServer;
                 }
             });
-        CreateMap<LocationAssignment, LocationAssignmentModel>();
-        CreateMap<LocationAssignmentCreateModel, LocationAssignment>();
         #endregion
 
         #region User
         CreateMap<User, UserModel>()
             .ForMember(dest => dest.Positions, opt => opt.MapFrom(src => src.UserRoles.Select(x => x.Role.Name)));
-        CreateMap<AppointmentUser, AppointmentUserModel>();
-        CreateMap<RequestUpgradeUser, RequestUpgradeUserModel>();
-        CreateMap<RequestExpandUser, RequestExpandUserModel>();
-
         #endregion
 
         #region Appointment
-        CreateMap<RequestUpgradeAppointmentUpdateModel, RequestUpgradeAppointment>();
         CreateMap<RequestAppointmentCreateModel, RequestUpgradeAppointment>();
         CreateMap<RequestUpgradeAppointment, RequestUpgradeAppointmentModel>();
 
@@ -224,8 +217,7 @@ public class MapperProfile : Profile
             })
             .AfterMap((src, dest, context) =>
             {
-                bool forRemoval = src.RemovalStatus != null;
-                var completeAppointment = src.RequestExpandAppointments?.Where(x => x.ForRemoval == forRemoval).Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success);
+                var completeAppointment = src.RequestExpandAppointments?.Where(x => x.ForRemoval == src.ForRemoval).Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success);
                 if (completeAppointment != null)
                 {
                     dest.SucceededAppointment = context.Mapper.Map<Appointment, AppointmentResultModel>(completeAppointment);
@@ -281,10 +273,7 @@ public class MapperProfile : Profile
         CreateMap<RequestExpandUpdateModel, RequestExpand>();
 
         CreateMap<RequestExpandLocation, RequestExpandLocationModel>();
-        CreateMap<RequestExpandLocationCreateModel, RequestExpandLocation>();
-
         CreateMap<RequestExpandAppointment, RequestExpandAppointmentModel>();
-        CreateMap<RequestExpandAppointmentCreateModel, RequestExpandAppointment>();
         #endregion
 
         //#region CompanyType
@@ -318,8 +307,6 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.SubnetIds, opt => opt.MapFrom(src => src.SubNets.Select(x => x.Id)));
 
         CreateMap<IpAssignment, IpAssignmentModel>();
-        CreateMap<IpAssignmentCreateModel, IpAssignment>();
-        CreateMap<IpAssignmentUpdateModel, IpAssignment>();
         #endregion
 
         #region RequestHost
@@ -367,21 +354,15 @@ public class MapperProfile : Profile
             .AfterMap((src, dest, context) =>
                 dest.Descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description));
         CreateMap<RequestExpand, RequestExpandResultModel>();
-        CreateMap<RequestUpgradeUser, RequestUpgradeUserResultModel>();
-        CreateMap<RequestUpgradeAppointment, RequestUpgradeAppointmentResultModel>();
         CreateMap<RequestHost, RequestHostResultModel>();
-        CreateMap<RequestExpandLocation, RequestExpandLocationResultModel>();
-        CreateMap<RequestExpandAppointment, RequestExpandAppointmentResultModel>();
         CreateMap<Rack, RackResultModel>();
         CreateMap<Location, LocationResultModel>();
-        CreateMap<LocationAssignment, LocationAssignmentResultModel>();
         CreateMap<IpSubnet, IpSubnetResultModel>();
-        CreateMap<IpAssignment, IpAssignmentResultModel>();
+        CreateMap<IpAssignment, IpAssignmentModel>();
         CreateMap<IpAddress, IpAddressResultModel>();
         CreateMap<Customer, CustomerResultModel>();
         CreateMap<Component, ComponentResultModel>();
         CreateMap<Area, AreaResultModel>();
-        CreateMap<AppointmentUser, AppointmentUserResultModel>();
         CreateMap<Appointment, AppointmentResultModel>();
         #endregion
 

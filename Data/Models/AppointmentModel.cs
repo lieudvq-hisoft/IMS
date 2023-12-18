@@ -71,26 +71,22 @@ public class AppointmentCreateModel
 
     public List<int>? RequestUpgradeIds { get; set; }
 
-    public List<int>? RequestExpandIds { get; set; }
-    public List<int>? RequestRemovalIds { get; set; }
+    public int? RequestExpandId { get; set; }
+    //public List<int>? RequestRemovalIds { get; set; }
 }
 
 public class RequestAppointmentCreateModel
 {
     public List<int>? RequestUpgradeIds { get; set; }
 
-    public List<int>? RequestExpandIds { get; set; }
-
-    public List<int>? RequestRemovalIds { get; set; }
+    public int? RequestExpandId { get; set; }
 }
 
 public class RequestAppointmentCreateResultModel
 {
     public IEnumerable<object> RequestUpgradeAppointments { get; set; }
 
-    public IEnumerable<object> RequestExpandAppointments { get; set; }
-
-    public IEnumerable<object> RequestRemovealAppointments { get; set; }
+    public object RequestExpandAppointment { get; set; }
 }
 
 public class AppointmentCreateResultModel
@@ -99,9 +95,7 @@ public class AppointmentCreateResultModel
 
     public IEnumerable<object> RequestUpgradeAppointments { get; set; }
 
-    public IEnumerable<object> RequestExpandAppointments { get; set; }
-
-    public IEnumerable<object> RequestRemovalAppointments { get; set; }
+    public object RequestExpandAppointment { get; set; }
 }
 
 public class AppointmentUpdateModel

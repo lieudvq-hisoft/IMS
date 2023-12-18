@@ -17,10 +17,11 @@ public interface IRequestExpandService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetAppointment(int requestExpandId, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
+    Task<ResultModel> Create(RequestExpandCreateModel model);
     Task<ResultModel> Update(RequestExpandUpdateModel model);
     Task<ResultModel> Delete(int requestExpandId);
     Task<ResultModel> Reject(int requestExpandId, RequestExpandRejectModel modell);
-    Task<ResultModel> FailRemoval(int requestExpandId);
+    //Task<ResultModel> FailRemoval(int requestExpandId);
     Task<ResultModel> Accept(int requestExpandId, Guid userId);
     Task<ResultModel> Deny(int requestExpandId, Guid userId, DenyModel model);
     Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
@@ -143,59 +144,70 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
-    //public async Task<ResultModel> Create(RequestExpandCreateModel model)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
-    //    bool validPrecondition = true;
+    public async Task<ResultModel> Create(RequestExpandCreateModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
 
-    //    try
-    //    {
-    //        var serverAllocation = _dbContext.ServerAllocations
-    //            .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
-    //            .Include(x => x.LocationAssignments).ThenInclude(x => x.Location)
-    //            .FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
-    //        var requiredComponents = _dbContext.Components.Where(x => x.IsRequired);
-    //        if (serverAllocation == null)
-    //        {
-    //            validPrecondition = false;
-    //            result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-    //        }
-    //        else if (serverAllocation.LocationAssignments.Any())
-    //        {
-    //            validPrecondition = false;
-    //            result.ErrorMessage = LocationAssignmentErrorMessage.EXISTED;
-    //        }
-    //        else
-    //        {
-    //            foreach (var component in requiredComponents)
-    //            {
-    //                if (serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == component.Id) == null)
-    //                {
-    //                    validPrecondition = false;
-    //                    result.ErrorMessage = "Cannot allocate server missing config for required component";
-    //                }
-    //            }
-    //        }
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations
+                .Include(x => x.RequestExpands)
+                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location)
+                .FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
+            var requiredComponents = _dbContext.Components.Where(x => x.IsRequired);
+            if (serverAllocation == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else if (serverAllocation.RequestExpands.Any(x => x.ForRemoval == model.ForRemoval && x.Status == RequestStatus.Accepted || x.Status == RequestStatus.Waiting))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = RequestExpandErrorMessage.EXISTED;
+            }
+            else if (!model.ForRemoval && serverAllocation.LocationAssignments.Any())
+            {
+                validPrecondition = false;
+                result.ErrorMessage = LocationAssignmentErrorMessage.EXISTED;
+            }
+            else if (model.ForRemoval && !serverAllocation.LocationAssignments.Any())
+            {
+                validPrecondition = false;
+                result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                foreach (var component in requiredComponents)
+                {
+                    if (serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == component.Id) == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "Cannot allocate server missing config for required component";
+                    }
+                }
+            }
 
-    //        if (validPrecondition)
-    //        {
-    //            var requestExpand = _mapper.Map<RequestExpand>(model);
-    //            requestExpand.Status = RequestStatus.Waiting;
-    //            _dbContext.RequestExpands.Add(requestExpand);
-    //            _dbContext.SaveChanges();
+            if (validPrecondition)
+            {
+                var requestExpand = _mapper.Map<RequestExpand>(model);
+                requestExpand.Status = RequestStatus.Waiting;
+                _dbContext.RequestExpands.Add(requestExpand);
+                _dbContext.SaveChanges();
 
-    //            result.Succeed = true;
-    //            result.Data = _mapper.Map<RequestExpandResultModel>(requestExpand);
-    //        }
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
+                result.Succeed = true;
+                result.Data = _mapper.Map<RequestExpandResultModel>(requestExpand);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
 
-    //    return result;
-    //}
+        return result;
+    }
 
     public async Task<ResultModel> Update(RequestExpandUpdateModel model)
     {
@@ -341,56 +353,56 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
-    public async Task<ResultModel> FailRemoval(int requestExpandId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> FailRemoval(int requestExpandId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var requestExpand = _dbContext.RequestExpands.Include(x => x.ServerAllocation).Include(x => x.RequestExpandAppointments).FirstOrDefault(x => x.Id == requestExpandId);
-            if (requestExpand == null)
-            {
-                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
-            }
-            else if (requestExpand.Status != RequestStatus.Success)
-            {
-                result.ErrorMessage = RequestExpandErrorMessage.NOT_SUCCESS;
-            }
-            else if (requestExpand.RemovalStatus != RemovalStatus.Accepted)
-            {
-                result.ErrorMessage = RequestExpandErrorMessage.REMOVAL_NOT_ACCEPTED;
-            }
-            else
-            {
-                requestExpand.RemovalStatus = RemovalStatus.Failed;
-                _dbContext.RequestExpandAppointments.RemoveRange(requestExpand.RequestExpandAppointments);
+    //    try
+    //    {
+    //        var requestExpand = _dbContext.RequestExpands.Include(x => x.ServerAllocation).Include(x => x.RequestExpandAppointments).FirstOrDefault(x => x.Id == requestExpandId);
+    //        if (requestExpand == null)
+    //        {
+    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+    //        }
+    //        else if (requestExpand.Status != RequestStatus.Success)
+    //        {
+    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_SUCCESS;
+    //        }
+    //        else if (requestExpand.RemovalStatus != RemovalStatus.Accepted)
+    //        {
+    //            result.ErrorMessage = RequestExpandErrorMessage.REMOVAL_NOT_ACCEPTED;
+    //        }
+    //        else
+    //        {
+    //            requestExpand.RemovalStatus = RemovalStatus.Failed;
+    //            _dbContext.RequestExpandAppointments.RemoveRange(requestExpand.RequestExpandAppointments);
 
-                var reuqestHostModelString = JsonSerializer.Serialize(_mapper.Map<RequestExpandResultModel>(requestExpand));
-                await _notiService.Add(new NotificationCreateModel
-                {
-                    UserId = requestExpand.ServerAllocation.CustomerId,
-                    Action = "Failed",
-                    Title = "Allocation removal request failed",
-                    Body = "There's an allocation removal request just failed",
-                    Data = new NotificationData
-                    {
-                        Key = "RequestExpand",
-                        Value = reuqestHostModelString
-                    }
-                });
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = requestExpand.Id;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //            var reuqestHostModelString = JsonSerializer.Serialize(_mapper.Map<RequestExpandResultModel>(requestExpand));
+    //            await _notiService.Add(new NotificationCreateModel
+    //            {
+    //                UserId = requestExpand.ServerAllocation.CustomerId,
+    //                Action = "Failed",
+    //                Title = "Allocation removal request failed",
+    //                Body = "There's an allocation removal request just failed",
+    //                Data = new NotificationData
+    //                {
+    //                    Key = "RequestExpand",
+    //                    Value = reuqestHostModelString
+    //                }
+    //            });
+    //            _dbContext.SaveChanges();
+    //            result.Succeed = true;
+    //            result.Data = requestExpand.Id;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> Accept(int requestExpandId, Guid userId)
     {
@@ -428,6 +440,10 @@ public class RequestExpandService : IRequestExpandService
                     RequestExpandId = requestExpand.Id,
                     UserId = userId
                 });
+                if (requestExpand.ForRemoval)
+                {
+                    requestExpand.ServerAllocation.Status = ServerAllocationStatus.Pausing;
+                }
                 _dbContext.SaveChanges();
 
                 var requestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestExpandResultModel>(requestExpand));
@@ -443,6 +459,22 @@ public class RequestExpandService : IRequestExpandService
                         Value = requestExpandModelString
                     }
                 });
+                if (requestExpand.ForRemoval)
+                {
+                    var serverModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(requestExpand.ServerAllocation));
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = requestExpand.ServerAllocation.CustomerId,
+                        Action = "Paused",
+                        Title = "Server paused",
+                        Body = "There's an server just paused",
+                        Data = new NotificationData
+                        {
+                            Key = "ServerAllocation",
+                            Value = serverModelString
+                        }
+                    });
+                }
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestHostModel>(requestExpand);
             }
@@ -463,7 +495,10 @@ public class RequestExpandService : IRequestExpandService
 
         try
         {
-            var requestExpand = _dbContext.RequestExpands.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == requestExpandId);
+            var requestExpand = _dbContext.RequestExpands
+                .Include(x => x.RequestExpandAppointments)
+                .Include(x => x.ServerAllocation)
+                .FirstOrDefault(x => x.Id == requestExpandId);
             if (requestExpand == null)
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
@@ -486,6 +521,7 @@ public class RequestExpandService : IRequestExpandService
             {
                 requestExpand.Status = RequestStatus.Denied;
                 requestExpand.SaleNote = model.SaleNote;
+                _dbContext.RequestExpandAppointments.RemoveRange(requestExpand.RequestExpandAppointments);
                 _dbContext.RequestExpandUsers.Add(new RequestExpandUser
                 {
                     Action = RequestUserAction.Evaluate,
@@ -565,6 +601,11 @@ public class RequestExpandService : IRequestExpandService
             {
                 validPrecondition = false;
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+            }
+            else if (requestExpand.ForRemoval)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Cannot assign location to removing server request";
             }
             else
             {

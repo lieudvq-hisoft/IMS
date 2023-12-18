@@ -55,3 +55,14 @@ public class IpAddressSearchModel
     public bool? IsBlocked { get; set; }
     public bool? IsReserved { get; set; }
 }
+
+public class IpAssignmentModel
+{
+    public int Id { get; set; }
+    public DateTime DateAssign { get; set; }
+    public DateTime? DateUnassign { get; set; }
+    public IpAssignmentTypes Type { get; set; }
+    public int? Capacity { get; set; }
+    public int IpAddressId { get; set; }
+    public int ServerAllocationId { get; set; }
+}

@@ -5,7 +5,7 @@ namespace Data.Entities;
 public class RequestExpand : BaseEntity
 {
     public RequestStatus Status { get; set; }
-    public RemovalStatus? RemovalStatus { get; set; }
+    public bool ForRemoval { get; set; }
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }

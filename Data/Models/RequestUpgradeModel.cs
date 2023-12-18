@@ -104,3 +104,11 @@ public class RequestUpgradeSearchModel
     public int? ServerAllocationId { get; set; }
     public List<RequestStatus?>? Statuses { get; set; }
 }
+
+public class RequestUpgradeAppointmentModel
+{
+    public int Id { get; set; }
+    public int AppointmentId { get; set; }
+    public int RequestUpgradeId { get; set; }
+}
+

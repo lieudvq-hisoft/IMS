@@ -14,8 +14,8 @@ public interface ILocationService
 {
     Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, LocationSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> GetRequestExpandLocation(int id);
-    Task<ResultModel> GetLocationAssignment(int id);
+    //Task<ResultModel> GetRequestExpandLocation(int id);
+    //Task<ResultModel> GetLocationAssignment(int id);
     Task<ResultModel> ReservceLocation(LocationReserveModel model);
     Task<ResultModel> UnreservceLocation(LocationReserveModel model);
 }
@@ -86,63 +86,63 @@ public class LocationService : ILocationService
         return result;
     }
 
-    public async Task<ResultModel> GetRequestExpandLocation(int id)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetRequestExpandLocation(int id)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var location = _dbContext.Locations
-                .Include(x => x.RequestExpandLocations)
-                .FirstOrDefault(x => x.Id == id);
+    //    try
+    //    {
+    //        var location = _dbContext.Locations
+    //            .Include(x => x.RequestExpandLocations)
+    //            .FirstOrDefault(x => x.Id == id);
 
-            if (location != null)
-            {
-                result.Succeed = true;
-                result.Data = _mapper.Map<List<RequestExpandLocationModel>>(location.RequestExpandLocations);
-            }
-            else
-            {
-                result.ErrorMessage = LocationErrorMessgae.NOT_EXISTED;
-                result.Succeed = false;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //        if (location != null)
+    //        {
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<List<RequestExpandLocationModel>>(location.RequestExpandLocations);
+    //        }
+    //        else
+    //        {
+    //            result.ErrorMessage = LocationErrorMessgae.NOT_EXISTED;
+    //            result.Succeed = false;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
-    public async Task<ResultModel> GetLocationAssignment(int id)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetLocationAssignment(int id)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var location = _dbContext.Locations
-                .Include(x => x.LocationAssignments)
-                .FirstOrDefault(x => x.Id == id);
+    //    try
+    //    {
+    //        var location = _dbContext.Locations
+    //            .Include(x => x.LocationAssignments)
+    //            .FirstOrDefault(x => x.Id == id);
 
-            if (location != null)
-            {
-                result.Succeed = true;
-                result.Data = _mapper.Map<List<LocationAssignmentModel>>(location.LocationAssignments);
-            }
-            else
-            {
-                result.ErrorMessage = LocationErrorMessgae.NOT_EXISTED;
-                result.Succeed = false;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //        if (location != null)
+    //        {
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<List<LocationAssignmentModel>>(location.LocationAssignments);
+    //        }
+    //        else
+    //        {
+    //            result.ErrorMessage = LocationErrorMessgae.NOT_EXISTED;
+    //            result.Succeed = false;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> ReservceLocation(LocationReserveModel model)
     {

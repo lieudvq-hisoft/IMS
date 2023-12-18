@@ -909,7 +909,7 @@ public class RequestHostService : IRequestHostService
                         }
                     });
                     result.Succeed = true;
-                    result.Data = _mapper.Map<List<IpAssignmentResultModel>>(ipAssignments);
+                    result.Data = _mapper.Map<List<IpAssignmentModel>>(ipAssignments);
                 }
             }
         }
@@ -1040,7 +1040,7 @@ public class RequestHostService : IRequestHostService
                         }
                     });
                     result.Succeed = true;
-                    result.Data = _mapper.Map<List<IpAssignmentResultModel>>(ipAssignments);
+                    result.Data = _mapper.Map<List<IpAssignmentModel>>(ipAssignments);
                 }
             }
         }

@@ -43,11 +43,6 @@ public class DenyModel
     public string SaleNote { get; set; }
 }
 
-public class UserRoleModel
-{
-    public RoleModel role { get; set; }
-}
-
 public class UserCreateModel
 {
     [Required]
@@ -105,16 +100,6 @@ public class UserUpdateModel
     public string PhoneNumber { get; set; }
 }
 
-public class UserAssignRoleModel
-{
-    [Required]
-    public Guid Id { get; set; }
-
-    [Required]
-    [EnsureMinimumElements]
-    public List<string> Roles { get; set; }
-}
-
 public class LoginModel
 {
     [Required]
@@ -122,13 +107,6 @@ public class LoginModel
 
     [Required]
     public string Password { get; set; }
-}
-
-public class AssignRoleModel
-{
-    public Guid UserId { get; set; }
-    public Guid RoleId { get; set; }
-    public bool isAssign { get; set; }
 }
 
 public class UserSearchModel
