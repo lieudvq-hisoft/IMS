@@ -12,13 +12,14 @@ public class MapperProfile : Profile
     {
         #region Customer
         CreateMap<Customer, CustomerModel>()
-            .AfterMap((src, dest) =>
-            {
-                if (src.Contact != null)
-                {
-                    dest.Contacts = JsonSerializer.Deserialize<List<ContactModel>>(src.Contact);
-                }
-            });
+            //.AfterMap((src, dest) =>
+            //{
+            //    if (src.Contact != null)
+            //    {
+            //        dest.Contacts = JsonSerializer.Deserialize<List<ContactModel>>(src.Contact);
+            //    }
+            //})
+            ;
         CreateMap<CustomerCreateModel, Customer>()
             .AfterMap((src, dest) =>
                 dest.Contact = JsonSerializer.Serialize(src.Contacts));
@@ -372,13 +373,14 @@ public class MapperProfile : Profile
         CreateMap<IpAssignment, IpAssignmentModel>();
         CreateMap<IpAddress, IpAddressResultModel>();
         CreateMap<Customer, CustomerResultModel>()
-            .AfterMap((src, dest) => 
-            {
-                if (src.Contact != null)
-                {
-                    dest.Contacts = JsonSerializer.Deserialize<List<ContactModel>>(src.Contact);
-                }
-            });
+            //.AfterMap((src, dest) => 
+            //{
+            //    if (src.Contact != null)
+            //    {
+            //        dest.Contacts = JsonSerializer.Deserialize<List<ContactModel>>(src.Contact);
+            //    }
+            //})
+            ;
         CreateMap<Component, ComponentResultModel>();
         CreateMap<Area, AreaResultModel>();
         CreateMap<Appointment, AppointmentResultModel>();
