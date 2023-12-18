@@ -372,7 +372,7 @@ public class MapperProfile : Profile
         CreateMap<IpAssignment, IpAssignmentModel>();
         CreateMap<IpAddress, IpAddressResultModel>();
         CreateMap<Customer, CustomerResultModel>()
-            .AfterMap((src, dest) =>
+            .AfterMap((src, dest) => 
             {
                 if (src.Contact != null)
                 {
