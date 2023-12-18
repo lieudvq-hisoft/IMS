@@ -1110,7 +1110,7 @@ public class AppointmentService : IAppointmentService
                 var requestExpandResult = new ResultModel();
                 if (appointment.RequestExpandAppointments.Any())
                 {
-                    var requestExpand = appointment.RequestExpandAppointments.FirstOrDefault(x => !x.ForRemoval).RequestExpand;
+                    var requestExpand = appointment.RequestExpandAppointments.FirstOrDefault().RequestExpand;
 
                     if (!requestExpand.ForRemoval)
                     {

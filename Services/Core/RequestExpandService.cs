@@ -194,9 +194,32 @@ public class RequestExpandService : IRequestExpandService
             {
                 var requestExpand = _mapper.Map<RequestExpand>(model);
                 requestExpand.Status = RequestStatus.Waiting;
+                if (requestExpand.ForRemoval)
+                {
+                    requestExpand.RequestType = RequestType.RemoveLocation;
+                }
                 _dbContext.RequestExpands.Add(requestExpand);
                 _dbContext.SaveChanges();
 
+                var sales = _dbContext.Users
+                    .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                    .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
+                var requestExpandModelString = JsonSerializer.Serialize(_mapper.Map<RequestExpandResultModel>(requestExpand));
+                foreach (var sale in sales)
+                {
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = sale.Id,
+                        Action = "Created",
+                        Title = $"New server {(requestExpand.ForRemoval ? "remove" : "allocate")} request",
+                        Body = $"There's a new server {(requestExpand.ForRemoval ? "remove" : "allocate")} request just created",
+                        Data = new NotificationData
+                        {
+                            Key = "RequestExpand",
+                            Value = requestExpandModelString
+                        }
+                    });
+                }
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestExpandResultModel>(requestExpand);
             }
