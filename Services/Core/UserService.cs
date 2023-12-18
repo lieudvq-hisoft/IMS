@@ -35,8 +35,8 @@ public interface IUserService
     Task<ResultModel> BindFcmtoken(BindFcmtokenModel model, Guid userId);
     Task<ResultModel> DeleteFcmToken(string fcmToken, Guid userId);
     Task<ResultModel> SeenCurrenNoticeCount(Guid userId);
-    Task<ResultModel> UnassignRole(UserAssignRoleModel model, Guid userId);
-    Task<ResultModel> AssignRole(UserAssignRoleModel model, Guid userId);
+    //Task<ResultModel> UnassignRole(UserAssignRoleModel model, Guid userId);
+    //Task<ResultModel> AssignRole(UserAssignRoleModel model, Guid userId);
 }
 public class UserService : IUserService
 {
@@ -210,7 +210,7 @@ public class UserService : IUserService
             if (validPrecondition)
             {
                 // Not able to create a customer
-                if (model.Roles.Exists(x => x == "Customer"))
+                if (model.Role == "Customer")
                 {
                     result.ErrorMessage = UserErrorMessage.CREATE_CUSTOMER;
                     validPrecondition = false;
@@ -220,18 +220,16 @@ public class UserService : IUserService
             var roles = new List<Role>();
             if (validPrecondition)
             {
-                foreach (string roleName in model.Roles)
+
+                var role = await _dbContext.Role.FirstOrDefaultAsync(r => r.Name == model.Role);
+                if (role == null)
                 {
-                    var role = await _dbContext.Role.FirstOrDefaultAsync(r => r.Name == roleName);
-                    if (role == null)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = "Role not exist";
-                    }
-                    else
-                    {
-                        roles.Add(role);
-                    }
+                    validPrecondition = false;
+                    result.ErrorMessage = "Role not exist";
+                }
+                else
+                {
+                    roles.Add(role);
                 }
             }
 
@@ -321,124 +319,124 @@ public class UserService : IUserService
         return result;
     }
 
-    public async Task<ResultModel> AssignRole(UserAssignRoleModel model, Guid userId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> AssignRole(UserAssignRoleModel model, Guid userId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
+    //    try
+    //    {
 
-            var user = _dbContext.User.Include(x => x.UserRoles).ThenInclude(x => x.Role).FirstOrDefault(x => x.Id == model.Id);
-            if (userId == model.Id)
-            {
-                result.ErrorMessage = "Cannot change your positions";
-            }
-            else if (user == null)
-            {
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var roles = new List<Role>();
-                foreach (string role in model.Roles)
-                {
-                    roles.Add(await _dbContext.Role.FirstOrDefaultAsync(r => r.Name == role));
-                }
-                if (roles.Count() < model.Roles.Count)
-                {
-                    result.ErrorMessage = "Role not exist";
-                }
-                else if (roles.Any(x => user.UserRoles.Select(x => x.Role.Name).Contains(x.Name)))
-                {
-                    result.ErrorMessage = "User have role already";
-                }
-                else
-                {
-                    foreach (Role role in roles)
-                    {
-                        var userRole = new UserRole
-                        {
-                            RoleId = role.Id,
-                            UserId = user.Id
-                        };
-                        _dbContext.UserRole.Add(userRole);
-                    }
-                    _dbContext.SaveChanges();
-                    result.Succeed = true;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //        var user = _dbContext.User.Include(x => x.UserRoles).ThenInclude(x => x.Role).FirstOrDefault(x => x.Id == model.Id);
+    //        if (userId == model.Id)
+    //        {
+    //            result.ErrorMessage = "Cannot change your positions";
+    //        }
+    //        else if (user == null)
+    //        {
+    //            result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+    //        }
+    //        else
+    //        {
+    //            var roles = new List<Role>();
+    //            foreach (string role in model.Roles)
+    //            {
+    //                roles.Add(await _dbContext.Role.FirstOrDefaultAsync(r => r.Name == role));
+    //            }
+    //            if (roles.Count() < model.Roles.Count)
+    //            {
+    //                result.ErrorMessage = "Role not exist";
+    //            }
+    //            else if (roles.Any(x => user.UserRoles.Select(x => x.Role.Name).Contains(x.Name)))
+    //            {
+    //                result.ErrorMessage = "User have role already";
+    //            }
+    //            else
+    //            {
+    //                foreach (Role role in roles)
+    //                {
+    //                    var userRole = new UserRole
+    //                    {
+    //                        RoleId = role.Id,
+    //                        UserId = user.Id
+    //                    };
+    //                    _dbContext.UserRole.Add(userRole);
+    //                }
+    //                _dbContext.SaveChanges();
+    //                result.Succeed = true;
+    //            }
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
-    public async Task<ResultModel> UnassignRole(UserAssignRoleModel model, Guid userId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> UnassignRole(UserAssignRoleModel model, Guid userId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var user = _dbContext.User
-                .Include(x => x.UserRoles).ThenInclude(x => x.Role)
-                .Include(x => x.RequestHostUsers).ThenInclude(x => x.RequestHost)
-                .Include(x => x.AppointmentUsers).ThenInclude(x => x.Appointment)
-                .FirstOrDefault(x => x.Id == model.Id);
-            if (userId == model.Id)
-            {
-                result.ErrorMessage = "Cannot change your positions";
-            }
-            else if (user == null)
-            {
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var roles = new List<Role>();
-                foreach (string role in model.Roles)
-                {
-                    roles.Add(await _dbContext.Role.FirstOrDefaultAsync(r => r.Name == role));
-                }
-                if (roles.Count() < model.Roles.Count)
-                {
-                    result.ErrorMessage = "Role not exist";
-                }
-                else if (!roles.Any(x => user.UserRoles.Select(x => x.Role.Name).Contains(x.Name)))
-                {
-                    result.ErrorMessage = "User dont have role";
-                }
-                else if (user.RequestHostUsers.Where(x => x.Action == RequestUserAction.Execute).Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Accepted))
-                {
-                    result.ErrorMessage = "User assign to request host";
-                }
-                else if (user.AppointmentUsers.Where(x => x.Action == RequestUserAction.Execute).Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Accepted))
-                {
-                    result.ErrorMessage = "User assign to appointment";
-                }
-                else
-                {
-                    foreach (Role role in roles)
-                    {
-                        var userRole = _dbContext.UserRoles.FirstOrDefault(x => x.UserId == user.Id && x.RoleId == role.Id);
-                        _dbContext.UserRole.Remove(userRole);
-                    }
-                    _dbContext.SaveChanges();
-                    result.Succeed = true;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //    try
+    //    {
+    //        var user = _dbContext.User
+    //            .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+    //            .Include(x => x.RequestHostUsers).ThenInclude(x => x.RequestHost)
+    //            .Include(x => x.AppointmentUsers).ThenInclude(x => x.Appointment)
+    //            .FirstOrDefault(x => x.Id == model.Id);
+    //        if (userId == model.Id)
+    //        {
+    //            result.ErrorMessage = "Cannot change your positions";
+    //        }
+    //        else if (user == null)
+    //        {
+    //            result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+    //        }
+    //        else
+    //        {
+    //            var roles = new List<Role>();
+    //            foreach (string role in model.Roles)
+    //            {
+    //                roles.Add(await _dbContext.Role.FirstOrDefaultAsync(r => r.Name == role));
+    //            }
+    //            if (roles.Count() < model.Roles.Count)
+    //            {
+    //                result.ErrorMessage = "Role not exist";
+    //            }
+    //            else if (!roles.Any(x => user.UserRoles.Select(x => x.Role.Name).Contains(x.Name)))
+    //            {
+    //                result.ErrorMessage = "User dont have role";
+    //            }
+    //            else if (user.RequestHostUsers.Where(x => x.Action == RequestUserAction.Execute).Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Accepted))
+    //            {
+    //                result.ErrorMessage = "User assign to request host";
+    //            }
+    //            else if (user.AppointmentUsers.Where(x => x.Action == RequestUserAction.Execute).Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Accepted))
+    //            {
+    //                result.ErrorMessage = "User assign to appointment";
+    //            }
+    //            else
+    //            {
+    //                foreach (Role role in roles)
+    //                {
+    //                    var userRole = _dbContext.UserRoles.FirstOrDefault(x => x.UserId == user.Id && x.RoleId == role.Id);
+    //                    _dbContext.UserRole.Remove(userRole);
+    //                }
+    //                _dbContext.SaveChanges();
+    //                result.Succeed = true;
+    //            }
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> Delete(Guid id)
     {
