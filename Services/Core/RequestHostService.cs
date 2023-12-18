@@ -186,6 +186,10 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.HAVE_IP_MASTER_ALREADY;
             }
+            else if (model.Capacities.Count != model.Quantity)
+            {
+                result.ErrorMessage = "Capacities count must match quantity";
+            }
             else if (serverAllocation.Status != ServerAllocationStatus.Working)
             {
                 result.ErrorMessage = "Server need to be working";
@@ -692,17 +696,6 @@ public class RequestHostService : IRequestHostService
                         IpAddressId = ipAddressId,
                         RequestHostId = requestHost.Id,
                     };
-                    if (requestHost.Type == IpAssignmentTypes.Port)
-                    {
-                        if (requestHost.Capacity != null)
-                        {
-                            requestHostIps.Capacity = requestHost.Capacity.Value;
-                        }
-                        else
-                        {
-                            requestHost.Capacity = int.Parse(_config[$"DefaultPortCapacity"]);
-                        }
-                    }
                     requestHostIps.Add(requestHostIp);
                 }
                 _dbContext.RequestHostIps.RemoveRange(requestHost.RequestHostIps);
@@ -856,7 +849,7 @@ public class RequestHostService : IRequestHostService
             }
             else
             {
-                var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress);
+                var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress).ToList();
                 var ipAssignments = new List<IpAssignment>();
                 foreach (var ipAddress in ipAddresses)
                 {
@@ -865,7 +858,7 @@ public class RequestHostService : IRequestHostService
                         ipAssignments.Add(new IpAssignment
                         {
                             IpAddressId = ipAddress.Id,
-                            Capacity = requestHost.Capacity,
+                            Capacity = requestHost.Capacities != null ? requestHost.Capacities[ipAddresses.IndexOf(ipAddress)] : null,
                             ServerAllocationId = requestHost.ServerAllocationId,
                             Type = requestHost.Type
                         });
@@ -1007,7 +1000,7 @@ public class RequestHostService : IRequestHostService
                 foreach (var ipAddress in ipAddresses)
                 {
                     var ipAssignment = _dbContext.IpAssignments.FirstOrDefault(x => x.IpAddressId == ipAddress.Id && x.ServerAllocationId == requestHost.ServerAllocationId && x.Type == IpAssignmentTypes.Port);
-                    ipAssignment.Capacity += requestHost.Capacity;
+                    ipAssignment.Capacity += requestHost.UpgradeCapacity;
                     ipAssignments.Add(ipAssignment);
                 }
                 requestHost.Status = RequestHostStatus.Success;
