@@ -14,8 +14,12 @@ public class MapperProfile : Profile
         CreateMap<Customer, CustomerModel>()
             .AfterMap((src, dest) =>
                 dest.Contacts = JsonSerializer.Deserialize<List<ContactModel>>(src.Contact));
-        CreateMap<CustomerCreateModel, Customer>();
-        CreateMap<CustomerUpdateModel, Customer>();
+        CreateMap<CustomerCreateModel, Customer>()
+            .AfterMap((src, dest) =>
+                dest.Contact = JsonSerializer.Serialize(src.Contacts));
+        CreateMap<CustomerUpdateModel, Customer>()
+            .AfterMap((src, dest) =>
+                dest.Contact = JsonSerializer.Serialize(src.Contacts));
         CreateMap<User, UserModel>();
         #endregion
 
