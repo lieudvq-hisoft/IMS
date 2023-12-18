@@ -867,7 +867,7 @@ public class RequestHostService : IRequestHostService
                         ipAssignments.Add(new IpAssignment
                         {
                             IpAddressId = ipAddress.Id,
-                            Capacity = requestHost.Capacities != null ? requestHost.Capacities[ipAddresses.IndexOf(ipAddress)] : null,
+                            Capacity = requestHost.Capacities.Any() ? requestHost.Capacities[ipAddresses.IndexOf(ipAddress)] : null,
                             ServerAllocationId = requestHost.ServerAllocationId,
                             Type = requestHost.Type
                         });
