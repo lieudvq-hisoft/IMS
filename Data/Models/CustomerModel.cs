@@ -4,12 +4,14 @@ namespace Data.Models;
 public class CustomerModel
 {
     public Guid Id { get; set; }
+    public string? Representator { get; set; }
     public string? CompanyName { get; set; }
     public string? Address { get; set; }
     public string? TaxNumber { get; set; }
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
     public bool IsDeleted { get; set; }
+    public List<ContactModel>? Contacts { get; set; }
     public int CurrenNoticeCount { get; set; }
     public List<string>? FcmTokens { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
@@ -19,17 +21,36 @@ public class CustomerModel
 public class CustomerResultModel
 {
     public Guid Id { get; set; }
+    public string? Representator { get; set; }
     public string? CompanyName { get; set; }
     public string? Address { get; set; }
     public string? TaxNumber { get; set; }
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
+    public List<ContactModel>? Contacts { get; set; }
     public int CurrenNoticeCount { get; set; }
     public List<string>? FcmTokens { get; set; }
 }
 
+public class ContactModel
+{
+    [Required]
+    public string? Name { get; set; }
+
+    public string? Position { get; set; }
+
+    [RegularExpression(@"^\d{10}$", ErrorMessage = "Phone number must be a string of 10 number")]
+    public string? PhoneNumber { get; set; }
+
+    [EmailAddress]
+    public string? Email { get; set; }
+}
+
 public class CustomerCreateModel
 {
+    [Required]
+    public string Representator { get; set; }
+
     [Required]
     public string CompanyName { get; set; }
 
@@ -48,14 +69,16 @@ public class CustomerCreateModel
     [RegularExpression(@"^\d{10}$", ErrorMessage = "Phone number must be a string of 10 number")]
     public string PhoneNumber { get; set; }
 
-    //[Required]
-    //public int CompanyTypeId { get; set; }
+    public List<ContactModel>? Contacts { get; set; }
 }
 
 public class CustomerUpdateModel
 {
     [Required]
     public string Id { get; set; }
+
+    [Required]
+    public string Representator { get; set; }
 
     [Required]
     public string CompanyName { get; set; }
@@ -75,8 +98,7 @@ public class CustomerUpdateModel
     [Phone]
     public string PhoneNumber { get; set; }
 
-    //[Required]
-    //public int CompanyTypeId { get; set; }
+    public List<ContactModel>? Contacts { get; set; }
 }
 
 public class CustomerChangePasswordModel

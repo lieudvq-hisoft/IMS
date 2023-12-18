@@ -1797,9 +1797,13 @@ public class AppointmentService : IAppointmentService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
-            else if (requestExpand.Status == RequestStatus.Accepted && serverAllocation.Status != ServerAllocationStatus.Waiting)
+            else if (!requestExpand.ForRemoval && serverAllocation.Status != ServerAllocationStatus.Waiting)
             {
-                result.ErrorMessage = "Server need to be waiting";
+                result.ErrorMessage = "Server need to be waiting for allocation";
+            }
+            else if (requestExpand.ForRemoval && serverAllocation.Status != ServerAllocationStatus.Pausing)
+            {
+                result.ErrorMessage = "Server need to be pausing to be remove";
             }
             else if (!serverAllocation.LocationAssignments.Any())
             {

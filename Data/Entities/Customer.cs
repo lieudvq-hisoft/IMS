@@ -12,6 +12,8 @@ public class Customer
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
     public bool IsDeleted { get; set; }
+    public string Representator { get; set; }
+    public string? Contact { get; set; }
     public string Password { get; set; }
     public string CompanyName { get; set; }
     public string Address { get; set; }
