@@ -16,6 +16,11 @@ public class EnsureMinimumElementsAttribute : ValidationAttribute
 
     public override bool IsValid(object value)
     {
+        if (value == null)
+        {
+            return true;
+        }
+
         if (!(value is IList list))
             return false;
 
