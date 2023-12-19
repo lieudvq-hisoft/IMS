@@ -1080,19 +1080,20 @@ public class RequestHostService : IRequestHostService
             else
             {
                 File.Copy(inputPath, outputPath, true);
+                var customer = serverAllocation.Customer;
                 using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
                 {
                     var now = DateTime.UtcNow;
                     TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
                     document.RenderText("__Date__", $"{now.Day:dd}/{now.Month:MM}/{now.Year}");
 
-                    document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
+                    document.RenderText("__Number__", textInfo.ToTitleCase(customer.ContractNumber));
 
-                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
+                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(customer.Representator));
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
 
-                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
+                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(customer.RepresentatorPosition));
 
                     document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
 
