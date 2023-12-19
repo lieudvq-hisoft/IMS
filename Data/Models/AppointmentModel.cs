@@ -55,6 +55,7 @@ public class AppointmentCreateModel
     public string AppointedCustomer { get; set; }
 
     [Required]
+    [OfficialTime]
     public DateTime DateAppointed { get; set; }
 
     [Required]
@@ -106,6 +107,7 @@ public class AppointmentUpdateModel
     public int Id { get; set; }
 
     [Required]
+    [OfficialTime]
     public DateTime DateAppointed { get; set; }
 
     [Required]
