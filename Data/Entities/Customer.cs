@@ -13,6 +13,7 @@ public class Customer
     public DateTime DateUpdated { get; set; } = DateTime.Now;
     public bool IsDeleted { get; set; }
     public string Representator { get; set; }
+    public string RepresentatorPosition { get; set; }
     public string? Contact { get; set; }
     public string Password { get; set; }
     public string CompanyName { get; set; }

@@ -5,6 +5,7 @@ public class CustomerModel
 {
     public Guid Id { get; set; }
     public string? Representator { get; set; }
+    public string? RepresentatorPosition { get; set; }
     public string? CompanyName { get; set; }
     public string? Address { get; set; }
     public string? TaxNumber { get; set; }
@@ -22,6 +23,7 @@ public class CustomerResultModel
 {
     public Guid Id { get; set; }
     public string? Representator { get; set; }
+    public string? RepresentatorPosition { get; set; }
     public string? CompanyName { get; set; }
     public string? Address { get; set; }
     public string? TaxNumber { get; set; }
@@ -52,6 +54,9 @@ public class CustomerCreateModel
     public string Representator { get; set; }
 
     [Required]
+    public string RepresentatorPosition { get; set; }
+
+    [Required]
     public string CompanyName { get; set; }
 
     [Required]
@@ -79,6 +84,9 @@ public class CustomerUpdateModel
 
     [Required]
     public string Representator { get; set; }
+
+    [Required]
+    public string RepresentatorPosition { get; set; }
 
     [Required]
     public string CompanyName { get; set; }

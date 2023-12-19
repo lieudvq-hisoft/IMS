@@ -379,6 +379,7 @@ public class CustomerService : ICustomerService
             Expires_in = int.Parse(_config["Jwt:ExpireTimes"]) * 60,
             UserID = customer.Id.ToString(),
             PhoneNumber = customer.PhoneNumber,
+            Roles = new List<string>() { "Customer" }
         };
     }
 
