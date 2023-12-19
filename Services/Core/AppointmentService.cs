@@ -259,6 +259,48 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
+                RequestExpand requestExpand = null;
+                if (model.RequestExpandId != null)
+                {
+                    requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == model.RequestExpandId.Value);
+                    if (requestExpand == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+                    }
+                }
+
+                if (validPrecondition)
+                {
+                    switch (model.Reason)
+                    {
+                        case AppointmentReason.Install:
+                            if (requestExpand.ForRemoval)
+                            {
+                                validPrecondition = false;
+                                result.ErrorMessage = "Cannot create install appointment for uninstall appointment";
+                            }
+                            break;
+                        case AppointmentReason.Uninstall:
+                            if (!requestExpand.ForRemoval)
+                            {
+                                validPrecondition = false;
+                                result.ErrorMessage = "Cannot create uninstall appointment for install appointment";
+                            }
+                            break;
+                        case AppointmentReason.Upgrade:
+                            if (model.RequestUpgradeIds.Any())
+                            {
+                                validPrecondition = false;
+                                result.ErrorMessage = "Cannot create upgrade appointment without upgrade request";
+                            }
+                            break;
+                    }
+                }
+            }
+
+            if (validPrecondition)
+            {
                 var appointment = _mapper.Map<Appointment>(model);
                 _dbContext.Appointments.Add(appointment);
                 _dbContext.SaveChanges();

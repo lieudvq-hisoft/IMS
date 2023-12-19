@@ -22,6 +22,15 @@ public enum ServerAllocationStatus
     Waiting,
 }
 
+public enum AppointmentReason
+{
+    Install,
+    Uninstall,
+    Upgrade,
+    Support,
+    Incident
+}
+
 public enum IpPurpose
 {
     Host,

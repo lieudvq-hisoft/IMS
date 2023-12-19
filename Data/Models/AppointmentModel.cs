@@ -10,7 +10,7 @@ public class AppointmentModel
     public DateTime DateAppointed { get; set; }
     public DateTime DateCheckedIn { get; set; }
     public DateTime DateCheckedOut { get; set; }
-    public string Reason { get; set; }
+    public AppointmentReason Reason { get; set; }
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
@@ -37,7 +37,7 @@ public class AppointmentResultModel
     public DateTime DateAppointed { get; set; }
     public DateTime DateCheckedIn { get; set; }
     public DateTime DateCheckedOut { get; set; }
-    public string Reason { get; set; }
+    public AppointmentReason Reason { get; set; }
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
@@ -58,7 +58,7 @@ public class AppointmentCreateModel
     public DateTime DateAppointed { get; set; }
 
     [Required]
-    public string Reason { get; set; }
+    public AppointmentReason Reason { get; set; }
 
     public string? Note { get; set; }
 
@@ -106,9 +106,6 @@ public class AppointmentUpdateModel
 
     [Required]
     public DateTime DateAppointed { get; set; }
-
-    [Required]
-    public string Reason { get; set; }
 
     [Required]
     [GreaterThanZero]
