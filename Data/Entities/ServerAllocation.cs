@@ -27,6 +27,7 @@ public class ServerAllocation : BaseEntity
     public ICollection<RequestExpand>? RequestExpands { get; set; }
     public ICollection<IpAssignment>? IpAssignments { get; set; }
     public ICollection<RequestHost>? RequestHosts { get; set; }
+    public ICollection<Incident>? Incidents { get; set; }
 
     public string GetServerLocation()
     {
