@@ -67,6 +67,14 @@ public class RequestHostController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPut("PortUpgrade")]
+    public async Task<ActionResult> UpdatePortUpgrade([FromBody] RequestHostUpdateUpgradeModel model)
+    {
+        var result = await _requestHostService.UpdatePortUpgrade(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)
     {

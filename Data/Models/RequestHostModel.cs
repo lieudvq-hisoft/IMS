@@ -124,7 +124,25 @@ public class RequestHostUpdateModel
     [GreaterThanZero]
     public int Quantity { get; set; }
 
-    public IpAssignmentTypes Type { get; set; }
+    [EnsureMinimumElements]
+    public List<int>? Capacities { get; set; }
+}
+
+public class RequestHostUpdateUpgradeModel
+{
+    [Required]
+    [GreaterThanZero]
+    public int Id { get; set; }
+
+    public string? Note { get; set; }
+
+    public string? SaleNote { get; set; }
+
+    public string? TechNote { get; set; }
+
+    [Required]
+    [EnsureMinimumElements]
+    public List<PortUpgradeModel> PortUpgrades { get; set; }
 }
 
 public class RequestHostSearchModel
