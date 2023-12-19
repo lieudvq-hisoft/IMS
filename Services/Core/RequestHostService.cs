@@ -489,7 +489,7 @@ public class RequestHostService : IRequestHostService
                 requestHost.Note = model.Note;
                 requestHost.SaleNote = model.SaleNote;
                 requestHost.TechNote = model.TechNote;
-                requestHost.Capacities = model.PortUpgrades.Select(x => x.Capacity);
+                requestHost.Capacities = model.PortUpgrades.Select(x => x.Capacity).ToList();
                 _dbContext.RequestHostIps.RemoveRange(requestHost.RequestHostIps);
 
                 foreach (var portUpgrade in model.PortUpgrades)
