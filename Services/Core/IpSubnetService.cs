@@ -182,9 +182,13 @@ public class IpSubnetService : IIpSubnetService
         if (subnet.Data != null)
         {
             var subnetIps = _dbContext.IpAddresses
+                .Include(x => x.IpSubnet)
                 .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
-                .OrderBy(x => x.Address)
+                .OrderBy(x => x.IpSubnet.FirstOctet)
+                .ThenBy(x => x.IpSubnet.SecondOctet)
+                .ThenBy(x => x.IpSubnet.ThirdOctet)
+                .ThenBy(x => x.Id)
                 .Where(x => x.IpSubnetId == subnet.Data.Id)
                 .Where(x => purposes != null && purposes.Count > 0 ? purposes.Contains(x.Purpose) : true)
                 .ToList();
@@ -641,9 +645,10 @@ public class IpSubnetService : IIpSubnetService
                         var numberOfRequired = model.Quantity - additionalIps.Count();
                         var additionalIpIds = additionalIps.Select(x => x.Id);
                         var ipAddresses = _dbContext.IpAddresses
+                            .Include(x => x.IpSubnet)
                             .Include(x => x.IpAssignments)
                             .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
-                            .OrderBy(x => x.Address)
+                            .OrderBy(x => x.IpSubnet.FirstOctet).ThenBy(x => x.IpSubnet.SecondOctet).ThenBy(x => x.IpSubnet.ThirdOctet).ThenBy(x => x.Id)
                             .Where(x => !x.Blocked && !x.IsReserved && !x.IpAssignments.Any() && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
                             .Where(x => model.Purposes != null && model.Purposes.Count > 0 ? model.Purposes.Contains(x.Purpose) : true)
                             .Where(x => !additionalIpIds.Contains(x.Id));
