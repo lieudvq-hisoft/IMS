@@ -31,6 +31,11 @@ public static class ServerAllocationErrorMessage
     public const string DOWNLOAD_FILE_FROM_NON_ACCEPTED = "Only accepted server allocation have file";
 }
 
+public static class IncidentErrorMessage
+{
+    public const string NOT_EXISTED = "Incident " + ErrorMessage.EXISTED;
+}
+
 public class AppointmentUserErrorMessage
 {
     public const string NOT_EXISTED = "Appointment User " + ErrorMessage.NOT_EXISTED;

@@ -287,9 +287,26 @@ public class MapperProfile : Profile
         CreateMap<RequestExpandAppointment, RequestExpandAppointmentModel>();
         #endregion
 
-        //#region CompanyType
-        //CreateMap<CompanyType, CompanyTypeModel>();
-        //#endregion
+        #region Incident
+        CreateMap<Incident, IncidentModel>()
+            .AfterMap((src, dest, context) =>
+            {
+                dest.Executor = context.Mapper.Map<User, UserModel>(src.User);
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                dest.ServerAllocation = context.Mapper.Map<ServerAllocation, ServerAllocationResultModel>(src.ServerAllocation);
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                var appointment = src.IncidentAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Accepted || x.Status == RequestStatus.Success);
+                if (appointment != null)
+                {
+                    dest.Appointment = context.Mapper.Map<Appointment, AppointmentResultModel>(appointment);
+                }
+            });
+        CreateMap<IncidentCreateModel, Incident>();
+        #endregion
 
         #region IP
         CreateMap<IpAddress, IpAddressModel>()
@@ -387,6 +404,7 @@ public class MapperProfile : Profile
                     dest.Contacts = JsonSerializer.Deserialize<List<ContactModel>>(src.Contact);
                 }
             });
+        CreateMap<Incident, IncidentResultModel>();
         CreateMap<Component, ComponentResultModel>();
         CreateMap<Area, AreaResultModel>();
         CreateMap<Appointment, AppointmentResultModel>();

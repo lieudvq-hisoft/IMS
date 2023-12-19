@@ -1,12 +1,6 @@
-﻿using Data.DataAccess.Constant;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
-using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Data.Utils.ValidationAttributes;
 public class OfficialTimeAttribute : ValidationAttribute

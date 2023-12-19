@@ -60,6 +60,7 @@ public static class StartupExtension
 
         services.AddScoped<IComponentService, ComponentService>();
         services.AddScoped<ICustomerService, CustomerService>();
+        services.AddScoped<IIncidentService, IncidentService>();
         services.AddScoped<IFileService, FileService>();
         services.AddScoped<ILocationService, LocationService>();
         services.AddScoped<IRackService, RackService>();
