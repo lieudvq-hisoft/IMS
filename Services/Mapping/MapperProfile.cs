@@ -313,6 +313,14 @@ public class MapperProfile : Profile
                 {
                     dest.AssignmentType = src.IpAssignments.FirstOrDefault()?.Type.ToString();
                 }
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                var ipAssignment = src.IpAssignments.FirstOrDefault();
+                if (ipAssignment != null)
+                {
+                    dest.Capacity = ipAssignment.Capacity;
+                }
             });
         CreateMap<IpSubnet, IpSubnetModel>()
             .ForMember(dest => dest.SubnetIds, opt => opt.MapFrom(src => src.SubNets.Select(x => x.Id)));

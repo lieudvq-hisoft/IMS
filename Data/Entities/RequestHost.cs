@@ -9,7 +9,6 @@ public class RequestHost : BaseEntity
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
     public int Quantity { get; set; }
-    public int? UpgradeCapacity { get; set; }
     public List<int>? Capacities { get; set; }
     public bool IsRemoval { get; set; }
     public bool IsUpgrade { get; set; }

@@ -51,6 +51,14 @@ public class RequestHostController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPost("PortUpgrade")]
+    public async Task<ActionResult> CreatePortUpgrade([FromBody] RequestHostCreateUpgradeModel model)
+    {
+        var result = await _requestHostService.CreatePortUpgrade(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut]
     public async Task<ActionResult> Update([FromBody] RequestHostUpdateModel model)
     {
@@ -137,6 +145,15 @@ public class RequestHostController : ControllerBase
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
         var result = await _requestHostService.Complete(id, new Guid(userId), model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("{id}/CompletePortUpgrade")]
+    public async Task<ActionResult> CompletePortUpgrade(int id, [FromBody] HostAndUpgradeCreateInspectionReportModel? model)
+    {
+        var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
+        var result = await _requestHostService.CompletePortUpgrade(id, new Guid(userId), model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

@@ -23,6 +23,7 @@ public interface IRequestHostService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> Create(RequestHostCreateModel model);
+    Task<ResultModel> CreatePortUpgrade(RequestHostCreateUpgradeModel model);
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Update(RequestHostUpdateModel model);
     Task<ResultModel> Accept(int requestHostId, Guid userId, UserAssignModel model);
@@ -32,6 +33,7 @@ public interface IRequestHostService
     Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model);
     //Task<ResultModel> Process(int requestHostId, Guid userId);
     Task<ResultModel> Complete(int requestHostId, Guid userId, HostAndUpgradeCreateInspectionReportModel? model);
+    Task<ResultModel> CompletePortUpgrade(int requestHostId, Guid userId, HostAndUpgradeCreateInspectionReportModel? model);
     Task<ResultModel> Reject(int requestHostId, RequestHostRejectModel modell);
     Task<ResultModel> DocumentConfirmTrue(int appointmentId);
 }
@@ -267,7 +269,7 @@ public class RequestHostService : IRequestHostService
             }
             else
             {
-                foreach (int ipId in model.PortIpIds)
+                foreach (int ipId in model.PortUpgrades.Select(x => x.PortIpId))
                 {
                     var ipAssignment = _dbContext.IpAssignments.FirstOrDefault(x => x.IpAddressId == ipId);
                     if (ipAssignment == null)
@@ -307,8 +309,8 @@ public class RequestHostService : IRequestHostService
                     TechNote = model.TechNote,
                     SaleNote = model.SaleNote,
                     Quantity = ipAssignments.Count(),
-                    UpgradeCapacity = model.Capacity,
                     IsUpgrade = true,
+                    Capacities = model.PortUpgrades.Select(x => x.Capacity).ToList(),
                     Type = IpAssignmentTypes.Port,
                     Status = RequestHostStatus.Waiting,
                     ServerAllocationId = model.ServerAllocationId
@@ -316,12 +318,13 @@ public class RequestHostService : IRequestHostService
                 _dbContext.RequestHosts.Add(requestHost);
                 _dbContext.SaveChanges();
 
-                foreach (var ipAssignment in ipAssignments)
+                foreach (var portUpgrade in model.PortUpgrades)
                 {
                     _dbContext.RequestHostIps.Add(new RequestHostIp
                     {
-                        IpAddressId = ipAssignment.IpAddressId,
-                        RequestHostId = requestHost.Id
+                        IpAddressId = portUpgrade.PortIpId,
+                        RequestHostId = requestHost.Id,
+                        Capacity = portUpgrade.Capacity,
                     });
                 }
                 _dbContext.SaveChanges();
@@ -1004,12 +1007,12 @@ public class RequestHostService : IRequestHostService
             }
             else
             {
-                var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress);
+                var reuqestHostIps = requestHost.RequestHostIps;
                 var ipAssignments = new List<IpAssignment>();
-                foreach (var ipAddress in ipAddresses)
+                foreach (var requestHostIp in reuqestHostIps)
                 {
-                    var ipAssignment = _dbContext.IpAssignments.FirstOrDefault(x => x.IpAddressId == ipAddress.Id && x.ServerAllocationId == requestHost.ServerAllocationId && x.Type == IpAssignmentTypes.Port);
-                    ipAssignment.Capacity += requestHost.UpgradeCapacity;
+                    var ipAssignment = _dbContext.IpAssignments.FirstOrDefault(x => x.IpAddressId == requestHostIp.IpAddressId && x.ServerAllocationId == requestHost.ServerAllocationId && x.Type == IpAssignmentTypes.Port);
+                    ipAssignment.Capacity = requestHostIp.Capacity;
                     ipAssignments.Add(ipAssignment);
                 }
                 requestHost.Status = RequestHostStatus.Success;

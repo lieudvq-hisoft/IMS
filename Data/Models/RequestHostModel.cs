@@ -10,7 +10,7 @@ public class RequestHostModel
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
-    public int? Capacity { get; set; }
+    public List<int>? Capacities { get; set; }
     public bool IsRemoval { get; set; }
     public bool IsUpgrade { get; set; }
     public IpAssignmentTypes Type { get; set; }
@@ -36,7 +36,7 @@ public class RequestHostResultModel
     public int Quantity { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
-    public int? Capacity { get; set; }
+    public List<int>? Capacities { get; set; }
     public bool IsRemoval { get; set; }
     public bool IsUpgrade { get; set; }
     public IpAssignmentTypes Type { get; set; }
@@ -83,16 +83,23 @@ public class RequestHostCreateUpgradeModel
     public string? TechNote { get; set; }
 
     [Required]
-    [GreaterThanZero]
-    public int Capacity { get; set; }
-
-    [Required]
     [EnsureMinimumElements]
-    public List<int> PortIpIds { get; set; }
+    public List<PortUpgradeModel> PortUpgrades { get; set; }
 
     [Required]
     [GreaterThanZero]
     public int ServerAllocationId { get; set; }
+}
+
+public class PortUpgradeModel
+{
+    [Required]
+    [GreaterThanZero]
+    public int PortIpId { get; set; }
+
+    [Required]
+    [GreaterThanZero]
+    public int Capacity { get; set; }
 }
 
 public class RequestHostIpAssignmentModel
