@@ -263,11 +263,6 @@ public class AppointmentService : IAppointmentService
                 if (model.RequestExpandId != null)
                 {
                     requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == model.RequestExpandId.Value);
-                    if (requestExpand == null)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
-                    }
                 }
 
                 if (validPrecondition)
@@ -275,14 +270,24 @@ public class AppointmentService : IAppointmentService
                     switch (model.Reason)
                     {
                         case AppointmentReason.Install:
-                            if (requestExpand.ForRemoval)
+                            if (requestExpand == null)
+                            {
+                                validPrecondition = false;
+                                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+                            }
+                            else if (requestExpand.ForRemoval)
                             {
                                 validPrecondition = false;
                                 result.ErrorMessage = "Cannot create install appointment for uninstall appointment";
                             }
                             break;
                         case AppointmentReason.Uninstall:
-                            if (!requestExpand.ForRemoval)
+                            if (requestExpand == null)
+                            {
+                                validPrecondition = false;
+                                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+                            }
+                            else if (!requestExpand.ForRemoval)
                             {
                                 validPrecondition = false;
                                 result.ErrorMessage = "Cannot create uninstall appointment for install appointment";
