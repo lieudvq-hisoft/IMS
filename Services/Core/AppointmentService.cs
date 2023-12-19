@@ -301,6 +301,8 @@ public class AppointmentService : IAppointmentService
                     case AppointmentReason.Support:
                         break;
                     case AppointmentReason.Incident:
+                        validPrecondition = false;
+                        result.ErrorMessage = "Cannot create incident appointment";
                         break;
                 }
             }
