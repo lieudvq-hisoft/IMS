@@ -12,7 +12,7 @@ public class MapperProfile : Profile
     {
         #region Customer
         CreateMap<Customer, CustomerModel>()
-            .AfterMap((src, dest) => 
+            .AfterMap((src, dest) =>
             {
                 if (src.Contact != null)
                 {
