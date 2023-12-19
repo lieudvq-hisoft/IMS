@@ -1409,19 +1409,20 @@ public class AppointmentService : IAppointmentService
             else
             {
                 File.Copy(inputPath, outputPath, true);
+                var customer = serverAllocation.Customer;
                 using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
                 {
                     var now = DateTime.UtcNow;
                     TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
                     document.RenderText("__Date__", now.ToString("dd/MM/yyyy"));
 
-                    document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
+                    document.RenderText("__Number__", textInfo.ToTitleCase(customer.ContractNumber.ToString()));
 
-                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
+                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(customer.Representator));
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
 
-                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
+                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(customer.RepresentatorPosition));
 
                     document.RenderText("__CustomerAddress__", serverAllocation.Customer.Address);
 
@@ -1530,21 +1531,22 @@ public class AppointmentService : IAppointmentService
             else
             {
                 File.Copy(inputPath, outputPath, true);
+                var customer = serverAllocation.Customer;
                 using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
                 {
                     TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
 
-                    document.RenderText("__Number__", textInfo.ToTitleCase(model.Number));
+                    document.RenderText("__Number__", textInfo.ToTitleCase(customer.ContractNumber.ToString()));
 
                     var now = DateTime.UtcNow;
                     document.RenderText("__Time__", now.ToString("dd/MM/yyyy"));
                     document.RenderText("__Time__", now.ToString("dd/MM/yyyy"));
 
-                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
+                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(customer.Representator));
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
 
-                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
+                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(customer.RepresentatorPosition));
 
                     document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
 
@@ -1676,6 +1678,7 @@ public class AppointmentService : IAppointmentService
             else
             {
                 File.Copy(inputPath, outputPath, true);
+                var customer = serverAllocation.Customer;
                 using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
                 {
                     TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
@@ -1686,8 +1689,8 @@ public class AppointmentService : IAppointmentService
                     document.RenderText("__Location__", model.Location);
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
-                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
-                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
+                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(customer.Representator));
+                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(customer.RepresentatorPosition));
                     document.RenderText("__Address__", serverAllocation.Customer.Address);
                     document.RenderText("__PhoneNumber__", serverAllocation.Customer.PhoneNumber);
                     document.RenderText("__Email__", serverAllocation.Customer.Email);
@@ -1816,6 +1819,7 @@ public class AppointmentService : IAppointmentService
             else
             {
                 File.Copy(inputPath, outputPath, true);
+                var customer = serverAllocation.Customer;
                 using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
                 {
                     TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
@@ -1826,8 +1830,8 @@ public class AppointmentService : IAppointmentService
                     document.RenderText("__Location__", model.Location);
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
-                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(model.CustomerName));
-                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(model.CustomerPosition));
+                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(customer.Representator));
+                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(customer.RepresentatorPosition));
                     document.RenderText("__Address__", serverAllocation.Customer.Address);
                     document.RenderText("__PhoneNumber__", serverAllocation.Customer.PhoneNumber);
                     document.RenderText("__Email__", serverAllocation.Customer.Email);

@@ -168,21 +168,6 @@ public class ServerAllocationCreateRequestExpandInspectionReportModel
     [Required]
     [MinLength(6)]
     [MaxLength(255)]
-    public string Number { get; set; } = "Number";
-
-    [Required]
-    [MinLength(6)]
-    [MaxLength(255)]
-    public string CustomerName { get; set; } = "CustomerName";
-
-    [Required]
-    [MinLength(6)]
-    [MaxLength(255)]
-    public string CustomerPosition { get; set; } = "CustomerPosition";
-
-    [Required]
-    [MinLength(6)]
-    [MaxLength(255)]
     public string QTName { get; set; } = "QTName";
 
     [Required]

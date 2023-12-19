@@ -14,7 +14,7 @@ public class Customer
     public bool IsDeleted { get; set; }
     public string Representator { get; set; }
     public string RepresentatorPosition { get; set; }
-    public int ContractNumber { get; set; }
+    public string ContractNumber { get; set; }
     public string? Contact { get; set; }
     public string Password { get; set; }
     public string CompanyName { get; set; }
