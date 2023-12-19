@@ -69,6 +69,7 @@ public class AppointmentCreateModel
     [GreaterThanZero]
     public int ServerAllocationId { get; set; }
 
+    [EnsureMinimumElements]
     public List<int>? RequestUpgradeIds { get; set; }
 
     public int? RequestExpandId { get; set; }

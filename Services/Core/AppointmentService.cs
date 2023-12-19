@@ -244,7 +244,7 @@ public class AppointmentService : IAppointmentService
         bool validPrecondition = true;
         using var transaction = _dbContext.Database.BeginTransaction();
 
-        if (model.RequestUpgradeIds.Any() && model.RequestExpandId != null)
+        if (model.RequestUpgradeIds != null && model.RequestExpandId != null)
         {
             result.ErrorMessage = "Cannot have both upgrade and expand request";
             return result;
@@ -292,11 +292,15 @@ public class AppointmentService : IAppointmentService
                         }
                         break;
                     case AppointmentReason.Upgrade:
-                        if (model.RequestUpgradeIds.Any())
+                        if (!model.RequestUpgradeIds.Any())
                         {
                             validPrecondition = false;
                             result.ErrorMessage = "Cannot create upgrade appointment without upgrade request";
                         }
+                        break;
+                    case AppointmentReason.Support:
+                        break;
+                    case AppointmentReason.Incident:
                         break;
                 }
             }
@@ -308,25 +312,25 @@ public class AppointmentService : IAppointmentService
                 _dbContext.SaveChanges();
 
                 var createRequestUpgradeAppointmentResults = new List<ResultModel>();
-                foreach (var requestUpgradeId in model.RequestUpgradeIds)
+                if (model.RequestUpgradeIds != null)
                 {
-                    createRequestUpgradeAppointmentResults.Add(await CreateOneRequestUpgradeAppointment(appointment.Id, requestUpgradeId));
-                }
+                    foreach (var requestUpgradeId in model.RequestUpgradeIds)
+                    {
+                        createRequestUpgradeAppointmentResults.Add(await CreateOneRequestUpgradeAppointment(appointment.Id, requestUpgradeId));
+                    }
 
-                if (createRequestUpgradeAppointmentResults.Any(x => !x.Succeed))
-                {
-                    result.ErrorMessage = createRequestUpgradeAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-                    transaction.Rollback();
-                    validPrecondition = false;
+                    if (createRequestUpgradeAppointmentResults.Any(x => !x.Succeed))
+                    {
+                        result.ErrorMessage = createRequestUpgradeAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                        transaction.Rollback();
+                        validPrecondition = false;
+                    }
                 }
 
                 var createRequestExpandAppointmentResult = new ResultModel();
-                if (validPrecondition)
+                if (validPrecondition && model.RequestExpandId != null)
                 {
-                    if (model.RequestExpandId != null)
-                    {
-                        createRequestExpandAppointmentResult = await CreateOneRequestExpandAppointment(appointment.Id, model.RequestExpandId.Value);
-                    }
+                    createRequestExpandAppointmentResult = await CreateOneRequestExpandAppointment(appointment.Id, model.RequestExpandId.Value);
 
                     if (!createRequestExpandAppointmentResult.Succeed)
                     {
