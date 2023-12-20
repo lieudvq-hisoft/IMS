@@ -77,6 +77,26 @@ public class AppointmentCreateModel
     //public List<int>? RequestRemovalIds { get; set; }
 }
 
+public class AppointmentIncidentCreateModel
+{
+    [Required]
+    public string AppointedCustomer { get; set; }
+
+    [Required]
+    [OfficialTime]
+    public DateTime DateAppointed { get; set; }
+
+    public string? Note { get; set; }
+
+    [Required]
+    [GreaterThanZero]
+    public int ServerAllocationId { get; set; }
+
+    [Required]
+    [EnsureMinimumElements]
+    public List<int> IncidentIds { get; set; }
+}
+
 public class RequestAppointmentCreateModel
 {
     public List<int>? RequestUpgradeIds { get; set; }

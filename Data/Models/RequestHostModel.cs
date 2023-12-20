@@ -25,8 +25,15 @@ public class RequestHostModel
 
     public ServerAllocationResultModel? ServerAllocation { get; set; }
     public CustomerResultModel? Customer { get; set; }
+    public List<RequestHostIpModel> IpAddresses { get; set; }
     public UserModel? Evaluator { get; set; }
     public UserModel? Executor { get; set; }
+}
+
+public class RequestHostIpModel
+{
+    public IpAddressResultModel? IpAddress { get; set; }
+    public int? Capacity { get; set; }
 }
 
 public class RequestHostResultModel

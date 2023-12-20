@@ -24,6 +24,7 @@ public interface IAppointmentService
     Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestUpgrade(int id, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
     Task<ResultModel> Create(AppointmentCreateModel model);
+    Task<ResultModel> CreateIncident(AppointmentIncidentCreateModel model);
     Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model);
     Task<ResultModel> Update(AppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
@@ -384,6 +385,74 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
+    public async Task<ResultModel> CreateIncident(AppointmentIncidentCreateModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        using var transaction = _dbContext.Database.BeginTransaction();
+
+        try
+        {
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
+            if (serverAllocation == null)
+            {
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                var appointment = _mapper.Map<Appointment>(model);
+                appointment.Status = RequestStatus.Success;
+                appointment.Reason = AppointmentReason.Incident;
+                _dbContext.Appointments.Add(appointment);
+                _dbContext.SaveChanges();
+
+                var createIncidentAppointmentResults = new List<ResultModel>();
+                foreach (var incidentId in model.IncidentIds)
+                {
+                    createIncidentAppointmentResults.Add(await CreateOneIncidentAppointment(appointment.Id, incidentId));
+                }
+
+                if (createIncidentAppointmentResults.Any(x => !x.Succeed))
+                {
+                    result.ErrorMessage = createIncidentAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                    transaction.Rollback();
+                }
+                else
+                {
+                    transaction.Commit();
+
+                    var sales = _dbContext.Users
+                    .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                    .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
+                    var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<AppointmentResultModel>(appointment));
+                    foreach (var sale in sales)
+                    {
+                        await _notiService.Add(new NotificationCreateModel
+                        {
+                            UserId = sale.Id,
+                            Action = "Created",
+                            Title = "New appointment",
+                            Body = "There's a new appointment just created",
+                            Data = new NotificationData
+                            {
+                                Key = "Appointment",
+                                Value = appointmentModelString
+                            }
+                        });
+                    }
+                    result.Succeed = true;
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            transaction.Rollback();
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
     public async Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model)
     {
         var result = new ResultModel();
@@ -615,81 +684,75 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    //private async Task<ResultModel> CreateOneRequestRemovalAppointment(int appointmentId, int requestRemovalId)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
-    //    bool validPrecondition = true;
+    private async Task<ResultModel> CreateOneIncidentAppointment(int appointmentId, int incidentId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
 
-    //    try
-    //    {
-    //        var existedRequestRemovalAppointment = _dbContext.RequestExpandAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.ForRemoval && x.AppointmentId == appointmentId && x.RequestExpandId == requestRemovalId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
-    //        var requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestRemovalId);
-    //        if (existedRequestRemovalAppointment != null)
-    //        {
-    //            validPrecondition = false;
-    //            result.ErrorMessage = RequestExpandErrorMessage.EXISTED;
-    //        }
-    //        else
-    //        {
-    //            var appoitment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
-    //            if (appoitment == null)
-    //            {
-    //                validPrecondition = false;
-    //                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
-    //            }
-    //            else if (appoitment.Status != RequestStatus.Waiting && appoitment.Status != RequestStatus.Accepted)
-    //            {
-    //                validPrecondition = false;
-    //                result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING + "/" + AppointmentErrorMessage.NOT_ACCEPTED;
-    //            }
-    //            else
-    //            {
-    //                if (requestExpand == null)
-    //                {
-    //                    validPrecondition = false;
-    //                    result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
-    //                }
-    //                else if (requestExpand.Status != RequestStatus.Success)
-    //                {
-    //                    validPrecondition = false;
-    //                    result.ErrorMessage = RequestExpandErrorMessage.NOT_SUCCESS;
-    //                }
-    //                else if (requestExpand.RemovalStatus != null && requestExpand.RemovalStatus != RemovalStatus.Failed)
-    //                {
-    //                    validPrecondition = false;
-    //                    result.ErrorMessage = "Request expand removal started";
-    //                }
-    //                else if (requestExpand.ServerAllocationId != appoitment.ServerAllocationId)
-    //                {
-    //                    result.ErrorMessage = "Request expand and appointment must belong to the same server allocation";
-    //                    validPrecondition = false;
-    //                }
-    //            }
-    //        }
+        try
+        {
+            var existedIncidentAppointment = _dbContext.IncidentAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == appointmentId && x.IncidentId == incidentId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
+            Incident incident = null;
+            if (existedIncidentAppointment != null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Incident have active appointment";
+            }
+            else
+            {
+                var appoitment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
+                if (appoitment == null)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+                }
+                else if (appoitment.Status != RequestStatus.Waiting && appoitment.Status != RequestStatus.Accepted)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING + "/" + AppointmentErrorMessage.NOT_ACCEPTED;
+                }
+                else
+                {
+                    incident = _dbContext.Incidents.FirstOrDefault(x => x.Id == incidentId && !x.IsResolved);
+                    if (incident == null)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = IncidentErrorMessage.NOT_EXISTED;
+                    }
+                    else if (!incident.IsResolvByClient)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "Incident will be resolv by Quang Trung";
+                    }
+                    else if (incident.ServerAllocationId != appoitment.ServerAllocationId)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = "Incident and appointment must belong to the same server allocation";
+                    }
+                }
+            }
 
-    //        if (validPrecondition)
-    //        {
-    //            var requestRemovalAppointment = new RequestExpandAppointment
-    //            {
-    //                ForRemoval = true,
-    //                RequestExpandId = requestRemovalId,
-    //                AppointmentId = appointmentId,
-    //            };
-    //            _dbContext.RequestExpandAppointments.Add(requestRemovalAppointment);
-    //            _dbContext.SaveChanges();
+            if (validPrecondition)
+            {
+                var incidentAppointment = new IncidentAppointment
+                {
+                    IncidentId = incidentId,
+                    AppointmentId = appointmentId,
+                };
+                _dbContext.IncidentAppointments.Add(incidentAppointment);
+                _dbContext.SaveChanges();
 
-    //            result.Succeed = true;
-    //            result.Data = _mapper.Map<RequestExpandAppointmentModel>(requestRemovalAppointment);
-    //        }
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
+                result.Succeed = true;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
 
-    //    return result;
-    //}
+        return result;
+    }
 
     public async Task<ResultModel> Update(AppointmentUpdateModel model)
     {

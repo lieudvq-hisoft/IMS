@@ -356,6 +356,17 @@ public class MapperProfile : Profile
             })
             .AfterMap((src, dest, context) =>
             {
+                if (src.RequestHostIps != null)
+                {
+                    dest.IpAddresses = src.RequestHostIps.Select(x => new RequestHostIpModel
+                    {
+                        IpAddress = context.Mapper.Map<IpAddress, IpAddressResultModel>(x.IpAddress),
+                        Capacity = x.Capacity
+                    }).ToList();
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
                 if (src.ServerAllocation != null)
                 {
                     dest.ServerAllocation = context.Mapper.Map<ServerAllocation, ServerAllocationResultModel>(src.ServerAllocation);

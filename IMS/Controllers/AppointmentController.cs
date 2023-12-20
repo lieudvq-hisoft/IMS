@@ -78,6 +78,14 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPost("Incident")]
+    public async Task<ActionResult> CreateIncident([FromBody] AppointmentIncidentCreateModel model)
+    {
+        var result = await _appointmentService.CreateIncident(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut]
     public async Task<ActionResult> Update([FromBody] AppointmentUpdateModel model)
     {
