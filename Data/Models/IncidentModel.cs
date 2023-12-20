@@ -33,9 +33,6 @@ public class IncidentResultModel
     public bool IsResolved { get; set; }
     public bool IsResolvByClient { get; set; }
     public string? Document { get; set; }
-
-    public Guid UserId { get; set; }
-
     public int ServerAllocationId { get; set; }
 }
 

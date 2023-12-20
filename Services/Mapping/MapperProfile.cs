@@ -213,6 +213,7 @@ public class MapperProfile : Profile
             });
         CreateMap<Appointment, AppointmentResultModel>();
         CreateMap<AppointmentCreateModel, Appointment>();
+        CreateMap<AppointmentIncidentCreateModel, Appointment>();
         CreateMap<AppointmentUpdateModel, Appointment>();
         CreateMap<AppointmentCompleteModel, Appointment>();
         #endregion
