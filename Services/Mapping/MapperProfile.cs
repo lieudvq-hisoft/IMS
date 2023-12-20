@@ -291,7 +291,11 @@ public class MapperProfile : Profile
         CreateMap<Incident, IncidentModel>()
             .AfterMap((src, dest, context) =>
             {
-                dest.Evaluator = context.Mapper.Map<User, UserModel>(src.IncidentUsers.FirstOrDefault(x => x.Action == RequestUserAction.Evaluate).User);
+                var evaluator = src.IncidentUsers.FirstOrDefault(x => x.Action == RequestUserAction.Evaluate);
+                if (evaluator != null)
+                {
+                    dest.Evaluator = context.Mapper.Map<User, UserModel>(evaluator.User);
+                }
             })
             .AfterMap((src, dest, context) =>
             {
