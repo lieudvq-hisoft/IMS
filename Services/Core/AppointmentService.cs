@@ -1176,7 +1176,7 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
-                validPrecondition = IsCompletable(appointmentId, result);
+                validPrecondition = IsCompletable(appointmentId, result, userId);
             }
 
             if ((appointment.ReceiptOfRecipientFilePath == null ||
@@ -1184,21 +1184,6 @@ public class AppointmentService : IAppointmentService
             {
                 validPrecondition = false;
                 result.ErrorMessage = "Need inspection report to complete";
-            }
-
-            if (validPrecondition)
-            {
-                var executor = _dbContext.AppointmentUsers.FirstOrDefault(x => x.AppointmentId == appointment.Id && x.Action == RequestUserAction.Execute);
-                if (executor == null)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "Appointment must have an assigned tech";
-                }
-                else if (executor.UserId != userId)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "Unassigned tech cannot complete this appointment";
-                }
             }
 
             if (validPrecondition)
@@ -1338,7 +1323,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    private bool IsCompletable(int appointmentId, ResultModel result)
+    private bool IsCompletable(int appointmentId, ResultModel result, Guid userId)
     {
         bool validPrecondition = true;
         var appointment = _dbContext.Appointments
@@ -1362,6 +1347,18 @@ public class AppointmentService : IAppointmentService
         {
             validPrecondition = false;
             result.ErrorMessage = "Please assign location to all request expand to complete the appointment";
+        }
+
+        var executor = _dbContext.AppointmentUsers.FirstOrDefault(x => x.AppointmentId == appointment.Id && x.Action == RequestUserAction.Execute);
+        if (executor == null)
+        {
+            validPrecondition = false;
+            result.ErrorMessage = "Appointment must have an assigned tech";
+        }
+        else if (executor.UserId != userId)
+        {
+            validPrecondition = false;
+            result.ErrorMessage = "Unassigned tech cannot complete this appointment";
         }
 
         return validPrecondition;
@@ -2181,7 +2178,7 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
-                validPrecondition = IsCompletable(appointmentId, result);
+                validPrecondition = IsCompletable(appointmentId, result, userId);
             }
 
             //if ((appointment.ReceiptOfRecipientFilePath == null ||
@@ -2190,21 +2187,6 @@ public class AppointmentService : IAppointmentService
             //    validPrecondition = false;
             //    result.ErrorMessage = "Need inspection report to complete";
             //}
-
-            if (validPrecondition)
-            {
-                var executor = _dbContext.AppointmentUsers.FirstOrDefault(x => x.AppointmentId == appointment.Id && x.Action == RequestUserAction.Execute);
-                if (executor == null)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "Appointment must have an assigned tech";
-                }
-                else if (executor.UserId != userId)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "Unassigned tech cannot complete this appointment";
-                }
-            }
 
             if (validPrecondition)
             {
@@ -2240,54 +2222,8 @@ public class AppointmentService : IAppointmentService
                             _dbContext.SaveChanges();
                         }
                     }
-                }
+                }  
 
-                var requestExpandResult = new ResultModel();
-                if (appointment.RequestExpandAppointments.Any())
-                {
-                    var requestExpand = appointment.RequestExpandAppointments.FirstOrDefault().RequestExpand;
-
-                    if (!requestExpand.ForRemoval)
-                    {
-                        requestExpandResult = await CompleteRequestExpand(requestExpand.Id);
-                    }
-                    var createInspectionResult = await CreateExpandInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
-                    var createReceiptResult = await CreateExpandReceiptReport(requestExpand.Id, model.DocumentModel);
-                    if (!createInspectionResult.Succeed)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = createInspectionResult.ErrorMessage;
-                    }
-                    else if (!createReceiptResult.Succeed)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = createReceiptResult.ErrorMessage;
-                    }
-                    else
-                    {
-                        var serverAllocation = appointment.ServerAllocation;
-                        if (!requestExpand.ForRemoval)
-                        {
-                            serverAllocation.InspectionRecordFilePath = createInspectionResult.Data as string;
-                            serverAllocation.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
-                        }
-                        else
-                        {
-                            requestExpandResult = await CompleteRemoval(requestExpand.Id);
-                            serverAllocation.RemovalFilePath = createReceiptResult.Data as string;
-                        }
-                        appointment.InspectionReportFilePath = createInspectionResult.Data as string;
-                        appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
-
-                        _dbContext.SaveChanges();
-                    }
-                }
-
-                if (!requestExpandResult.Succeed)
-                {
-                    transaction.Rollback();
-                    result.ErrorMessage = requestExpandResult.ErrorMessage;
-                }
                 else if (requestUpgradeResults.Any(x => !x.Succeed))
                 {
                     transaction.Rollback();
