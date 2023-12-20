@@ -24,7 +24,7 @@ public interface IAppointmentService
     Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestUpgrade(int id, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
     Task<ResultModel> Create(AppointmentCreateModel model);
-    Task<ResultModel> CreateIncident(AppointmentIncidentCreateModel model);
+    Task<ResultModel> CreateIncident(AppointmentIncidentCreateModel model, Guid userId);
     Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model);
     Task<ResultModel> Update(AppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
