@@ -95,6 +95,8 @@ public class AppointmentIncidentCreateModel
     [Required]
     [EnsureMinimumElements]
     public List<int> IncidentIds { get; set; }
+
+    public string UserId { get; set; }
 }
 
 public class RequestAppointmentCreateModel

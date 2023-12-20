@@ -79,9 +79,9 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPost("Incident")]
-    public async Task<ActionResult> CreateIncident([FromBody] AppointmentIncidentCreateModel model, [FromBody] UserAssignModel userAssignModel)
+    public async Task<ActionResult> CreateIncident([FromBody] AppointmentIncidentCreateModel model)
     {
-        var result = await _appointmentService.CreateIncident(model, Guid.Parse(userAssignModel.UserId));
+        var result = await _appointmentService.CreateIncident(model, Guid.Parse(model.UserId));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
