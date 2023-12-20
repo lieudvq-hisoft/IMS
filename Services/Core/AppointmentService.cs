@@ -1240,7 +1240,7 @@ public class AppointmentService : IAppointmentService
                     }
                 }
 
-                var requestExpandResult = new ResultModel();
+                ResultModel requestExpandResult = null;
                 if (appointment.RequestExpandAppointments.Any())
                 {
                     var requestExpand = appointment.RequestExpandAppointments.FirstOrDefault().RequestExpand;
@@ -1281,7 +1281,7 @@ public class AppointmentService : IAppointmentService
                     }
                 }
 
-                if (!requestExpandResult.Succeed)
+                if (requestExpandResult != null && !requestExpandResult.Succeed)
                 {
                     transaction.Rollback();
                     result.ErrorMessage = requestExpandResult.ErrorMessage;
