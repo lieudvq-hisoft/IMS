@@ -93,8 +93,8 @@ public class AppointmentIncidentCreateModel
     public int ServerAllocationId { get; set; }
 
     [Required]
-    [EnsureMinimumElements]
-    public List<int> IncidentIds { get; set; }
+    [GreaterThanZero]
+    public int IncidentId { get; set; }
 
     public string UserId { get; set; }
 }
@@ -159,16 +159,28 @@ public class AppointmentCompleteModel
     [SameDateAndLaterThan("DateCheckedIn")]
     public DateTime DateCheckedOut { get; set; }
 
-    //[StringLength(2000)]
-    //public string? SaleNote { get; set; }
-
-    //[StringLength(2000)]
-    //public string? TechNote { get; set; }
-
     [Required]
     public bool IsCorrectPerson { get; set; }
 
     public ServerAllocationCreateRequestExpandInspectionReportModel DocumentModel;
+}
+
+public class AppointmentResolvModel
+{
+    [Required]
+    public DateTime DateCheckedIn { get; set; }
+
+    [Required]
+    [SameDateAndLaterThan("DateCheckedIn")]
+    public DateTime DateCheckedOut { get; set; }
+
+    [Required]
+    public bool IsCorrectPerson { get; set; }
+
+    [Required]
+    public IncidentResolvModel IncidentResolvModel { get; set; }
+
+    public ServerAllocationCreateRequestExpandInspectionReportModel? DocumentModel;
 }
 
 public class AppointmentSearchModel

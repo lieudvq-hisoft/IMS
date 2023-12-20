@@ -52,7 +52,10 @@ public class RequestExpandCompleteBulkModel
 public class RequestExpandCreateModel
 {
     public bool ForRemoval { get; set; }
-    public int? Size { get; set; }
+
+    [Required]
+    [GreaterThanZero]
+    public int Size { get; set; }
 
     [Required]
     public string? Note { get; set; }
@@ -83,8 +86,9 @@ public class RequestExpandUpdateModel
     [GreaterThanZero]
     public int Id { get; set; }
 
+    [Required]
     [GreaterThanZero]
-    public int? Size { get; set; }
+    public int Size { get; set; }
 
     public string? Note { get; set; }
 

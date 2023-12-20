@@ -3,6 +3,7 @@ using Data.Enums;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.ClaimExtensions;
 using Services.Core;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -135,6 +136,14 @@ public class AppointmentController : ControllerBase
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
         var result = await _appointmentService.Complete(id, model, new Guid(userId));
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPut("{id}/Resolv")]
+    public async Task<ActionResult> Resolv(int id, [FromBody] AppointmentResolvModel model)
+    {
+        var result = await _appointmentService.Resolv(id, model, new Guid(User.GetId()));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

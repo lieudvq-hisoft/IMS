@@ -55,9 +55,6 @@ public class IncidentCreateModel
 public class IncidentResolvModel
 {
     [Required]
-    public int Id { get; set; }
-
-    [Required]
     public string Solution { get; set; }
 }
 

@@ -216,6 +216,7 @@ public class MapperProfile : Profile
         CreateMap<AppointmentIncidentCreateModel, Appointment>();
         CreateMap<AppointmentUpdateModel, Appointment>();
         CreateMap<AppointmentCompleteModel, Appointment>();
+        CreateMap<AppointmentResolvModel, Appointment>();
         #endregion
 
         #region RequestExpand 

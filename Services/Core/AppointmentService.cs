@@ -32,6 +32,7 @@ public interface IAppointmentService
     Task<ResultModel> Deny(int appointmentId, Guid userId, DenyModel model);
     Task<ResultModel> AssignTech(int appointmentId, UserAssignModel model);
     Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model, Guid userId);
+    Task<ResultModel> Resolv(int appointmentId, AppointmentResolvModel model, Guid userId);
     Task<ResultModel> Fail(int appointmentId, AppointmentFailModel model);
     Task<ResultModel> AssignInspectionReport(int appointmentId, DocumentFileUploadModel model);
     Task<ResultModel> DocumentConfirmTrue(int appointmentId);
@@ -407,20 +408,18 @@ public class AppointmentService : IAppointmentService
                 _dbContext.SaveChanges();
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
+                    Action = RequestUserAction.Execute,
                     AppointmentId = appointment.Id,
                     UserId = userId
                 });
                 _dbContext.SaveChanges();
 
-                var createIncidentAppointmentResults = new List<ResultModel>();
-                foreach (var incidentId in model.IncidentIds)
-                {
-                    createIncidentAppointmentResults.Add(await CreateOneIncidentAppointment(appointment.Id, incidentId, userId));
-                }
+                var createIncidentAppointmentResult = await CreateOneIncidentAppointment(appointment.Id, model.IncidentId, userId);
 
-                if (createIncidentAppointmentResults.Any(x => !x.Succeed))
+
+                if (!createIncidentAppointmentResult.Succeed)
                 {
-                    result.ErrorMessage = createIncidentAppointmentResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                    result.ErrorMessage = createIncidentAppointmentResult.ErrorMessage;
                     transaction.Rollback();
                 }
                 else
@@ -2152,7 +2151,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> Resolv(int appointmentId, AppointmentCompleteModel model, Guid userId)
+    public async Task<ResultModel> Resolv(int appointmentId, AppointmentResolvModel model, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -2163,8 +2162,7 @@ public class AppointmentService : IAppointmentService
         {
             var appointment = _dbContext.Appointments
                 .Include(x => x.ServerAllocation)
-                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.ServerAllocation)
-                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.ServerAllocation)
+                .Include(x => x.IncidentAppointments).ThenInclude(x => x.Incident)
                 .FirstOrDefault(x => x.Id == appointmentId);
             if (appointment == null)
             {
@@ -2181,98 +2179,124 @@ public class AppointmentService : IAppointmentService
                 validPrecondition = IsCompletable(appointmentId, result, userId);
             }
 
-            //if ((appointment.ReceiptOfRecipientFilePath == null ||
-            //    appointment.InspectionReportFilePath == null) && model.DocumentModel == null)
-            //{
-            //    validPrecondition = false;
-            //    result.ErrorMessage = "Need inspection report to complete";
-            //}
-
             if (validPrecondition)
             {
-                _mapper.Map<AppointmentCompleteModel, Appointment>(model, appointment);
+                _mapper.Map<AppointmentResolvModel, Appointment>(model, appointment);
                 appointment.Status = RequestStatus.Success;
                 _dbContext.SaveChanges();
+                var incident = appointment.IncidentAppointments.FirstOrDefault().Incident;
+                var incidentResult = await ResolvIncident(incident.Id, model.IncidentResolvModel, userId);
 
-                var requestUpgradeResults = new List<ResultModel>();
-                if (appointment.RequestUpgradeAppointment.Any())
+                if (!incidentResult.Succeed)
                 {
-                    var createReceiptResult = await CreateUpgradeReceiptReport(appointment.Id, model.DocumentModel);
-                    if (!createReceiptResult.Succeed)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = createReceiptResult.ErrorMessage;
-                    }
-                    else
-                    {
-                        appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
-                        foreach (var requestUpgradeId in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgradeId))
-                        {
-                            requestUpgradeResults.Add(await CompleteRequestUpgrade(requestUpgradeId));
-                        }
-                        var createInspectionResult = await CreateUpgradeInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
-                        if (!createInspectionResult.Succeed)
-                        {
-                            validPrecondition = false;
-                            result.ErrorMessage = createInspectionResult.ErrorMessage;
-                        }
-                        else
-                        {
-                            appointment.InspectionReportFilePath = createInspectionResult.Data as string;
-                            _dbContext.SaveChanges();
-                        }
-                    }
-                }  
+                    validPrecondition = false;
+                    result.ErrorMessage = incidentResult.ErrorMessage;
+                }
+            }
 
-                else if (requestUpgradeResults.Any(x => !x.Succeed))
+            if (!validPrecondition)
+            {
+                transaction.Rollback();
+            }
+            else
+            {
+                var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<AppointmentResultModel>(appointment));
+                await _notiService.Add(new NotificationCreateModel
                 {
-                    transaction.Rollback();
-                    result.ErrorMessage = requestUpgradeResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-                }
-                else if (!validPrecondition)
-                {
-                    transaction.Rollback();
-                }
-                else
-                {
-                    var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<AppointmentResultModel>(appointment));
-                    await _notiService.Add(new NotificationCreateModel
+                    UserId = appointment.ServerAllocation.CustomerId,
+                    Action = "Complete",
+                    Title = "Appointment complete",
+                    Body = "There's an appointment and incident just resolved",
+                    Data = new NotificationData
                     {
-                        UserId = appointment.ServerAllocation.CustomerId,
-                        Action = "Complete",
-                        Title = "Appointment complete",
-                        Body = "There's an appointment and all associated request just complete",
-                        Data = new NotificationData
-                        {
-                            Key = "Appointment",
-                            Value = appointmentModelString
-                        }
-                    });
-                    if (appointment.RequestExpandAppointments.Any(x => x.ForRemoval))
-                    {
-                        var serverModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(appointment.ServerAllocation));
-                        await _notiService.Add(new NotificationCreateModel
-                        {
-                            UserId = appointment.ServerAllocation.CustomerId,
-                            Action = "Removed",
-                            Title = "Server removed",
-                            Body = "There's an server just removed",
-                            Data = new NotificationData
-                            {
-                                Key = "ServerAllocation",
-                                Value = serverModelString
-                            }
-                        });
+                        Key = "Appointment",
+                        Value = appointmentModelString
                     }
+                });
 
-                    result.Succeed = true;
-                    transaction.Commit();
-                }
+                result.Succeed = true;
+                transaction.Commit();
             }
         }
         catch (Exception e)
         {
             transaction.Rollback();
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    private async Task<ResultModel> ResolvIncident(int incidentId, IncidentResolvModel model, Guid userId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var incident = _dbContext.Incidents
+                .Include(x => x.IncidentAppointments).ThenInclude(x => x.Appointment)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.ServerAllocation)
+                .Include(x => x.IncidentUsers).ThenInclude(x => x.User)
+                .FirstOrDefault(x => x.Id == incidentId && !x.IsResolved);
+            if (incident == null)
+            {
+                result.ErrorMessage = IncidentErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                incident.Solution = model.Solution;
+                incident.IsResolved = true;
+                _dbContext.IncidentUsers.Add(new IncidentUser
+                {
+                    IncidentId = incident.Id,
+                    UserId = userId,
+                    Action = RequestUserAction.Execute
+                });
+                var serverAllocation = incident.ServerAllocation;
+                bool stopPausing = serverAllocation.Status == ServerAllocationStatus.Pausing && !serverAllocation.Incidents.Any(x => !x.IsResolved && x.PausingRequired);
+                if (stopPausing)
+                {
+                    serverAllocation.Status = ServerAllocationStatus.Working;
+                }
+                _dbContext.SaveChanges();
+
+                var incidentModelString = JsonSerializer.Serialize(_mapper.Map<IncidentResultModel>(incident));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = serverAllocation.CustomerId,
+                    Action = "Resolved",
+                    Title = "Incident resolved",
+                    Body = "There's an incident just resolved",
+                    Data = new NotificationData
+                    {
+                        Key = "Incident",
+                        Value = incidentModelString
+                    }
+                });
+                if (stopPausing)
+                {
+                    var serverModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(serverAllocation));
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = serverAllocation.CustomerId,
+                        Action = "Resolved",
+                        Title = "Incident resolved",
+                        Body = "There's an incident just resolved",
+                        Data = new NotificationData
+                        {
+                            Key = "ServerAllocation",
+                            Value = serverModelString
+                        }
+                    });
+                }
+                result.Succeed = true;
+                result.Data = _mapper.Map<IncidentResultModel>(incident);
+            }
+        }
+        catch (Exception e)
+        {
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 

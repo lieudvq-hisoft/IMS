@@ -16,7 +16,7 @@ public interface IIncidentService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(IncidentCreateModel model, Guid userId);
-    Task<ResultModel> Resolv(IncidentResolvModel model, Guid userId);
+    Task<ResultModel> Resolv(int incidentId, IncidentResolvModel model, Guid userId);
 }
 
 public class IncidentService : IIncidentService
@@ -146,7 +146,7 @@ public class IncidentService : IIncidentService
         return result;
     }
 
-    public async Task<ResultModel> Resolv(IncidentResolvModel model, Guid userId)
+    public async Task<ResultModel> Resolv(int incidentId, IncidentResolvModel model, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -158,7 +158,7 @@ public class IncidentService : IIncidentService
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.ServerAllocation)
                 .Include(x => x.IncidentUsers).ThenInclude(x => x.User)
-                .FirstOrDefault(x => x.Id == model.Id && !x.IsResolved);
+                .FirstOrDefault(x => x.Id == incidentId && !x.IsResolved);
             if (incident == null)
             {
                 result.ErrorMessage = IncidentErrorMessage.NOT_EXISTED;
