@@ -446,6 +446,7 @@ public class AppointmentService : IAppointmentService
                         });
                     }
                     result.Succeed = true;
+                    result.Data = _mapper.Map<AppointmentResultModel>(appointment);
                 }
             }
         }
@@ -747,7 +748,7 @@ public class AppointmentService : IAppointmentService
                 };
                 _dbContext.IncidentUsers.Add(new IncidentUser
                 {
-                    Action = RequestUserAction.Evaluate,
+                    Action = RequestUserAction.Execute,
                     IncidentId = incidentId,
                     UserId = userId
                 });
@@ -1167,6 +1168,11 @@ public class AppointmentService : IAppointmentService
             {
                 validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+            }
+            else if (appointment.Reason == AppointmentReason.Incident)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Cannot complete incident appointment";
             }
             else
             {
@@ -2143,6 +2149,194 @@ public class AppointmentService : IAppointmentService
         }
         catch (Exception e)
         {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Resolv(int appointmentId, AppointmentCompleteModel model, Guid userId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+        bool validPrecondition = true;
+        using var transaction = _dbContext.Database.BeginTransaction();
+
+        try
+        {
+            var appointment = _dbContext.Appointments
+                .Include(x => x.ServerAllocation)
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.ServerAllocation)
+                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.ServerAllocation)
+                .FirstOrDefault(x => x.Id == appointmentId);
+            if (appointment == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+            }
+            else if (appointment.Reason != AppointmentReason.Incident)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Cannot resolv non incident appointment";
+            }
+            else
+            {
+                validPrecondition = IsCompletable(appointmentId, result);
+            }
+
+            //if ((appointment.ReceiptOfRecipientFilePath == null ||
+            //    appointment.InspectionReportFilePath == null) && model.DocumentModel == null)
+            //{
+            //    validPrecondition = false;
+            //    result.ErrorMessage = "Need inspection report to complete";
+            //}
+
+            if (validPrecondition)
+            {
+                var executor = _dbContext.AppointmentUsers.FirstOrDefault(x => x.AppointmentId == appointment.Id && x.Action == RequestUserAction.Execute);
+                if (executor == null)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Appointment must have an assigned tech";
+                }
+                else if (executor.UserId != userId)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Unassigned tech cannot complete this appointment";
+                }
+            }
+
+            if (validPrecondition)
+            {
+                _mapper.Map<AppointmentCompleteModel, Appointment>(model, appointment);
+                appointment.Status = RequestStatus.Success;
+                _dbContext.SaveChanges();
+
+                var requestUpgradeResults = new List<ResultModel>();
+                if (appointment.RequestUpgradeAppointment.Any())
+                {
+                    var createReceiptResult = await CreateUpgradeReceiptReport(appointment.Id, model.DocumentModel);
+                    if (!createReceiptResult.Succeed)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = createReceiptResult.ErrorMessage;
+                    }
+                    else
+                    {
+                        appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
+                        foreach (var requestUpgradeId in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgradeId))
+                        {
+                            requestUpgradeResults.Add(await CompleteRequestUpgrade(requestUpgradeId));
+                        }
+                        var createInspectionResult = await CreateUpgradeInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
+                        if (!createInspectionResult.Succeed)
+                        {
+                            validPrecondition = false;
+                            result.ErrorMessage = createInspectionResult.ErrorMessage;
+                        }
+                        else
+                        {
+                            appointment.InspectionReportFilePath = createInspectionResult.Data as string;
+                            _dbContext.SaveChanges();
+                        }
+                    }
+                }
+
+                var requestExpandResult = new ResultModel();
+                if (appointment.RequestExpandAppointments.Any())
+                {
+                    var requestExpand = appointment.RequestExpandAppointments.FirstOrDefault().RequestExpand;
+
+                    if (!requestExpand.ForRemoval)
+                    {
+                        requestExpandResult = await CompleteRequestExpand(requestExpand.Id);
+                    }
+                    var createInspectionResult = await CreateExpandInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
+                    var createReceiptResult = await CreateExpandReceiptReport(requestExpand.Id, model.DocumentModel);
+                    if (!createInspectionResult.Succeed)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = createInspectionResult.ErrorMessage;
+                    }
+                    else if (!createReceiptResult.Succeed)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = createReceiptResult.ErrorMessage;
+                    }
+                    else
+                    {
+                        var serverAllocation = appointment.ServerAllocation;
+                        if (!requestExpand.ForRemoval)
+                        {
+                            serverAllocation.InspectionRecordFilePath = createInspectionResult.Data as string;
+                            serverAllocation.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
+                        }
+                        else
+                        {
+                            requestExpandResult = await CompleteRemoval(requestExpand.Id);
+                            serverAllocation.RemovalFilePath = createReceiptResult.Data as string;
+                        }
+                        appointment.InspectionReportFilePath = createInspectionResult.Data as string;
+                        appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
+
+                        _dbContext.SaveChanges();
+                    }
+                }
+
+                if (!requestExpandResult.Succeed)
+                {
+                    transaction.Rollback();
+                    result.ErrorMessage = requestExpandResult.ErrorMessage;
+                }
+                else if (requestUpgradeResults.Any(x => !x.Succeed))
+                {
+                    transaction.Rollback();
+                    result.ErrorMessage = requestUpgradeResults.FirstOrDefault(x => !x.Succeed).ErrorMessage;
+                }
+                else if (!validPrecondition)
+                {
+                    transaction.Rollback();
+                }
+                else
+                {
+                    var appointmentModelString = JsonSerializer.Serialize(_mapper.Map<AppointmentResultModel>(appointment));
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = appointment.ServerAllocation.CustomerId,
+                        Action = "Complete",
+                        Title = "Appointment complete",
+                        Body = "There's an appointment and all associated request just complete",
+                        Data = new NotificationData
+                        {
+                            Key = "Appointment",
+                            Value = appointmentModelString
+                        }
+                    });
+                    if (appointment.RequestExpandAppointments.Any(x => x.ForRemoval))
+                    {
+                        var serverModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(appointment.ServerAllocation));
+                        await _notiService.Add(new NotificationCreateModel
+                        {
+                            UserId = appointment.ServerAllocation.CustomerId,
+                            Action = "Removed",
+                            Title = "Server removed",
+                            Body = "There's an server just removed",
+                            Data = new NotificationData
+                            {
+                                Key = "ServerAllocation",
+                                Value = serverModelString
+                            }
+                        });
+                    }
+
+                    result.Succeed = true;
+                    transaction.Commit();
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            transaction.Rollback();
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
 
