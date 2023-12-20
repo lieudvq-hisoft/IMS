@@ -130,6 +130,14 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/AssignedIncident")]
+    public async Task<ActionResult> GetAssignedIncident(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] IncidentSearchModel searchModel)
+    {
+        var result = await _userService.GetIncident(Guid.Parse(id), pagingParam, searchModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost("FcmToken")]
     [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<IActionResult> BindFcmToken([FromBody] BindFcmtokenModel model)

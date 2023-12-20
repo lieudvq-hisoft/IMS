@@ -71,6 +71,14 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/Incident")]
+    public async Task<ActionResult> GetIncident(int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] IncidentSearchModel searchModel)
+    {
+        var result = await _appointmentService.GetIncident(id, paginationModel, searchModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] AppointmentCreateModel model)
     {

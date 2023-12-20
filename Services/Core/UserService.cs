@@ -32,6 +32,7 @@ public interface IUserService
     Task<ResultModel> GetAssignedRequestExpand(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel);
     Task<ResultModel> GetAssignedRequestUpgrade(string userId, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
     Task<ResultModel> GetAssignedRequestHost(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel);
+    Task<ResultModel> GetIncident(Guid id, PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel);
     Task<ResultModel> BindFcmtoken(BindFcmtokenModel model, Guid userId);
     Task<ResultModel> DeleteFcmToken(string fcmToken, Guid userId);
     Task<ResultModel> SeenCurrenNoticeCount(Guid userId);
@@ -726,6 +727,37 @@ public class UserService : IUserService
                 result.Data = paging;
                 result.Succeed = true;
             }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetIncident(Guid id, PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var incidents = _dbContext.Incidents
+                .Include(x => x.IncidentAppointments).ThenInclude(x => x.Appointment)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.IncidentUsers).ThenInclude(x => x.User)
+                .Where(x => x.IncidentUsers.Any(x => x.UserId == id && x.Action == RequestUserAction.Execute))
+                .AsQueryable();
+
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, incidents.Count());
+
+            incidents = incidents.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            incidents = incidents.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            paging.Data = _mapper.Map<List<IncidentModel>>(incidents.ToList());
+
+            result.Data = paging;
+            result.Succeed = true;
         }
         catch (Exception e)
         {

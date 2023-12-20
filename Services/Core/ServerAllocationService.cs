@@ -21,6 +21,7 @@ public interface IServerAllocationService
     Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestHost(int id, PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel);
+    Task<ResultModel> GetIncident(int id, PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel);
     //Task<ResultModel> GetLocationAssignment(int id);
     Task<ResultModel> GetIpAddress(int id, PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetLocation(PagingParam<SimpleSortCriteria> paginationModel, int id);
@@ -260,30 +261,36 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    //public async Task<ResultModel> GetLocationAssignment(int id)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
+    public async Task<ResultModel> GetIncident(int id, PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
 
-    //    try
-    //    {
-    //        var serverAllocation = _dbContext.ServerAllocations.Include(x => x.LocationAssignments).FirstOrDefault(x => x.Id == id);
-    //        if (serverAllocation == null)
-    //        {
-    //            result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-    //        }
-    //        else
-    //        {
-    //            result.Data = _mapper.Map<List<LocationAssignmentModel>>(serverAllocation.LocationAssignments);
-    //            result.Succeed = true;
-    //        }
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
-    //    return result;
-    //}
+        try
+        {
+            var incidents = _dbContext.Incidents
+                .Include(x => x.IncidentAppointments).ThenInclude(x => x.Appointment)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.IncidentUsers).ThenInclude(x => x.User)
+                .Where(x => x.ServerAllocationId == id)
+                .AsQueryable();
+
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, incidents.Count());
+
+            incidents = incidents.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            incidents = incidents.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            paging.Data = _mapper.Map<List<IncidentModel>>(incidents.ToList());
+
+            result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
 
     public async Task<ResultModel> GetIpAddress(int id, PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel)
     {

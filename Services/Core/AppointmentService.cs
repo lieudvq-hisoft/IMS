@@ -23,6 +23,7 @@ public interface IAppointmentService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestUpgrade(int id, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
+    Task<ResultModel> GetIncident(int id, PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel);
     Task<ResultModel> Create(AppointmentCreateModel model);
     Task<ResultModel> CreateIncident(AppointmentIncidentCreateModel model, Guid userId);
     Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model);
@@ -231,6 +232,37 @@ public class AppointmentService : IAppointmentService
                 result.Data = paging;
                 result.Succeed = true;
             }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetIncident(int id, PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var incidents = _dbContext.Incidents
+                .Include(x => x.IncidentAppointments).ThenInclude(x => x.Appointment)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.IncidentUsers).ThenInclude(x => x.User)
+                .Where(x => x.IncidentAppointments.Any(x => x.AppointmentId == id))
+                .AsQueryable();
+
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, incidents.Count());
+
+            incidents = incidents.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            incidents = incidents.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            paging.Data = _mapper.Map<List<IncidentModel>>(incidents.ToList());
+
+            result.Data = paging;
+            result.Succeed = true;
         }
         catch (Exception e)
         {
