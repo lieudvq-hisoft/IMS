@@ -774,17 +774,10 @@ public class AppointmentService : IAppointmentService
         try
         {
             var appointment = _dbContext.Appointments.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == model.Id && x.ServerAllocation.Status != ServerAllocationStatus.Removed);
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == model.UserId);
             if (appointment == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
-            }
-
-            if (user == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
 
             if (validPrecondition)
