@@ -107,6 +107,7 @@ public class IncidentService : IIncidentService
             else
             {
                 var incident = _mapper.Map<IncidentCreateModel, Incident>(model);
+                _dbContext.Incidents.Add(incident);
                 _dbContext.SaveChanges();
                 _dbContext.IncidentUsers.Add(new IncidentUser
                 {
@@ -114,7 +115,6 @@ public class IncidentService : IIncidentService
                     UserId = userId,
                     Action = RequestUserAction.Evaluate
                 });
-                _dbContext.Incidents.Add(incident);
                 if (model.PausingRequired)
                 {
                     serverAllocation.Status = Data.Enums.ServerAllocationStatus.Pausing;
