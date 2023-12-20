@@ -784,12 +784,6 @@ public class AppointmentService : IAppointmentService
             {
                 _dbContext.AppointmentUsers.RemoveRange(_dbContext.AppointmentUsers.Where(x => x.AppointmentId == appointment.Id && x.Action == RequestUserAction.Execute));
                 _mapper.Map<AppointmentUpdateModel, Appointment>(model, appointment);
-                _dbContext.AppointmentUsers.Add(new AppointmentUser
-                {
-                    Action = RequestUserAction.Execute,
-                    AppointmentId = appointment.Id,
-                    UserId = model.UserId
-                });
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<AppointmentResultModel>(appointment);
