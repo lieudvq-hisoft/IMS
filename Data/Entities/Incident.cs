@@ -8,8 +8,7 @@ public class Incident : BaseEntity
     public string? Document { get; set; }
     public bool PausingRequired { get; set; }
 
-    public Guid UserId { get; set; }
-    public User User { get; set; }
+    public ICollection<IncidentUser> IncidentUsers { get; set; }
 
     public int ServerAllocationId { get; set; }
     public ServerAllocation ServerAllocation { get; set; }

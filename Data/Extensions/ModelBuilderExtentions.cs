@@ -232,6 +232,7 @@ public static class ModelBuilderExtentions
         builder.Entity<Customer>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Incident>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<IncidentAppointment>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<IncidentUser>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<IpAddress>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<IpAssignment>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<IpSubnet>().HasQueryFilter(x => !x.IsDeleted);

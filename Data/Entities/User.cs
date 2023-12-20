@@ -23,5 +23,5 @@ public class User : IdentityUser<Guid>
     public ICollection<RequestExpandUser>? RequestExpandUsers { get; set; }
     public ICollection<RequestHostUser>? RequestHostUsers { get; set; }
     public ICollection<UserCustomer>? UserCustomers { get; set; }
-    public ICollection<Incident>? Incidents { get; set; }
+    public ICollection<IncidentUser>? IncidentUsers { get; set; }
 }

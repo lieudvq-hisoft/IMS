@@ -7,18 +7,19 @@ public class IncidentModel
     public int Id { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
-    public string Description { get; set; }
+    public string? Description { get; set; }
     public string? Solution { get; set; }
     public bool PausingRequired { get; set; }
     public bool IsResolved { get; set; }
     public bool IsResolvByClient { get; set; }
     public string? Document { get; set; }
 
-    public UserModel Executor { get; set; }
+    public UserModel? Evaluator { get; set; }
+    public UserModel? Executor { get; set; }
 
-    public ServerAllocationResultModel ServerAllocation { get; set; }
+    public ServerAllocationResultModel? ServerAllocation { get; set; }
 
-    public AppointmentResultModel Appointment { get; set; }
+    public AppointmentResultModel? Appointment { get; set; }
 }
 
 public class IncidentResultModel
@@ -26,7 +27,7 @@ public class IncidentResultModel
     public int Id { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
-    public string Description { get; set; }
+    public string? Description { get; set; }
     public string? Solution { get; set; }
     public bool PausingRequired { get; set; }
     public bool IsResolved { get; set; }

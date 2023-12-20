@@ -42,7 +42,7 @@ public class IncidentService : IIncidentService
             var incidents = _dbContext.Incidents
                 .Include(x => x.IncidentAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .Include(x => x.User)
+                .Include(x => x.IncidentUsers).ThenInclude(x => x.User)
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, incidents.Count());
@@ -72,7 +72,7 @@ public class IncidentService : IIncidentService
             var incident = _dbContext.Incidents
                 .Include(x => x.IncidentAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .Include(x => x.User)
+                .Include(x => x.IncidentUsers).ThenInclude(x => x.User)
                 .FirstOrDefault(x => x.Id == id);
 
             if (incident == null)
@@ -107,7 +107,13 @@ public class IncidentService : IIncidentService
             else
             {
                 var incident = _mapper.Map<IncidentCreateModel, Incident>(model);
-                incident.UserId = userId;
+                _dbContext.SaveChanges();
+                _dbContext.IncidentUsers.Add(new IncidentUser
+                {
+                    IncidentId = incident.Id,
+                    UserId = userId,
+                    Action = RequestUserAction.Evaluate
+                });
                 _dbContext.Incidents.Add(incident);
                 if (model.PausingRequired)
                 {
@@ -151,7 +157,7 @@ public class IncidentService : IIncidentService
                 .Include(x => x.IncidentAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.ServerAllocation)
-                .Include(x => x.User)
+                .Include(x => x.IncidentUsers).ThenInclude(x => x.User)
                 .FirstOrDefault(x => x.Id == model.Id && !x.IsResolved);
             if (incident == null)
             {
@@ -161,14 +167,16 @@ public class IncidentService : IIncidentService
             {
                 result.ErrorMessage = "Incident need an appointment from client to be resolved";
             }
-            else if (incident.UserId != userId)
-            {
-                result.ErrorMessage = "Not incident executor";
-            }
             else
             {
                 incident.Solution = model.Solution;
                 incident.IsResolved = true;
+                _dbContext.IncidentUsers.Add(new IncidentUser
+                {
+                    IncidentId = incident.Id,
+                    UserId = userId,
+                    Action = RequestUserAction.Execute
+                });
                 var serverAllocation = incident.ServerAllocation;
                 bool stopPausing = serverAllocation.Status == ServerAllocationStatus.Pausing && !serverAllocation.Incidents.Any(x => !x.IsResolved && x.PausingRequired);
                 if (stopPausing)

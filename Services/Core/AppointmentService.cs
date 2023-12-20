@@ -385,7 +385,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateIncident(AppointmentIncidentCreateModel model)
+    public async Task<ResultModel> CreateIncident(AppointmentIncidentCreateModel model, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -401,15 +401,21 @@ public class AppointmentService : IAppointmentService
             else
             {
                 var appointment = _mapper.Map<Appointment>(model);
-                appointment.Status = RequestStatus.Success;
+                appointment.Status = RequestStatus.Accepted;
                 appointment.Reason = AppointmentReason.Incident;
                 _dbContext.Appointments.Add(appointment);
+                _dbContext.SaveChanges();
+                _dbContext.AppointmentUsers.Add(new AppointmentUser
+                {
+                    AppointmentId = appointment.Id,
+                    UserId = userId
+                });
                 _dbContext.SaveChanges();
 
                 var createIncidentAppointmentResults = new List<ResultModel>();
                 foreach (var incidentId in model.IncidentIds)
                 {
-                    createIncidentAppointmentResults.Add(await CreateOneIncidentAppointment(appointment.Id, incidentId));
+                    createIncidentAppointmentResults.Add(await CreateOneIncidentAppointment(appointment.Id, incidentId, userId));
                 }
 
                 if (createIncidentAppointmentResults.Any(x => !x.Succeed))
@@ -420,7 +426,6 @@ public class AppointmentService : IAppointmentService
                 else
                 {
                     transaction.Commit();
-
                     var sales = _dbContext.Users
                     .Include(x => x.UserRoles).ThenInclude(x => x.Role)
                     .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
@@ -684,7 +689,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    private async Task<ResultModel> CreateOneIncidentAppointment(int appointmentId, int incidentId)
+    private async Task<ResultModel> CreateOneIncidentAppointment(int appointmentId, int incidentId, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -740,6 +745,12 @@ public class AppointmentService : IAppointmentService
                     IncidentId = incidentId,
                     AppointmentId = appointmentId,
                 };
+                _dbContext.IncidentUsers.Add(new IncidentUser
+                {
+                    Action = RequestUserAction.Evaluate,
+                    IncidentId = incidentId,
+                    UserId = userId
+                });
                 _dbContext.IncidentAppointments.Add(incidentAppointment);
                 _dbContext.SaveChanges();
 
