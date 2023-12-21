@@ -44,6 +44,14 @@ public class IncidentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPut]
+    public async Task<ActionResult> Update([FromBody] IncidentUpdateModel model)
+    {
+        var result = await _incidentService.Update(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut("{id}/Resolve")]
     public async Task<ActionResult> Resolve(int id, [FromBody] IncidentResolvModel model)
     {

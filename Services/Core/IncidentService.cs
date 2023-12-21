@@ -16,6 +16,7 @@ public interface IIncidentService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(IncidentCreateModel model, Guid userId);
+    Task<ResultModel> Update(IncidentUpdateModel model);
     Task<ResultModel> Resolv(int incidentId, IncidentResolvModel model, Guid userId);
 }
 
@@ -106,7 +107,7 @@ public class IncidentService : IIncidentService
             var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != Data.Enums.ServerAllocationStatus.Removed && x.Status != Data.Enums.ServerAllocationStatus.Waiting);
             if (serverAllocation == null)
             {
-                result.ErrorMessage = IncidentErrorMessage.NOT_EXISTED;
+                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
             {
@@ -138,6 +139,44 @@ public class IncidentService : IIncidentService
                         Value = incidentModelString
                     }
                 });
+                result.Succeed = true;
+                result.Data = _mapper.Map<IncidentResultModel>(incident);
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> Update(IncidentUpdateModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var incident = _dbContext.Incidents
+                .Include(x => x.IncidentAppointments).ThenInclude(x => x.Appointment)
+                .FirstOrDefault(x => x.Id == model.Id);
+            if (incident == null)
+            {
+                result.ErrorMessage = IncidentErrorMessage.NOT_EXISTED;
+            }
+            else if (incident.IsResolved)
+            {
+                result.ErrorMessage = "Incident resolved";
+            }
+            else if (incident.IncidentAppointments.Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Accepted))
+            {
+                result.ErrorMessage = "Have accepted appointment already";
+            }
+            else
+            {
+                _mapper.Map<IncidentUpdateModel, Incident>(model, incident);
+                _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = _mapper.Map<IncidentResultModel>(incident);
             }

@@ -52,6 +52,19 @@ public class IncidentCreateModel
     public int ServerAllocationId { get; set; }
 }
 
+public class IncidentUpdateModel
+{
+    [Required]
+    [GreaterThanZero]
+    public int Id { get; set; }
+
+    [Required]
+    public string Description { get; set; }
+
+    [Required]
+    public bool IsResolvByClient { get; set; }
+}
+
 public class IncidentResolvModel
 {
     [Required]

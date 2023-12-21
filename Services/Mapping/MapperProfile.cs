@@ -320,6 +320,7 @@ public class MapperProfile : Profile
                 }
             });
         CreateMap<IncidentCreateModel, Incident>();
+        CreateMap<IncidentUpdateModel, Incident>();
         #endregion
 
         #region IP
