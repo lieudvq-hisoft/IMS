@@ -73,6 +73,7 @@ public static class StartupExtension
         services.AddScoped<IIpAddressService, IpAddressService>();
         services.AddScoped<IIpSubnetService, IpSubnetService>();
         services.AddScoped<IRequestHostService, RequestHostService>();
+        services.AddScoped<IStatisticService, StatisticService>();
 
         //services.AddScoped<IIpAssignmentService, IpAssignmentService>();
         //services.AddScoped<ICompanyTypeService, CompanyTypeService>();
