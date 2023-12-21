@@ -788,6 +788,12 @@ public class RequestHostService : IRequestHostService
                     }
                     else if (requestHost.IsRemoval)
                     {
+                        if (ipAddress.RequestHostIps.Any(x => x.RequestHostId != requestHostId && (x.RequestHost.Status == RequestHostStatus.Waiting || x.RequestHost.Status == RequestHostStatus.Accepted || x.RequestHost.Status == RequestHostStatus.Processed)))
+                        {
+                            validPrecondition = false;
+                            result.ErrorMessage = "Ip belong to another request host";
+                        }
+
                         if (ipAddress.IpAssignments.FirstOrDefault().ServerAllocationId != requestHost.ServerAllocationId)
                         {
                             validPrecondition = false;
