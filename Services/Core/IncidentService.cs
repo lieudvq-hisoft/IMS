@@ -43,6 +43,10 @@ public class IncidentService : IIncidentService
                 .Include(x => x.IncidentAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.IncidentUsers).ThenInclude(x => x.User)
+                .Where(delegate (Incident x)
+                {
+                    return x.Filter(searchModel);
+                })
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, incidents.Count());

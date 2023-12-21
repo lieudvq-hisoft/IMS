@@ -25,7 +25,7 @@ public interface IAppointmentService
     Task<ResultModel> GetRequestUpgrade(int id, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
     Task<ResultModel> GetIncident(int id, PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel);
     Task<ResultModel> Create(AppointmentCreateModel model);
-    Task<ResultModel> CreateIncident(AppointmentIncidentCreateModel model, Guid userId);
+    Task<ResultModel> CreateIncident(AppointmentIncidentCreateModel model);
     Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model);
     Task<ResultModel> Update(AppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
@@ -252,6 +252,10 @@ public class AppointmentService : IAppointmentService
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.IncidentUsers).ThenInclude(x => x.User)
                 .Where(x => x.IncidentAppointments.Any(x => x.AppointmentId == id))
+                .Where(delegate (Incident x)
+                {
+                    return x.Filter(searchModel);
+                })
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, incidents.Count());
@@ -333,6 +337,11 @@ public class AppointmentService : IAppointmentService
                         }
                         break;
                     case AppointmentReason.Support:
+                        if (model.RequestUpgradeIds != null || model.RequestUpgradeIds.Any() || model.RequestExpandId != null)
+                        {
+                            validPrecondition = false;
+                            result.ErrorMessage = "Cannot add request to support appointment";
+                        }
                         break;
                     case AppointmentReason.Incident:
                         validPrecondition = false;
@@ -418,7 +427,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateIncident(AppointmentIncidentCreateModel model, Guid userId)
+    public async Task<ResultModel> CreateIncident(AppointmentIncidentCreateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -438,15 +447,15 @@ public class AppointmentService : IAppointmentService
                 appointment.Reason = AppointmentReason.Incident;
                 _dbContext.Appointments.Add(appointment);
                 _dbContext.SaveChanges();
-                _dbContext.AppointmentUsers.Add(new AppointmentUser
-                {
-                    Action = RequestUserAction.Execute,
-                    AppointmentId = appointment.Id,
-                    UserId = userId
-                });
+                //_dbContext.AppointmentUsers.Add(new AppointmentUser
+                //{
+                //    Action = RequestUserAction.Execute,
+                //    AppointmentId = appointment.Id,
+                //    UserId = userId
+                //});
                 _dbContext.SaveChanges();
 
-                var createIncidentAppointmentResult = await CreateOneIncidentAppointment(appointment.Id, model.IncidentId, userId);
+                var createIncidentAppointmentResult = await CreateOneIncidentAppointment(appointment.Id, model.IncidentId);
 
 
                 if (!createIncidentAppointmentResult.Succeed)
@@ -721,7 +730,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    private async Task<ResultModel> CreateOneIncidentAppointment(int appointmentId, int incidentId, Guid userId)
+    private async Task<ResultModel> CreateOneIncidentAppointment(int appointmentId, int incidentId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -729,7 +738,8 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var existedIncidentAppointment = _dbContext.IncidentAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == appointmentId && x.IncidentId == incidentId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
+            var existedIncidentAppointment = _dbContext.IncidentAppointments
+                .Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == appointmentId && x.IncidentId == incidentId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
             Incident incident = null;
             if (existedIncidentAppointment != null)
             {
@@ -777,12 +787,12 @@ public class AppointmentService : IAppointmentService
                     IncidentId = incidentId,
                     AppointmentId = appointmentId,
                 };
-                _dbContext.IncidentUsers.Add(new IncidentUser
-                {
-                    Action = RequestUserAction.Execute,
-                    IncidentId = incidentId,
-                    UserId = userId
-                });
+                //_dbContext.IncidentUsers.Add(new IncidentUser
+                //{
+                //    Action = RequestUserAction.Execute,
+                //    IncidentId = incidentId,
+                //    UserId = userId
+                //});
                 _dbContext.IncidentAppointments.Add(incidentAppointment);
                 _dbContext.SaveChanges();
 
@@ -1122,7 +1132,12 @@ public class AppointmentService : IAppointmentService
         try
         {
             var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
-            var appointment = _dbContext.Appointments.Include(x => x.AppointmentUsers).FirstOrDefault(x => x.Id == appointmentId);
+            var appointment = _dbContext.Appointments
+                .Include(x => x.AppointmentUsers)
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandUsers)
+                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.RequestUpgradeUsers)
+                .Include(x => x.IncidentAppointments).ThenInclude(x => x.Incident).ThenInclude(x => x.IncidentUsers)
+                .FirstOrDefault(x => x.Id == appointmentId);
             if (appointment == null)
             {
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
@@ -1148,6 +1163,57 @@ public class AppointmentService : IAppointmentService
                     if (existedExecutor != null)
                     {
                         _dbContext.AppointmentUsers.Remove(existedExecutor);
+                    }
+                    switch (appointment.Reason)
+                    {
+                        case AppointmentReason.Support:
+                            break;
+                        case AppointmentReason.Install:
+                        case AppointmentReason.Uninstall:
+                            {
+                                var requestExpand = appointment.RequestExpandAppointments.FirstOrDefault().RequestExpand;
+                                var executor = requestExpand.RequestExpandUsers.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
+                                _dbContext.RequestExpandUsers.Remove(executor);
+                                _dbContext.RequestExpandUsers.Add(new RequestExpandUser
+                                {
+                                    Action = RequestUserAction.Execute,
+                                    RequestExpandId = requestExpand.Id,
+                                    UserId = user.Id,
+                                });
+                                break;
+                            }
+                        case AppointmentReason.Upgrade:
+                            {
+                                var requestUpgrades = appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade);
+                                foreach (var requestUpgrade in requestUpgrades)
+                                {
+                                    var executor = requestUpgrade.RequestUpgradeUsers.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
+                                    _dbContext.RequestUpgradeUsers.Remove(executor);
+                                    _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
+                                    {
+                                        Action = RequestUserAction.Execute,
+                                        RequestUpgradeId = requestUpgrade.Id,
+                                        UserId = user.Id,
+                                    });
+                                }
+                            }
+                            break;
+                        case AppointmentReason.Incident:
+                            {
+                                var incident = appointment.IncidentAppointments.FirstOrDefault().Incident;
+                                var executor = incident.IncidentUsers.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
+                                if (executor != null)
+                                {
+                                    _dbContext.IncidentUsers.Remove(executor);
+                                }
+                                _dbContext.IncidentUsers.Add(new IncidentUser
+                                {
+                                    Action = RequestUserAction.Execute,
+                                    IncidentId = incident.Id,
+                                    UserId = user.Id,
+                                });
+                                break;
+                            }
                     }
                     _dbContext.AppointmentUsers.Add(new AppointmentUser
                     {

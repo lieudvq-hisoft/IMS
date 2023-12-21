@@ -1,4 +1,6 @@
-﻿namespace Data.Entities;
+﻿using Data.Models;
+
+namespace Data.Entities;
 public class Incident : BaseEntity
 {
     public string Description { get; set; }
@@ -14,4 +16,12 @@ public class Incident : BaseEntity
     public ServerAllocation ServerAllocation { get; set; }
 
     public ICollection<IncidentAppointment> IncidentAppointments { get; set; }
+
+    public bool Filter(IncidentSearchModel searchModel)
+    {
+        var matchIsReserved = searchModel.IsResolved != null ? IsResolved == searchModel.IsResolved : true;
+        var matchResolvByClient = searchModel.IsResolvByClient != null ? IsResolvByClient == searchModel.IsResolvByClient : true;
+        var matchServer = searchModel.ServerAllocationId != null ? ServerAllocationId == searchModel.ServerAllocationId : true;
+        return matchIsReserved && matchResolvByClient && matchServer;
+    }
 }

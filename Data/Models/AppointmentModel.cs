@@ -95,8 +95,6 @@ public class AppointmentIncidentCreateModel
     [Required]
     [GreaterThanZero]
     public int IncidentId { get; set; }
-
-    public string UserId { get; set; }
 }
 
 public class RequestAppointmentCreateModel
