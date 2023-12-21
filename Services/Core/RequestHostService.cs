@@ -193,7 +193,7 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = "Please specify capacity of each port";
             }
-            else if (model.Type == IpAssignmentTypes.Additional && model.Capacities != null)
+            else if (model.Type == IpAssignmentTypes.Additional || !model.IsRemoval && model.Capacities != null)
             {
                 result.ErrorMessage = "Additional ip cannot have capacity";
             }
