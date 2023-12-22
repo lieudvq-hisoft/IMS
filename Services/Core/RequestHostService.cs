@@ -850,7 +850,9 @@ public class RequestHostService : IRequestHostService
     {
         var ipAddress = _dbContext.IpAddresses.Include(x => x.IpAssignments)
             .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
-            .Where(x => !x.Blocked && !x.IsReserved && x.IpAssignments.Any() == isRemoval && !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed))
+            .Where(x => !x.Blocked && !x.IsReserved && x.IpAssignments.Any() == isRemoval
+//&& !x.RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed)
+)
             .FirstOrDefault(x => x.Id == ipAddressId);
 
         return ipAddress;
