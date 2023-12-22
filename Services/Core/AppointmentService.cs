@@ -911,9 +911,9 @@ public class AppointmentService : IAppointmentService
                 validPrecondition = false;
             }
 
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
+            var evaluator = _dbContext.User.FirstOrDefault(x => x.Id == userId);
             User executor = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
-            if (user == null)
+            if (evaluator == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
@@ -947,7 +947,7 @@ public class AppointmentService : IAppointmentService
                 {
                     Action = RequestUserAction.Evaluate,
                     AppointmentId = appointment.Id,
-                    UserId = userId
+                    UserId = evaluator.Id
                 });
 
                 if (executor != null)
@@ -967,7 +967,7 @@ public class AppointmentService : IAppointmentService
                     {
                         Action = RequestUserAction.Evaluate,
                         RequestUpgradeId = requestUpgrade.Id,
-                        UserId = userId
+                        UserId = evaluator.Id
                     });
 
                     _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
