@@ -910,6 +910,11 @@ public class AppointmentService : IAppointmentService
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
             }
+            else if (appointment.Status != RequestStatus.Waiting)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING;
+                validPrecondition = false;
+            }
 
             var evaluator = _dbContext.User.FirstOrDefault(x => x.Id == userId);
             User executor = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
@@ -934,12 +939,6 @@ public class AppointmentService : IAppointmentService
                 }
             }
 
-            if (validPrecondition && appointment.Status != RequestStatus.Waiting)
-            {
-                result.ErrorMessage = AppointmentErrorMessage.NOT_WAITING;
-                validPrecondition = false;
-            }
-
             if (validPrecondition)
             {
                 appointment.Status = RequestStatus.Accepted;
@@ -950,15 +949,12 @@ public class AppointmentService : IAppointmentService
                     UserId = evaluator.Id
                 });
 
-                if (executor != null)
+                _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
-                    _dbContext.AppointmentUsers.Add(new AppointmentUser
-                    {
-                        Action = RequestUserAction.Execute,
-                        AppointmentId = appointmentId,
-                        UserId = executor.Id,
-                    });
-                }
+                    Action = RequestUserAction.Execute,
+                    AppointmentId = appointmentId,
+                    UserId = executor.Id,
+                });
 
                 foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
                 {
