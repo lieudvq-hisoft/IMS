@@ -135,10 +135,13 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
                 result.ErrorMessage = "Config for component require capacity";
             }
 
-            if (serverAllocation.ServerHardwareConfigs.Any(x => x.ComponentId == component.Id))
+            if (serverAllocation != null)
             {
-                validPrecondition = false;
-                result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
+                if (serverAllocation.ServerHardwareConfigs.Any(x => x.ComponentId == component.Id))
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
+                }
             }
 
             if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList()))
