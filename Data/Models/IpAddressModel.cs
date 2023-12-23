@@ -11,7 +11,7 @@ public class IpAddressModel
     public string Purpose { get; set; }
     public string AssignmentType { get; set; }
     public string Reason { get; set; }
-    public int? Capacity { get; set; }
+    public double? Capacity { get; set; }
     public ServerAllocationResultModel? ServerAllocation { get; set; }
     public CustomerResultModel? Customer { get; set; }
 
@@ -63,7 +63,7 @@ public class IpAssignmentModel
     public DateTime DateAssign { get; set; }
     public DateTime? DateUnassign { get; set; }
     public IpAssignmentTypes Type { get; set; }
-    public int? Capacity { get; set; }
+    public double? Capacity { get; set; }
     public int IpAddressId { get; set; }
     public int ServerAllocationId { get; set; }
 }

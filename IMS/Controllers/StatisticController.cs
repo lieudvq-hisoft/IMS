@@ -1,6 +1,4 @@
-﻿using Data.Common.PaginationModel;
-using Data.Enums;
-using Data.Models;
+﻿using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Services.Core;
@@ -9,7 +7,7 @@ namespace IMS.Controllers;
 [Route("api/[controller]")]
 [ApiController]
 [Authorize(AuthenticationSchemes = "Bearer")]
-public class StatisticController: ControllerBase
+public class StatisticController : ControllerBase
 {
     private readonly IStatisticService _statisticService;
 

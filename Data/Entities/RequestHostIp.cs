@@ -1,7 +1,7 @@
 ﻿namespace Data.Entities;
 public class RequestHostIp : BaseEntity
 {
-    public int? Capacity { get; set; }
+    public double? Capacity { get; set; }
 
     public int IpAddressId { get; set; }
     public virtual IpAddress IpAddress { get; set; }
