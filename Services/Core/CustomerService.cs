@@ -23,7 +23,7 @@ public interface ICustomerService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> GetDetail(Guid id);
     Task<ResultModel> GetServerAllocation(PagingParam<BaseSortCriteria> paginationModel, Guid id);
-    Task<ResultModel> GetAppointment(Guid id, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
+    //Task<ResultModel> GetAppointment(Guid id, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> Create(CustomerCreateModel model, Guid userId);
     Task<ResultModel> Delete(Guid id);
     Task<ResultModel> Update(CustomerUpdateModel model);
@@ -153,42 +153,42 @@ public class CustomerService : ICustomerService
         return result;
     }
 
-    public async Task<ResultModel> GetAppointment(Guid id, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetAppointment(Guid id, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var appointments = _dbContext.Appointments
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .Include(x => x.AppointmentUsers).ThenInclude(x => x.User)
-                .Include(x => x.RequestExpandAppointments)
-                .Include(x => x.RequestUpgradeAppointment)
-                .Where(x => x.ServerAllocation.CustomerId == id)
-                .Where(delegate (Appointment x)
-                {
-                    return x.FilterAppointment(searchModel);
-                })
-                .AsQueryable();
+    //    try
+    //    {
+    //        var appointments = _dbContext.Appointments
+    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+    //            .Include(x => x.AppointmentUsers).ThenInclude(x => x.User)
+    //            .Include(x => x.RequestExpandAppointments)
+    //            .Include(x => x.RequestUpgradeAppointment)
+    //            .Where(x => x.ServerAllocation.CustomerId == id)
+    //            .Where(delegate (Appointment x)
+    //            {
+    //                return x.FilterAppointment(searchModel);
+    //            })
+    //            .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, appointments.Count());
+    //        var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, appointments.Count());
 
-            appointments = appointments.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            appointments = appointments.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //        appointments = appointments.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //        appointments = appointments.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.Map<List<AppointmentModel>>(appointments);
+    //        paging.Data = _mapper.Map<List<AppointmentModel>>(appointments);
 
-            result.Data = paging;
-            result.Succeed = true;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //        result.Data = paging;
+    //        result.Succeed = true;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> Create(CustomerCreateModel model, Guid userId)
     {

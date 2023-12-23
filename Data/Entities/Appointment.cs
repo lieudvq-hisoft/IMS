@@ -31,7 +31,8 @@ public class Appointment : BaseEntity
         bool matchId = model.Id != null ? this.Id == model.Id : true;
         bool matchStatus = model.Status != null ? this.Status == model.Status : true;
         bool matchServerAllocationId = model.ServerAllocationId != null ? this.ServerAllocationId == model.ServerAllocationId : true;
+        bool matchCustomer = model.CustomerId != null ? this.ServerAllocation.CustomerId == model.CustomerId : true;
 
-        return matchId && matchStatus && matchServerAllocationId;
+        return matchId && matchStatus && matchServerAllocationId && matchCustomer;
     }
 }
