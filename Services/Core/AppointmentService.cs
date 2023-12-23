@@ -290,9 +290,11 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
+            var serverAllocation = _dbContext.ServerAllocations
+                .FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed);
             if (serverAllocation == null)
             {
+                validPrecondition = false;
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
             else
@@ -446,13 +448,6 @@ public class AppointmentService : IAppointmentService
                 appointment.Status = RequestStatus.Accepted;
                 appointment.Reason = AppointmentReason.Incident;
                 _dbContext.Appointments.Add(appointment);
-                _dbContext.SaveChanges();
-                //_dbContext.AppointmentUsers.Add(new AppointmentUser
-                //{
-                //    Action = RequestUserAction.Execute,
-                //    AppointmentId = appointment.Id,
-                //    UserId = userId
-                //});
                 _dbContext.SaveChanges();
 
                 var createIncidentAppointmentResult = await CreateOneIncidentAppointment(appointment.Id, model.IncidentId);
@@ -787,12 +782,6 @@ public class AppointmentService : IAppointmentService
                     IncidentId = incidentId,
                     AppointmentId = appointmentId,
                 };
-                //_dbContext.IncidentUsers.Add(new IncidentUser
-                //{
-                //    Action = RequestUserAction.Execute,
-                //    IncidentId = incidentId,
-                //    UserId = userId
-                //});
                 _dbContext.IncidentAppointments.Add(incidentAppointment);
                 _dbContext.SaveChanges();
 
@@ -1254,16 +1243,15 @@ public class AppointmentService : IAppointmentService
                 validPrecondition = false;
                 result.ErrorMessage = "Cannot complete incident appointment";
             }
-            else
-            {
-                validPrecondition = IsCompletable(appointmentId, result, userId);
-            }
-
-            if ((appointment.ReceiptOfRecipientFilePath == null ||
+            else if ((appointment.ReceiptOfRecipientFilePath == null ||
                 appointment.InspectionReportFilePath == null) && model.DocumentModel == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = "Need inspection report to complete";
+            }
+            else
+            {
+                validPrecondition = IsCompletable(appointmentId, result, userId);
             }
 
             if (validPrecondition)
@@ -2337,27 +2325,12 @@ public class AppointmentService : IAppointmentService
                 });
                 var serverAllocation = incident.ServerAllocation;
                 bool stopPausing = serverAllocation.Status == ServerAllocationStatus.Pausing && !serverAllocation.Incidents.Any(x => !x.IsResolved && x.PausingRequired);
+                _dbContext.SaveChanges();
+
                 if (stopPausing)
                 {
                     serverAllocation.Status = ServerAllocationStatus.Working;
-                }
-                _dbContext.SaveChanges();
-
-                var incidentModelString = JsonSerializer.Serialize(_mapper.Map<IncidentResultModel>(incident));
-                await _notiService.Add(new NotificationCreateModel
-                {
-                    UserId = serverAllocation.CustomerId,
-                    Action = "Resolved",
-                    Title = "Incident resolved",
-                    Body = "There's an incident just resolved",
-                    Data = new NotificationData
-                    {
-                        Key = "Incident",
-                        Value = incidentModelString
-                    }
-                });
-                if (stopPausing)
-                {
+                    _dbContext.SaveChanges();
                     var serverModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(serverAllocation));
                     await _notiService.Add(new NotificationCreateModel
                     {
@@ -2372,6 +2345,20 @@ public class AppointmentService : IAppointmentService
                         }
                     });
                 }
+
+                var incidentModelString = JsonSerializer.Serialize(_mapper.Map<IncidentResultModel>(incident));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = serverAllocation.CustomerId,
+                    Action = "Resolved",
+                    Title = "Incident resolved",
+                    Body = "There's an incident just resolved",
+                    Data = new NotificationData
+                    {
+                        Key = "Incident",
+                        Value = incidentModelString
+                    }
+                });
                 result.Succeed = true;
                 result.Data = _mapper.Map<IncidentResultModel>(incident);
             }

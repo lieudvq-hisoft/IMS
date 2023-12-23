@@ -16,7 +16,7 @@ public class PortCapacityAttribute : ValidationAttribute
     {
         if (value == null)
         {
-            return false;
+            return true;
         }
 
         double inputValue;
