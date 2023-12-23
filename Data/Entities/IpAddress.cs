@@ -30,7 +30,7 @@ public class IpAddress
 
     public bool IsAssigned()
     {
-        return IpAssignments.Any();
+        return IpAssignments.Any() && !RequestHostIps.Select(x => x.RequestHost).Any(x => x.Status == RequestHostStatus.Waiting || x.Status == RequestHostStatus.Accepted || x.Status == RequestHostStatus.Processed); ;
     }
 
     public bool Filter(IpAddressSearchModel searchModel)
