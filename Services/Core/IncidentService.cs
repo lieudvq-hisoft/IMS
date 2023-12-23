@@ -104,7 +104,7 @@ public class IncidentService : IIncidentService
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != Data.Enums.ServerAllocationStatus.Removed && x.Status != Data.Enums.ServerAllocationStatus.Waiting);
+            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == model.ServerAllocationId && x.Status != ServerAllocationStatus.Removed && x.Status != ServerAllocationStatus.Waiting);
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;

@@ -47,6 +47,14 @@ public class CustomerController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/Appointment")]
+    public async Task<ActionResult> GetAppointment(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] AppointmentSearchModel searchModel)
+    {
+        var result = await _customerService.GetAppointment(new Guid(id), pagingParam, searchModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPost]
     [SwaggerOperation(Summary = "Create a customer and associate user")]
     public async Task<ActionResult> Create([FromBody] CustomerCreateModel model)
