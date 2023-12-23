@@ -394,9 +394,9 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = RequestHostErrorMessage.NO_MASTER_IP;
             }
-            else if (requestHost.RequestHostIps.Any())
+            else if (requestHost.Status != RequestHostStatus.Waiting)
             {
-                result.ErrorMessage = "Have ip choice already";
+                result.ErrorMessage = "Request host need to be waiting";
             }
             else if (requestHost.Type == IpAssignmentTypes.Port && model.Capacities == null)
             {
