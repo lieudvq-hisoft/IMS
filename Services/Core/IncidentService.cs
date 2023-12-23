@@ -222,27 +222,11 @@ public class IncidentService : IIncidentService
                 });
                 var serverAllocation = incident.ServerAllocation;
                 bool stopPausing = serverAllocation.Status == ServerAllocationStatus.Pausing && !serverAllocation.Incidents.Any(x => !x.IsResolved && x.PausingRequired);
+                _dbContext.SaveChanges();
                 if (stopPausing)
                 {
                     serverAllocation.Status = ServerAllocationStatus.Working;
-                }
-                _dbContext.SaveChanges();
-
-                var incidentModelString = JsonSerializer.Serialize(_mapper.Map<IncidentResultModel>(incident));
-                await _notiService.Add(new NotificationCreateModel
-                {
-                    UserId = serverAllocation.CustomerId,
-                    Action = "Resolved",
-                    Title = "Incident resolved",
-                    Body = "There's an incident just resolved",
-                    Data = new NotificationData
-                    {
-                        Key = "Incident",
-                        Value = incidentModelString
-                    }
-                });
-                if (stopPausing)
-                {
+                    _dbContext.SaveChanges();
                     var serverModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(serverAllocation));
                     await _notiService.Add(new NotificationCreateModel
                     {
@@ -257,6 +241,20 @@ public class IncidentService : IIncidentService
                         }
                     });
                 }
+
+                var incidentModelString = JsonSerializer.Serialize(_mapper.Map<IncidentResultModel>(incident));
+                await _notiService.Add(new NotificationCreateModel
+                {
+                    UserId = serverAllocation.CustomerId,
+                    Action = "Resolved",
+                    Title = "Incident resolved",
+                    Body = "There's an incident just resolved",
+                    Data = new NotificationData
+                    {
+                        Key = "Incident",
+                        Value = incidentModelString
+                    }
+                });
                 result.Succeed = true;
                 result.Data = _mapper.Map<IncidentResultModel>(incident);
             }
