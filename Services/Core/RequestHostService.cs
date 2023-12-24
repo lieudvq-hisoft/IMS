@@ -823,6 +823,7 @@ public class RequestHostService : IRequestHostService
                     {
                         IpAddressId = ipAddressId,
                         RequestHostId = requestHost.Id,
+                        Capacity = requestHost.Capacities.Any() ? requestHost.Capacities[model.IpAddressIds.IndexOf(ipAddressId)] : null
                     };
                     requestHostIps.Add(requestHostIp);
                 }
