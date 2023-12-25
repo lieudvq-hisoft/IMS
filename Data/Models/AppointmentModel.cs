@@ -130,6 +130,9 @@ public class AppointmentUpdateModel
     [OfficialTime]
     public DateTime DateAppointed { get; set; }
 
+    [Required]
+    public string AppointedCustomer { get; set; }
+
     //[Required]
     //[GreaterThanZero]
     //public Guid UserId { get; set; }

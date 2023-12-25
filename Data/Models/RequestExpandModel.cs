@@ -53,9 +53,9 @@ public class RequestExpandCreateModel
 {
     public bool ForRemoval { get; set; }
 
-    [Required]
+    //[Required]
     [GreaterThanZero]
-    public int Size { get; set; }
+    public int? Size { get; set; }
 
     [Required]
     public string? Note { get; set; }

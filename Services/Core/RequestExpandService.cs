@@ -178,6 +178,11 @@ public class RequestExpandService : IRequestExpandService
                 validPrecondition = false;
                 result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
             }
+            else if (model.ForRemoval && model.Size != null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Can not specify size for removal request";
+            }
             else
             {
                 foreach (var component in requiredComponents)
@@ -197,6 +202,7 @@ public class RequestExpandService : IRequestExpandService
                 if (requestExpand.ForRemoval)
                 {
                     requestExpand.RequestType = RequestType.RemoveLocation;
+                    requestExpand.Size = serverAllocation.LocationAssignments.Count();
                 }
                 _dbContext.RequestExpands.Add(requestExpand);
                 _dbContext.SaveChanges();
