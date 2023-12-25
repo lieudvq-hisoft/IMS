@@ -242,9 +242,9 @@ public class RequestExpandService : IRequestExpandService
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
             }
-            else if (requestExpand.Status != RequestStatus.Accepted)
+            else if (requestExpand.Status != RequestStatus.Accepted && requestExpand.Status != RequestStatus.Waiting)
             {
-                result.ErrorMessage = RequestExpandErrorMessage.NOT_ACCEPTED;
+                result.ErrorMessage = "Request must be waiting or accepted";
             }
             else
             {
