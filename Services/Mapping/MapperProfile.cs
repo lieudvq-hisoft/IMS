@@ -238,6 +238,14 @@ public class MapperProfile : Profile
             })
             .AfterMap((src, dest, context) =>
             {
+                var appointment = src.RequestExpandAppointments?.Where(x => x.ForRemoval == src.ForRemoval).Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted);
+                if (appointment != null)
+                {
+                    dest.Appointment = context.Mapper.Map<Appointment, AppointmentResultModel>(appointment);
+                }
+            })
+            .AfterMap((src, dest, context) =>
+            {
                 if (src.ServerAllocation?.Customer != null)
                 {
                     dest.Customer = context.Mapper.Map<Customer, CustomerResultModel>(src.ServerAllocation.Customer);

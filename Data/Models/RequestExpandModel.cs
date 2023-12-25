@@ -21,6 +21,7 @@ public class RequestExpandModel
     public int? SuccessExpandAppointmentId { get; set; }
 
     public ServerAllocationResultModel? ServerAllocation { get; set; }
+    public AppointmentResultModel? Appointment { get; set; }
     public AppointmentResultModel? SucceededAppointment { get; set; }
     public CustomerResultModel? Customer { get; set; }
     public UserModel? Evaluator { get; set; }
