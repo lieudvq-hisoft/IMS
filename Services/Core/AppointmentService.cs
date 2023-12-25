@@ -548,6 +548,7 @@ public class AppointmentService : IAppointmentService
             }
 
             var createRequestExpandAppointmentResult = new ResultModel();
+            createRequestExpandAppointmentResult.Succeed = true;
             if (validPrecondition)
             {
                 if (model.RequestExpandId != null)
