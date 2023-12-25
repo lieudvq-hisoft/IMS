@@ -76,4 +76,5 @@ public class IncidentSearchModel
     public bool? IsResolved { get; set; }
     public bool? IsResolvByClient { get; set; }
     public int? ServerAllocationId { get; set; }
+    public bool? IsAssigned { get; set; }
 }

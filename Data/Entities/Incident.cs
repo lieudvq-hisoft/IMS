@@ -22,6 +22,7 @@ public class Incident : BaseEntity
         var matchIsReserved = searchModel.IsResolved != null ? IsResolved == searchModel.IsResolved : true;
         var matchResolvByClient = searchModel.IsResolvByClient != null ? IsResolvByClient == searchModel.IsResolvByClient : true;
         var matchServer = searchModel.ServerAllocationId != null ? ServerAllocationId == searchModel.ServerAllocationId : true;
-        return matchIsReserved && matchResolvByClient && matchServer;
+        var isAssign = searchModel.IsAssigned != null ? IncidentAppointments.Select(x => x.Appointment).Any(x => x.Status == Enums.RequestStatus.Accepted) == searchModel.IsAssigned || IsResolved : true;
+        return matchIsReserved && matchResolvByClient && matchServer && isAssign;
     }
 }
