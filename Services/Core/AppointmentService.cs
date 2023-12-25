@@ -339,7 +339,7 @@ public class AppointmentService : IAppointmentService
                         }
                         break;
                     case AppointmentReason.Support:
-                        if (model.RequestUpgradeIds != null || model.RequestUpgradeIds.Any() || model.RequestExpandId != null)
+                        if (model.RequestUpgradeIds != null || (model.RequestUpgradeIds != null && model.RequestUpgradeIds.Any()))
                         {
                             validPrecondition = false;
                             result.ErrorMessage = "Cannot add request to support appointment";
