@@ -1,0 +1,43 @@
+
+actor Client
+participant ServerAllocationController
+participant HttpContext
+participant ServerAllocationService
+participant NotificationService
+
+participant Database
+activate Client
+Client->ServerAllocationController: Send Http Request
+activate ServerAllocationController
+ServerAllocationController->HttpContext: Get Claims
+activate HttpContext
+ServerAllocationController<--HttpContext: Return result
+deactivate HttpContext
+ServerAllocationController->ServerAllocationService:Call Create()
+activate ServerAllocationService
+ServerAllocationService->Database: Execute query for existing customer
+activate Database
+ServerAllocationService<--Database: Return result
+ServerAllocationService->Database: Execute query for existing server allocation
+ServerAllocationService<--Database: Return result
+alt Server allocation exist
+ServerAllocationController<--ServerAllocationService: Return result
+Client<--ServerAllocationController: Return Http Response
+else Server allocaton not exist
+ServerAllocationService->Database: Execute non-query create server allocation
+ServerAllocationService<--Database: Return result
+ServerAllocationService->Database: Execute non-query create request expand
+ServerAllocationService<--Database: Return result
+
+ServerAllocationService->Database: Execute query for sale users
+ServerAllocationService<--Database: Return Result
+activate NotificationService
+loop For each sale user
+ServerAllocationService->NotificationService: Call Add()
+ServerAllocationService<--NotificationService: Return result
+end
+deactivate NotificationService
+
+ServerAllocationController<--ServerAllocationService: Return result
+Client<--ServerAllocationController: Return Http Response
+end

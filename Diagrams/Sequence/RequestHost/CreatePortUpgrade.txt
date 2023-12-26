@@ -1,0 +1,53 @@
+actor Client
+participant RequestHostController
+participant RequestHostService
+participant NotificationService
+
+participant Database
+activate Client
+Client->RequestHostController: Send Http Request
+activate RequestHostController
+RequestHostController->RequestHostService: Call Create()
+activate RequestHostService
+RequestHostService->Database: Start transaction
+activate Database
+RequestHostService->Database: Execute query for server
+RequestHostService<--Database: Return result
+
+alt Server not exist or not have master ip
+RequestHostService->RequestHostService: Set validPrecondition false
+else Server dont have master ip
+RequestHostService->RequestHostService: Set validPrecondition false
+else Server not working
+RequestHostService->RequestHostService: Set validPrecondition false
+else 
+RequestHostService->Database: Execute query for ipAddresses by input ips
+RequestHostService<--Database: Return Result
+opt Ip address not exist
+RequestHostService->RequestHostService: Set validPrecondition false
+end
+opt Ip address not assignable
+RequestHostService->RequestHostService: Set validPrecondition false
+end
+end 
+
+alt validPrecondition false
+RequestHostService->Database: Transaction rollback
+else 
+RequestHostService->Database: Execute non-query create requestHost
+RequestHostService<--Database: Return result
+RequestHostService->Database: Execute query for sale users
+RequestHostService<--Database: Return Result
+activate NotificationService
+loop For each sale user
+RequestHostService->NotificationService: Call Add()
+RequestHostService<--NotificationService: Return result
+end
+deactivate NotificationService
+RequestHostService->Database: Commit transaction
+deactivate Database
+end
+RequestHostController<--RequestHostService: Return result
+deactivate RequestHostService
+Client<--RequestHostController: Return Http Response
+deactivate RequestHostController

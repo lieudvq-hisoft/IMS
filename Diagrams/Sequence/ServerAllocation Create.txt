@@ -1,0 +1,25 @@
+activate Client
+Client->ServerAllocationController: Send Http Request
+activate ServerAllocationController
+ServerAllocationController->HttpContext: Get Claims
+activate HttpContext
+ServerAllocationController<--HttpContext: Return result
+deactivate HttpContext
+ServerAllocationController->ServerAllocationService:Call Create()
+activate ServerAllocationService
+ServerAllocationService->Database: Execute query for existing customer
+activate Database
+ServerAllocationService<--Database: Return result
+ServerAllocationService->Database: Execute query for existing server allocation
+ServerAllocationService<--Database: Return result
+alt Server allocation exist
+ServerAllocationController<--ServerAllocationService: Return result
+Client<--ServerAllocationController: Return Http Response
+else Server allocaton not exist
+ServerAllocationService->Database: Execute non-query create server allocation
+ServerAllocationService<--Database: Return result
+ServerAllocationService->Database: Execute non-query create request expand
+ServerAllocationService<--Database: Return result
+ServerAllocationController<--ServerAllocationService: Return result
+Client<--ServerAllocationController: Return Http Response
+end

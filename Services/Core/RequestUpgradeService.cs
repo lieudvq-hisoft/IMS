@@ -227,8 +227,8 @@ public class RequestUpgradeService : IRequestUpgradeService
                     {
                         UserId = sale.Id,
                         Action = "Created",
-                        Title = "New upgrade request",
-                        Body = "There's a new upgrade request just created",
+                        Title = "New hardware modify request",
+                        Body = "There's a new hardware modify request just created",
                         Data = new NotificationData
                         {
                             Key = "RequestUpgrade",

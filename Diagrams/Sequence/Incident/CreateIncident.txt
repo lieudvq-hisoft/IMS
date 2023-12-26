@@ -1,0 +1,34 @@
+actor Client
+participant IncidentController
+participant IncidentService
+
+participant NotificationService
+participant Database
+
+activate Client
+Client->IncidentController: Send Http Request
+activate IncidentController
+IncidentController->IncidentService: Call Create()
+activate IncidentService
+IncidentService->Database: Execute query for server
+activate Database
+IncidentService<--Database: Return result
+alt Server not exist
+IncidentService->IncidentService: Set error message
+else 
+IncidentService->Database: Execute non-query create incident
+IncidentService<--Database: Return result
+IncidentService->Database: Execute non-query create incidentUser
+IncidentService<--Database: Return result
+opt Incident required server pause
+IncidentService->Database: Execute non-query pause server
+IncidentService<--Database: Return result
+end
+IncidentService->NotificationService: Call Add()
+activate NotificationService
+IncidentService<--NotificationService: Return result
+deactivate NotificationService
+deactivate Database
+end
+IncidentController<--IncidentService: Return result
+Client<--IncidentController: Return Http Response

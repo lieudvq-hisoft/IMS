@@ -1,0 +1,47 @@
+
+actor MobileClient
+actor WebClient
+participant NotificationController
+participant NotificationService
+participant FireBaseNotificationService
+participant Database
+
+participant NotificationHub
+
+activate MobileClient
+activate WebClient
+MobileClient->NotificationController: Send Http Request
+activate NotificationController
+NotificationController->NotificationService: Call Add()
+activate NotificationService
+NotificationService->Database: Execute non-query create notification
+activate Database
+NotificationService<--Database: Return result
+NotificationService->Database: Execute query for user
+NotificationService<--Database: Return result
+NotificationService->NotificationService: Call SendNotifyFcm()
+activate NotificationService
+NotificationService->Database: Execute query for user
+NotificationService<--Database: Return result
+deactivate Database
+
+opt User exist
+NotificationService->FireBaseNotificationService: Call SendNotification()
+activate FireBaseNotificationService
+MobileClient<--FireBaseNotificationService: Send mobile notify
+NotificationService<--FireBaseNotificationService: Return result
+deactivate FireBaseNotificationService
+end
+deactivate NotificationService
+
+NotificationService->NotificationHub: Call NewNotification()
+activate NotificationHub
+WebClient<--NotificationHub: Send web notify
+NotificationService<--NotificationHub: Return result
+NotificationService->NotificationHub: Call NewNotificationCount()
+NotificationService<--NotificationHub: Return result
+deactivate NotificationHub
+NotificationController<--NotificationService: Return result
+MobileClient<--NotificationController: Return Http Response
+deactivate NotificationController
+deactivate NotificationService

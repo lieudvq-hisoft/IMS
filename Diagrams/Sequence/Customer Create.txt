@@ -1,0 +1,57 @@
+frame Create Customer
+actor Client
+participant CustomerController
+participant HttpContext
+participant CustomerService
+participant EmailService
+participant SmtpClient
+participant NotificationService
+participant Database
+
+
+activate Client
+Client->CustomerController: Send Http Request
+activate CustomerController
+CustomerController->HttpContext: Get Claims
+activate HttpContext
+
+CustomerController<--HttpContext: Return result
+deactivate HttpContext
+CustomerController->CustomerService: Call Create()
+activate CustomerService
+CustomerService->Database: Execute query for user
+activate Database
+
+CustomerService<--Database: Return result
+opt User is null
+CustomerService->CustomerService: Set validPrecondition false
+end
+CustomerService->Database: Execute query for exsiting customer
+CustomerService<--Database: Return result
+opt Customer existed
+CustomerService->CustomerService: Set validPrecondition false
+end
+opt validPrecondition true
+CustomerService->Database: Execute non query
+CustomerService<--Database: Return result
+CustomerService->CustomerService: Call SendActivationEmail()
+activate CustomerService
+CustomerService->EmailService: Call GetClient()
+activate EmailService
+EmailService->SmtpClient: Create StmpClient
+activate SmtpClient
+EmailService<--SmtpClient: Return result
+CustomerService<--EmailService: Return result
+CustomerService->EmailService: Call GetActivationMessage()
+CustomerService<--EmailService: Return result
+deactivate EmailService
+CustomerService->SmtpClient: Call SendMailAsync()
+CustomerService<--SmtpClient: Return result
+deactivate SmtpClient
+deactivate CustomerService
+
+CustomerController<--CustomerService: Return result
+deactivate CustomerService
+Client<--CustomerController: Return Http response
+deactivate CustomerController
+

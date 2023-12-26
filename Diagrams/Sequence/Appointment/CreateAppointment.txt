@@ -1,0 +1,82 @@
+actor Client
+participant AppointmentController
+participant AppointmentService
+
+participant NotificationService
+participant Database
+
+activate Client
+Client->AppointmentController: Send Http Request
+activate AppointmentController
+AppointmentController->AppointmentService:Call Create()
+activate AppointmentService
+AppointmentService->Database: Start transaction
+activate Database
+opt Input have both request expand and request upgrade
+AppointmentService->AppointmentService: Set validPrecondition false
+end
+
+AppointmentService->Database: Execute query for server
+AppointmentService<--Database: Return result
+alt Server not exsit
+AppointmentService->AppointmentService: Set validPrecondition false
+else 
+opt Input have request expand
+AppointmentService->Database: Execute query for request expand
+AppointmentService<--Database: Return result
+AppointmentService->AppointmentService: Set requestExpand
+end
+opt Invalid reason
+AppointmentService->AppointmentService: Set validPrecondition false
+end
+end
+
+opt validPrecondition true
+AppointmentService->Database: Execute non-query create appointment
+AppointmentService<--Database: Return result
+
+opt Input have request upgrade
+loop For each requestUpgradeId
+AppointmentService->AppointmentService: Call CreateOneRequestUpgradeAppointment()
+activate AppointmentService
+AppointmentService->Database: Execute non-query create requestUpgradeAppointment
+AppointmentService<--Database: Return result
+AppointmentService<--AppointmentService: Return result
+deactivate AppointmentService
+AppointmentService->AppointmentService: Add result to createRequestUpgradeAppointmentResults
+end
+opt createRequestUpgradeAppointmentResults have unsuccess result
+AppointmentService->AppointmentService: Set validPrecondition false \n and rollback transaction
+end
+end
+
+opt Input have request expand
+AppointmentService->AppointmentService: Call CreateOneRequestExpandAppointment()
+activate AppointmentService
+AppointmentService->Database: Execute non-query create requestExpandAppointment
+AppointmentService<--Database: Return result
+AppointmentService<--AppointmentService: return Result
+deactivate AppointmentService
+end
+AppointmentService->AppointmentService: Set createRequestExpandAppointmentResult
+opt createRequestExpandAppointmentResult unsuccess
+AppointmentService->AppointmentService: Set validPrecondition false \n and rollback transaction
+end
+end
+
+opt validPrecondition true
+AppointmentService->Database: commit transaction
+AppointmentService->Database: Execute query for sale users
+AppointmentService<--Database: Return Result
+activate NotificationService
+loop For each sale user
+AppointmentService->NotificationService: Call Add()
+AppointmentService<--NotificationService: Return result
+end
+deactivate NotificationService
+end
+
+AppointmentController<--AppointmentService: Return result
+deactivate AppointmentService
+Client<--AppointmentController: Return Http Response
+deactivate AppointmentController

@@ -1,0 +1,65 @@
+actor Client
+participant AppointmentController
+participant AppointmentService
+
+participant NotificationService
+participant Database
+
+activate Client
+Client->AppointmentController: Send Http Request
+activate AppointmentController
+AppointmentController->AppointmentService:Call CreateIncident()
+activate AppointmentService
+AppointmentService->Database: Start transaction
+activate Database
+AppointmentService->Database: Execute query for server
+AppointmentService<--Database: Return result
+alt Server not exsit
+AppointmentService->AppointmentService: Set error message
+else 
+AppointmentService->Database: Execute non-query create appointment
+AppointmentService<--Database: Return result
+AppointmentService->AppointmentService: Call CreateOneIncidentAppointment()
+activate AppointmentService
+AppointmentService->Database: Execute query for existed incident appointment
+AppointmentService<--Database: Return result
+alt Incident appointment existed
+AppointmentService->AppointmentService: Set validPrecondition false
+else 
+AppointmentService->Database: Execute query for incident appointment
+AppointmentService<--Database: Return result
+alt Appointment not exist or invalid
+AppointmentService->AppointmentService: Set validPrecondition false
+else 
+AppointmentService->Database: Execute query for incident
+AppointmentService<--Database: Return result
+opt Incident not exsit or invalid
+AppointmentService->AppointmentService: Set validPrecondition false
+end
+end
+end
+
+opt validPrecondition true
+AppointmentService->Database: Execute non-query create incidentAppointment
+AppointmentService<--Database: Return result
+end
+AppointmentService<--AppointmentService: Return result
+deactivate AppointmentService
+
+alt result unsuccess
+AppointmentService->Database: Rollback transaction
+else 
+AppointmentService->Database: Execute query for sale users
+AppointmentService<--Database: Return Result
+activate NotificationService
+loop For each sale user
+AppointmentService->NotificationService: Call Add()
+AppointmentService<--NotificationService: Return result
+end
+deactivate Database
+deactivate NotificationService
+end
+end
+AppointmentController<--AppointmentService: Return result
+Client<--AppointmentController: Return Http Response
+

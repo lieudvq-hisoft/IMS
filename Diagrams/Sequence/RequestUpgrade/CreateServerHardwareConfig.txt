@@ -1,0 +1,49 @@
+
+actor Client
+participant ServerHardwareconfigController
+
+
+participant ServerHardwareConfigService
+participant Database
+
+
+activate Client
+Client->ServerHardwareconfigController: Send Http Request
+activate ServerHardwareconfigController
+ServerHardwareconfigController->ServerHardwareConfigService: Call Create()
+activate ServerHardwareConfigService
+
+ServerHardwareConfigService->Database: Execute query for server
+activate Database
+ServerHardwareConfigService<--Database: Return result
+alt Server not exist
+ServerHardwareConfigService->ServerHardwareConfigService: Set validPrecondition false
+else 
+opt Server allocated
+ServerHardwareConfigService->ServerHardwareConfigService: Set validPrecondition false
+end
+end
+
+ServerHardwareConfigService->Database: Execute query for component
+ServerHardwareConfigService<--Database: Return result
+opt Component not exist
+ServerHardwareConfigService->ServerHardwareConfigService: Set validPrecondition false
+end
+opt Server exist
+opt Server have config for component
+ServerHardwareConfigService->ServerHardwareConfigService: Set validPrecondition false
+end
+end
+opt validPrecondition true and Config serial number invalid
+ServerHardwareConfigService->ServerHardwareConfigService: Set validPrecondition false
+end
+
+opt validPrecondition true
+ServerHardwareConfigService->Database: Execute non-query create config
+ServerHardwareConfigService<--Database: Return result
+ServerHardwareConfigService->Database: Execute non-query create reqquest upgrade
+ServerHardwareConfigService<--Database: Return result
+end
+deactivate Database
+ServerHardwareconfigController<--ServerHardwareConfigService: Return result
+Client<--ServerHardwareconfigController: Return Http Response

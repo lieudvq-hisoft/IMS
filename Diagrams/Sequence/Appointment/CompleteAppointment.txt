@@ -1,0 +1,92 @@
+actor Client
+participant AppointmentController
+participant AppointmentService
+
+participant NotificationService
+participant Database
+
+activate Client
+Client->AppointmentController: Send Http Request
+activate AppointmentController
+AppointmentController->AppointmentService:Call Create()
+activate AppointmentService
+AppointmentService->Database: Start transaction
+activate Database
+
+AppointmentService->Database: Execute query for appointment
+AppointmentService<--Database: Return result
+alt Appointment non-exist
+AppointmentService->AppointmentService: Set validPrecondition false
+else Input not valid
+AppointmentService->AppointmentService: Set validPrecondition false
+else 
+AppointmentService->AppointmentService: Call IsCompletable()
+activate AppointmentService
+AppointmentService<--AppointmentService: Return result
+deactivate AppointmentService
+opt Appointment is completable
+AppointmentService->AppointmentService: Set validPrecondition false
+end
+end
+
+opt validPrecondition false
+AppointmentService->Database: Execute non-query update status appointment to success
+AppointmentService<--Database: Return result
+opt Input have request upgrade
+AppointmentService->AppointmentService: Call CreateUpgradeReceiptReport()
+activate AppointmentService
+AppointmentService<--AppointmentService: Return result
+deactivate AppointmentService
+AppointmentService->AppointmentService: Call CreateUpgradeInspectionReport()
+activate AppointmentService
+AppointmentService<--AppointmentService: Return result
+deactivate AppointmentService
+
+alt create document not success
+AppointmentService->AppointmentService: Set validPrecondition false
+else
+loop For each requestUpgradeId
+AppointmentService->AppointmentService: Call CompleteRequestUpgrade()
+activate AppointmentService
+AppointmentService<--AppointmentService: Return result
+deactivate AppointmentService
+AppointmentService->AppointmentService: Add result to requestUpgradeResults
+end
+end
+AppointmentService->Database: Execute non-query
+AppointmentService<--Database: Return result
+end
+
+opt Input have request expand
+AppointmentService->AppointmentService: Call CreateExpandInspectionReport()
+activate AppointmentService
+AppointmentService<--AppointmentService: Return result
+deactivate AppointmentService
+AppointmentService->AppointmentService: Call CreateExpandReceiptReport()
+activate AppointmentService
+AppointmentService<--AppointmentService: Return result
+deactivate AppointmentService
+
+alt create document not success
+AppointmentService->AppointmentService: Set validPrecondition false
+else
+AppointmentService->AppointmentService: Complete requext expand
+end
+AppointmentService->Database: Execute non-query
+AppointmentService<--Database: Return result
+end
+
+alt Any request complete result unsuccess or validPrecondition false
+AppointmentService->Database: Rollback transaction
+else 
+AppointmentService->Database: Commit transaction
+deactivate Database
+AppointmentService->NotificationService: Call Add()
+activate NotificationService
+AppointmentService<--NotificationService: Return result
+deactivate NotificationService
+end
+end
+AppointmentController<--AppointmentService: Return result
+deactivate AppointmentService
+Client<--AppointmentController: Return Http Response

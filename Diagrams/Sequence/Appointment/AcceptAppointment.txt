@@ -1,0 +1,56 @@
+actor Client
+participant AppointmentController
+participant HttpContext
+participant AppointmentService
+
+participant NotificationService
+participant Database
+
+
+activate Client
+Client->AppointmentController: Send Http Request
+activate AppointmentController
+AppointmentController->HttpContext: Get Claims
+activate HttpContext
+AppointmentController<--HttpContext: Return result
+deactivate HttpContext
+AppointmentController->AppointmentService:Call Accept()
+activate AppointmentService
+
+AppointmentService->Database: Execute query for appointment
+activate Database
+AppointmentService<--Database: Return result
+alt Appointment not exist
+AppointmentService->AppointmentService: Set validPrecondition false
+else appointment not waiting
+AppointmentService->AppointmentService: Set validPrecondition false
+end
+
+AppointmentService->Database: Execute query for executor and evaluator user
+alt Evaluator or executor not exist
+AppointmentService->AppointmentService:  Set validPrecondition false
+else Executor not a tech
+AppointmentService->AppointmentService:  Set validPrecondition false
+end
+end
+
+opt validPrecondition true
+AppointmentService->Database: Execute non-query update appointment status, assign executor and evaluator to appointment and related request.\n Pause server if appointment have request expand for removal
+AppointmentService<--Database: Return result
+AppointmentService->NotificationService: Call Add()
+activate NotificationService
+AppointmentService<--NotificationService: Return result
+opt Appointment have request expand for removal
+AppointmentService->NotificationService: Call Add()
+AppointmentService<--NotificationService: Return result
+end
+end
+
+deactivate NotificationService
+deactivate Database
+AppointmentController<--AppointmentService: Return result
+deactivate AppointmentService
+Client<--AppointmentController: Return Http Response
+deactivate AppointmentController
+
+

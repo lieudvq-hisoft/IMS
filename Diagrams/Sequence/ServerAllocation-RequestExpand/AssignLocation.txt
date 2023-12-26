@@ -1,0 +1,46 @@
+actor Client
+participant RequestExpandController
+participant RequestExpandService
+
+participant Database
+activate Client
+Client->RequestExpandController: Send Http Request
+activate RequestExpandController
+RequestExpandController->RequestExpandService: Call AssignLocation()
+activate RequestExpandService
+RequestExpandService->Database: Execute query for requestExpand
+activate Database
+RequestExpandService<--Database: Return result
+opt requestExpand not exist or not valid
+RequestExpandService->RequestExpandService: Set validPrecondition false
+end
+
+opt validPrecondition true
+RequestExpandService->Database: Execute query
+RequestExpandService<--Database: Return result
+opt requestExpand not have accepted appointment
+RequestExpandService->RequestExpandService: Set validPrecondition false
+end
+end
+
+opt validPrecondition true
+RequestExpandService->Database: Execute query for locations from input location ids
+RequestExpandService<--Database: Return result
+alt Number of location not equal requestExpand size
+RequestExpandService->RequestExpandService: Set validPrecondition false
+else Location assigned or requested
+RequestExpandService->RequestExpandService: Set validPrecondition false
+end
+end
+
+opt validPrecondition true
+RequestExpandService->Database: Execute non-query assign locations to requestExpand
+RequestExpandService<--Database: Return result
+end
+deactivate Database
+
+RequestExpandController<--RequestExpandService: Return result
+deactivate RequestExpandService
+Client<--RequestExpandController: Return Http Response
+deactivate RequestExpandController
+
