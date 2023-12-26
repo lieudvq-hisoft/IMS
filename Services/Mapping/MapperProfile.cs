@@ -62,7 +62,12 @@ public class MapperProfile : Profile
                 }
             })
             .AfterMap((src, dest) =>
-                dest.Descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description))
+            {
+                if (src.Description != null)
+                {
+                    dest.Descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description);
+                }
+            })
             .AfterMap((src, dest, context) =>
             {
                 if (src.Component != null)
@@ -110,10 +115,20 @@ public class MapperProfile : Profile
             });
         CreateMap<RequestUpgradeCreateModel, RequestUpgrade>()
             .AfterMap((src, dest) =>
-                dest.Description = JsonSerializer.Serialize(src.Descriptions));
+            {
+                if (src.Descriptions != null)
+                {
+                dest.Description = JsonSerializer.Serialize(src.Descriptions);
+                }
+            });
         CreateMap<RequestUpgradeUpdateModel, RequestUpgrade>()
             .AfterMap((src, dest) =>
-                dest.Description = JsonSerializer.Serialize(src.Descriptions));
+            {
+                if (src.Descriptions != null)
+                {
+                    dest.Description = JsonSerializer.Serialize(src.Descriptions);
+                }
+            });
         #endregion
 
         #region ServerAllocation
@@ -437,8 +452,13 @@ public class MapperProfile : Profile
                 dest.Descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description));
         CreateMap<ServerAllocation, ServerAllocationResultModel>();
         CreateMap<RequestUpgrade, RequestUpgradeResultModel>()
-            .AfterMap((src, dest, context) =>
-                dest.Descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description));
+            .AfterMap((src, dest) =>
+            {
+                if (src.Description != null)
+                {
+                    dest.Descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description);
+                }
+            });
         CreateMap<RequestExpand, RequestExpandResultModel>();
         CreateMap<RequestHost, RequestHostResultModel>();
         CreateMap<Rack, RackResultModel>();

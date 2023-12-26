@@ -155,7 +155,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 result.ErrorMessage = "Component is required";
             }
 
-            if (component.RequireCapacity && model.Descriptions.Any(x => x.Capacity == null))
+            if (component.RequireCapacity && model.Descriptions != null && model.Descriptions.Any(x => x.Capacity == null))
             {
                 validPrecondition = false;
                 result.ErrorMessage = "Config for component require capacity";
@@ -196,10 +196,13 @@ public class RequestUpgradeService : IRequestUpgradeService
                 }
             }
 
-            if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), model.ComponentId, serverAllocation.Id))
+            if (model.Descriptions != null)
             {
-                validPrecondition = false;
-                result.ErrorMessage = "Serial number existed";
+                if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), model.ComponentId, serverAllocation.Id))
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Serial number existed";
+                }
             }
 
             if (validPrecondition)
@@ -316,6 +319,11 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING + " & " + RequestUpgradeErrorMessage.NOT_ACCEPTED;
             }
+            else if (requestUpgrade.RequestType == RequestType.RemoveHardware && model.Descriptions != null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Request for removal cannot have description";
+            }
 
             var component = requestUpgrade?.Component;
             if (component == null)
@@ -330,7 +338,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 result.ErrorMessage = "Config for component require capacity";
             }
 
-            if (component.RequireCapacity && model.Descriptions.Any(x => x.Capacity == null))
+            if (component.RequireCapacity && model.Descriptions != null && model.Descriptions.Any(x => x.Capacity == null))
             {
                 validPrecondition = false;
                 result.ErrorMessage = "Config for component require capacity";
@@ -353,10 +361,13 @@ public class RequestUpgradeService : IRequestUpgradeService
                 result.ErrorMessage = "Server dont have config to remove";
             }
 
-            if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), requestUpgrade.ComponentId, serverAllocation.Id))
+            if (model.Descriptions != null)
             {
-                validPrecondition = false;
-                result.ErrorMessage = "Serial number existed";
+                if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), requestUpgrade.ComponentId, serverAllocation.Id))
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Serial number existed";
+                }
             }
 
             if (validPrecondition)

@@ -951,6 +951,7 @@ public class RequestHostService : IRequestHostService
                         _dbContext.IpAssignments.RemoveRange(ipAddress.IpAssignments);
                     }
                 }
+
                 if (!requestHost.IsRemoval)
                 {
                     _dbContext.IpAssignments.AddRange(ipAssignments);

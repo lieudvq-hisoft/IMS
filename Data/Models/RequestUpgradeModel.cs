@@ -6,7 +6,7 @@ namespace Data.Models;
 public class RequestUpgradeModel
 {
     public int Id { get; set; }
-    public List<ConfigDescriptionModel> Descriptions { get; set; }
+    public List<ConfigDescriptionModel>? Descriptions { get; set; }
     public string Status { get; set; }
     public string? Note { get; set; }
     public string? TechNote { get; set; }
@@ -30,7 +30,7 @@ public class RequestUpgradeModel
 public class RequestUpgradeResultModel
 {
     public int Id { get; set; }
-    public List<ConfigDescriptionModel> Descriptions { get; set; }
+    public List<ConfigDescriptionModel>? Descriptions { get; set; }
     public string Status { get; set; }
     public RequestType RequestType { get; set; }
     public string? Note { get; set; }
