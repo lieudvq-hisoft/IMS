@@ -1,0 +1,55 @@
+actor Client
+participant RequestHostController
+participant RequestHostService
+participant NotificationService
+
+participant Database
+activate Client
+Client->RequestHostController: Send Http Request
+activate RequestHostController
+RequestHostController->RequestHostService: Call Create()
+activate RequestHostService
+RequestHostService->Database: Start transaction
+activate Database
+RequestHostService->Database: Execute query for request Host
+RequestHostService<--Database: Return result
+alt request not Exist
+RequestHostService->RequestHostService: Set validPrecondition false
+else Request host not completable
+RequestHostService->RequestHostService: Set validPrecondition false
+end
+
+alt validPrecondition false
+RequestHostService->Database: Rollback transaction
+else
+loop for each ipAddress in ipAddresses
+alt requestHost is for removal
+RequestHostService->Database: Execute query for ipAddress
+RequestHostService<--Database: Return result
+RequestHostService->RequestHostService: Update ipAssignment capacity
+RequestHostService->RequestHostService: Add to ipAssignment list
+end
+end
+RequestHostService->Database: Execute non-query update ipAssignment capacity
+RequestHostService<--Database: Return result
+
+RequestHostService->RequestHostService: Call CreateUpgradeAndHostInspectionReport()
+activate RequestHostService
+RequestHostService<--RequestHostService: Return result
+deactivate RequestHostService
+
+alt create doc unsuccessfully 
+RequestHostService->Database: Rollback transaction
+else 
+RequestHostService->Database: Commit transaction
+RequestHostService->NotificationService: Call Add()
+activate NotificationService
+RequestHostService<--NotificationService: Return result
+deactivate NotificationService
+end
+end
+deactivate Database
+RequestHostController<--RequestHostService: Return result
+deactivate RequestHostService
+Client<--RequestHostController: Return Http Response
+deactivate RequestHostController

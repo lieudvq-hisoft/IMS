@@ -1907,7 +1907,11 @@ public class AppointmentService : IAppointmentService
                     var receiptReportModels = new List<ReceiptReportModel>();
                     foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
                     {
-                        var requestUpgradeDescriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(requestUpgrade.Description);
+                        var requestUpgradeDescriptions = new List<ConfigDescriptionModel>();
+                        if (requestUpgrade.Description != null)
+                        {
+                            requestUpgradeDescriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(requestUpgrade.Description);
+                        }
                         var hardwareDescriptions = new List<ConfigDescriptionModel>();
                         var hardware = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId);
                         if (hardware != null)
