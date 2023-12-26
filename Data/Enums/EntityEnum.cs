@@ -83,12 +83,12 @@ public enum RemovalStatus
 public enum RequestType
 {
     Upgrade,
-    RemoveHardware,
     Expand,
     RemoveLocation,
     Host,
     RemoveIp,
-    Other
+    Other,
+    RemoveHardware,
 }
 
 public enum LocationAssignmentSortingCriteria
