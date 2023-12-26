@@ -20,7 +20,8 @@ public class ServerAllocationModel
     public string? InspectionRecordFilePath { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
     public string? RemovalFilePath { get; set; }
-
+    public int? PausingRequireIncidentCount { get; set; }
+    public int? IncidentCount { get; set; }
     public string Location { get; set; }
     public int IpCount { get; set; }
     public Guid CustomerId { get; set; }

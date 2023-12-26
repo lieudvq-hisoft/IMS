@@ -53,6 +53,14 @@ public class MapperProfile : Profile
                     dest.AppointmentId = src.RequestUpgradeAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Accepted || x.Status == RequestStatus.Waiting)?.Id;
                 }
             })
+            .AfterMap((src, dest, context) =>
+            {
+                var appointment = src.RequestUpgradeAppointments?.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted);
+                if (appointment != null)
+                {
+                    dest.Appointment = context.Mapper.Map<Appointment, AppointmentResultModel>(appointment);
+                }
+            })
             .AfterMap((src, dest) =>
                 dest.Descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description))
             .AfterMap((src, dest, context) =>
@@ -118,6 +126,14 @@ public class MapperProfile : Profile
                 {
                     dest.MasterIp = context.Mapper.Map<IpAddress, IpAddressResultModel>(masterIp);
                 }
+            })
+            .AfterMap((src, dest) =>
+            {
+                dest.IncidentCount = src.Incidents?.Count(x => !x.IsResolved);
+            })
+            .AfterMap((src, dest) =>
+            {
+                dest.PausingRequireIncidentCount = src.Incidents?.Count(x => !x.IsResolved && x.PausingRequired);
             })
             .AfterMap((src, dest, context) =>
             {

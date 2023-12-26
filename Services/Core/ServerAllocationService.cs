@@ -38,15 +38,13 @@ public class ServerAllocationService : IServerAllocationService
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
     private readonly ICloudinaryHelper _cloudinaryHelper;
-    private readonly UserManager<User> _userManager;
     private readonly INotificationService _notiService;
 
-    public ServerAllocationService(AppDbContext dbContext, IMapper mapper, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManager, INotificationService notiService)
+    public ServerAllocationService(AppDbContext dbContext, IMapper mapper, ICloudinaryHelper cloudinaryHelper, INotificationService notiService)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _cloudinaryHelper = cloudinaryHelper;
-        _userManager = userManager;
         _notiService = notiService;
     }
 
@@ -61,6 +59,7 @@ public class ServerAllocationService : IServerAllocationService
                 .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                 .Include(x => x.Customer)
                 .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+                .Include(x => x.Incidents)
                 .Where(delegate (ServerAllocation x)
                 {
                     var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(x.Status) : true;
