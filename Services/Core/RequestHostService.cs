@@ -29,10 +29,8 @@ public interface IRequestHostService
     Task<ResultModel> UpdatePortUpgrade(RequestHostUpdateUpgradeModel model);
     Task<ResultModel> Accept(int requestHostId, Guid userId, UserAssignModel model);
     Task<ResultModel> Deny(int requestHostId, Guid userId, DenyModel model);
-    //Task<ResultModel> EvaluateBulk(RequestHostEvaluateBulkModel model, RequestHostStatus status, Guid userId);
     Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model);
     Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model);
-    //Task<ResultModel> Process(int requestHostId, Guid userId);
     Task<ResultModel> Complete(int requestHostId, Guid userId, HostAndUpgradeCreateInspectionReportModel? model);
     Task<ResultModel> CompletePortUpgrade(int requestHostId, Guid userId, HostAndUpgradeCreateInspectionReportModel? model);
     Task<ResultModel> Reject(int requestHostId, RequestHostRejectModel modell);
@@ -898,52 +896,6 @@ public class RequestHostService : IRequestHostService
 
         return result;
     }
-
-    //public async Task<ResultModel> Process(int requestHostId, Guid userId)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
-
-    //    try
-    //    {
-    //        var requestHost = _dbContext.RequestHosts.Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress).FirstOrDefault(x => x.Id == requestHostId);
-    //        if (requestHost == null)
-    //        {
-    //            result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
-    //        }
-    //        else if (requestHost.Status != RequestHostStatus.Accepted)
-    //        {
-    //            result.ErrorMessage = RequestHostErrorMessage.NOT_ACCEPTED;
-    //        }
-    //        else if (!requestHost.RequestHostIps.Any())
-    //        {
-    //            result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
-    //        }
-    //        else if (requestHost.InspectionReportFilePath == null)
-    //        {
-    //            result.ErrorMessage = RequestHostErrorMessage.NOT_PROCESSABLE;
-    //        }
-    //        else
-    //        {
-    //            requestHost.Status = RequestHostStatus.Processed;
-    //            _dbContext.RequestHostUsers.Add(new RequestHostUser
-    //            {
-    //                Action = RequestUserAction.Process,
-    //                UserId = userId,
-    //                RequestHostId = requestHostId,
-    //            });
-    //            _dbContext.SaveChanges();
-    //            result.Succeed = true;
-    //            result.Data = _mapper.Map<RequestHostResultModel>(requestHost);
-    //        }
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
-
-    //    return result;
-    //}
 
     public async Task<ResultModel> Complete(int requestHostId, Guid userId, HostAndUpgradeCreateInspectionReportModel? model)
     {

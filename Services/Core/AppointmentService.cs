@@ -1474,7 +1474,14 @@ public class AppointmentService : IAppointmentService
                 }
                 else
                 {
-                    serverHardwareConfig.Description = requestUpgrade.Description;
+                    if (requestUpgrade.Description != null)
+                    {
+                        serverHardwareConfig.Description = requestUpgrade.Description;
+                    }
+                    else
+                    {
+                        _dbContext.ServerHardwareConfigs.Remove(serverHardwareConfig);
+                    }
                 }
                 requestUpgrade.Status = RequestStatus.Success;
                 requestUpgrade.ServerAllocation.DateUpdated = DateTime.UtcNow;

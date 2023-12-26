@@ -17,16 +17,11 @@ public interface IRequestUpgradeService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetAppointment(int requestUpgradeId, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> Create(RequestUpgradeCreateModel model);
-    //Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model);
     Task<ResultModel> Delete(int requestUpgradeId);
     Task<ResultModel> Reject(int requestUpgradeId, RequestUpgradeRejectModel model);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
     Task<ResultModel> Accept(int requestUpgradeId, Guid userId);
     Task<ResultModel> Deny(int requestUpgradeId, Guid userId, DenyModel model);
-    //Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status, Guid userId);
-    //Task<ResultModel> CheckCompletability(int requestUpgradeId);
-    //Task<ResultModel> Complete(int requestUpgradeId, Guid userId);
-    //Task<ResultModel> CompleteBulk(RequestUpgradeCompleteBulkModel model, Guid userId);
 }
 
 public class RequestUpgradeService : IRequestUpgradeService
@@ -154,6 +149,12 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
             }
 
+            if (component.IsRequired && model.Descriptions == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Component is required";
+            }
+
             if (component.RequireCapacity && model.Descriptions.Any(x => x.Capacity == null))
             {
                 validPrecondition = false;
@@ -176,11 +177,11 @@ public class RequestUpgradeService : IRequestUpgradeService
                     validPrecondition = false;
                     result.ErrorMessage = "Cannot modify unallocated server";
                 }
-                //else if (!serverAllocation.ServerHardwareConfigs.Select(x => x.Component).Any(x => x.Id == component.Id))
-                //{
-                //    validPrecondition = false;
-                //    result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
-                //}
+                else if (!serverAllocation.ServerHardwareConfigs.Any(x => x.ComponentId == component.Id) && model.Descriptions == null)
+                {
+                    validPrecondition = false;
+                    result.ErrorMessage = "Server dont have config to remove";
+                }
             }
 
             if (validPrecondition)
@@ -205,6 +206,10 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 var requestUpgrade = _mapper.Map<RequestUpgrade>(model);
                 requestUpgrade.Status = RequestStatus.Waiting;
+                if (requestUpgrade.Description == null)
+                {
+                    requestUpgrade.RequestType = RequestType.RemoveHardware;
+                }
 
                 _dbContext.RequestUpgrades.Add(requestUpgrade);
                 _dbContext.SaveChanges();
@@ -299,6 +304,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             var requestUpgrade = _dbContext.RequestUpgrades
                 .Include(x => x.Component)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
                 .FirstOrDefault(x => x.Id == model.Id);
             if (requestUpgrade == null)
             {
@@ -318,6 +324,12 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
             }
 
+            if (component.IsRequired && model.Descriptions == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Config for component require capacity";
+            }
+
             if (component.RequireCapacity && model.Descriptions.Any(x => x.Capacity == null))
             {
                 validPrecondition = false;
@@ -334,6 +346,11 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 validPrecondition = false;
                 result.ErrorMessage = "Cannot modify unallocated server";
+            }
+            else if (!serverAllocation.ServerHardwareConfigs.Any(x => x.ComponentId == component.Id) && model.Descriptions == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Server dont have config to remove";
             }
 
             if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), requestUpgrade.ComponentId, serverAllocation.Id))
@@ -596,174 +613,4 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         return result;
     }
-
-    //public async Task<ResultModel> EvaluateBulk(RequestUpgradeEvaluateBulkModel model, RequestStatus status, Guid userId)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
-
-    //    try
-    //    {
-    //        using var transaction = _dbContext.Database.BeginTransaction();
-    //        var results = new List<ResultModel>();
-    //        foreach (var requestUpgradeId in model.RequestUpgradeIds)
-    //        {
-    //            results.Add(await Evaluate(requestUpgradeId, status, userId));
-    //        }
-
-    //        if (results.Any(x => !x.Succeed))
-    //        {
-    //            result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-    //            transaction.Rollback();
-    //        }
-    //        else
-    //        {
-    //            transaction.Commit();
-    //            result.Succeed = true;
-    //            result.Data = results.Select(x => x.Data);
-    //        }
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
-
-    //    return result;
-    //}
-
-    //public async Task<ResultModel> CheckCompletability(int requestUpgradeId)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
-
-    //    try
-    //    {
-    //        result.Data = IsCompletable(requestUpgradeId);
-    //        result.Succeed = true;
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
-
-    //    return result;
-    //}
-
-    //private bool IsCompletable(int requestUpgradeId)
-    //{
-    //    var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment).FirstOrDefault(x => x.Id == requestUpgradeId);
-    //    if (requestUpgrade == null)
-    //    {
-    //        return false;
-    //    }
-
-    //    return requestUpgrade.RequestUpgradeAppointments.Select(x => x.Appointment).Any(x => x.Status == RequestStatus.Success && !x.InspectionReportFilePath.IsNullOrEmpty() && !x.ReceiptOfRecipientFilePath.IsNullOrEmpty());
-    //}
-
-    //public async Task<ResultModel> Complete(int requestUpgradeId, Guid userId)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
-    //    bool validPrecondition = true;
-
-    //    try
-    //    {
-    //        var requestUpgrade = _dbContext.RequestUpgrades
-    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs)
-    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.LocationAssignments)
-    //            .Include(x => x.Component).FirstOrDefault(x => x.Id == requestUpgradeId && x.Status == RequestStatus.Accepted);
-    //        ServerHardwareConfig serverHardwareConfig = null;
-    //        if (requestUpgrade == null)
-    //        {
-    //            validPrecondition = false;
-    //            result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
-    //        }
-    //        else if (!requestUpgrade.ServerAllocation.LocationAssignments.Any())
-    //        {
-    //            validPrecondition = false;
-    //            result.ErrorMessage = "Cannot modify unallocated server";
-    //        }
-    //        else
-    //        {
-    //            serverHardwareConfig = requestUpgrade.ServerAllocation?.ServerHardwareConfigs?.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId);
-    //        }
-
-    //        if (!IsCompletable(requestUpgradeId))
-    //        {
-    //            result.ErrorMessage = RequestUpgradeErrorMessage.NOT_COMPLETABLE;
-    //            validPrecondition = false;
-    //        }
-
-
-    //        if (validPrecondition)
-    //        {
-    //            if (serverHardwareConfig == null)
-    //            {
-    //                _dbContext.ServerHardwareConfigs.Add(new ServerHardwareConfig
-    //                {
-    //                    Description = requestUpgrade.Description,
-    //                    ServerAllocationId = requestUpgrade.ServerAllocationId,
-    //                    ComponentId = requestUpgrade.ComponentId
-    //                });
-    //            }
-    //            else
-    //            {
-    //                serverHardwareConfig.Description = requestUpgrade.Description;
-    //            }
-    //            requestUpgrade.Status = RequestStatus.Success;
-    //            _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
-    //            {
-    //                Action = RequestUserAction.Execute,
-    //                RequestUpgradeId = requestUpgrade.Id,
-    //                UserId = userId
-    //            });
-    //            requestUpgrade.ServerAllocation.DateUpdated = DateTime.UtcNow;
-    //            _dbContext.SaveChanges();
-
-
-    //            result.Succeed = true;
-    //            result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
-    //        }
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
-
-    //    return result;
-    //}
-
-    //public async Task<ResultModel> CompleteBulk(RequestUpgradeCompleteBulkModel model, Guid userId)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
-
-    //    try
-    //    {
-    //        using var transaction = _dbContext.Database.BeginTransaction();
-    //        var results = new List<ResultModel>();
-    //        foreach (var requestUpgradeId in model.RequestUpgradeIds)
-    //        {
-    //            results.Add(await Complete(requestUpgradeId, userId));
-    //        }
-
-    //        if (results.Any(x => !x.Succeed))
-    //        {
-    //            result.ErrorMessage = results.FirstOrDefault(x => !x.Succeed).ErrorMessage;
-    //            transaction.Rollback();
-    //        }
-    //        else
-    //        {
-    //            transaction.Commit();
-    //            result.Succeed = true;
-    //            result.Data = results.Select(x => x.Data);
-    //        }
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
-
-    //    return result;
-    //}
 }

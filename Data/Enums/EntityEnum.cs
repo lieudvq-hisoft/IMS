@@ -83,6 +83,7 @@ public enum RemovalStatus
 public enum RequestType
 {
     Upgrade,
+    RemoveHardware,
     Expand,
     RemoveLocation,
     Host,

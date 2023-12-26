@@ -41,9 +41,8 @@ public class RequestUpgradeResultModel
 
 public class RequestUpgradeCreateModel
 {
-    [Required]
     [EnsureMinimumElements(min: 1, ErrorMessage = "Select at least one item")]
-    public List<ConfigDescriptionModel> Descriptions { get; set; }
+    public List<ConfigDescriptionModel>? Descriptions { get; set; }
 
     public string? Note { get; set; }
 
@@ -77,9 +76,8 @@ public class RequestUpgradeUpdateModel
     [Required]
     public int Id { get; set; }
 
-    [Required]
     [EnsureMinimumElements(min: 1, ErrorMessage = "Select at least one item")]
-    public List<ConfigDescriptionModel> Descriptions { get; set; }
+    public List<ConfigDescriptionModel>? Descriptions { get; set; }
 
     public string? Note { get; set; }
 
