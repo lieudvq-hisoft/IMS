@@ -1,0 +1,56 @@
+actor Client
+participant IpSubnetController
+participant IpSubnetService
+
+participant Database
+activate Client
+Client->IpSubnetController: Send Http Request
+activate IpSubnetController
+IpSubnetController->IpSubnetService:Call SuggestAdditionalIps()
+activate IpSubnetService
+IpSubnetService->Database: Execute query for server
+activate Database
+IpSubnetService<--Database: Return result
+
+alt server not exist or not valid
+IpSubnetService->IpSubnetService: Set error message
+else 
+IpSubnetService->IpSubnetService: Call CreateSubnetTree()
+activate IpSubnetService
+IpSubnetService->Database: Execute query for ipSubnet
+IpSubnetService<--Database: Return result
+IpSubnetService->IpSubnetService: Create ipSubnet tree
+IpSubnetService<--IpSubnetService: Return result
+deactivate IpSubnetService
+IpSubnetService->IpSubnetService: Call GetSubnetTree()
+activate IpSubnetService
+IpSubnetService<--IpSubnetService: Return root subnet of server master ip
+deactivate IpSubnetService
+loop root subnet have parent and not get enough ipAddress
+IpSubnetService->Database: Execute query for ipAddresses of the subnet
+IpSubnetService<--Database: Return result
+alt ipAddresses more than required
+IpSubnetService->IpSubnetService: Take neccessary ipAddresses and add to list
+else 
+IpSubnetService->IpSubnetService: Add all ipAddresses to list
+IpSubnetService->IpSubnetService: Set root to current root parent
+end
+end
+
+opt Not enough ipAddress
+IpSubnetService->Database: Execute query for ipAddress
+IpSubnetService<--Database: Return result
+deactivate Database
+alt Not enough ipAddress
+IpSubnetService->IpSubnetService: Set error message
+else 
+IpSubnetService->IpSubnetService: Take enough ipAddress and add to list
+end
+end
+end
+IpSubnetController<--IpSubnetService: Return result
+deactivate IpSubnetService
+Client<--IpSubnetController: Return Http Response
+deactivate IpSubnetController
+
+
