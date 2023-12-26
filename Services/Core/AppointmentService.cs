@@ -592,7 +592,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var existedRequestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == appointmentId && x.RequestUpgradeId == requestUpgradeId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
+            var existedRequestUpgradeAppointment = _dbContext.RequestUpgradeAppointments.Include(x => x.Appointment).FirstOrDefault(x => x.RequestUpgradeId == requestUpgradeId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
             if (existedRequestUpgradeAppointment != null)
             {
                 validPrecondition = false;
@@ -613,7 +613,7 @@ public class AppointmentService : IAppointmentService
                 }
                 else
                 {
-                    var requestUpgrade = _dbContext.RequestUpgrades.FirstOrDefault(x => x.Id == requestUpgradeId);
+                    var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.RequestUpgradeAppointments).FirstOrDefault(x => x.Id == requestUpgradeId);
                     if (requestUpgrade == null)
                     {
                         validPrecondition = false;
@@ -662,7 +662,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
-            var existedRequestExpandAppointment = _dbContext.RequestExpandAppointments.Include(x => x.Appointment).FirstOrDefault(x => !x.ForRemoval && x.AppointmentId == appointmentId && x.RequestExpandId == requestExpandId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
+            var existedRequestExpandAppointment = _dbContext.RequestExpandAppointments.Include(x => x.Appointment).FirstOrDefault(x => !x.ForRemoval && x.RequestExpandId == requestExpandId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
             RequestExpand requestExpand = null;
             if (existedRequestExpandAppointment != null)
             {
@@ -684,7 +684,7 @@ public class AppointmentService : IAppointmentService
                 }
                 else
                 {
-                    requestExpand = _dbContext.RequestExpands.FirstOrDefault(x => x.Id == requestExpandId);
+                    requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandAppointments).FirstOrDefault(x => x.Id == requestExpandId);
                     if (requestExpand == null)
                     {
                         validPrecondition = false;
@@ -735,7 +735,7 @@ public class AppointmentService : IAppointmentService
         try
         {
             var existedIncidentAppointment = _dbContext.IncidentAppointments
-                .Include(x => x.Appointment).FirstOrDefault(x => x.AppointmentId == appointmentId && x.IncidentId == incidentId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
+                .Include(x => x.Appointment).FirstOrDefault(x => x.IncidentId == incidentId && x.Appointment.Status != RequestStatus.Denied && x.Appointment.Status != RequestStatus.Failed);
             Incident incident = null;
             if (existedIncidentAppointment != null)
             {
