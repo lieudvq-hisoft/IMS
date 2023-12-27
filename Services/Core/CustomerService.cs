@@ -269,7 +269,9 @@ public class CustomerService : ICustomerService
             }
             else
             {
-                _dbContext.Customers.Remove(customer);
+                _dbContext.ServerAllocations.RemoveRange(customer.ServerAllocations);
+                _dbContext.UserCustomers.RemoveRange(customer.UserCustomers);
+                customer.IsDeleted = true;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = customer.Id;
