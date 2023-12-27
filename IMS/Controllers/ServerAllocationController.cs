@@ -46,17 +46,17 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpGet("{id}/RequestUpgrade")]
-    public async Task<ActionResult> GetRequestUpgrade([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromRoute] int id)
+    public async Task<ActionResult> GetRequestUpgrade([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestUpgradeSearchModel searchModel, int id)
     {
-        var result = await _serverAllocationService.GetRequestUpgrade(pagingParam, id);
+        var result = await _serverAllocationService.GetRequestUpgrade(pagingParam, searchModel, id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpGet("{id}/RequestExpand")]
-    public async Task<ActionResult> GetRequestExpand([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromRoute] int id)
+    public async Task<ActionResult> GetRequestExpand([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestExpandSearchModel searchModel, int id)
     {
-        var result = await _serverAllocationService.GetRequestExpand(pagingParam, id);
+        var result = await _serverAllocationService.GetRequestExpand(pagingParam, searchModel, id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

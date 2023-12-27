@@ -27,7 +27,8 @@ public class RequestUpgrade : BaseEntity
         bool matchServerAllocationId = model.ServerAllocationId != null ? ServerAllocationId == model.ServerAllocationId : true;
         bool matchStatus = model.Statuses != null ? model.Statuses.Contains(Status) : true;
         bool matchCustomer = model.CustomerId != null ? model.CustomerId == model.CustomerId : true;
+        bool matchUser = model.UserId != null ? RequestUpgradeUsers.Any(x => x.UserId == model.UserId) : true;
 
-        return matchId && matchComponentId && matchServerAllocationId && matchStatus && matchCustomer;
+        return matchId && matchComponentId && matchServerAllocationId && matchStatus && matchCustomer && matchUser;
     }
 }

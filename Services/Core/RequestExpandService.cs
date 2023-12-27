@@ -53,7 +53,10 @@ public class RequestExpandService : IRequestExpandService
                 .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.RequestExpandUsers).ThenInclude(x => x.User)
-                .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
+                .Where(delegate (RequestExpand x)
+                {
+                    return x.FilterRequestUpgrade(searchModel);
+                })
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpands.Count());

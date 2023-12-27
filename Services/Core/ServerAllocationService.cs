@@ -18,11 +18,10 @@ public interface IServerAllocationService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetHardwareConfig(PagingParam<BaseSortCriteria> paginationModel, int id);
-    Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id);
-    Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id);
+    Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel, int id);
+    Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel, int id);
     Task<ResultModel> GetRequestHost(int id, PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel);
     Task<ResultModel> GetIncident(int id, PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel);
-    //Task<ResultModel> GetLocationAssignment(int id);
     Task<ResultModel> GetIpAddress(int id, PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetLocation(PagingParam<SimpleSortCriteria> paginationModel, int id);
     Task<ResultModel> GetAppointment(int id, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
@@ -148,34 +147,31 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id)
+    public async Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel, int id)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations
-                .Include(x => x.Customer)
-                .Include(x => x.RequestUpgrades).ThenInclude(x => x.Component)
-                .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
-                .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
-                .FirstOrDefault(x => x.Id == id);
-            if (serverAllocation == null)
-            {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var requestUpgrades = serverAllocation.RequestUpgrades.AsQueryable();
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestUpgrades.Count());
-                requestUpgrades = requestUpgrades.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                requestUpgrades = requestUpgrades.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-                paging.Data = _mapper.Map<List<RequestUpgradeModel>>(requestUpgrades.ToList());
+            var requestUpgrades = _dbContext.RequestUpgrades
+                .Include(x => x.Component)
+                .Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
+                .Include(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Where(delegate (RequestUpgrade x)
+                {
+                    return x.FilterRequestUpgrade(searchModel);
+                })
+                .Where(x => x.ServerAllocationId == id)
+                .AsQueryable();
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestUpgrades.Count());
+            requestUpgrades = requestUpgrades.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            requestUpgrades = requestUpgrades.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            paging.Data = _mapper.Map<List<RequestUpgradeModel>>(requestUpgrades.ToList());
 
-                result.Data = paging;
-                result.Succeed = true;
-            }
+            result.Data = paging;
+            result.Succeed = true;
         }
         catch (Exception e)
         {
@@ -184,34 +180,31 @@ public class ServerAllocationService : IServerAllocationService
         return result;
     }
 
-    public async Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id)
+    public async Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel, int id)
     {
         var result = new ResultModel();
         result.Succeed = false;
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations
-                .Include(x => x.Customer)
-                .Include(x => x.RequestExpands).ThenInclude(x => x.RequestExpandLocations).ThenInclude(x => x.Location)
-                .Include(x => x.RequestExpands).ThenInclude(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
-                .Include(x => x.RequestExpands).ThenInclude(x => x.RequestExpandUsers).ThenInclude(x => x.User)
-                .FirstOrDefault(x => x.Id == id);
-            if (serverAllocation == null)
-            {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var requestExpands = serverAllocation.RequestExpands.AsQueryable();
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpands.Count());
-                requestExpands = requestExpands.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                requestExpands = requestExpands.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-                paging.Data = _mapper.Map<List<RequestExpandModel>>(requestExpands.ToList());
+            var requestExpands = _dbContext.RequestExpands
+                 .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location)
+                 .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
+                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                 .Include(x => x.RequestExpandUsers).ThenInclude(x => x.User)
+                 .Where(delegate (RequestExpand x)
+                 {
+                     return x.FilterRequestUpgrade(searchModel);
+                 })
+                 .Where(x => x.ServerAllocationId == id)
+                 .AsQueryable();
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpands.Count());
+            requestExpands = requestExpands.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            requestExpands = requestExpands.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            paging.Data = _mapper.Map<List<RequestExpandModel>>(requestExpands.ToList());
 
-                result.Data = paging;
-                result.Succeed = true;
-            }
+            result.Data = paging;
+            result.Succeed = true;
         }
         catch (Exception e)
         {
@@ -227,31 +220,23 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations.FirstOrDefault(x => x.Id == id);
-            if (serverAllocation == null)
-            {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var requestHosts = _dbContext.RequestHosts
-                    .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
-                    .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                    .Include(x => x.RequestHostUsers).ThenInclude(x => x.User)
-                    .Where(x => x.ServerAllocationId == id)
-                    .Where(delegate (RequestHost x)
-                     {
-                         return x.FilterRequestHost(searchModel);
-                     })
-                    .AsQueryable();
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestHosts.Count());
-                requestHosts = requestHosts.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                requestHosts = requestHosts.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-                paging.Data = _mapper.Map<List<RequestHostModel>>(requestHosts.ToList());
+            var requestHosts = _dbContext.RequestHosts
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.RequestHostUsers).ThenInclude(x => x.User)
+                .Where(x => x.ServerAllocationId == id)
+                .Where(delegate (RequestHost x)
+                 {
+                     return x.FilterRequestHost(searchModel);
+                 })
+                .AsQueryable();
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestHosts.Count());
+            requestHosts = requestHosts.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            requestHosts = requestHosts.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            paging.Data = _mapper.Map<List<RequestHostModel>>(requestHosts.ToList());
 
-                result.Data = paging;
-                result.Succeed = true;
-            }
+            result.Data = paging;
+            result.Succeed = true;
         }
         catch (Exception e)
         {
@@ -276,6 +261,7 @@ public class ServerAllocationService : IServerAllocationService
                 {
                     return x.Filter(searchModel);
                 })
+                .Where(x => x.ServerAllocationId == id)
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, incidents.Count());
@@ -302,36 +288,24 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations
-                .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
-                .Include(x => x.RequestHosts).ThenInclude(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
-                .Include(x => x.Customer)
-                .FirstOrDefault(x => x.Id == id);
-            if (serverAllocation == null)
-            {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var ipAddresses = _dbContext.IpAddresses
-                    .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                    .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
-                    .Where(x => x.IpAssignments.Any(x => x.ServerAllocationId == id))
-                    .Where(delegate (IpAddress x)
-                    {
-                        return x.Filter(searchModel);
-                    })
-                    .AsQueryable();
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddresses.Count());
+            var ipAddresses = _dbContext.IpAddresses
+                .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+                .Where(x => x.IpAssignments.Any(x => x.ServerAllocationId == id))
+                .Where(delegate (IpAddress x)
+                {
+                    return x.Filter(searchModel);
+                })
+                .AsQueryable();
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddresses.Count());
 
-                ipAddresses = ipAddresses.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                ipAddresses = ipAddresses.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            ipAddresses = ipAddresses.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            ipAddresses = ipAddresses.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-                paging.Data = _mapper.Map<List<IpAddressModel>>(ipAddresses.ToList());
+            paging.Data = _mapper.Map<List<IpAddressModel>>(ipAddresses.ToList());
 
-                result.Data = paging;
-                result.Succeed = true;
-            }
+            result.Data = paging;
+            result.Succeed = true;
         }
         catch (Exception e)
         {
@@ -381,35 +355,25 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
-            var serverAllocation = _dbContext.ServerAllocations
-                .Include(x => x.Customer).Include(x => x.Appointments)
-                .FirstOrDefault(x => x.Id == id);
-            if (serverAllocation == null)
-            {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var appointments = _dbContext.Appointments
-                    .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
-                    .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                    .Include(x => x.AppointmentUsers).ThenInclude(x => x.User)
-                    .Include(x => x.RequestExpandAppointments)
-                    .Include(x => x.RequestUpgradeAppointment)
-                    .Where(x => x.ServerAllocationId == id)
-                    .Where(delegate (Appointment x)
-                    {
-                        return x.FilterAppointment(searchModel);
-                    })
-                    .AsQueryable();
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, appointments.Count());
-                appointments = appointments.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                appointments = appointments.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-                paging.Data = _mapper.Map<List<AppointmentModel>>(appointments.ToList());
+            var appointments = _dbContext.Appointments
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.AppointmentUsers).ThenInclude(x => x.User)
+                .Include(x => x.RequestExpandAppointments)
+                .Include(x => x.RequestUpgradeAppointment)
+                .Where(x => x.ServerAllocationId == id)
+                .Where(delegate (Appointment x)
+                {
+                    return x.FilterAppointment(searchModel);
+                })
+                .AsQueryable();
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, appointments.Count());
+            appointments = appointments.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            appointments = appointments.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+            paging.Data = _mapper.Map<List<AppointmentModel>>(appointments.ToList());
 
-                result.Data = paging;
-                result.Succeed = true;
-            }
+            result.Data = paging;
+            result.Succeed = true;
         }
         catch (Exception e)
         {
@@ -1078,7 +1042,7 @@ public class ServerAllocationService : IServerAllocationService
                         }
                     });
                 }
-                
+
                 result.Succeed = true;
                 result.Data = serverAllocationId;
             }
