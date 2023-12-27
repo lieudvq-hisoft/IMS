@@ -1059,19 +1059,26 @@ public class ServerAllocationService : IServerAllocationService
                 serverAllocation.Appointments.FirstOrDefault(x => x.Status == RequestStatus.Success).DocumentConfirm = true;
                 _dbContext.SaveChanges();
 
+                var sales = _dbContext.Users
+                    .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                    .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Sale")).ToList();
                 var serverModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(serverAllocation));
-                await _notiService.Add(new NotificationCreateModel
+                foreach (var sale in sales)
                 {
-                    UserId = serverAllocation.CustomerId,
-                    Action = "Working",
-                    Title = "Start working",
-                    Body = "There's an server allocation just start working",
-                    Data = new NotificationData
+                    await _notiService.Add(new NotificationCreateModel
                     {
-                        Key = "ServerAllocation",
-                        Value = serverModelString
-                    }
-                });
+                        UserId = sale.Id,
+                        Action = "Working",
+                        Title = "Start working",
+                        Body = "There's an server allocation just start working",
+                        Data = new NotificationData
+                        {
+                            Key = "ServerAllocation",
+                            Value = serverModelString
+                        }
+                    });
+                }
+                
                 result.Succeed = true;
                 result.Data = serverAllocationId;
             }
