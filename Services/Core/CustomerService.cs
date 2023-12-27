@@ -258,7 +258,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customers.Include(x => x.ServerAllocations).FirstOrDefault(x => x.Id == id);
+            var customer = _dbContext.Customers.Include(x => x.ServerAllocations).Include(x => x.UserCustomers).FirstOrDefault(x => x.Id == id);
             if (customer == null)
             {
                 result.ErrorMessage = CustomerErrorMessage.NOT_EXISTED;
