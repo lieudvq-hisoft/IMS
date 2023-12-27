@@ -226,18 +226,6 @@ public class CustomerService : ICustomerService
                     CustomerId = customer.Id
                 });
                 _dbContext.SaveChanges();
-                //await _notiService.Add(new NotificationCreateModel
-                //{
-                //    UserId = customer.Id,
-                //    Action = "Action",
-                //    Title = "Title",
-                //    Body = "Body",
-                //    Data = new NotificationData
-                //    {
-                //        Key = "string",
-                //        Value = "string"
-                //    }
-                //});
 
                 result.Succeed = true;
                 result.Data = _mapper.Map<CustomerModel>(customer);

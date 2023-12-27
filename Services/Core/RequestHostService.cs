@@ -1160,7 +1160,7 @@ public class RequestHostService : IRequestHostService
                 {
                     var now = DateTime.UtcNow;
                     TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
-                    document.RenderText("__Date__", $"{now.Day:dd}/{now.Month:MM}/{now.Year}");
+                    document.RenderText("__Date__", now.ToString("dd/MM/yyyy"));
 
                     document.RenderText("__Number__", textInfo.ToTitleCase(customer.ContractNumber));
 
