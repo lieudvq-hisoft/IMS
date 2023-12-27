@@ -25,10 +25,12 @@ public class RequestExpand : BaseEntity
 
     public bool FilterRequestUpgrade(RequestExpandSearchModel model)
     {
-        bool matchId = model.Id != null ? this.Id == model.Id : true;
-        bool matchServerAllocationId = model.ServerAllocationId != null ? this.ServerAllocationId == model.ServerAllocationId : true;
-        bool matchStatus = model.Statuses != null ? model.Statuses.Contains(this.Status) : true;
+        bool matchId = model.Id != null ? Id == model.Id : true;
+        bool matchServerAllocationId = model.ServerAllocationId != null ? ServerAllocationId == model.ServerAllocationId : true;
+        bool matchStatus = model.Statuses != null ? model.Statuses.Contains(Status) : true;
+        bool matchUser = model.UserId != null? RequestExpandUsers.Any(x => x.UserId == model.UserId) : true;
+        //bool C
 
-        return matchId && matchServerAllocationId && matchStatus;
+        return matchId && matchServerAllocationId && matchStatus && matchUser;
     }
 }

@@ -119,6 +119,8 @@ public class RequestExpandSearchModel
     public int? Id { get; set; }
     public int? ServerAllocationId { get; set; }
     public List<RequestStatus?>? Statuses { get; set; }
+    public Guid? CustomerId { get; set; }
+    public Guid? UserId { get; set; }
 }
 
 public class RequestExpandAppointmentModel

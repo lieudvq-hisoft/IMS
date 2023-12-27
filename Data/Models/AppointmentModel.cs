@@ -190,5 +190,6 @@ public class AppointmentSearchModel
     public RequestStatus? Status { get; set; }
     public int? ServerAllocationId { get; set; }
     public Guid? CustomerId { get; set; }
+    public Guid? UserId { get; set; }
 }
 

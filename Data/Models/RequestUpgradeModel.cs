@@ -102,6 +102,7 @@ public class RequestUpgradeSearchModel
     public int? ComponentId { get; set; }
     public int? ServerAllocationId { get; set; }
     public List<RequestStatus?>? Statuses { get; set; }
+    public Guid? UserId { get; set; }
 }
 
 public class RequestUpgradeAppointmentModel

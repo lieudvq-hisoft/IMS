@@ -28,11 +28,12 @@ public class Appointment : BaseEntity
 
     public bool FilterAppointment(AppointmentSearchModel model)
     {
-        bool matchId = model.Id != null ? this.Id == model.Id : true;
-        bool matchStatus = model.Status != null ? this.Status == model.Status : true;
-        bool matchServerAllocationId = model.ServerAllocationId != null ? this.ServerAllocationId == model.ServerAllocationId : true;
-        bool matchCustomer = model.CustomerId != null ? this.ServerAllocation.CustomerId == model.CustomerId : true;
+        bool matchId = model.Id != null ? Id == model.Id : true;
+        bool matchStatus = model.Status != null ? Status == model.Status : true;
+        bool matchServerAllocationId = model.ServerAllocationId != null ? ServerAllocationId == model.ServerAllocationId : true;
+        bool matchCustomer = model.CustomerId != null ? ServerAllocation.CustomerId == model.CustomerId : true;
+        bool matchUser = model.UserId != null ? AppointmentUsers.Any(x => x.UserId == model.UserId) : true;
 
-        return matchId && matchStatus && matchServerAllocationId && matchCustomer;
+        return matchId && matchStatus && matchServerAllocationId && matchCustomer && matchUser;
     }
 }
