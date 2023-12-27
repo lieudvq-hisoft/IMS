@@ -66,7 +66,6 @@ public class UserCreateModel
     public string PhoneNumber { get; set; }
 
     [Required]
-    [EnsureMinimumElements]
     public string Role { get; set; }
 }
 
