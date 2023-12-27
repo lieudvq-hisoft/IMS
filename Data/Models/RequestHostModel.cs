@@ -161,6 +161,9 @@ public class RequestHostSearchModel
     public RequestHostStatus? Status { get; set; }
     public string? MasterIp { get; set; }
     public string? Customer { get; set; }
+    public int? ServerAllocationId { get; set; }
+    public Guid? CustomerId { get; set; }
+    public Guid? UserId { get; set; }
     public bool? IsRemoved { get; set; }
 }
 

@@ -32,7 +32,10 @@ public class RequestHost : BaseEntity
         bool matchMasterIp = model.MasterIp != null ? ServerAllocation.MasterIpAddress.Contains(model.MasterIp) : true;
         bool matchCustomer = model.Customer != null ? MyFunction.MatchString(ServerAllocation.Customer.CompanyName, model.Customer) : true;
         bool matchPurpose = model.IsRemoved != null ? IsRemoval == model.IsRemoved : true;
+        bool matchServer = model.ServerAllocationId != null ? ServerAllocationId == model.ServerAllocationId : true;
+        bool matchCustomerId = model.CustomerId != null ? ServerAllocation.CustomerId == model.CustomerId : true;
+        bool matchUser = model.UserId != null ? RequestHostUsers.Any(x => x.UserId == model.CustomerId) : true;
 
-        return matchIpAssignmentTypes && matchStatus && matchMasterIp && matchCustomer && matchPurpose;
+        return matchIpAssignmentTypes && matchStatus && matchMasterIp && matchCustomer && matchPurpose && matchServer && matchCustomerId && matchUser;
     }
 }

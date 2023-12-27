@@ -28,9 +28,9 @@ public class RequestExpand : BaseEntity
         bool matchId = model.Id != null ? Id == model.Id : true;
         bool matchServerAllocationId = model.ServerAllocationId != null ? ServerAllocationId == model.ServerAllocationId : true;
         bool matchStatus = model.Statuses != null ? model.Statuses.Contains(Status) : true;
-        bool matchUser = model.UserId != null? RequestExpandUsers.Any(x => x.UserId == model.UserId) : true;
-        //bool C
+        bool matchUser = model.UserId != null ? RequestExpandUsers.Any(x => x.UserId == model.UserId) : true;
+        bool matchCustomer = model.CustomerId != null ? ServerAllocation.CustomerId == model.CustomerId : true;
 
-        return matchId && matchServerAllocationId && matchStatus && matchUser;
+        return matchId && matchServerAllocationId && matchStatus && matchUser && matchCustomer;
     }
 }

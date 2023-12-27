@@ -22,11 +22,12 @@ public class RequestUpgrade : BaseEntity
 
     public bool FilterRequestUpgrade(RequestUpgradeSearchModel model)
     {
-        bool matchId = model.Id != null ? this.Id == model.Id : true;
-        bool matchComponentId = model.ComponentId != null ? this.ComponentId == model.ComponentId : true;
-        bool matchServerAllocationId = model.ServerAllocationId != null ? this.ServerAllocationId == model.ServerAllocationId : true;
-        bool matchStatus = model.Statuses != null ? model.Statuses.Contains(this.Status) : true;
+        bool matchId = model.Id != null ? Id == model.Id : true;
+        bool matchComponentId = model.ComponentId != null ? ComponentId == model.ComponentId : true;
+        bool matchServerAllocationId = model.ServerAllocationId != null ? ServerAllocationId == model.ServerAllocationId : true;
+        bool matchStatus = model.Statuses != null ? model.Statuses.Contains(Status) : true;
+        bool matchCustomer = model.CustomerId != null ? model.CustomerId == model.CustomerId : true;
 
-        return matchId && matchComponentId && matchServerAllocationId && matchStatus;
+        return matchId && matchComponentId && matchServerAllocationId && matchStatus && matchCustomer;
     }
 }
