@@ -29,10 +29,10 @@ public interface IUserService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, UserSearchModel searchModel);
     Task<ResultModel> GetTech(PagingParam<BaseSortCriteria> paginationModel, UserSearchModel searchModel);
     Task<ResultModel> GetDetail(string id);
-    Task<ResultModel> GetAssignedRequestExpand(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel);
-    Task<ResultModel> GetAssignedRequestUpgrade(string userId, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
-    Task<ResultModel> GetAssignedRequestHost(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel);
-    Task<ResultModel> GetIncident(Guid id, PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel);
+    //Task<ResultModel> GetAssignedRequestExpand(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel);
+    //Task<ResultModel> GetAssignedRequestUpgrade(string userId, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
+    //Task<ResultModel> GetAssignedRequestHost(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel);
+    //Task<ResultModel> GetIncident(Guid id, PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel);
     Task<ResultModel> BindFcmtoken(BindFcmtokenModel model, Guid userId);
     Task<ResultModel> DeleteFcmToken(string fcmToken, Guid userId);
     Task<ResultModel> SeenCurrenNoticeCount(Guid userId);
@@ -604,171 +604,171 @@ public class UserService : IUserService
         return result;
     }
 
-    public async Task<ResultModel> GetAssignedRequestExpand(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetAssignedRequestExpand(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestExpandSearchModel searchModel)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var user = _dbContext.User
-                .FirstOrDefault(x => x.Id == new Guid(userId));
-            if (user == null)
-            {
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var requestExpands = _dbContext.RequestExpands
-                    .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location)
-                    .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
-                    .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                    .Include(x => x.RequestExpandUsers).ThenInclude(x => x.User)
-                    .Where(x => x.RequestExpandUsers.Any(x => x.UserId == new Guid(userId) && x.Action == RequestUserAction.Execute))
-                    .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
-                    .AsQueryable();
+    //    try
+    //    {
+    //        var user = _dbContext.User
+    //            .FirstOrDefault(x => x.Id == new Guid(userId));
+    //        if (user == null)
+    //        {
+    //            result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+    //        }
+    //        else
+    //        {
+    //            var requestExpands = _dbContext.RequestExpands
+    //                .Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location)
+    //                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
+    //                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+    //                .Include(x => x.RequestExpandUsers).ThenInclude(x => x.User)
+    //                .Where(x => x.RequestExpandUsers.Any(x => x.UserId == new Guid(userId) && x.Action == RequestUserAction.Execute))
+    //                .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
+    //                .AsQueryable();
 
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpands.Count());
+    //            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpands.Count());
 
-                requestExpands = requestExpands.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                requestExpands = requestExpands.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //            requestExpands = requestExpands.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //            requestExpands = requestExpands.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-                paging.Data = _mapper.Map<List<RequestExpandModel>>(requestExpands.ToList());
+    //            paging.Data = _mapper.Map<List<RequestExpandModel>>(requestExpands.ToList());
 
-                result.Data = paging;
-                result.Succeed = true;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //            result.Data = paging;
+    //            result.Succeed = true;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
-    public async Task<ResultModel> GetAssignedRequestUpgrade(string userId, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetAssignedRequestUpgrade(string userId, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var user = _dbContext.User
-                .FirstOrDefault(x => x.Id == new Guid(userId));
-            if (user == null)
-            {
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var requestUpgrades = _dbContext.RequestUpgrades
-                     .Include(x => x.Component)
-                     .Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
-                     .Include(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
-                     .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                     .Where(x => x.RequestUpgradeUsers.Any(x => x.UserId == new Guid(userId) && x.Action == RequestUserAction.Execute))
-                     .Where(delegate (RequestUpgrade x)
-                     {
-                         return x.FilterRequestUpgrade(searchModel);
-                     })
-                     .AsQueryable();
+    //    try
+    //    {
+    //        var user = _dbContext.User
+    //            .FirstOrDefault(x => x.Id == new Guid(userId));
+    //        if (user == null)
+    //        {
+    //            result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+    //        }
+    //        else
+    //        {
+    //            var requestUpgrades = _dbContext.RequestUpgrades
+    //                 .Include(x => x.Component)
+    //                 .Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
+    //                 .Include(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
+    //                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+    //                 .Where(x => x.RequestUpgradeUsers.Any(x => x.UserId == new Guid(userId) && x.Action == RequestUserAction.Execute))
+    //                 .Where(delegate (RequestUpgrade x)
+    //                 {
+    //                     return x.FilterRequestUpgrade(searchModel);
+    //                 })
+    //                 .AsQueryable();
 
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestUpgrades.Count());
+    //            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestUpgrades.Count());
 
-                requestUpgrades = requestUpgrades.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                requestUpgrades = requestUpgrades.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //            requestUpgrades = requestUpgrades.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //            requestUpgrades = requestUpgrades.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-                paging.Data = _mapper.Map<List<RequestUpgradeModel>>(requestUpgrades.ToList());
+    //            paging.Data = _mapper.Map<List<RequestUpgradeModel>>(requestUpgrades.ToList());
 
-                result.Data = paging;
-                result.Succeed = true;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //            result.Data = paging;
+    //            result.Succeed = true;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
-    public async Task<ResultModel> GetAssignedRequestHost(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetAssignedRequestHost(string userId, PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var user = _dbContext.User
-                .FirstOrDefault(x => x.Id == new Guid(userId));
-            if (user == null)
-            {
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var requestHosts = _dbContext.RequestHosts
-                    .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
-                    .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                    .Include(x => x.RequestHostUsers).ThenInclude(x => x.User)
-                    .Where(x => x.RequestHostUsers.Any(x => x.UserId == new Guid(userId) && x.Action == RequestUserAction.Execute))
-                    .Where(delegate (RequestHost x)
-                    {
-                        return x.FilterRequestHost(searchModel);
-                    })
-                    .AsQueryable();
+    //    try
+    //    {
+    //        var user = _dbContext.User
+    //            .FirstOrDefault(x => x.Id == new Guid(userId));
+    //        if (user == null)
+    //        {
+    //            result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+    //        }
+    //        else
+    //        {
+    //            var requestHosts = _dbContext.RequestHosts
+    //                .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
+    //                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+    //                .Include(x => x.RequestHostUsers).ThenInclude(x => x.User)
+    //                .Where(x => x.RequestHostUsers.Any(x => x.UserId == new Guid(userId) && x.Action == RequestUserAction.Execute))
+    //                .Where(delegate (RequestHost x)
+    //                {
+    //                    return x.FilterRequestHost(searchModel);
+    //                })
+    //                .AsQueryable();
 
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestHosts.Count());
+    //            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestHosts.Count());
 
-                requestHosts = requestHosts.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                requestHosts = requestHosts.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //            requestHosts = requestHosts.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //            requestHosts = requestHosts.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-                paging.Data = _mapper.Map<List<RequestHostModel>>(requestHosts.ToList());
+    //            paging.Data = _mapper.Map<List<RequestHostModel>>(requestHosts.ToList());
 
-                result.Data = paging;
-                result.Succeed = true;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //            result.Data = paging;
+    //            result.Succeed = true;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
-    public async Task<ResultModel> GetIncident(Guid id, PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetIncident(Guid id, PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var incidents = _dbContext.Incidents
-                .Include(x => x.IncidentAppointments).ThenInclude(x => x.Appointment)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .Include(x => x.IncidentUsers).ThenInclude(x => x.User)
-                .Where(x => x.IncidentUsers.Any(x => x.UserId == id && x.Action == RequestUserAction.Execute))
-                .Where(delegate (Incident x)
-                {
-                    return x.Filter(searchModel);
-                })
-                .AsQueryable();
+    //    try
+    //    {
+    //        var incidents = _dbContext.Incidents
+    //            .Include(x => x.IncidentAppointments).ThenInclude(x => x.Appointment)
+    //            .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+    //            .Include(x => x.IncidentUsers).ThenInclude(x => x.User)
+    //            .Where(x => x.IncidentUsers.Any(x => x.UserId == id && x.Action == RequestUserAction.Execute))
+    //            .Where(delegate (Incident x)
+    //            {
+    //                return x.Filter(searchModel);
+    //            })
+    //            .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, incidents.Count());
+    //        var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, incidents.Count());
 
-            incidents = incidents.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            incidents = incidents.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //        incidents = incidents.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //        incidents = incidents.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.Map<List<IncidentModel>>(incidents.ToList());
+    //        paging.Data = _mapper.Map<List<IncidentModel>>(incidents.ToList());
 
-            result.Data = paging;
-            result.Succeed = true;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //        result.Data = paging;
+    //        result.Succeed = true;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> GetCustomer(Guid userId, PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel)
     {

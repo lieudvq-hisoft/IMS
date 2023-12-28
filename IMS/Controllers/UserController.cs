@@ -106,37 +106,37 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("{id}/AssignedRequestExpand")]
-    public async Task<ActionResult> GetAssignedRequestExpand(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestExpandSearchModel searchModel)
-    {
-        var result = await _userService.GetAssignedRequestExpand(id, pagingParam, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/AssignedRequestExpand")]
+    //public async Task<ActionResult> GetAssignedRequestExpand(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestExpandSearchModel searchModel)
+    //{
+    //    var result = await _userService.GetAssignedRequestExpand(id, pagingParam, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpGet("{id}/AssignedRequestUpgrade")]
-    public async Task<ActionResult> GetAssignedRequestUpgrade(string id, [FromQuery] PagingParam<RequestUpgradeSortCriteria> paginationModel, [FromQuery] RequestUpgradeSearchModel searchModel)
-    {
-        var result = await _userService.GetAssignedRequestUpgrade(id, paginationModel, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/AssignedRequestUpgrade")]
+    //public async Task<ActionResult> GetAssignedRequestUpgrade(string id, [FromQuery] PagingParam<RequestUpgradeSortCriteria> paginationModel, [FromQuery] RequestUpgradeSearchModel searchModel)
+    //{
+    //    var result = await _userService.GetAssignedRequestUpgrade(id, paginationModel, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpGet("{id}/AssignedRequestHost")]
-    public async Task<ActionResult> GetAssignedRequestHost(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestHostSearchModel searchModel)
-    {
-        var result = await _userService.GetAssignedRequestHost(id, pagingParam, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/AssignedRequestHost")]
+    //public async Task<ActionResult> GetAssignedRequestHost(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestHostSearchModel searchModel)
+    //{
+    //    var result = await _userService.GetAssignedRequestHost(id, pagingParam, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpGet("{id}/AssignedIncident")]
-    public async Task<ActionResult> GetAssignedIncident(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] IncidentSearchModel searchModel)
-    {
-        var result = await _userService.GetIncident(Guid.Parse(id), pagingParam, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/AssignedIncident")]
+    //public async Task<ActionResult> GetAssignedIncident(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] IncidentSearchModel searchModel)
+    //{
+    //    var result = await _userService.GetIncident(Guid.Parse(id), pagingParam, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPost("FcmToken")]
     [Authorize(AuthenticationSchemes = "Bearer")]

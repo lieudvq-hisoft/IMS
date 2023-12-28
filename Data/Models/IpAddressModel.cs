@@ -57,6 +57,7 @@ public class IpAddressSearchModel
     public bool? IsReserved { get; set; }
     public int? RequestHostId { get; set; }
     public int? ServerAllocationId { get; set; }
+    public int? SubnetId { get; set; }
 }
 
 public class IpAssignmentModel

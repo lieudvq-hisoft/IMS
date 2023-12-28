@@ -42,8 +42,9 @@ public class IpAddress
         var blocked = searchModel.IsBlocked != null ? Blocked == searchModel.IsBlocked : true;
         var matchRequestHost = searchModel.RequestHostId != null ? RequestHostIps.Any(x => x.RequestHostId == searchModel.RequestHostId) : true;
         var matchServer = searchModel.ServerAllocationId != null ? IpAssignments.Any(x => x.ServerAllocationId == searchModel.ServerAllocationId) : true;
+        var matchSubnet = searchModel.SubnetId != null ? IpSubnetId == searchModel.SubnetId : true;
 
-        return matchAddress && available && assigned && isReserved && blocked && matchRequestHost;
+        return matchAddress && available && assigned && isReserved && blocked && matchRequestHost && matchSubnet;
     }
 
     public static string GetDefaultSubnetMask(string ipAddressString)

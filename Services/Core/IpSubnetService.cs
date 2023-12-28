@@ -17,7 +17,7 @@ public interface IIpSubnetService
 {
     //Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
     //Task<ResultModel> GetIpRange(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
-    Task<ResultModel> GetIpAddress(int ipSubnetId, PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
+    //Task<ResultModel> GetIpAddress(int ipSubnetId, PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetIpSubnetTree();
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetIpSubnet(int subnetId);
@@ -125,41 +125,41 @@ public class IpSubnetService : IIpSubnetService
         return result;
     }
 
-    public async Task<ResultModel> GetIpAddress(int subnetId, PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetIpAddress(int subnetId, PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var subnetTree = CreateSubnetTree();
-            var rootSubnet = GetSubnetTree(subnetId, subnetTree);
-            var ipAddressesQuery = _dbContext.IpAddresses
-                .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
-                .Where(x => x.IpSubnetId == subnetId)
-                .Where(delegate (IpAddress x)
-                {
-                    return x.Filter(searchModel);
-                })
-                .AsQueryable();
+    //    try
+    //    {
+    //        var subnetTree = CreateSubnetTree();
+    //        var rootSubnet = GetSubnetTree(subnetId, subnetTree);
+    //        var ipAddressesQuery = _dbContext.IpAddresses
+    //            .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+    //            .Include(x => x.RequestHostIps).ThenInclude(x => x.RequestHost)
+    //            .Where(x => x.IpSubnetId == subnetId)
+    //            .Where(delegate (IpAddress x)
+    //            {
+    //                return x.Filter(searchModel);
+    //            })
+    //            .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddressesQuery.Count());
+    //        var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddressesQuery.Count());
 
-            ipAddressesQuery = ipAddressesQuery.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            ipAddressesQuery = ipAddressesQuery.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //        ipAddressesQuery = ipAddressesQuery.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //        ipAddressesQuery = ipAddressesQuery.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.Map<List<IpAddressModel>>(ipAddressesQuery.ToList());
+    //        paging.Data = _mapper.Map<List<IpAddressModel>>(ipAddressesQuery.ToList());
 
-            result.Data = paging;
-            result.Succeed = true;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //        result.Data = paging;
+    //        result.Succeed = true;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
     private ITree<IpSubnet> CreateSubnetTree()
     {
