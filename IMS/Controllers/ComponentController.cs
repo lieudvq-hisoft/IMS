@@ -26,13 +26,13 @@ public class ComponentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("{id}")]
-    public async Task<ActionResult> GetDetail(int id)
-    {
-        var result = await _componentService.GetDetail(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}")]
+    //public async Task<ActionResult> GetDetail(int id)
+    //{
+    //    var result = await _componentService.GetDetail(id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpGet("All")]
     public async Task<ActionResult> GetAll()

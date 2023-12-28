@@ -79,4 +79,5 @@ public class IncidentSearchModel
     public bool? IsAssigned { get; set; }
     public Guid? CustomerId { get; set; }
     public Guid? UserId { get; set; }
+    public int? AppointmentId { get; set; }
 }

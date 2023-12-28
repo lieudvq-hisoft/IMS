@@ -15,15 +15,15 @@ using static Data.Utils.Tree.TreeExtensions;
 namespace Services.Core;
 public interface IIpSubnetService
 {
-    Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
-    Task<ResultModel> GetIpRange(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
+    //Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
+    //Task<ResultModel> GetIpRange(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel);
     Task<ResultModel> GetIpAddress(int ipSubnetId, PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetIpSubnetTree();
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetIpSubnet(int subnetId);
-    Task<ResultModel> GetNextAddress(NextAddressModel model);
+    //Task<ResultModel> GetNextAddress(NextAddressModel model);
     Task<ResultModel> CreateIpRange(IpRangeCreateModel model);
-    Task<ResultModel> Create(int ipSubnetId, List<IpSubnetCreateModel> models);
+    //Task<ResultModel> Create(int ipSubnetId, List<IpSubnetCreateModel> models);
     Task<ResultModel> Delete(int subnetId);
     Task<ResultModel> SuggestAdditionalIps(SuggestAdditionalIpModel model);
     Task<ResultModel> GetTree();
@@ -42,61 +42,61 @@ public class IpSubnetService : IIpSubnetService
         _mapper = mapper;
     }
 
-    public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var ipSubnets = _dbContext.IpSubnets.Include(x => x.SubNets)
-                .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
-                .AsQueryable();
+    //    try
+    //    {
+    //        var ipSubnets = _dbContext.IpSubnets.Include(x => x.SubNets)
+    //            .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
+    //            .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipSubnets.Count());
+    //        var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipSubnets.Count());
 
-            ipSubnets = ipSubnets.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            ipSubnets = ipSubnets.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //        ipSubnets = ipSubnets.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //        ipSubnets = ipSubnets.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.Map<List<IpSubnetModel>>(ipSubnets.ToList());
+    //        paging.Data = _mapper.Map<List<IpSubnetModel>>(ipSubnets.ToList());
 
-            result.Data = paging;
-            result.Succeed = true;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //        result.Data = paging;
+    //        result.Succeed = true;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
-    public async Task<ResultModel> GetIpRange(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetIpRange(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var ipSubnets = _dbContext.IpSubnets.Include(x => x.SubNets).Include(x => x.ParentNetwork)
-                .Where(x => x.ParentNetworkId == null && searchModel.Id != null ? x.Id == searchModel.Id : true)
-                .AsQueryable();
+    //    try
+    //    {
+    //        var ipSubnets = _dbContext.IpSubnets.Include(x => x.SubNets).Include(x => x.ParentNetwork)
+    //            .Where(x => x.ParentNetworkId == null && searchModel.Id != null ? x.Id == searchModel.Id : true)
+    //            .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipSubnets.Count());
+    //        var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipSubnets.Count());
 
-            ipSubnets = ipSubnets.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            ipSubnets = ipSubnets.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //        ipSubnets = ipSubnets.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //        ipSubnets = ipSubnets.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.Map<List<IpSubnetModel>>(ipSubnets.Where(x => x.ParentNetworkId == null).ToList());
+    //        paging.Data = _mapper.Map<List<IpSubnetModel>>(ipSubnets.Where(x => x.ParentNetworkId == null).ToList());
 
-            result.Data = paging;
-            result.Succeed = true;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //        result.Data = paging;
+    //        result.Succeed = true;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> GetDetail(int id)
     {
@@ -253,48 +253,48 @@ public class IpSubnetService : IIpSubnetService
         return result;
     }
 
-    public async Task<ResultModel> GetNextAddress(NextAddressModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetNextAddress(NextAddressModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var octets = GetIPv4Octets(model.IpAddresss);
-            var numberOfIp = Math.Pow(2, PREFIX_LENGTH_MAX - model.PrefixLength);
-            if (numberOfIp < SUBNET_MAX_SIZE)
-            {
-                var newFourthOctet = octets[3] + numberOfIp;
-                if (newFourthOctet > SUBNET_MAX_SIZE - 1)
-                {
-                    result.ErrorMessage = "End of subnet";
-                }
-                else
-                {
-                    result.Data = $"{octets[0]}.{octets[1]}.{octets[2]}.{newFourthOctet}";
-                    result.Succeed = true;
-                }
-            }
-            else
-            {
-                var newThirdOctet = octets[2] + numberOfIp / 256;
-                if (newThirdOctet > SUBNET_MAX_SIZE - 1 || octets[3] != 0)
-                {
-                    result.ErrorMessage = "End of subnet";
-                }
-                else
-                {
-                    result.Data = $"{octets[0]}.{octets[1]}.{newThirdOctet}.{octets[3]}";
-                    result.Succeed = true;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //    try
+    //    {
+    //        var octets = GetIPv4Octets(model.IpAddresss);
+    //        var numberOfIp = Math.Pow(2, PREFIX_LENGTH_MAX - model.PrefixLength);
+    //        if (numberOfIp < SUBNET_MAX_SIZE)
+    //        {
+    //            var newFourthOctet = octets[3] + numberOfIp;
+    //            if (newFourthOctet > SUBNET_MAX_SIZE - 1)
+    //            {
+    //                result.ErrorMessage = "End of subnet";
+    //            }
+    //            else
+    //            {
+    //                result.Data = $"{octets[0]}.{octets[1]}.{octets[2]}.{newFourthOctet}";
+    //                result.Succeed = true;
+    //            }
+    //        }
+    //        else
+    //        {
+    //            var newThirdOctet = octets[2] + numberOfIp / 256;
+    //            if (newThirdOctet > SUBNET_MAX_SIZE - 1 || octets[3] != 0)
+    //            {
+    //                result.ErrorMessage = "End of subnet";
+    //            }
+    //            else
+    //            {
+    //                result.Data = $"{octets[0]}.{octets[1]}.{newThirdOctet}.{octets[3]}";
+    //                result.Succeed = true;
+    //            }
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> CreateIpRange(IpRangeCreateModel model)
     {
@@ -429,117 +429,117 @@ public class IpSubnetService : IIpSubnetService
         }
     }
 
-    public async Task<ResultModel> Create(int ipSubnetId, List<IpSubnetCreateModel> models)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-        bool validPrecondition = true;
+    //public async Task<ResultModel> Create(int ipSubnetId, List<IpSubnetCreateModel> models)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+    //    bool validPrecondition = true;
 
-        try
-        {
-            //using var transaction = _dbContext.Database.BeginTransaction();
-            var parentSubnet = _dbContext.IpSubnets.Include(x => x.IpAddresses).FirstOrDefault(x => x.Id
-             == ipSubnetId);
-            var subnetsOctets = new List<List<int>>();
-            var subnetIps = new List<List<IpAddress>>();
+    //    try
+    //    {
+    //        //using var transaction = _dbContext.Database.BeginTransaction();
+    //        var parentSubnet = _dbContext.IpSubnets.Include(x => x.IpAddresses).FirstOrDefault(x => x.Id
+    //         == ipSubnetId);
+    //        var subnetsOctets = new List<List<int>>();
+    //        var subnetIps = new List<List<IpAddress>>();
 
-            if (parentSubnet == null)
-            {
-                result.ErrorMessage = IpSubnetErrorMessage.NOT_EXISTED;
-                validPrecondition = false;
-            }
-            else
-            {
-                if (models.Any(x => x.PrefixLength < parentSubnet.PrefixLength))
-                {
-                    result.ErrorMessage = IpSubnetErrorMessage.INVALID_RANGE;
-                    validPrecondition = false;
-                }
+    //        if (parentSubnet == null)
+    //        {
+    //            result.ErrorMessage = IpSubnetErrorMessage.NOT_EXISTED;
+    //            validPrecondition = false;
+    //        }
+    //        else
+    //        {
+    //            if (models.Any(x => x.PrefixLength < parentSubnet.PrefixLength))
+    //            {
+    //                result.ErrorMessage = IpSubnetErrorMessage.INVALID_RANGE;
+    //                validPrecondition = false;
+    //            }
 
-                for (int i = 0; i < models.Count; i++)
-                {
-                    var octets = GetIPv4Octets(models[i].IpAddresss);
-                    if (!IpSubnetBelongToParent(octets, parentSubnet) || !ValidPrefixLengthAndOctets(octets, models[i].PrefixLength))
-                    {
-                        result.ErrorMessage = IpSubnetErrorMessage.INVALID_RANGE;
-                        validPrecondition = false;
-                    }
-                    else
-                    {
-                        subnetsOctets.Add(octets);
-                    }
-                }
-            }
+    //            for (int i = 0; i < models.Count; i++)
+    //            {
+    //                var octets = GetIPv4Octets(models[i].IpAddresss);
+    //                if (!IpSubnetBelongToParent(octets, parentSubnet) || !ValidPrefixLengthAndOctets(octets, models[i].PrefixLength))
+    //                {
+    //                    result.ErrorMessage = IpSubnetErrorMessage.INVALID_RANGE;
+    //                    validPrecondition = false;
+    //                }
+    //                else
+    //                {
+    //                    subnetsOctets.Add(octets);
+    //                }
+    //            }
+    //        }
 
-            if (validPrecondition)
-            {
-                var parentIps = parentSubnet.IpAddresses.ToList();
-                for (int i = 0; i < models.Count; i++)
-                {
-                    double numberOfIps = Math.Pow(2, PREFIX_LENGTH_MAX - models[i].PrefixLength);
-                    var ips = ExtractSubnetIpAddresses(numberOfIps, subnetsOctets[i], parentIps);
+    //        if (validPrecondition)
+    //        {
+    //            var parentIps = parentSubnet.IpAddresses.ToList();
+    //            for (int i = 0; i < models.Count; i++)
+    //            {
+    //                double numberOfIps = Math.Pow(2, PREFIX_LENGTH_MAX - models[i].PrefixLength);
+    //                var ips = ExtractSubnetIpAddresses(numberOfIps, subnetsOctets[i], parentIps);
 
-                    if (ips.Count != numberOfIps)
-                    {
-                        validPrecondition = false;
-                        result.ErrorMessage = IpSubnetErrorMessage.OVERLAPPED;
-                    }
-                    else
-                    {
-                        subnetIps.Add(ips);
-                    }
-                }
-            }
+    //                if (ips.Count != numberOfIps)
+    //                {
+    //                    validPrecondition = false;
+    //                    result.ErrorMessage = IpSubnetErrorMessage.OVERLAPPED;
+    //                }
+    //                else
+    //                {
+    //                    subnetIps.Add(ips);
+    //                }
+    //            }
+    //        }
 
-            if (validPrecondition)
-            {
-                for (int i = 0; i < models.Count; i++)
-                {
-                    var model = models[i];
-                    var octets = subnetsOctets[i];
-                    double numberOfIps = Math.Pow(2, PREFIX_LENGTH_MAX - model.PrefixLength);
-                    var ips = subnetIps[i];
-                    var ipSubnet = new IpSubnet
-                    {
-                        FirstOctet = octets[0],
-                        SecondOctet = octets[1],
-                        ThirdOctet = octets[2],
-                        FourthOctet = octets[3],
-                        PrefixLength = model.PrefixLength,
-                        Note = model.Note,
-                        ParentNetworkId = parentSubnet.Id
-                    };
-                    _dbContext.IpSubnets.Add(ipSubnet);
-                    _dbContext.SaveChanges();
+    //        if (validPrecondition)
+    //        {
+    //            for (int i = 0; i < models.Count; i++)
+    //            {
+    //                var model = models[i];
+    //                var octets = subnetsOctets[i];
+    //                double numberOfIps = Math.Pow(2, PREFIX_LENGTH_MAX - model.PrefixLength);
+    //                var ips = subnetIps[i];
+    //                var ipSubnet = new IpSubnet
+    //                {
+    //                    FirstOctet = octets[0],
+    //                    SecondOctet = octets[1],
+    //                    ThirdOctet = octets[2],
+    //                    FourthOctet = octets[3],
+    //                    PrefixLength = model.PrefixLength,
+    //                    Note = model.Note,
+    //                    ParentNetworkId = parentSubnet.Id
+    //                };
+    //                _dbContext.IpSubnets.Add(ipSubnet);
+    //                _dbContext.SaveChanges();
 
-                    foreach (var ip in ips)
-                    {
-                        int fourthOctet = GetIPv4Octets(ip.Address)[3];
-                        IpPurpose purpose = IpPurpose.Host;
-                        if (fourthOctet == 0 || fourthOctet == octets[3])
-                        {
-                            purpose = IpPurpose.Network;
-                        }
-                        if (fourthOctet == 255 || fourthOctet == octets[3] + numberOfIps - 1)
-                        {
-                            purpose = IpPurpose.Broadcast;
-                        }
-                        ip.IsReserved = purpose != IpPurpose.Host;
-                        ip.Purpose = purpose;
-                        ip.IpSubnetId = ipSubnet.Id;
-                    }
-                    _dbContext.SaveChanges();
-                    result.Succeed = true;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //                foreach (var ip in ips)
+    //                {
+    //                    int fourthOctet = GetIPv4Octets(ip.Address)[3];
+    //                    IpPurpose purpose = IpPurpose.Host;
+    //                    if (fourthOctet == 0 || fourthOctet == octets[3])
+    //                    {
+    //                        purpose = IpPurpose.Network;
+    //                    }
+    //                    if (fourthOctet == 255 || fourthOctet == octets[3] + numberOfIps - 1)
+    //                    {
+    //                        purpose = IpPurpose.Broadcast;
+    //                    }
+    //                    ip.IsReserved = purpose != IpPurpose.Host;
+    //                    ip.Purpose = purpose;
+    //                    ip.IpSubnetId = ipSubnet.Id;
+    //                }
+    //                _dbContext.SaveChanges();
+    //                result.Succeed = true;
+    //            }
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     private bool IpSubnetBelongToParent(List<int> subnetOctet, IpSubnet parentSubnet)
     {

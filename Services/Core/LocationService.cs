@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Services.Core;
 public interface ILocationService
 {
-    Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, LocationSearchModel searchModel);
-    Task<ResultModel> GetDetail(int id);
+    //Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, LocationSearchModel searchModel);
+    //Task<ResultModel> GetDetail(int id);
     //Task<ResultModel> GetRequestExpandLocation(int id);
     //Task<ResultModel> GetLocationAssignment(int id);
     Task<ResultModel> ReservceLocation(LocationReserveModel model);
@@ -31,60 +31,60 @@ public class LocationService : ILocationService
         _mapper = mapper;
     }
 
-    public async Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, LocationSearchModel searchModel)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, LocationSearchModel searchModel)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var Locations = _dbContext.Locations
-                .Where(x => searchModel.LocationId != null ? x.Id == searchModel.LocationId : true)
-                .AsQueryable();
+    //    try
+    //    {
+    //        var Locations = _dbContext.Locations
+    //            .Where(x => searchModel.LocationId != null ? x.Id == searchModel.LocationId : true)
+    //            .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, Locations.Count());
+    //        var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, Locations.Count());
 
-            Locations = Locations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            Locations = Locations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //        Locations = Locations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //        Locations = Locations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.Map<List<LocationModel>>(Locations.ToList());
+    //        paging.Data = _mapper.Map<List<LocationModel>>(Locations.ToList());
 
-            result.Data = paging;
-            result.Succeed = true;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //        result.Data = paging;
+    //        result.Succeed = true;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
-    public async Task<ResultModel> GetDetail(int id)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetDetail(int id)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var location = _dbContext.Locations.FirstOrDefault(x => x.Id == id);
+    //    try
+    //    {
+    //        var location = _dbContext.Locations.FirstOrDefault(x => x.Id == id);
 
-            if (location != null)
-            {
-                result.Succeed = true;
-                result.Data = _mapper.Map<LocationModel>(location);
-            }
-            else
-            {
-                result.ErrorMessage = LocationErrorMessgae.NOT_EXISTED;
-                result.Succeed = false;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //        if (location != null)
+    //        {
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<LocationModel>(location);
+    //        }
+    //        else
+    //        {
+    //            result.ErrorMessage = LocationErrorMessgae.NOT_EXISTED;
+    //            result.Succeed = false;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
     //public async Task<ResultModel> GetRequestExpandLocation(int id)
     //{

@@ -104,6 +104,7 @@ public class RequestUpgradeSearchModel
     public List<RequestStatus?>? Statuses { get; set; }
     public Guid? UserId { get; set; }
     public Guid? CustomerId { get; set; }
+    public int? AppointmentId { get; set; }
 }
 
 public class RequestUpgradeAppointmentModel

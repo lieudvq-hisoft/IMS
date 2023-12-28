@@ -12,12 +12,12 @@ using Microsoft.EntityFrameworkCore;
 namespace Services.Core;
 public interface IIpAddressService
 {
-    Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
+    //Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetServerAllocation(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
+    Task<ResultModel> GetCustomer(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> GetIsBlockedCount();
     Task<ResultModel> GetIsReservedCount();
-    Task<ResultModel> GetCustomer(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> SuggestMasterIp();
     Task<ResultModel> ChangeBlockingStatus(IpAddressIdListModel model, bool isBlock);
     Task<ResultModel> ChangePurpose(IpAddressChangePurposeModel model);
@@ -108,16 +108,14 @@ public class IpAddressService : IIpAddressService
             }
             else
             {
-                var serverAllocations = _dbContext.ServerAllocations
+                var serverAllocations = _dbContext.ServerAllocations.IgnoreQueryFilters()
                     .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                     .Include(x => x.Customer)
                     .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                     .Where(x => x.IpAssignments.Any(x => x.IpAddressId == ipAddressId))
                     .Where(delegate (ServerAllocation x)
                     {
-                        var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(x.Status) : true;
-                        var matchCustomerId = searchModel.CustomerId != null ? x.CustomerId == searchModel.CustomerId : true;
-                        return matchStatus;
+                        return x.Filter(searchModel);
                     })
                     .AsQueryable();
 
@@ -154,13 +152,13 @@ public class IpAddressService : IIpAddressService
             }
             else
             {
-                var customers = _dbContext.Customers
+                var customers = _dbContext.Customers.IgnoreQueryFilters()
                     .Include(x => x.ServerAllocations).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                     .Where(x => x.ServerAllocations.Any(x => x.IpAssignments.Any(x => x.IpAddressId == ipAddressId)))
-                    //.Where(delegate (Customer x)
-                    //{
-                    //    return MyFunction.MatchString(searchModel.CompanyName, x.CustomerName);
-                    //})
+                    .Where(delegate (Customer x)
+                    {
+                        return x.Filter(searchModel);
+                    })
                     .AsQueryable();
 
                 var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, customers.Count());

@@ -30,7 +30,8 @@ public class RequestExpand : BaseEntity
         bool matchStatus = model.Statuses != null ? model.Statuses.Contains(Status) : true;
         bool matchUser = model.UserId != null ? RequestExpandUsers.Any(x => x.UserId == model.UserId) : true;
         bool matchCustomer = model.CustomerId != null ? ServerAllocation.CustomerId == model.CustomerId : true;
+        bool matchAppointment = model.AppointmentId != null ? RequestExpandAppointments.Any(x => x.AppointmentId == model.AppointmentId) : true;
 
-        return matchId && matchServerAllocationId && matchStatus && matchUser && matchCustomer;
+        return matchId && matchServerAllocationId && matchStatus && matchUser && matchCustomer && matchAppointment;
     }
 }

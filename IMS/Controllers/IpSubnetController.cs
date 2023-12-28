@@ -19,21 +19,21 @@ public class IpSubnetController : ControllerBase
         _ipSubnetService = ipSubnetService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] IpSubnetSearchModel searchModel)
-    {
-        var result = await _ipSubnetService.Get(pagingParam, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet]
+    //public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] IpSubnetSearchModel searchModel)
+    //{
+    //    var result = await _ipSubnetService.Get(pagingParam, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpGet("IpRange")]
-    public async Task<ActionResult> GetIpRange([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] IpSubnetSearchModel searchModel)
-    {
-        var result = await _ipSubnetService.GetIpRange(pagingParam, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("IpRange")]
+    //public async Task<ActionResult> GetIpRange([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] IpSubnetSearchModel searchModel)
+    //{
+    //    var result = await _ipSubnetService.GetIpRange(pagingParam, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpGet("{id}")]
     public async Task<ActionResult> GetDetail(int id)
@@ -67,13 +67,13 @@ public class IpSubnetController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("NextAddress")]
-    public async Task<ActionResult> GetNextAddress([FromQuery] NextAddressModel model)
-    {
-        var result = await _ipSubnetService.GetNextAddress(model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("NextAddress")]
+    //public async Task<ActionResult> GetNextAddress([FromQuery] NextAddressModel model)
+    //{
+    //    var result = await _ipSubnetService.GetNextAddress(model);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPost]
     public async Task<ActionResult> CreateIpRange([FromBody] IpRangeCreateModel model)
@@ -83,13 +83,13 @@ public class IpSubnetController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPost("{id}/Subnet")]
-    public async Task<ActionResult> CreateIpSubnet(int id, [FromBody] CreateSubnetModel model)
-    {
-        var result = await _ipSubnetService.Create(id, model.IpSubnets);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPost("{id}/Subnet")]
+    //public async Task<ActionResult> CreateIpSubnet(int id, [FromBody] CreateSubnetModel model)
+    //{
+    //    var result = await _ipSubnetService.Create(id, model.IpSubnets);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpGet("SuggestAdditional")]
     public async Task<ActionResult> SuggestAdditional([FromQuery] SuggestAdditionalIpModel model)

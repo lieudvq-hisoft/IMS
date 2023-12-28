@@ -112,6 +112,7 @@ public class ServerAllocationMasterIpAssignmentModel
 public class ServerAllocationSearchModel
 {
     public Guid? CustomerId { get; set; }
+    public int? RackId { get; set; }
     public List<ServerAllocationStatus>? Status { get; set; }
 }
 

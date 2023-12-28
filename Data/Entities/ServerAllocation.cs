@@ -1,4 +1,5 @@
 ﻿using Data.Enums;
+using Data.Models;
 
 namespace Data.Entities;
 public class ServerAllocation : BaseEntity
@@ -36,5 +37,13 @@ public class ServerAllocation : BaseEntity
         var startPosition = locations.Select(x => x.Position).Min();
         var endPosition = locations.Select(x => x.Position).Max();
         return $"{rack.Area.Name}{rack.Column}-{rack.Row} U{startPosition + 1}-U{endPosition + 1}";
+    }
+
+    public bool Filter(ServerAllocationSearchModel searchModel)
+    {
+        var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(Status) : true;
+        var matchCustomerId = searchModel.CustomerId != null ? CustomerId == searchModel.CustomerId : true;
+        var matchRack = searchModel.RackId != null? LocationAssignments.Select(x => x.Location.RackId).Distinct().Any(x => x == searchModel.RackId) : true; 
+        return matchStatus && matchCustomerId && matchRack;
     }
 }

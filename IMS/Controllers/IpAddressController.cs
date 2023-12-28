@@ -19,13 +19,13 @@ public class IpAddressController : ControllerBase
         _ipAddressService = ipAddressService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult> Get([FromQuery] PagingParam<SimpleSortCriteria> pagingParam, [FromQuery] IpAddressSearchModel searchModel)
-    {
-        var result = await _ipAddressService.Get(pagingParam, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet]
+    //public async Task<ActionResult> Get([FromQuery] PagingParam<SimpleSortCriteria> pagingParam, [FromQuery] IpAddressSearchModel searchModel)
+    //{
+    //    var result = await _ipAddressService.Get(pagingParam, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpGet("{id}")]
     public async Task<ActionResult> GetDetail(int id)

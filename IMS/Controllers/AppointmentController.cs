@@ -47,13 +47,13 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("{id}/RequestExpand")]
-    public async Task<ActionResult> GetRequestExpand([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
-    {
-        var result = await _appointmentService.GetRequestExpand(pagingParam, id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/RequestExpand")]
+    //public async Task<ActionResult> GetRequestExpand([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
+    //{
+    //    var result = await _appointmentService.GetRequestExpand(pagingParam, id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPut("{id}/Request")]
     public async Task<ActionResult> CreateRequestUpgradeAppointment(int id, RequestAppointmentCreateModel model)
@@ -63,21 +63,21 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("{id}/RequestUpgrade")]
-    public async Task<ActionResult> GetRequestUpgrade(int id, [FromQuery] PagingParam<RequestUpgradeSortCriteria> paginationModel, [FromQuery] RequestUpgradeSearchModel searchModel)
-    {
-        var result = await _appointmentService.GetRequestUpgrade(id, paginationModel, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/RequestUpgrade")]
+    //public async Task<ActionResult> GetRequestUpgrade(int id, [FromQuery] PagingParam<RequestUpgradeSortCriteria> paginationModel, [FromQuery] RequestUpgradeSearchModel searchModel)
+    //{
+    //    var result = await _appointmentService.GetRequestUpgrade(id, paginationModel, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpGet("{id}/Incident")]
-    public async Task<ActionResult> GetIncident(int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] IncidentSearchModel searchModel)
-    {
-        var result = await _appointmentService.GetIncident(id, paginationModel, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/Incident")]
+    //public async Task<ActionResult> GetIncident(int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] IncidentSearchModel searchModel)
+    //{
+    //    var result = await _appointmentService.GetIncident(id, paginationModel, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPost]
     public async Task<ActionResult> Create([FromBody] AppointmentCreateModel model)

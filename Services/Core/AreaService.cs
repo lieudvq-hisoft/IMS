@@ -12,10 +12,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Services.Core;
 public interface IAreaService
 {
-    Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AreaSearchModel searchModel);
+    //Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AreaSearchModel searchModel);
     Task<ResultModel> GetAll();
-    Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> GetRack(PagingParam<BaseSortCriteria> paginationModel, int id);
+    //Task<ResultModel> GetDetail(int id);
+    //Task<ResultModel> GetRack(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRackAll(int id);
     Task<ResultModel> Create(AreaCreateModel model);
     Task<ResultModel> Update(AreaUpdateModel model);
@@ -33,33 +33,33 @@ public class AreaService : IAreaService
         _mapper = mapper;
     }
 
-    public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AreaSearchModel searchModel)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AreaSearchModel searchModel)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var areas = _dbContext.Areas
-                .Where(x => searchModel.AreaId != null ? x.Id == searchModel.AreaId : true)
-                .AsQueryable();
+    //    try
+    //    {
+    //        var areas = _dbContext.Areas
+    //            .Where(x => searchModel.AreaId != null ? x.Id == searchModel.AreaId : true)
+    //            .AsQueryable();
 
-            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, areas.Count());
+    //        var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, areas.Count());
 
-            areas = areas.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-            areas = areas.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //        areas = areas.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //        areas = areas.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-            paging.Data = _mapper.Map<List<AreaModel>>(areas.ToList());
+    //        paging.Data = _mapper.Map<List<AreaModel>>(areas.ToList());
 
-            result.Data = paging;
-            result.Succeed = true;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //        result.Data = paging;
+    //        result.Succeed = true;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> GetAll()
     {
@@ -81,69 +81,69 @@ public class AreaService : IAreaService
         return result;
     }
 
-    public async Task<ResultModel> GetDetail(int id)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetDetail(int id)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var area = _dbContext.Areas
-                .FirstOrDefault(x => x.Id == id);
+    //    try
+    //    {
+    //        var area = _dbContext.Areas
+    //            .FirstOrDefault(x => x.Id == id);
 
-            if (area != null)
-            {
-                result.Succeed = true;
-                result.Data = _mapper.Map<AreaModel>(area);
-            }
-            else
-            {
-                result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
-                result.Succeed = false;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //        if (area != null)
+    //        {
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<AreaModel>(area);
+    //        }
+    //        else
+    //        {
+    //            result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
+    //            result.Succeed = false;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
-    public async Task<ResultModel> GetRack(PagingParam<BaseSortCriteria> paginationModel, int id)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetRack(PagingParam<BaseSortCriteria> paginationModel, int id)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var area = _dbContext.Areas
-                .Include(x => x.Racks)
-                .FirstOrDefault(x => x.Id == id);
+    //    try
+    //    {
+    //        var area = _dbContext.Areas
+    //            .Include(x => x.Racks)
+    //            .FirstOrDefault(x => x.Id == id);
 
-            if (area == null)
-            {
-                result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
-                result.Succeed = false;
-            }
+    //        if (area == null)
+    //        {
+    //            result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
+    //            result.Succeed = false;
+    //        }
 
-            else
-            {
-                var racks = area.Racks.AsQueryable();
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, racks.Count());
-                racks = racks.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                racks = racks.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-                paging.Data = _mapper.Map<List<RackModel>>(racks.ToList());
+    //        else
+    //        {
+    //            var racks = area.Racks.AsQueryable();
+    //            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, racks.Count());
+    //            racks = racks.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //            racks = racks.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //            paging.Data = _mapper.Map<List<RackModel>>(racks.ToList());
 
-                result.Data = paging;
-                result.Succeed = true;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //            result.Data = paging;
+    //            result.Succeed = true;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> GetRackAll(int id)
     {

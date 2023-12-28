@@ -61,9 +61,7 @@ public class ServerAllocationService : IServerAllocationService
                 .Include(x => x.Incidents)
                 .Where(delegate (ServerAllocation x)
                 {
-                    var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(x.Status) : true;
-                    var matchCustomerId = searchModel.CustomerId != null ? x.CustomerId == searchModel.CustomerId : true;
-                    return matchStatus && matchCustomerId;
+                    return x.Filter(searchModel);
                 })
                 .AsQueryable();
 

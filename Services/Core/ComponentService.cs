@@ -16,7 +16,7 @@ public interface IComponentService
     Task<ResultModel> GetServerHardwareConfig(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetAll();
-    Task<ResultModel> GetDetail(int id);
+    //Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(ComponentCreateModel model);
     Task<ResultModel> Update(ComponentUpdateModel model);
     Task<ResultModel> Delete(int componentId);
@@ -83,32 +83,32 @@ public class ComponentService : IComponentService
         return result;
     }
 
-    public async Task<ResultModel> GetDetail(int id)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetDetail(int id)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var component = _dbContext.Components.FirstOrDefault(x => x.Id == id);
+    //    try
+    //    {
+    //        var component = _dbContext.Components.FirstOrDefault(x => x.Id == id);
 
-            if (component != null)
-            {
-                result.Succeed = true;
-                result.Data = _mapper.Map<ComponentModel>(component);
-            }
-            else
-            {
-                result.ErrorMessage = ComponentErrorMessgae.NOT_EXISTED;
-                result.Succeed = false;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //        if (component != null)
+    //        {
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<ComponentModel>(component);
+    //        }
+    //        else
+    //        {
+    //            result.ErrorMessage = ComponentErrorMessgae.NOT_EXISTED;
+    //            result.Succeed = false;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> Create(ComponentCreateModel model)
     {

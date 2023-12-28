@@ -20,23 +20,23 @@ public class RackController : ControllerBase
         _RackService = RackService;
     }
 
-    [HttpGet]
-    [SwaggerOperation(Summary = "Get all Rack")]
-    public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RackSearchModel searchModel)
-    {
-        var result = await _RackService.Get(pagingParam, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet]
+    //[SwaggerOperation(Summary = "Get all Rack")]
+    //public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RackSearchModel searchModel)
+    //{
+    //    var result = await _RackService.Get(pagingParam, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpGet("All")]
-    [SwaggerOperation(Summary = "Get all Rack no paging")]
-    public async Task<ActionResult> GetAll()
-    {
-        var result = await _RackService.GetAll();
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("All")]
+    //[SwaggerOperation(Summary = "Get all Rack no paging")]
+    //public async Task<ActionResult> GetAll()
+    //{
+    //    var result = await _RackService.GetAll();
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpGet("{id}")]
     [SwaggerOperation(Summary = "Get detail information of an Rack")]
@@ -56,14 +56,14 @@ public class RackController : ControllerBase
     //    return BadRequest(result.ErrorMessage);
     //}
 
-    [HttpGet("{id}/ServerAllocation")]
-    [SwaggerOperation(Summary = "Get all rack server allocation by rack id")]
-    public async Task<ActionResult> GetServerAllocation([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
-    {
-        var result = await _RackService.GetServerAllocation(pagingParam, id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/ServerAllocation")]
+    //[SwaggerOperation(Summary = "Get all rack server allocation by rack id")]
+    //public async Task<ActionResult> GetServerAllocation([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
+    //{
+    //    var result = await _RackService.GetServerAllocation(pagingParam, id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpGet("{id}/Map")]
     [SwaggerOperation(Summary = "Get all rack location with server allocation id by rack id")]
@@ -74,14 +74,14 @@ public class RackController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("{id}/Power")]
-    [SwaggerOperation(Summary = "Get rack power")]
-    public async Task<ActionResult> GetPower(int id)
-    {
-        var result = await _RackService.GetPower(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/Power")]
+    //[SwaggerOperation(Summary = "Get rack power")]
+    //public async Task<ActionResult> GetPower(int id)
+    //{
+    //    var result = await _RackService.GetPower(id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPost]
     [SwaggerOperation(Summary = "Create an arae")]
@@ -97,14 +97,6 @@ public class RackController : ControllerBase
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _RackService.Delete(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
-
-    [HttpGet("SuggestLocation")]
-    public async Task<ActionResult> Suggest([FromQuery] SuggestLocationModel model)
-    {
-        var result = await _RackService.GetRackChoiceSuggestionBySize(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

@@ -39,13 +39,13 @@ public class CustomerController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("{id}/ServerAllocation")]
-    public async Task<ActionResult> GetServerAllocation([FromQuery] PagingParam<BaseSortCriteria> pagingParam, string id)
-    {
-        var result = await _customerService.GetServerAllocation(pagingParam, new Guid(id));
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/ServerAllocation")]
+    //public async Task<ActionResult> GetServerAllocation([FromQuery] PagingParam<BaseSortCriteria> pagingParam, string id)
+    //{
+    //    var result = await _customerService.GetServerAllocation(pagingParam, new Guid(id));
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     //[HttpGet("{id}/Appointment")]
     //public async Task<ActionResult> GetAppointment(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] AppointmentSearchModel searchModel)
