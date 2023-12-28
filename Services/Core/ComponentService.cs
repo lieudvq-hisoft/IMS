@@ -13,8 +13,8 @@ namespace Services.Core;
 public interface IComponentService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, ComponentSearchModel searchModel);
-    Task<ResultModel> GetServerHardwareConfig(PagingParam<BaseSortCriteria> paginationModel, int id);
-    Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id);
+    //Task<ResultModel> GetServerHardwareConfig(PagingParam<BaseSortCriteria> paginationModel, int id);
+    //Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetAll();
     //Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(ComponentCreateModel model);
@@ -205,75 +205,75 @@ public class ComponentService : IComponentService
         return result;
     }
 
-    public async Task<ResultModel> GetServerHardwareConfig(PagingParam<BaseSortCriteria> paginationModel, int id)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetServerHardwareConfig(PagingParam<BaseSortCriteria> paginationModel, int id)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var component = _dbContext.Components
-                .Include(x => x.ServerHardwareConfigs)
-                .FirstOrDefault(x => x.Id == id);
+    //    try
+    //    {
+    //        var component = _dbContext.Components
+    //            .Include(x => x.ServerHardwareConfigs)
+    //            .FirstOrDefault(x => x.Id == id);
 
-            if (component == null)
-            {
-                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
-                result.Succeed = false;
-            }
-            else
-            {
-                var hardwareConfigs = component.ServerHardwareConfigs.AsQueryable();
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, hardwareConfigs.Count());
-                hardwareConfigs = hardwareConfigs.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                hardwareConfigs = hardwareConfigs.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-                paging.Data = _mapper.Map<List<ServerHardwareConfigModel>>(hardwareConfigs.ToList());
+    //        if (component == null)
+    //        {
+    //            result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
+    //            result.Succeed = false;
+    //        }
+    //        else
+    //        {
+    //            var hardwareConfigs = component.ServerHardwareConfigs.AsQueryable();
+    //            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, hardwareConfigs.Count());
+    //            hardwareConfigs = hardwareConfigs.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //            hardwareConfigs = hardwareConfigs.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //            paging.Data = _mapper.Map<List<ServerHardwareConfigModel>>(hardwareConfigs.ToList());
 
-                result.Data = paging;
-                result.Succeed = true;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //            result.Data = paging;
+    //            result.Succeed = true;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
-    public async Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetRequestUpgrade(PagingParam<BaseSortCriteria> paginationModel, int id)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var component = _dbContext.Components
-                .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
-                .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
-                .Include(x => x.RequestUpgrades).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .FirstOrDefault(x => x.Id == id);
+    //    try
+    //    {
+    //        var component = _dbContext.Components
+    //            .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
+    //            .Include(x => x.RequestUpgrades).ThenInclude(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
+    //            .Include(x => x.RequestUpgrades).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+    //            .FirstOrDefault(x => x.Id == id);
 
-            if (component == null)
-            {
-                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
-                result.Succeed = false;
-            }
-            else
-            {
-                var requestUpgrades = component.RequestUpgrades.AsQueryable();
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestUpgrades.Count());
-                requestUpgrades = requestUpgrades.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                requestUpgrades = requestUpgrades.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
-                paging.Data = _mapper.Map<List<RequestUpgradeModel>>(requestUpgrades.ToList());
+    //        if (component == null)
+    //        {
+    //            result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
+    //            result.Succeed = false;
+    //        }
+    //        else
+    //        {
+    //            var requestUpgrades = component.RequestUpgrades.AsQueryable();
+    //            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestUpgrades.Count());
+    //            requestUpgrades = requestUpgrades.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //            requestUpgrades = requestUpgrades.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //            paging.Data = _mapper.Map<List<RequestUpgradeModel>>(requestUpgrades.ToList());
 
-                result.Data = paging;
-                result.Succeed = true;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //            result.Data = paging;
+    //            result.Succeed = true;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 }

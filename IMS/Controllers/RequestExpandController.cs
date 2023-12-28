@@ -99,13 +99,13 @@ public class RequestExpandController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpDelete("{id}/RequestExpandLocation")]
-    public async Task<ActionResult> DeleteRequestExpandLocation(int id)
-    {
-        var result = await _requestExpandService.DeleteRequestExpandLocation(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpDelete("{id}/RequestExpandLocation")]
+    //public async Task<ActionResult> DeleteRequestExpandLocation(int id)
+    //{
+    //    var result = await _requestExpandService.DeleteRequestExpandLocation(id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     //[HttpDelete("Removal/{id}")]
     //public async Task<ActionResult> FailRequestRemoval(int id)
@@ -161,13 +161,13 @@ public class RequestExpandController : ControllerBase
     //    return BadRequest(result.ErrorMessage);
     //}
 
-    [HttpGet("{id}/ChosenLocation")]
-    public async Task<ActionResult> GetChosenLocation(int id)
-    {
-        var result = await _requestExpandService.GetChosenLocation(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/ChosenLocation")]
+    //public async Task<ActionResult> GetChosenLocation(int id)
+    //{
+    //    var result = await _requestExpandService.GetChosenLocation(id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpGet("{id}/SuggestLocation")]
     [SwaggerOperation(Summary = "Suggest location for request expand")]

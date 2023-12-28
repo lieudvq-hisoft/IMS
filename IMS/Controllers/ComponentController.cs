@@ -66,19 +66,19 @@ public class ComponentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("{id}/ServerHardwareConfig")]
-    public async Task<ActionResult> GetServerHardwareConfig([FromQuery] PagingParam<BaseSortCriteria> paginationModel, int id)
-    {
-        var result = await _componentService.GetServerHardwareConfig(paginationModel, id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/ServerHardwareConfig")]
+    //public async Task<ActionResult> GetServerHardwareConfig([FromQuery] PagingParam<BaseSortCriteria> paginationModel, int id)
+    //{
+    //    var result = await _componentService.GetServerHardwareConfig(paginationModel, id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpGet("{id}/RequestUpgrade")]
-    public async Task<ActionResult> GetRequestUpgrade([FromQuery] PagingParam<BaseSortCriteria> paginationModel, int id)
-    {
-        var result = await _componentService.GetRequestUpgrade(paginationModel, id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/RequestUpgrade")]
+    //public async Task<ActionResult> GetRequestUpgrade([FromQuery] PagingParam<BaseSortCriteria> paginationModel, int id)
+    //{
+    //    var result = await _componentService.GetRequestUpgrade(paginationModel, id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 }

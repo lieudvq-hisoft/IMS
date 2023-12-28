@@ -37,70 +37,70 @@ public class ServerAllocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpGet("{id}/HardwareConfig")]
-    public async Task<ActionResult> GetHardwareConfig([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromRoute] int id)
-    {
-        var result = await _serverAllocationService.GetHardwareConfig(pagingParam, id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/HardwareConfig")]
+    //public async Task<ActionResult> GetHardwareConfig([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromRoute] int id)
+    //{
+    //    var result = await _serverAllocationService.GetHardwareConfig(pagingParam, id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpGet("{id}/RequestUpgrade")]
-    public async Task<ActionResult> GetRequestUpgrade([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestUpgradeSearchModel searchModel, int id)
-    {
-        var result = await _serverAllocationService.GetRequestUpgrade(pagingParam, searchModel, id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/RequestUpgrade")]
+    //public async Task<ActionResult> GetRequestUpgrade([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestUpgradeSearchModel searchModel, int id)
+    //{
+    //    var result = await _serverAllocationService.GetRequestUpgrade(pagingParam, searchModel, id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpGet("{id}/RequestExpand")]
-    public async Task<ActionResult> GetRequestExpand([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestExpandSearchModel searchModel, int id)
-    {
-        var result = await _serverAllocationService.GetRequestExpand(pagingParam, searchModel, id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/RequestExpand")]
+    //public async Task<ActionResult> GetRequestExpand([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestExpandSearchModel searchModel, int id)
+    //{
+    //    var result = await _serverAllocationService.GetRequestExpand(pagingParam, searchModel, id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpGet("{id}/RequestHost")]
-    public async Task<ActionResult> GetRequestHost(int id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestHostSearchModel searchModel)
-    {
-        var result = await _serverAllocationService.GetRequestHost(id, pagingParam, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/RequestHost")]
+    //public async Task<ActionResult> GetRequestHost(int id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestHostSearchModel searchModel)
+    //{
+    //    var result = await _serverAllocationService.GetRequestHost(id, pagingParam, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
 
-    [HttpGet("{id}/Incident")]
-    public async Task<ActionResult> GetIncident(int id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] IncidentSearchModel searchModel)
-    {
-        var result = await _serverAllocationService.GetIncident(id, pagingParam, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/Incident")]
+    //public async Task<ActionResult> GetIncident(int id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] IncidentSearchModel searchModel)
+    //{
+    //    var result = await _serverAllocationService.GetIncident(id, pagingParam, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpGet("{id}/IpAddress")]
-    public async Task<ActionResult> GetIpAddress([FromRoute] int id, [FromQuery] PagingParam<SimpleSortCriteria> paginationModel, [FromQuery] IpAddressSearchModel searchModel)
-    {
-        var result = await _serverAllocationService.GetIpAddress(id, paginationModel, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/IpAddress")]
+    //public async Task<ActionResult> GetIpAddress([FromRoute] int id, [FromQuery] PagingParam<SimpleSortCriteria> paginationModel, [FromQuery] IpAddressSearchModel searchModel)
+    //{
+    //    var result = await _serverAllocationService.GetIpAddress(id, paginationModel, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpGet("{id}/Location")]
-    public async Task<ActionResult> GetLocation([FromQuery] PagingParam<SimpleSortCriteria> pagingParam, [FromRoute] int id)
-    {
-        var result = await _serverAllocationService.GetLocation(pagingParam, id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/Location")]
+    //public async Task<ActionResult> GetLocation([FromQuery] PagingParam<SimpleSortCriteria> pagingParam, [FromRoute] int id)
+    //{
+    //    var result = await _serverAllocationService.GetLocation(pagingParam, id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpGet("{id}/Appointment")]
-    public async Task<ActionResult> GetAppointment([FromRoute] int id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] AppointmentSearchModel searchModel)
-    {
-        var result = await _serverAllocationService.GetAppointment(id, pagingParam, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet("{id}/Appointment")]
+    //public async Task<ActionResult> GetAppointment([FromRoute] int id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] AppointmentSearchModel searchModel)
+    //{
+    //    var result = await _serverAllocationService.GetAppointment(id, pagingParam, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpPost]
     [Authorize(Roles = "Customer")]

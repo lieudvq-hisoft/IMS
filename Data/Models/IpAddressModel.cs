@@ -55,6 +55,8 @@ public class IpAddressSearchModel
     public bool? IsAssigned { get; set; }
     public bool? IsBlocked { get; set; }
     public bool? IsReserved { get; set; }
+    public int? RequestHostId { get; set; }
+    public int? ServerAllocationId { get; set; }
 }
 
 public class IpAssignmentModel

@@ -21,7 +21,7 @@ public interface IRequestHostService
 {
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, RequestHostSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
-    Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
+    //Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> Create(RequestHostCreateModel model);
     Task<ResultModel> CreatePortUpgrade(RequestHostCreateUpgradeModel model);
     Task<ResultModel> Delete(int id);
@@ -123,47 +123,47 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    public async Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetIpAddress(int id, PagingParam<BaseSortCriteria> paginationModel, IpAddressSearchModel searchModel)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var requestHost = _dbContext.RequestHosts
-                .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
-                .ThenInclude(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .FirstOrDefault(x => x.Id == id);
+    //    try
+    //    {
+    //        var requestHost = _dbContext.RequestHosts
+    //            .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
+    //            .ThenInclude(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+    //            .FirstOrDefault(x => x.Id == id);
 
-            if (requestHost != null)
-            {
-                var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress)
-                    .Where(delegate (IpAddress x)
-                    {
-                        return x.Filter(searchModel);
-                    }).AsQueryable();
-                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddresses.Count());
+    //        if (requestHost != null)
+    //        {
+    //            var ipAddresses = requestHost.RequestHostIps.Select(x => x.IpAddress)
+    //                .Where(delegate (IpAddress x)
+    //                {
+    //                    return x.Filter(searchModel);
+    //                }).AsQueryable();
+    //            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipAddresses.Count());
 
-                ipAddresses = ipAddresses.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
-                ipAddresses = ipAddresses.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+    //            ipAddresses = ipAddresses.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+    //            ipAddresses = ipAddresses.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
 
-                paging.Data = _mapper.Map<List<IpAddressModel>>(ipAddresses.ToList());
+    //            paging.Data = _mapper.Map<List<IpAddressModel>>(ipAddresses.ToList());
 
-                result.Data = paging;
-                result.Succeed = true;
-            }
-            else
-            {
-                result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
-                result.Succeed = false;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //            result.Data = paging;
+    //            result.Succeed = true;
+    //        }
+    //        else
+    //        {
+    //            result.ErrorMessage = RequestHostErrorMessage.NOT_EXISTED;
+    //            result.Succeed = false;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> Create(RequestHostCreateModel model)
     {

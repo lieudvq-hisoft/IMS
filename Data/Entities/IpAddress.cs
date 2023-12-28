@@ -40,7 +40,10 @@ public class IpAddress
         var assigned = searchModel.IsAssigned != null ? IsAssigned() == searchModel.IsAssigned : true;
         var isReserved = searchModel.IsReserved != null ? IsReserved == searchModel.IsReserved : true;
         var blocked = searchModel.IsBlocked != null ? Blocked == searchModel.IsBlocked : true;
-        return matchAddress && available && assigned && isReserved && blocked;
+        var matchRequestHost = searchModel.RequestHostId != null ? RequestHostIps.Any(x => x.RequestHostId == searchModel.RequestHostId) : true;
+        var matchServer = searchModel.ServerAllocationId != null ? IpAssignments.Any(x => x.ServerAllocationId == searchModel.ServerAllocationId) : true;
+
+        return matchAddress && available && assigned && isReserved && blocked && matchRequestHost;
     }
 
     public static string GetDefaultSubnetMask(string ipAddressString)

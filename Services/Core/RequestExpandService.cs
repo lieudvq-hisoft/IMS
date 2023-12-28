@@ -22,9 +22,9 @@ public interface IRequestExpandService
     Task<ResultModel> Reject(int requestExpandId, RequestExpandRejectModel modell);
     Task<ResultModel> Accept(int requestExpandId, Guid userId);
     Task<ResultModel> Deny(int requestExpandId, Guid userId, DenyModel model);
-    Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
+    //Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
     Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model);
-    Task<ResultModel> GetChosenLocation(int requestExpandId);
+    //Task<ResultModel> GetChosenLocation(int requestExpandId);
     Task<ResultModel> GetRackChoiceSuggestionBySize(int requestExpandId);
 }
 
@@ -579,38 +579,38 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
-    public async Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandLocations).FirstOrDefault(x => x.Id == requestExpandId);
-            if (requestExpand == null)
-            {
-                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
-            }
-            else if (requestExpand.Status != RequestStatus.Accepted)
-            {
-                result.ErrorMessage = RequestExpandErrorMessage.NOT_ACCEPTED;
-            }
-            else
-            {
-                var requestExpandLocations = requestExpand.RequestExpandLocations;
-                _dbContext.RequestExpandLocations.RemoveRange(requestExpandLocations);
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = requestExpandLocations.Select(x => x.Id);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //    try
+    //    {
+    //        var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandLocations).FirstOrDefault(x => x.Id == requestExpandId);
+    //        if (requestExpand == null)
+    //        {
+    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+    //        }
+    //        else if (requestExpand.Status != RequestStatus.Accepted)
+    //        {
+    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_ACCEPTED;
+    //        }
+    //        else
+    //        {
+    //            var requestExpandLocations = requestExpand.RequestExpandLocations;
+    //            _dbContext.RequestExpandLocations.RemoveRange(requestExpandLocations);
+    //            _dbContext.SaveChanges();
+    //            result.Succeed = true;
+    //            result.Data = requestExpandLocations.Select(x => x.Id);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model)
     {
@@ -736,43 +736,43 @@ public class RequestExpandService : IRequestExpandService
         return allValidLocation;
     }
 
-    public async Task<ResultModel> GetChosenLocation(int requestExpandId)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> GetChosenLocation(int requestExpandId)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area).FirstOrDefault(x => x.Id == requestExpandId);
-            if (requestExpand == null)
-            {
-                result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
-            }
-            if (!requestExpand.RequestExpandLocations.Any())
-            {
-                result.ErrorMessage = "Request expand dont have any chosen location";
-            }
-            else
-            {
-                var rack = requestExpand.RequestExpandLocations.Select(x => x.Location.Rack).DistinctBy(x => x.Id).FirstOrDefault();
-                var suggestedLocation = new LocationSuggestResultModel
-                {
-                    Area = _mapper.Map<AreaResultModel>(rack?.Area),
-                    Rack = _mapper.Map<RackResultModel>(rack),
-                    Position = requestExpand.RequestExpandLocations.Select(x => x.Location.Position).Min()
-                };
+    //    try
+    //    {
+    //        var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandLocations).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area).FirstOrDefault(x => x.Id == requestExpandId);
+    //        if (requestExpand == null)
+    //        {
+    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
+    //        }
+    //        if (!requestExpand.RequestExpandLocations.Any())
+    //        {
+    //            result.ErrorMessage = "Request expand dont have any chosen location";
+    //        }
+    //        else
+    //        {
+    //            var rack = requestExpand.RequestExpandLocations.Select(x => x.Location.Rack).DistinctBy(x => x.Id).FirstOrDefault();
+    //            var suggestedLocation = new LocationSuggestResultModel
+    //            {
+    //                Area = _mapper.Map<AreaResultModel>(rack?.Area),
+    //                Rack = _mapper.Map<RackResultModel>(rack),
+    //                Position = requestExpand.RequestExpandLocations.Select(x => x.Location.Position).Min()
+    //            };
 
-                result.Succeed = true;
-                result.Data = suggestedLocation;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //            result.Succeed = true;
+    //            result.Data = suggestedLocation;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> GetRackChoiceSuggestionBySize(int requestExpandId)
     {
