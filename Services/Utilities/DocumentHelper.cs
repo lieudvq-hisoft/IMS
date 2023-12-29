@@ -96,9 +96,8 @@ public static class DocumentHelper
                 TableCell cell3 = new TableCell(new Paragraph(new Run(new Text(item.Action))));
                 TableCell cell4 = new TableCell(new Paragraph(new Run(new Text(item.Quantity.ToString()))));
                 TableCell cell5 = new TableCell(new Paragraph(new Run(new Text(item.Unit))));
-                TableCell cell6 = new TableCell(new Paragraph(new Run(new Text(item.SerialNumber))));
 
-                newRow.Append(cell1, cell2, cell3, cell4, cell5, cell6);
+                newRow.Append(cell1, cell2, cell3, cell4, cell5);
 
                 // Add the new row to the table
                 chosenTable.Append(newRow);

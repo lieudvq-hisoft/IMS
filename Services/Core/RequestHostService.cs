@@ -1184,33 +1184,14 @@ public class RequestHostService : IRequestHostService
 
                     document.RenderText("__ServerName__", serverAllocation.Name);
 
-                    var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.Component.Name == "CPU")?.Description);
-                    var cpuString = "";
-                    for (int i = 0; i < cpus.Count(); i++)
-                    {
-                        cpuString += cpus[i].Model;
-                        if (i != cpus.Count() - 1)
-                        {
-                            cpuString += ", ";
-                        }
-                    }
-                    document.RenderText("__CPUs__", cpuString);
+                    var cpu = serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.Component.Name == "CPU")?.Description;
+                    document.RenderText("__CPUs__", cpu);
 
-                    var rams = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.Component.Name == "RAM")?.Description);
-                    var ramCapacity = 0;
-                    for (int i = 0; i < rams.Count(); i++)
-                    {
-                        ramCapacity += rams[i].Capacity.Value;
-                    }
-                    document.RenderText("__Ram__", ramCapacity + "Gb");
+                    var ram = serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.Component.Name == "RAM")?.Description;
+                    document.RenderText("__Ram__", ram);
 
-                    var hardDisks = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.Component.Name == "Harddisk")?.Description);
-                    var hardDiskCapacity = 0;
-                    for (int i = 0; i < hardDisks.Count(); i++)
-                    {
-                        hardDiskCapacity += hardDisks[i].Capacity.Value;
-                    }
-                    document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
+                    var hardDisk = serverAllocation.ServerHardwareConfigs?.FirstOrDefault(x => x.Component.Name == "Harddisk")?.Description;
+                    document.RenderText("__HardDisk__", hardDisk);
 
                     document.RenderText("__ServerLocation__", serverAllocation.ServerLocation);
 

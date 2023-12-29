@@ -8,7 +8,7 @@ public class ComponentModel
     public string Name { get; set; }
     public string? Description { get; set; }
     public bool IsRequired { get; set; }
-    public bool RequireCapacity { get; set; }
+    //public bool RequireCapacity { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
 }
@@ -19,7 +19,7 @@ public class ComponentResultModel
     public string Name { get; set; }
     public string? Description { get; set; }
     public bool IsRequired { get; set; }
-    public bool RequireCapacity { get; set; }
+    //public bool RequireCapacity { get; set; }
 }
 
 public class ComponentCreateModel

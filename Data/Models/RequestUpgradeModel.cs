@@ -6,7 +6,7 @@ namespace Data.Models;
 public class RequestUpgradeModel
 {
     public int Id { get; set; }
-    public List<ConfigDescriptionModel>? Descriptions { get; set; }
+    public string? Description { get; set; }
     public string Status { get; set; }
     public string? Note { get; set; }
     public string? TechNote { get; set; }
@@ -30,7 +30,7 @@ public class RequestUpgradeModel
 public class RequestUpgradeResultModel
 {
     public int Id { get; set; }
-    public List<ConfigDescriptionModel>? Descriptions { get; set; }
+    public string? Description { get; set; }
     public string Status { get; set; }
     public RequestType RequestType { get; set; }
     public string? Note { get; set; }
@@ -42,8 +42,8 @@ public class RequestUpgradeResultModel
 
 public class RequestUpgradeCreateModel
 {
-    [EnsureMinimumElements(min: 1, ErrorMessage = "Select at least one item")]
-    public List<ConfigDescriptionModel>? Descriptions { get; set; }
+    [Required]
+    public string Description { get; set; }
 
     public string? Note { get; set; }
 
@@ -77,8 +77,8 @@ public class RequestUpgradeUpdateModel
     [Required]
     public int Id { get; set; }
 
-    [EnsureMinimumElements(min: 1, ErrorMessage = "Select at least one item")]
-    public List<ConfigDescriptionModel>? Descriptions { get; set; }
+    [Required]
+    public string Description { get; set; }
 
     public string? Note { get; set; }
 
@@ -113,4 +113,3 @@ public class RequestUpgradeAppointmentModel
     public int AppointmentId { get; set; }
     public int RequestUpgradeId { get; set; }
 }
-

@@ -149,18 +149,6 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
             }
 
-            if (component.IsRequired && model.Descriptions == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = "Component is required";
-            }
-
-            if (component.RequireCapacity && model.Descriptions != null && model.Descriptions.Any(x => x.Capacity == null))
-            {
-                validPrecondition = false;
-                result.ErrorMessage = "Config for component require capacity";
-            }
-
             var serverAllocation = _dbContext.ServerAllocations
                 .Include(x => x.LocationAssignments)
                 .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
@@ -177,11 +165,6 @@ public class RequestUpgradeService : IRequestUpgradeService
                     validPrecondition = false;
                     result.ErrorMessage = "Cannot modify unallocated server";
                 }
-                else if (!serverAllocation.ServerHardwareConfigs.Any(x => x.ComponentId == component.Id) && model.Descriptions == null)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "Server dont have config to remove";
-                }
             }
 
             if (validPrecondition)
@@ -193,15 +176,6 @@ public class RequestUpgradeService : IRequestUpgradeService
                 {
                     validPrecondition = false;
                     result.ErrorMessage = RequestUpgradeErrorMessage.EXISTED;
-                }
-            }
-
-            if (model.Descriptions != null)
-            {
-                if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), model.ComponentId, serverAllocation.Id))
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "Serial number existed";
                 }
             }
 
@@ -249,18 +223,18 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    private bool CheckValidSerialNumber(List<string> serialNumbers, int componentId, int serverAllocationId)
-    {
-        var thisSerialNumber = _dbContext.ServerHardwareConfigs.Include(x => x.ServerAllocation)
-            .FirstOrDefault(x => x.ServerAllocation.Status != ServerAllocationStatus.Removed && x.ServerAllocationId == serverAllocationId && x.ComponentId == componentId);
-        var existingConfig = _dbContext.ServerHardwareConfigs.Include(x => x.ServerAllocation)
-            .Where(x => x.ServerAllocation.Status != ServerAllocationStatus.Removed)
-            .ToList();
-        existingConfig.Remove(thisSerialNumber);
-        var existedSerialNumber = existingConfig
-            .SelectMany(x => JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(x.Description).Select(x => x.SerialNumber));
-        return !serialNumbers.Any(x => existedSerialNumber.Contains(x)) && serialNumbers.Distinct().Count() == serialNumbers.Count();
-    }
+    //private bool CheckValidSerialNumber(List<string> serialNumbers, int componentId, int serverAllocationId)
+    //{
+    //    var thisSerialNumber = _dbContext.ServerHardwareConfigs.Include(x => x.ServerAllocation)
+    //        .FirstOrDefault(x => x.ServerAllocation.Status != ServerAllocationStatus.Removed && x.ServerAllocationId == serverAllocationId && x.ComponentId == componentId);
+    //    var existingConfig = _dbContext.ServerHardwareConfigs.Include(x => x.ServerAllocation)
+    //        .Where(x => x.ServerAllocation.Status != ServerAllocationStatus.Removed)
+    //        .ToList();
+    //    existingConfig.Remove(thisSerialNumber);
+    //    var existedSerialNumber = existingConfig
+    //        .SelectMany(x => JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(x.Description).Select(x => x.SerialNumber));
+    //    return !serialNumbers.Any(x => existedSerialNumber.Contains(x)) && serialNumbers.Distinct().Count() == serialNumbers.Count();
+    //}
 
     //public async Task<ResultModel> CreateBulk(RequestUpgradeCreateBulkModel model)
     //{
@@ -319,29 +293,12 @@ public class RequestUpgradeService : IRequestUpgradeService
                 validPrecondition = false;
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING + " & " + RequestUpgradeErrorMessage.NOT_ACCEPTED;
             }
-            else if (requestUpgrade.RequestType == RequestType.RemoveHardware && model.Descriptions != null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = "Request for removal cannot have description";
-            }
 
             var component = requestUpgrade?.Component;
             if (component == null)
             {
                 result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
                 validPrecondition = false;
-            }
-
-            if (component.IsRequired && model.Descriptions == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = "Config for component require capacity";
-            }
-
-            if (component.RequireCapacity && model.Descriptions != null && model.Descriptions.Any(x => x.Capacity == null))
-            {
-                validPrecondition = false;
-                result.ErrorMessage = "Config for component require capacity";
             }
 
             var serverAllocation = requestUpgrade?.ServerAllocation;
@@ -354,20 +311,6 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 validPrecondition = false;
                 result.ErrorMessage = "Cannot modify unallocated server";
-            }
-            else if (!serverAllocation.ServerHardwareConfigs.Any(x => x.ComponentId == component.Id) && model.Descriptions == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = "Server dont have config to remove";
-            }
-
-            if (model.Descriptions != null)
-            {
-                if (validPrecondition && !CheckValidSerialNumber(model.Descriptions.Select(x => x.SerialNumber).ToList(), requestUpgrade.ComponentId, serverAllocation.Id))
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "Serial number existed";
-                }
             }
 
             if (validPrecondition)

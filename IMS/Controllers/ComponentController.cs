@@ -18,13 +18,13 @@ public class ComponentController : ControllerBase
         _componentService = componentService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] ComponentSearchModel searchModel)
-    {
-        var result = await _componentService.Get(paginationModel, searchModel);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpGet]
+    //public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] ComponentSearchModel searchModel)
+    //{
+    //    var result = await _componentService.Get(paginationModel, searchModel);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     //[HttpGet("{id}")]
     //public async Task<ActionResult> GetDetail(int id)
@@ -42,29 +42,29 @@ public class ComponentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPost]
-    public async Task<ActionResult> Create([FromBody] ComponentCreateModel model)
-    {
-        var result = await _componentService.Create(model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPost]
+    //public async Task<ActionResult> Create([FromBody] ComponentCreateModel model)
+    //{
+    //    var result = await _componentService.Create(model);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpPut]
-    public async Task<ActionResult> Update([FromBody] ComponentUpdateModel model)
-    {
-        var result = await _componentService.Update(model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPut]
+    //public async Task<ActionResult> Update([FromBody] ComponentUpdateModel model)
+    //{
+    //    var result = await _componentService.Update(model);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
-    [HttpDelete("{id}")]
-    public async Task<ActionResult> Delete(int id)
-    {
-        var result = await _componentService.Delete(id);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpDelete("{id}")]
+    //public async Task<ActionResult> Delete(int id)
+    //{
+    //    var result = await _componentService.Delete(id);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     //[HttpGet("{id}/ServerHardwareConfig")]
     //public async Task<ActionResult> GetServerHardwareConfig([FromQuery] PagingParam<BaseSortCriteria> paginationModel, int id)

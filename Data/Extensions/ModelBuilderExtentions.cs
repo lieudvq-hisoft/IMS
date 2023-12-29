@@ -13,33 +13,33 @@ public static class ModelBuilderExtentions
         {
             Id = 1,
             Name = "CPU",
-            IsRequired = true,
+            //IsRequired = true,
         });
         builder.Entity<Component>().HasData(new Component
         {
             Id = 2,
-            Name = "GPU",
-            RequireCapacity = true
+            Name = "RAM",
+            //IsRequired = true,
+            //RequireCapacity = true
         });
         builder.Entity<Component>().HasData(new Component
         {
             Id = 3,
-            Name = "RAM",
-            IsRequired = true,
-            RequireCapacity = true
-        });
-        builder.Entity<Component>().HasData(new Component
-        {
-            Id = 4,
-            Name = "Motherboard",
-        });
-        builder.Entity<Component>().HasData(new Component
-        {
-            Id = 5,
             Name = "Harddisk",
-            IsRequired = true,
-            RequireCapacity = true
+            //IsRequired = true,
+            //RequireCapacity = true
         });
+        //builder.Entity<Component>().HasData(new Component
+        //{
+        //    Id = 2,
+        //    Name = "GPU",
+        //    RequireCapacity = true
+        //});
+        //builder.Entity<Component>().HasData(new Component
+        //{
+        //    Id = 4,
+        //    Name = "Motherboard",
+        //});
         #endregion
 
         #region Location

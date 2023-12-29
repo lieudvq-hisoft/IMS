@@ -12,15 +12,9 @@ public class MapperProfile : Profile
     public MapperProfile()
     {
         #region Customer
-        CreateMap<Customer, CustomerModel>()
-            //.ForMember(dest => dest.Contacts, opt => opt.MapFrom(src => src.Contacts))
-            ;
-        CreateMap<CustomerCreateModel, Customer>()
-            //.ForMember(dest => dest.Contacts, opt => opt.MapFrom(src => src.Contacts))
-            ;
-        CreateMap<CustomerUpdateModel, Customer>()
-            //.ForMember(dest => dest.Contacts, opt => opt.MapFrom(src => src.Contacts))
-            ;
+        CreateMap<Customer, CustomerModel>();
+        CreateMap<CustomerCreateModel, Customer>();
+        CreateMap<CustomerUpdateModel, Customer>();
         CreateMap<Contact, ContactModel>().ReverseMap();
         CreateMap<User, UserModel>();
         #endregion
@@ -32,15 +26,9 @@ public class MapperProfile : Profile
 
         CreateMap<ServerHardwareConfig, ServerHardwareConfigModel>()
             .AfterMap((src, dest, context) =>
-                dest.Component = context.Mapper.Map<Component, ComponentModel>(src.Component))
-            .AfterMap((src, dest) =>
-                dest.Descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description));
-        CreateMap<ServerHardwareConfigCreateModel, ServerHardwareConfig>()
-            .AfterMap((src, dest) =>
-                dest.Description = JsonSerializer.Serialize(src.Descriptions));
-        CreateMap<ServerHardwareConfigUpdateModel, ServerHardwareConfig>()
-            .AfterMap((src, dest) =>
-                dest.Description = JsonSerializer.Serialize(src.Descriptions));
+                dest.Component = context.Mapper.Map<Component, ComponentModel>(src.Component));
+        CreateMap<ServerHardwareConfigCreateModel, ServerHardwareConfig>();
+        CreateMap<ServerHardwareConfigUpdateModel, ServerHardwareConfig>();
 
         CreateMap<RequestUpgrade, RequestUpgradeModel>()
             .AfterMap((src, dest) =>
@@ -56,13 +44,6 @@ public class MapperProfile : Profile
                 if (appointment != null)
                 {
                     dest.Appointment = context.Mapper.Map<Appointment, AppointmentResultModel>(appointment);
-                }
-            })
-            .AfterMap((src, dest) =>
-            {
-                if (src.Description != null)
-                {
-                    dest.Descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description);
                 }
             })
             .AfterMap((src, dest, context) =>
@@ -113,19 +94,12 @@ public class MapperProfile : Profile
         CreateMap<RequestUpgradeCreateModel, RequestUpgrade>()
             .AfterMap((src, dest) =>
             {
-                if (src.Descriptions != null)
+                if (src.Description != null)
                 {
-                    dest.Description = JsonSerializer.Serialize(src.Descriptions);
+                    dest.Description = JsonSerializer.Serialize(src.Description);
                 }
             });
-        CreateMap<RequestUpgradeUpdateModel, RequestUpgrade>()
-            .AfterMap((src, dest) =>
-            {
-                if (src.Descriptions != null)
-                {
-                    dest.Description = JsonSerializer.Serialize(src.Descriptions);
-                }
-            });
+        CreateMap<RequestUpgradeUpdateModel, RequestUpgrade>();
         #endregion
 
         #region ServerAllocation
@@ -444,18 +418,9 @@ public class MapperProfile : Profile
         #endregion
 
         #region ResultModel
-        CreateMap<ServerHardwareConfig, ServerHardwareConfigResultModel>()
-            .AfterMap((src, dest, context) =>
-                dest.Descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description));
+        CreateMap<ServerHardwareConfig, ServerHardwareConfigResultModel>();
         CreateMap<ServerAllocation, ServerAllocationResultModel>();
-        CreateMap<RequestUpgrade, RequestUpgradeResultModel>()
-            .AfterMap((src, dest) =>
-            {
-                if (src.Description != null)
-                {
-                    dest.Descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(src.Description);
-                }
-            });
+        CreateMap<RequestUpgrade, RequestUpgradeResultModel>();
         CreateMap<RequestExpand, RequestExpandResultModel>();
         CreateMap<RequestHost, RequestHostResultModel>();
         CreateMap<Rack, RackResultModel>();
@@ -463,9 +428,7 @@ public class MapperProfile : Profile
         CreateMap<IpSubnet, IpSubnetResultModel>();
         CreateMap<IpAssignment, IpAssignmentModel>();
         CreateMap<IpAddress, IpAddressResultModel>();
-        CreateMap<Customer, CustomerResultModel>()
-            //.ForMember(dest => dest.Contacts, opt => opt.MapFrom(src => src.Contacts))
-            ;
+        CreateMap<Customer, CustomerResultModel>();
         CreateMap<Incident, IncidentResultModel>();
         CreateMap<Component, ComponentResultModel>();
         CreateMap<Area, AreaResultModel>();

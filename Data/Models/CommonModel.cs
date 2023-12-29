@@ -76,5 +76,4 @@ public class ReceiptReportModel
     public string Action { get; set; }
     public int Quantity { get; set; }
     public string Unit { get; set; }
-    public string SerialNumber { get; set; }
 }

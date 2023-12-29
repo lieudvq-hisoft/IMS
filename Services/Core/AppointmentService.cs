@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
 using System.Globalization;
+using System.Linq;
 using System.Text.Json;
 
 namespace Services.Core;
@@ -1641,33 +1642,14 @@ public class AppointmentService : IAppointmentService
 
                     document.RenderText("__ServerName__", serverAllocation.Name);
 
-                    var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
-                    var cpuString = "";
-                    for (int i = 0; i < cpus.Count(); i++)
-                    {
-                        cpuString += cpus[i].Model;
-                        if (i != cpus.Count() - 1)
-                        {
-                            cpuString += ", ";
-                        }
-                    }
-                    document.RenderText("__CPUs__", cpuString);
+                    var cpu = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description;
+                    document.RenderText("__CPUs__", cpu);
 
-                    var rams = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description);
-                    var ramCapacity = 0;
-                    for (int i = 0; i < rams.Count(); i++)
-                    {
-                        ramCapacity += rams[i].Capacity.Value;
-                    }
-                    document.RenderText("__Ram__", ramCapacity + "Gb");
+                    var ram = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description;
+                    document.RenderText("__Ram__", ram);
 
-                    var hardDisks = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description);
-                    var hardDiskCapacity = 0;
-                    for (int i = 0; i < hardDisks.Count(); i++)
-                    {
-                        hardDiskCapacity += hardDisks[i].Capacity.Value;
-                    }
-                    document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
+                    var hardDisk = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description;
+                    document.RenderText("__HardDisk__", hardDisk);
 
                     document.RenderText("__ServerLocation__", serverAllocation.ServerLocation);
 
@@ -1766,44 +1748,16 @@ public class AppointmentService : IAppointmentService
 
                     document.TickCheckBoxInDocx("Allocation");
 
-                    var cpus = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description);
-                    var cpuString = "";
-                    for (int i = 0; i < cpus.Count(); i++)
-                    {
-                        cpuString += cpus[i].Model;
-                        if (i != cpus.Count() - 1)
-                        {
-                            cpuString += ", ";
-                        }
-                    }
-                    document.RenderText("__Model__", cpuString);
+                    document.RenderText("__Model__", serverAllocation.Name);
 
-                    var cpuCpu = "";
-                    for (int i = 0; i < cpus.Count(); i++)
-                    {
-                        cpuString += cpus[i].SerialNumber;
-                        if (i != cpus.Count() - 1)
-                        {
-                            cpuString += ", ";
-                        }
-                    }
-                    document.RenderText("__CPU__", cpuString);
+                    var cpu = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description;
+                    document.RenderText("__CPU__", cpu);
 
-                    var rams = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description);
-                    var ramCapacity = 0;
-                    for (int i = 0; i < rams.Count(); i++)
-                    {
-                        ramCapacity += rams[i].Capacity.Value;
-                    }
-                    document.RenderText("__Memory__", ramCapacity + "Gb");
+                    var ram = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description;
+                    document.RenderText("__Memory__", ram);
 
-                    var hardDisks = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description);
-                    var hardDiskCapacity = 0;
-                    for (int i = 0; i < hardDisks.Count(); i++)
-                    {
-                        hardDiskCapacity += hardDisks[i].Capacity.Value;
-                    }
-                    document.RenderText("__HardDisk__", hardDiskCapacity + "Gb");
+                    var hardDisk = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description;
+                    document.RenderText("__HardDisk__", hardDisk);
 
                     document.RenderText("__Power__", serverAllocation.Power + "W");
 
@@ -1907,76 +1861,38 @@ public class AppointmentService : IAppointmentService
                     var receiptReportModels = new List<ReceiptReportModel>();
                     foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
                     {
-                        var requestUpgradeDescriptions = new List<ConfigDescriptionModel>();
-                        if (requestUpgrade.Description != null)
-                        {
-                            requestUpgradeDescriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(requestUpgrade.Description);
-                        }
-                        var hardwareDescriptions = new List<ConfigDescriptionModel>();
+                        var requestUpgradeDescription = requestUpgrade.Description;
                         var hardware = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId);
-                        if (hardware != null)
-                        {
-                            hardwareDescriptions.AddRange(JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(hardware.Description));
-                        }
-                        var unChange = requestUpgradeDescriptions.IntersectBy(hardwareDescriptions.Select(x => x.SerialNumber), x => x.SerialNumber).Select(x => x.SerialNumber);
-                        requestUpgradeDescriptions.RemoveAll(x => unChange.Contains(x.SerialNumber));
-                        hardwareDescriptions.RemoveAll(x => unChange.Contains(x.SerialNumber));
                         var newConfig = new ReceiptReportModel
                         {
                             PartNo = counter++,
-                            Model = requestUpgrade.Component.Name + " - ",
+                            Model = requestUpgrade.Component.Name + " - " + requestUpgradeDescription,
                             Action = "Thêm",
-                            Quantity = requestUpgradeDescriptions.Count,
+                            Quantity = 1,
                             Unit = "Cái",
-                            SerialNumber = ""
                         };
-
-                        for (int i = 0; i < requestUpgradeDescriptions.Count; i++)
-                        {
-                            newConfig.Model += requestUpgradeDescriptions[i].Model;
-                            newConfig.SerialNumber += requestUpgradeDescriptions[i].SerialNumber;
-                            if (i < requestUpgradeDescriptions.Count - 1)
-                            {
-                                newConfig.Model += ", ";
-                                newConfig.SerialNumber += ", ";
-                            }
-                        }
                         receiptReportModels.Add(newConfig);
 
-                        if (hardwareDescriptions.Any())
+                        var oldConfig = new ReceiptReportModel
                         {
-                            var oldConfig = new ReceiptReportModel
-                            {
-                                PartNo = counter++,
-                                Model = hardware.Component.Name + " - ",
-                                Action = "Gỡ",
-                                Quantity = hardwareDescriptions.Count,
-                                Unit = "Cái",
-                                SerialNumber = ""
-                            };
+                            PartNo = counter++,
+                            Model = hardware.Component.Name + " - " + hardware.Description,
+                            Action = "Gỡ",
+                            Quantity = 1,
+                            Unit = "Cái",
+                        };
 
-                            for (int i = 0; i < hardwareDescriptions.Count; i++)
-                            {
-                                oldConfig.Model += hardwareDescriptions[i].Model;
-                                oldConfig.SerialNumber += hardwareDescriptions[i].SerialNumber;
-                                if (i < hardwareDescriptions.Count - 1)
-                                {
-                                    oldConfig.Model += ", ";
-                                    oldConfig.SerialNumber += ", ";
-                                }
-                            }
-                            receiptReportModels.Add(oldConfig);
-                        }
+                        receiptReportModels.Add(oldConfig);
+                        document.InsertToSingleTable(receiptReportModels);
+                        document.MainDocumentPart.Document.Save();
                     }
-                    document.InsertToSingleTable(receiptReportModels);
-                    document.MainDocumentPart.Document.Save();
-                }
-                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
-                serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
-                _dbContext.SaveChanges();
+                    string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
+                    serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+                    _dbContext.SaveChanges();
 
-                result.Succeed = true;
-                result.Data = receiptOfRecipientFileName;
+                    result.Succeed = true;
+                    result.Data = receiptOfRecipientFileName;
+                }
             }
         }
         catch (Exception e)
@@ -2052,33 +1968,20 @@ public class AppointmentService : IAppointmentService
                     var receiptReportModels = new List<ReceiptReportModel>();
                     foreach (var hardware in serverAllocation.ServerHardwareConfigs)
                     {
-                        List<ConfigDescriptionModel> descriptions = JsonSerializer.Deserialize<List<ConfigDescriptionModel>>(hardware.Description);
                         var receiptReportModel = new ReceiptReportModel
                         {
                             PartNo = counter++,
-                            Model = hardware.Component.Name + " - ",
+                            Model = hardware.Component.Name + " - " + hardware.Description,
                             Action = "Thêm",
-                            Quantity = descriptions.Count,
+                            Quantity = 1,
                             Unit = "Cái",
-                            SerialNumber = ""
                         };
-
-                        for (int i = 0; i < descriptions.Count; i++)
-                        {
-                            receiptReportModel.Model += descriptions[i].Model;
-                            receiptReportModel.SerialNumber += descriptions[i].SerialNumber;
-                            if (i < descriptions.Count - 1)
-                            {
-                                receiptReportModel.Model += ", ";
-                                receiptReportModel.SerialNumber += ", ";
-                            }
-                        }
                         receiptReportModels.Add(receiptReportModel);
                     }
                     document.InsertToSingleTable(receiptReportModels);
                     document.MainDocumentPart.Document.Save();
                 }
-                //var formfile = document.ConvertToIFormFile(outputPath);
+
                 string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
                 serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
                 _dbContext.SaveChanges();
