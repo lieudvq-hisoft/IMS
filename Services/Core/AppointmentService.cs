@@ -1601,7 +1601,7 @@ public class AppointmentService : IAppointmentService
             string inputPath = Path.Combine(_env.WebRootPath, "Report", "UpgradeAndHostTemplate.docx");
             string outputPath = Path.Combine(_env.WebRootPath, "Report", "BBNT.docx");
             var serverAllocation = _dbContext.ServerAllocations
-               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress).ThenInclude(x => x.IpSubnet).ThenInclude(x => x.IpAddresses)
                .Include(x => x.Customer)
                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
@@ -1704,7 +1704,7 @@ public class AppointmentService : IAppointmentService
             string inputPath = Path.Combine(_env.WebRootPath, "Report", "ExpandTemplate.docx");
             string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
             var serverAllocation = _dbContext.ServerAllocations
-               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress).ThenInclude(x => x.IpSubnet).ThenInclude(x => x.IpAddresses)
                .Include(x => x.Customer)
                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
