@@ -71,6 +71,7 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<Area> Areas { get; set; }
     //public DbSet<CompanyType> CompanyTypes { get; set; }
     public DbSet<Component> Components { get; set; }
+    public DbSet<Contact> Contacts { get; set; }
     public DbSet<Customer> Customers { get; set; }
     public DbSet<Incident> Incidents { get; set; }
     public DbSet<IncidentAppointment> IncidentAppointments { get; set; }

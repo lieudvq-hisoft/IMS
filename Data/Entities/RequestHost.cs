@@ -16,7 +16,9 @@ public class RequestHost : BaseEntity
     public RequestHostStatus Status { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Host;
     public bool DocumentConfirm { get; set; }
+    public DateTime? DateConfirm { get; set; }
     public string? InspectionReportFilePath { get; set; }
+    public string? FinalInspectionReport { get; set; }
 
     public int ServerAllocationId { get; set; }
     public ServerAllocation ServerAllocation { get; set; }

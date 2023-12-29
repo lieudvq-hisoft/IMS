@@ -15,7 +15,6 @@ public class Customer
     public string Representator { get; set; }
     public string RepresentatorPosition { get; set; }
     public string ContractNumber { get; set; }
-    public string? Contact { get; set; }
     public string Password { get; set; }
     public string CompanyName { get; set; }
     public string Address { get; set; }
@@ -24,13 +23,10 @@ public class Customer
     public string PhoneNumber { get; set; }
     public int CurrenNoticeCount { get; set; } = 0;
     public List<string>? FcmTokens { get; set; } = new List<string>();
-    //public string CustomerName { get; set; }
-
-    //public int CompanyTypeId { get; set; }
-    //public CompanyType CompanyType { get; set; }
 
     public ICollection<ServerAllocation> ServerAllocations { get; set; }
     public ICollection<UserCustomer> UserCustomers { get; set; }
+    public ICollection<Contact> Contacts { get; set; }
 
     public bool Filter(CustomerSearchModel searchModel)
     {

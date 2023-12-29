@@ -16,8 +16,9 @@ public class RequestHostModel
     public IpAssignmentTypes Type { get; set; }
     public RequestHostStatus Status { get; set; }
     public bool DocumentConfirm { get; set; }
+    public DateTime? DateConfirm { get; set; }
     public string? InspectionReportFilePath { get; set; }
-    //public string? ReceiptOfRecipientFilePath { get; set; }
+    public string? FinalInspectionReport { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Host;
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
@@ -50,7 +51,9 @@ public class RequestHostResultModel
     public RequestHostStatus Status { get; set; }
     public RequestType RequestType { get; set; } = RequestType.Host;
     public bool DocumentConfirm { get; set; }
+    public DateTime? DateConfirm { get; set; }
     public string? InspectionReportFilePath { get; set; }
+    public string? FinalInspectionReport { get; set; }
 
     public int ServerAllocationId { get; set; }
 }

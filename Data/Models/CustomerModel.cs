@@ -41,6 +41,9 @@ public class ContactModel
     [Required]
     public string? Name { get; set; }
 
+    [Required]
+    public bool ForAppointment { get; set; }
+
     public string? Position { get; set; }
 
     [RegularExpression(@"^\d{10}$|^\d{11}$", ErrorMessage = "Phone number must be a string of 10 or 11 number")]
@@ -113,7 +116,7 @@ public class CustomerUpdateModel
     public string Email { get; set; }
 
     [Required]
-    [RegularExpression(@"^\d{10|11}$", ErrorMessage = "Phone number must be a string of 10 or 11 number")]
+    [RegularExpression(@"^\d{10}$|^\d{11}$", ErrorMessage = "Phone number must be a string of 10 or 11 number")]
     public string PhoneNumber { get; set; }
 
     public List<ContactModel>? Contacts { get; set; }

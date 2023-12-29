@@ -14,13 +14,15 @@ public class AppointmentModel
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
-    public bool IsCorrectPerson { get; set; }
     public RequestStatus Status { get; set; }
     public int ServerAllocationId { get; set; }
     public bool DocumentConfirm { get; set; }
     public string? Purpose { get; set; }
+    public DateTime? DateConfirm { get; set; }
     public string? InspectionReportFilePath { get; set; }
+    public string? FinalInspectionReport { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
+    public string? FinalReceiptOfRecipient { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
 
@@ -41,12 +43,14 @@ public class AppointmentResultModel
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
-    public bool IsCorrectPerson { get; set; }
     public bool DocumentConfirm { get; set; }
     public RequestStatus Status { get; set; }
     public int ServerAllocationId { get; set; }
+    public DateTime? DateConfirm { get; set; }
     public string? InspectionReportFilePath { get; set; }
+    public string? FinalInspectionReport { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
+    public string? FinalReceiptOfRecipient { get; set; }
 }
 
 public class AppointmentCreateModel
@@ -74,7 +78,6 @@ public class AppointmentCreateModel
     public List<int>? RequestUpgradeIds { get; set; }
 
     public int? RequestExpandId { get; set; }
-    //public List<int>? RequestRemovalIds { get; set; }
 }
 
 public class AppointmentIncidentCreateModel
@@ -133,10 +136,6 @@ public class AppointmentUpdateModel
     [Required]
     public string AppointedCustomer { get; set; }
 
-    //[Required]
-    //[GreaterThanZero]
-    //public Guid UserId { get; set; }
-
     public string? Note { get; set; }
 
     public string? SaleNote { get; set; }
@@ -160,9 +159,6 @@ public class AppointmentCompleteModel
     [SameDateAndLaterThan("DateCheckedIn")]
     public DateTime DateCheckedOut { get; set; }
 
-    [Required]
-    public bool IsCorrectPerson { get; set; }
-
     public ServerAllocationCreateRequestExpandInspectionReportModel DocumentModel;
 }
 
@@ -174,9 +170,6 @@ public class AppointmentResolvModel
     [Required]
     [SameDateAndLaterThan("DateCheckedIn")]
     public DateTime DateCheckedOut { get; set; }
-
-    [Required]
-    public bool IsCorrectPerson { get; set; }
 
     [Required]
     public IncidentResolvModel IncidentResolvModel { get; set; }

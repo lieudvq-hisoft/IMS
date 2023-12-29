@@ -17,9 +17,13 @@ public class ServerAllocationModel
     public bool LocationRemoved { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdated { get; set; }
+    public DateTime? DateConfirm { get; set; }
     public string? InspectionRecordFilePath { get; set; }
+    public string? FinalInspectionReport { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
+    public string? FinalReceiptOfRecipient { get; set; }
     public string? RemovalFilePath { get; set; }
+    public string? FinalRemoval { get; set; }
     public int? PausingRequireIncidentCount { get; set; }
     public int? IncidentCount { get; set; }
     public string Location { get; set; }
@@ -43,9 +47,13 @@ public class ServerAllocationResultModel
     public bool LocationRemoved { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdated { get; set; }
+    public DateTime? DateConfirm { get; set; }
     public string? InspectionRecordFilePath { get; set; }
+    public string? FinalInspectionReport { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
+    public string? FinalReceiptOfRecipient { get; set; }
     public string? RemovalFilePath { get; set; }
+    public string? FinalRemoval { get; set; }
     public Guid CustomerId { get; set; }
 }
 

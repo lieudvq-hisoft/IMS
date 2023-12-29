@@ -229,6 +229,7 @@ public static class ModelBuilderExtentions
         builder.Entity<AppointmentUser>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Area>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Component>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<Contact>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Customer>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Incident>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<IncidentAppointment>().HasQueryFilter(x => !x.IsDeleted);

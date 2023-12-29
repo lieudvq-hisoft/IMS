@@ -66,6 +66,7 @@ public class CustomerService : ICustomerService
         try
         {
             var customers = _dbContext.Customers
+                .Include(x => x.Contacts)
                 .IgnoreQueryFilters()
                 .Where(delegate (Customer x)
                 {
@@ -217,6 +218,7 @@ public class CustomerService : ICustomerService
                 var password = "Password@123";
                 customer.Password = _passwordHasher.HashPassword(customer, password);
                 _dbContext.Customers.Add(customer);
+                //_dbContext.Contacts.AddRange(customer.Contacts);
                 _dbContext.SaveChanges();
                 await SendActivationEmail(customer);
 

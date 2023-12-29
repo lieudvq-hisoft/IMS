@@ -2,6 +2,7 @@
 using Data.Entities;
 using Data.Enums;
 using Data.Models;
+using DocumentFormat.OpenXml.InkML;
 using System.Text.Json;
 
 namespace Services.Mapping;
@@ -12,19 +13,15 @@ public class MapperProfile : Profile
     {
         #region Customer
         CreateMap<Customer, CustomerModel>()
-            .AfterMap((src, dest) =>
-            {
-                if (src.Contact != null)
-                {
-                    dest.Contacts = JsonSerializer.Deserialize<List<ContactModel>>(src.Contact);
-                }
-            });
+            //.ForMember(dest => dest.Contacts, opt => opt.MapFrom(src => src.Contacts))
+            ;
         CreateMap<CustomerCreateModel, Customer>()
-            .AfterMap((src, dest) =>
-                dest.Contact = JsonSerializer.Serialize(src.Contacts));
+            //.ForMember(dest => dest.Contacts, opt => opt.MapFrom(src => src.Contacts))
+            ;
         CreateMap<CustomerUpdateModel, Customer>()
-            .AfterMap((src, dest) =>
-                dest.Contact = JsonSerializer.Serialize(src.Contacts));
+            //.ForMember(dest => dest.Contacts, opt => opt.MapFrom(src => src.Contacts))
+            ;
+        CreateMap<Contact, ContactModel>().ReverseMap();
         CreateMap<User, UserModel>();
         #endregion
 
@@ -118,7 +115,7 @@ public class MapperProfile : Profile
             {
                 if (src.Descriptions != null)
                 {
-                dest.Description = JsonSerializer.Serialize(src.Descriptions);
+                    dest.Description = JsonSerializer.Serialize(src.Descriptions);
                 }
             });
         CreateMap<RequestUpgradeUpdateModel, RequestUpgrade>()
@@ -467,13 +464,8 @@ public class MapperProfile : Profile
         CreateMap<IpAssignment, IpAssignmentModel>();
         CreateMap<IpAddress, IpAddressResultModel>();
         CreateMap<Customer, CustomerResultModel>()
-            .AfterMap((src, dest) =>
-            {
-                if (src.Contact != null)
-                {
-                    dest.Contacts = JsonSerializer.Deserialize<List<ContactModel>>(src.Contact);
-                }
-            });
+            //.ForMember(dest => dest.Contacts, opt => opt.MapFrom(src => src.Contacts))
+            ;
         CreateMap<Incident, IncidentResultModel>();
         CreateMap<Component, ComponentResultModel>();
         CreateMap<Area, AreaResultModel>();

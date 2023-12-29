@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Services.Core;
 public interface IIpAddressService
 {
-    //Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
+    Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> GetServerAllocation(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
     Task<ResultModel> GetCustomer(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel);
