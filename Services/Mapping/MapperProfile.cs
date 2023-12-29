@@ -91,14 +91,7 @@ public class MapperProfile : Profile
                     dest.Executor = context.Mapper.Map<User, UserModel>(executor.User);
                 }
             });
-        CreateMap<RequestUpgradeCreateModel, RequestUpgrade>()
-            .AfterMap((src, dest) =>
-            {
-                if (src.Description != null)
-                {
-                    dest.Description = JsonSerializer.Serialize(src.Description);
-                }
-            });
+        CreateMap<RequestUpgradeCreateModel, RequestUpgrade>();
         CreateMap<RequestUpgradeUpdateModel, RequestUpgrade>();
         #endregion
 

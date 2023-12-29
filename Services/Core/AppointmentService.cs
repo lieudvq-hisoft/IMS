@@ -1886,13 +1886,13 @@ public class AppointmentService : IAppointmentService
                         document.InsertToSingleTable(receiptReportModels);
                         document.MainDocumentPart.Document.Save();
                     }
-                    string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
-                    serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
-                    _dbContext.SaveChanges();
-
-                    result.Succeed = true;
-                    result.Data = receiptOfRecipientFileName;
                 }
+                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
+                serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+                _dbContext.SaveChanges();
+
+                result.Succeed = true;
+                result.Data = receiptOfRecipientFileName;
             }
         }
         catch (Exception e)
