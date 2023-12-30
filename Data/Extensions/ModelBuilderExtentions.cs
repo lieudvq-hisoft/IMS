@@ -291,7 +291,7 @@ public static class ModelBuilderExtentions
 
         builder.Entity<Customer>(b =>
         {
-            b.HasIndex(e => e.TaxNumber).IsUnique();
+            //b.HasIndex(e => e.TaxNumber).IsUnique();
             b.HasMany(e => e.ServerAllocations)
                 .WithOne(e => e.Customer)
                 .OnDelete(DeleteBehavior.ClientCascade);
