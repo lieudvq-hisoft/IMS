@@ -44,7 +44,7 @@ public class IpAddress
         var matchServer = searchModel.ServerAllocationId != null ? IpAssignments.Any(x => x.ServerAllocationId == searchModel.ServerAllocationId) : true;
         var matchSubnet = searchModel.SubnetId != null ? IpSubnetId == searchModel.SubnetId : true;
 
-        return matchAddress && available && assigned && isReserved && blocked && matchRequestHost && matchSubnet;
+        return matchAddress && available && assigned && isReserved && blocked && matchRequestHost && matchServer && matchSubnet;
     }
 
     public static string GetDefaultSubnetMask(string ipAddressString)
