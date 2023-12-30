@@ -6,12 +6,20 @@
 		<Nullable>enable</Nullable>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+	  <Optimize>False</Optimize>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<PackageReference Include="AutoMapper" Version="12.0.1" />
 		<PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="12.0.1" />
 		<PackageReference Include="CloudinaryDotNet" Version="1.23.0" />
+		<PackageReference Include="ConvertApi" Version="3.0.14" />
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.0.0" />
 		<PackageReference Include="EPPlus" Version="4.5.3.3" />
+		<PackageReference Include="IronPdf" Version="2024.1.2" />
+		<PackageReference Include="IronPdf.Native.Chrome.Windows" Version="2024.1.59" />
+		<PackageReference Include="IronPdf.Slim" Version="2024.1.2" />
 		<PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Abstractions" Version="2.2.0" />
 		<PackageReference Include="Microsoft.AspNetCore.StaticFiles" Version="2.2.0" />

@@ -22,9 +22,6 @@ public interface IAppointmentService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> GetByMonth(AppointmentSearchModel searchModel, int month);
     Task<ResultModel> GetDetail(int id);
-    //Task<ResultModel> GetRequestExpand(PagingParam<BaseSortCriteria> paginationModel, int id);
-    //Task<ResultModel> GetRequestUpgrade(int id, PagingParam<RequestUpgradeSortCriteria> paginationModel, RequestUpgradeSearchModel searchModel);
-    //Task<ResultModel> GetIncident(int id, PagingParam<BaseSortCriteria> paginationModel, IncidentSearchModel searchModel);
     Task<ResultModel> Create(AppointmentCreateModel model);
     Task<ResultModel> CreateIncident(AppointmentIncidentCreateModel model);
     Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model);
@@ -1679,7 +1676,9 @@ public class AppointmentService : IAppointmentService
                     document.RenderText("__Note__", model.Note);
                     document.MainDocumentPart.Document.Save();
                 }
-                string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
+                string pdfPath = Path.Combine(_env.WebRootPath, "Report", "PDF.pdf");
+                await DocumentHelper.ConvertToPDF(outputPath, pdfPath);
+                string inspectionReportFileName = _cloudinaryHelper.UploadFile(pdfPath);
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
@@ -1791,7 +1790,9 @@ public class AppointmentService : IAppointmentService
                     document.RenderText("__Note__", model.Note);
                     document.MainDocumentPart.Document.Save();
                 }
-                string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
+                string pdfPath = Path.Combine(_env.WebRootPath, "Report", "PDF.pdf");
+                await DocumentHelper.ConvertToPDF(outputPath, pdfPath);
+                string inspectionReportFileName = _cloudinaryHelper.UploadFile(pdfPath);
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
@@ -1887,8 +1888,11 @@ public class AppointmentService : IAppointmentService
                         document.MainDocumentPart.Document.Save();
                     }
                 }
-                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
-                serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+
+                string pdfPath = Path.Combine(_env.WebRootPath, "Report", "PDF.pdf");
+                await DocumentHelper.ConvertToPDF(outputPath, pdfPath);
+                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(pdfPath);
+                //serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
@@ -1982,8 +1986,9 @@ public class AppointmentService : IAppointmentService
                     document.MainDocumentPart.Document.Save();
                 }
 
-                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(outputPath);
-                serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+                string pdfPath = Path.Combine(_env.WebRootPath, "Report", "PDF.pdf");
+                await DocumentHelper.ConvertToPDF(outputPath, pdfPath);
+                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(pdfPath);
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;

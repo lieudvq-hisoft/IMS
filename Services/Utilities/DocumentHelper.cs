@@ -3,6 +3,9 @@ using DocumentFormat.OpenXml.Office2010.Word;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Wordprocessing;
 using Microsoft.AspNetCore.Http;
+using IronPdf;
+using ConvertApiDotNet;
+using ConvertApiDotNet.Model;
 
 namespace Services.Utilities;
 public static class DocumentHelper
@@ -103,5 +106,18 @@ public static class DocumentHelper
                 chosenTable.Append(newRow);
             }
         }
+    }
+
+    public async static Task ConvertToPDF(string wordFilePath, string pdfFilPath)
+    {
+        //xbKuA9Nht4nl9pLF
+        //377277176
+        var convertApi = new ConvertApi("xbKuA9Nht4nl9pLF");
+        ConvertApiResponse result = await convertApi.ConvertAsync("docx", "pdf",
+   new ConvertApiFileParam(wordFilePath)
+);
+
+        // save to file
+        var fileInfo = await result.SaveFileAsync(pdfFilPath);
     }
 }
