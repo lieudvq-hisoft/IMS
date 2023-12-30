@@ -165,10 +165,18 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPost("{id}/Document")]
-    public async Task<ActionResult> UploadInspectionReport(int id, [FromForm] DocumentFileUploadModel model)
+    [HttpPut("{id}/Document")]
+    public async Task<ActionResult> UpdateDocument(int id, [FromBody] ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
-        var result = await _appointmentService.AssignInspectionReport(id, model);
+        var result = await _appointmentService.UpdateDocument(id, model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
+    [HttpPost("{id}/FinalDocument")]
+    public async Task<ActionResult> UploadFinalDocument(int id, [FromForm] DocumentFileUploadModel model)
+    {
+        var result = await _appointmentService.AssignFinalDocument(id, model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -176,7 +184,7 @@ public class AppointmentController : ControllerBase
     [HttpPut("{id}/DocumentConfirmation/True")]
     public async Task<ActionResult> DocumentConfirmationTrue(int id)
     {
-        var result = await _appointmentService.DocumentConfirmTrue(id);
+        var result = await _appointmentService.ConfirmDocument(id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

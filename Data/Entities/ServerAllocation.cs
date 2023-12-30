@@ -19,8 +19,11 @@ public class ServerAllocation : BaseEntity
     public string? FinalInspectionReport { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
     public string? FinalReceiptOfRecipient { get; set; }
-    public string? RemovalFilePath { get; set; }
-    public string? FinalRemoval { get; set; }
+    public string? RemovalInspectFilePath { get; set; }
+    public string? FinalRemovalInspect { get; set; }
+    public string? RemovalReceiptFilePath { get; set; }
+    public string? FinalRemovalReceipt { get; set; }
+    public string? PartNumber { get; set; }
 
     public Guid CustomerId { get; set; }
     public Customer? Customer { get; set; }

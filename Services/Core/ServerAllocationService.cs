@@ -1074,7 +1074,7 @@ public class ServerAllocationService : IServerAllocationService
             else
             {
                 string removalReportFilePath = _cloudinaryHelper.UploadFile(model.RemovalReport);
-                serverAllocation.RemovalFilePath = removalReportFilePath;
+                serverAllocation.RemovalReceiptFilePath = removalReportFilePath;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = new DocumentFileResultModel

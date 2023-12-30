@@ -33,8 +33,9 @@ public interface IAppointmentService
     Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model, Guid userId);
     Task<ResultModel> Resolv(int appointmentId, AppointmentResolvModel model, Guid userId);
     Task<ResultModel> Fail(int appointmentId, AppointmentFailModel model);
-    Task<ResultModel> AssignInspectionReport(int appointmentId, DocumentFileUploadModel model);
-    Task<ResultModel> DocumentConfirmTrue(int appointmentId);
+    Task<ResultModel> UpdateDocument(int appointmentId, ServerAllocationCreateRequestExpandInspectionReportModel model);
+    Task<ResultModel> AssignFinalDocument(int appointmentId, DocumentFileUploadModel model);
+    Task<ResultModel> ConfirmDocument(int appointmentId);
 }
 
 public class AppointmentService : IAppointmentService
@@ -1262,31 +1263,31 @@ public class AppointmentService : IAppointmentService
                 var requestUpgradeResults = new List<ResultModel>();
                 if (appointment.RequestUpgradeAppointment.Any())
                 {
-                    var createReceiptResult = await CreateUpgradeReceiptReport(appointment.Id, model.DocumentModel);
-                    if (!createReceiptResult.Succeed)
+                    //var createReceiptResult = await CreateUpgradeReceiptReport(appointment.Id, model.DocumentModel);
+                    //if (!createReceiptResult.Succeed)
+                    //{
+                    //    validPrecondition = false;
+                    //    result.ErrorMessage = createReceiptResult.ErrorMessage;
+                    //}
+                    //else
+                    //{
+                    //appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
+                    foreach (var requestUpgradeId in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgradeId))
+                    {
+                        requestUpgradeResults.Add(await CompleteRequestUpgrade(requestUpgradeId));
+                    }
+                    var createInspectionResult = await CreateUpgradeInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
+                    if (!createInspectionResult.Succeed)
                     {
                         validPrecondition = false;
-                        result.ErrorMessage = createReceiptResult.ErrorMessage;
+                        result.ErrorMessage = createInspectionResult.ErrorMessage;
                     }
                     else
                     {
-                        appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
-                        foreach (var requestUpgradeId in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgradeId))
-                        {
-                            requestUpgradeResults.Add(await CompleteRequestUpgrade(requestUpgradeId));
-                        }
-                        var createInspectionResult = await CreateUpgradeInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
-                        if (!createInspectionResult.Succeed)
-                        {
-                            validPrecondition = false;
-                            result.ErrorMessage = createInspectionResult.ErrorMessage;
-                        }
-                        else
-                        {
-                            appointment.InspectionReportFilePath = createInspectionResult.Data as string;
-                            _dbContext.SaveChanges();
-                        }
+                        appointment.InspectionReportFilePath = createInspectionResult.Data as string;
+                        _dbContext.SaveChanges();
                     }
+                    //}
                 }
 
                 ResultModel requestExpandResult = null;
@@ -1321,7 +1322,8 @@ public class AppointmentService : IAppointmentService
                         else
                         {
                             requestExpandResult = await CompleteRemoval(requestExpand.Id);
-                            serverAllocation.RemovalFilePath = createReceiptResult.Data as string;
+                            serverAllocation.RemovalReceiptFilePath = createReceiptResult.Data as string;
+                            serverAllocation.RemovalInspectFilePath = createInspectionResult.Data as string;
                         }
                         appointment.InspectionReportFilePath = createInspectionResult.Data as string;
                         appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
@@ -1498,7 +1500,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CompleteRequestExpand(int requestExpandId)
+    private async Task<ResultModel> CompleteRequestExpand(int requestExpandId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -1587,7 +1589,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateUpgradeInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model)
+    private async Task<ResultModel> CreateUpgradeInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
 
         var result = new ResultModel();
@@ -1693,7 +1695,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateExpandInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model)
+    private async Task<ResultModel> CreateExpandInspectionReport(int serverAllocationId, ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -1807,107 +1809,107 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> CreateUpgradeReceiptReport(int appointmentId, ServerAllocationCreateRequestExpandInspectionReportModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> CreateUpgradeReceiptReport(int appointmentId, ServerAllocationCreateRequestExpandInspectionReportModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            string inputPath = Path.Combine(_env.WebRootPath, "Report", "Template2.docx");
-            string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
-            var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
-            var serverAllocation = _dbContext.ServerAllocations
-               .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
-               .Include(x => x.Customer)
-               .Include(x => x.RequestUpgrades).ThenInclude(x => x.Component)
-               .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
-               .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
-               .FirstOrDefault(x => x.Id == appointment.ServerAllocationId);
-            if (serverAllocation == null)
-            {
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else if (!serverAllocation.LocationAssignments.Any())
-            {
-                result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
-            }
+    //    try
+    //    {
+    //        string inputPath = Path.Combine(_env.WebRootPath, "Report", "Template2.docx");
+    //        string outputPath = Path.Combine(_env.WebRootPath, "Report", "Result.docx");
+    //        var appointment = _dbContext.Appointments.FirstOrDefault(x => x.Id == appointmentId);
+    //        var serverAllocation = _dbContext.ServerAllocations
+    //           .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+    //           .Include(x => x.Customer)
+    //           .Include(x => x.RequestUpgrades).ThenInclude(x => x.Component)
+    //           .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+    //           .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+    //           .FirstOrDefault(x => x.Id == appointment.ServerAllocationId);
+    //        if (serverAllocation == null)
+    //        {
+    //            result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+    //        }
+    //        else if (!serverAllocation.LocationAssignments.Any())
+    //        {
+    //            result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+    //        }
 
-            else
-            {
-                File.Copy(inputPath, outputPath, true);
-                var customer = serverAllocation.Customer;
-                using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
-                {
-                    TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
+    //        else
+    //        {
+    //            File.Copy(inputPath, outputPath, true);
+    //            var customer = serverAllocation.Customer;
+    //            using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
+    //            {
+    //                TextInfo textInfo = new CultureInfo("en-US", false).TextInfo;
 
-                    var now = DateTime.UtcNow;
-                    document.RenderText("__Time__", $"{now.Hour} Giờ {now.Minute} Phút");
-                    document.RenderText("__Date__", $"ngày {now.Day:dd} tháng {now.Month:MM} Năm {now.Year}");
-                    document.RenderText("__Location__", model.Location);
+    //                var now = DateTime.UtcNow;
+    //                document.RenderText("__Time__", $"{now.Hour} Giờ {now.Minute} Phút");
+    //                document.RenderText("__Date__", $"ngày {now.Day:dd} tháng {now.Month:MM} Năm {now.Year}");
+    //                document.RenderText("__Location__", model.Location);
 
-                    document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
-                    document.RenderText("__CustomerName__", textInfo.ToTitleCase(customer.Representator));
-                    document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(customer.RepresentatorPosition));
-                    document.RenderText("__Address__", serverAllocation.Customer.Address);
-                    document.RenderText("__PhoneNumber__", serverAllocation.Customer.PhoneNumber);
-                    document.RenderText("__Email__", serverAllocation.Customer.Email);
+    //                document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
+    //                document.RenderText("__CustomerName__", textInfo.ToTitleCase(customer.Representator));
+    //                document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(customer.RepresentatorPosition));
+    //                document.RenderText("__Address__", serverAllocation.Customer.Address);
+    //                document.RenderText("__PhoneNumber__", serverAllocation.Customer.PhoneNumber);
+    //                document.RenderText("__Email__", serverAllocation.Customer.Email);
 
-                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
-                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+    //                document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+    //                document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
 
-                    document.RenderText("__DeviceCondition__", model.DeviceCondition);
+    //                document.RenderText("__DeviceCondition__", model.DeviceCondition);
 
-                    int counter = 1;
-                    var receiptReportModels = new List<ReceiptReportModel>();
-                    foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
-                    {
-                        var requestUpgradeDescription = requestUpgrade.Description;
-                        var hardware = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId);
-                        var newConfig = new ReceiptReportModel
-                        {
-                            PartNo = counter++,
-                            Model = requestUpgrade.Component.Name + " - " + requestUpgradeDescription,
-                            Action = "Thêm",
-                            Quantity = 1,
-                            Unit = "Cái",
-                        };
-                        receiptReportModels.Add(newConfig);
+    //                int counter = 1;
+    //                var receiptReportModels = new List<ReceiptReportModel>();
+    //                foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
+    //                {
+    //                    var requestUpgradeDescription = requestUpgrade.Description;
+    //                    var hardware = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.ComponentId == requestUpgrade.ComponentId);
+    //                    var newConfig = new ReceiptReportModel
+    //                    {
+    //                        PartNo = counter++,
+    //                        Model = requestUpgrade.Component.Name + " - " + requestUpgradeDescription,
+    //                        Action = "Thêm",
+    //                        Quantity = 1,
+    //                        Unit = "Cái",
+    //                    };
+    //                    receiptReportModels.Add(newConfig);
 
-                        var oldConfig = new ReceiptReportModel
-                        {
-                            PartNo = counter++,
-                            Model = hardware.Component.Name + " - " + hardware.Description,
-                            Action = "Gỡ",
-                            Quantity = 1,
-                            Unit = "Cái",
-                        };
+    //                    var oldConfig = new ReceiptReportModel
+    //                    {
+    //                        PartNo = counter++,
+    //                        Model = hardware.Component.Name + " - " + hardware.Description,
+    //                        Action = "Gỡ",
+    //                        Quantity = 1,
+    //                        Unit = "Cái",
+    //                    };
 
-                        receiptReportModels.Add(oldConfig);
-                        document.InsertToSingleTable(receiptReportModels);
-                        document.MainDocumentPart.Document.Save();
-                    }
-                }
+    //                    receiptReportModels.Add(oldConfig);
+    //                    document.InsertToSingleTable(receiptReportModels);
+    //                    document.MainDocumentPart.Document.Save();
+    //                }
+    //            }
 
-                string pdfPath = Path.Combine(_env.WebRootPath, "Report", "PDF.pdf");
-                await DocumentHelper.ConvertToPDF(outputPath, pdfPath);
-                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(pdfPath);
-                //serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
-                _dbContext.SaveChanges();
+    //            string pdfPath = Path.Combine(_env.WebRootPath, "Report", "PDF.pdf");
+    //            await DocumentHelper.ConvertToPDF(outputPath, pdfPath);
+    //            string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(pdfPath);
+    //            //serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+    //            _dbContext.SaveChanges();
 
-                result.Succeed = true;
-                result.Data = receiptOfRecipientFileName;
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //            result.Succeed = true;
+    //            result.Data = receiptOfRecipientFileName;
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
-    public async Task<ResultModel> CreateExpandReceiptReport(int requestExpandId, ServerAllocationCreateRequestExpandInspectionReportModel model)
+    private async Task<ResultModel> CreateExpandReceiptReport(int requestExpandId, ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -2291,16 +2293,18 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> AssignInspectionReport(int appointmentId, DocumentFileUploadModel model)
+    public async Task<ResultModel> UpdateDocument(int appointmentId, ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
+        bool validPrecondition = true;
 
         try
         {
-
             var appointment = _dbContext.Appointments
-                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade)
+                .Include(x => x.ServerAllocation)
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.ServerAllocation)
+                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.ServerAllocation)
                 .FirstOrDefault(x => x.Id == appointmentId);
             if (appointment == null)
             {
@@ -2314,16 +2318,62 @@ public class AppointmentService : IAppointmentService
             {
                 result.ErrorMessage = "Appointment's status is not successed!";
             }
-            else if (appointment.DocumentConfirm)
-            {
-                result.ErrorMessage = "Document already confirmed!";
-            }
             else
             {
-                string inspectionRecordFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
-                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(model.ReceiptOfRecipient);
-                appointment.InspectionReportFilePath = inspectionRecordFileName;
-                appointment.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+                var inspectionRecordFileName = "";
+                var receiptOfRecipientFileName = "";
+                if (appointment.RequestUpgradeAppointment.Any())
+                {
+                    var createInspectionResult = await CreateUpgradeInspectionReport(appointment.ServerAllocationId, model);
+                    if (!createInspectionResult.Succeed)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = createInspectionResult.ErrorMessage;
+                    }
+                    else
+                    {
+                        inspectionRecordFileName = createInspectionResult.Data as string;
+                        appointment.InspectionReportFilePath = inspectionRecordFileName;
+                        _dbContext.SaveChanges();
+                    }
+                }
+
+                ResultModel requestExpandResult = null;
+                if (appointment.RequestExpandAppointments.Any())
+                {
+                    var requestExpand = appointment.RequestExpandAppointments.FirstOrDefault().RequestExpand;
+                    var createInspectionResult = await CreateExpandInspectionReport(appointment.ServerAllocationId, model);
+                    var createReceiptResult = await CreateExpandReceiptReport(requestExpand.Id, model);
+                    if (!createInspectionResult.Succeed)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = createInspectionResult.ErrorMessage;
+                    }
+                    else if (!createReceiptResult.Succeed)
+                    {
+                        validPrecondition = false;
+                        result.ErrorMessage = createReceiptResult.ErrorMessage;
+                    }
+                    else
+                    {
+                        inspectionRecordFileName = createInspectionResult.Data as string;
+                        receiptOfRecipientFileName = createReceiptResult.Data as string;
+                        var serverAllocation = appointment.ServerAllocation;
+                        if (!requestExpand.ForRemoval)
+                        {
+                            serverAllocation.InspectionRecordFilePath = inspectionRecordFileName;
+                            serverAllocation.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+                        }
+                        else
+                        {
+                            serverAllocation.RemovalInspectFilePath = inspectionRecordFileName;
+                            serverAllocation.RemovalReceiptFilePath = receiptOfRecipientFileName;
+                        }
+                        appointment.InspectionReportFilePath = createInspectionResult.Data as string;
+                        appointment.ReceiptOfRecipientFilePath = receiptOfRecipientFileName;
+                        _dbContext.SaveChanges();
+                    }
+                }
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = new DocumentFileResultModel
@@ -2341,7 +2391,52 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> DocumentConfirmTrue(int appointmentId)
+    public async Task<ResultModel> AssignFinalDocument(int appointmentId, DocumentFileUploadModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var appointment = _dbContext.Appointments
+                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade)
+                .FirstOrDefault(x => x.Id == appointmentId);
+            if (appointment == null)
+            {
+                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+            }
+            else if (!appointment.RequestUpgradeAppointment.Any())
+            {
+                result.ErrorMessage = "Appointment does not have request upgrade!";
+            }
+            else if (appointment.Status != RequestStatus.Success)
+            {
+                result.ErrorMessage = "Appointment's status is not successed!";
+            }
+            else
+            {
+                string inspectionRecordFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
+                string receiptOfRecipientFileName = _cloudinaryHelper.UploadFile(model.ReceiptOfRecipient);
+                appointment.FinalInspectionReport = inspectionRecordFileName;
+                appointment.FinalReceiptOfRecipient = receiptOfRecipientFileName;
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = new DocumentFileResultModel
+                {
+                    InspectionReport = inspectionRecordFileName,
+                    ReceiptOfRecipient = receiptOfRecipientFileName,
+                };
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> ConfirmDocument(int appointmentId)
     {
         var result = new ResultModel();
         result.Succeed = false;

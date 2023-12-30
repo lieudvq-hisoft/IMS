@@ -22,11 +22,15 @@ public class ServerAllocationModel
     public string? FinalInspectionReport { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
     public string? FinalReceiptOfRecipient { get; set; }
-    public string? RemovalFilePath { get; set; }
-    public string? FinalRemoval { get; set; }
+    public string? RemovalInspectFilePath { get; set; }
+    public string? FinalRemovalInspect { get; set; }
+    public string? RemovalReceiptFilePath { get; set; }
+    public string? FinalRemovalReceipt { get; set; }
     public int? PausingRequireIncidentCount { get; set; }
     public int? IncidentCount { get; set; }
     public string Location { get; set; }
+    public string? MasterIpAddress { get; set; }
+    public string? PartNumber { get; set; }
     public int IpCount { get; set; }
     public Guid CustomerId { get; set; }
     public CustomerModel? Customer { get; set; }
@@ -39,6 +43,7 @@ public class ServerAllocationResultModel
     public int Power { get; set; }
     public string Name { get; set; }
     public string SerialNumber { get; set; }
+    public string? PartNumber { get; set; }
     public string? MasterIpAddress { get; set; }
     public string? Note { get; set; }
     public string? TechNote { get; set; }
@@ -52,8 +57,10 @@ public class ServerAllocationResultModel
     public string? FinalInspectionReport { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
     public string? FinalReceiptOfRecipient { get; set; }
-    public string? RemovalFilePath { get; set; }
-    public string? FinalRemoval { get; set; }
+    public string? RemovalInspectFilePath { get; set; }
+    public string? FinalRemovalInspect { get; set; }
+    public string? RemovalReceiptFilePath { get; set; }
+    public string? FinalRemovalReceipt { get; set; }
     public Guid CustomerId { get; set; }
 }
 
@@ -81,6 +88,9 @@ public class ServerAllocationCreateModel
     [StringLength(255, MinimumLength = 6)]
     public string? SerialNumber { get; set; }
 
+    [StringLength(255, MinimumLength = 6)]
+    public string? PartNumber { get; set; }
+
     [Range(100, double.MaxValue)]
     public int? Power { get; set; }
 
@@ -98,7 +108,11 @@ public class ServerAllocationUpdateModel
 
     [Required]
     [StringLength(255, MinimumLength = 6)]
-    public string? SerialNumber { get; set; }
+    public string SerialNumber { get; set; }
+
+    [Required]
+    [StringLength(255, MinimumLength = 6)]
+    public string PartNumber { get; set; }
 
     [Required]
     public string Name { get; set; }
