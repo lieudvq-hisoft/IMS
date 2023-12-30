@@ -51,12 +51,22 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    [HttpPatch("MyAccount")]
-    [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
-    [SwaggerOperation(Summary = "Update your information")]
-    public async Task<ActionResult> UpdateAccountInfo([FromBody] UserUpdateModel model)
+    //[HttpPatch("MyAccount")]
+    //[Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    //[SwaggerOperation(Summary = "Update your information")]
+    //public async Task<ActionResult> UpdateAccountInfo([FromBody] UserUpdateModel model)
+    //{
+    //    var result = await _userService.ChangePassword(model);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
+
+    [HttpPut("Password")]
+    //[Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    [AllowAnonymous]
+    public async Task<ActionResult> ChangePassword([FromBody] UserChangePasswordModel model)
     {
-        var result = await _userService.UpdateAccountInfo(model);
+        var result = await _userService.ChangePassword(model, Guid.Parse(User.GetId()));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

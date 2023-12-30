@@ -24,7 +24,7 @@ public interface IUserService
     Task<ResultModel> Register(UserCreateModel model);
     Task<ResultModel> ActivateUser(string email);
     Task<ResultModel> GetAccountInfo(string email);
-    Task<ResultModel> UpdateAccountInfo(UserUpdateModel model);
+    Task<ResultModel> ChangePassword(UserChangePasswordModel model, Guid userId);
     Task<ResultModel> Delete(Guid id);
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, UserSearchModel searchModel);
     Task<ResultModel> GetTech(PagingParam<BaseSortCriteria> paginationModel, UserSearchModel searchModel);
@@ -280,45 +280,45 @@ public class UserService : IUserService
         return result;
     }
 
-    public async Task<ResultModel> UpdateAccountInfo(UserUpdateModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> UpdateAccountInfo(UserUpdateModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == model.Id);
-            if (user == null)
-            {
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                user.Email = model.Email;
-                user.Fullname = model.Fullname;
-                user.Address = model.Address;
-                user.PhoneNumber = model.PhoneNumber;
-                user.NormalizedEmail = model.Email.ToLower();
-                var updateUserResult = await _userManager.UpdateAsync(user);
+    //    try
+    //    {
+    //        var user = _dbContext.User.FirstOrDefault(x => x.Id == model.Id);
+    //        if (user == null)
+    //        {
+    //            result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+    //        }
+    //        else
+    //        {
+    //            user.Email = model.Email;
+    //            user.Fullname = model.Fullname;
+    //            user.Address = model.Address;
+    //            user.PhoneNumber = model.PhoneNumber;
+    //            user.NormalizedEmail = model.Email.ToLower();
+    //            var updateUserResult = await _userManager.UpdateAsync(user);
 
-                if (updateUserResult.Succeeded)
-                {
-                    result.Succeed = true;
-                    result.Data = _mapper.Map<UserModel>(user);
-                }
-                else
-                {
-                    result.Succeed = false;
-                    result.ErrorMessage = UserErrorMessage.UPDATE_FAILED;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
-        return result;
-    }
+    //            if (updateUserResult.Succeeded)
+    //            {
+    //                result.Succeed = true;
+    //                result.Data = _mapper.Map<UserModel>(user);
+    //            }
+    //            else
+    //            {
+    //                result.Succeed = false;
+    //                result.ErrorMessage = UserErrorMessage.UPDATE_FAILED;
+    //            }
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
+    //    return result;
+    //}
 
     //public async Task<ResultModel> AssignRole(UserAssignRoleModel model, Guid userId)
     //{

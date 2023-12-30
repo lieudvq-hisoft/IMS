@@ -72,7 +72,8 @@ public class UserCreateModel
 public class UserChangePasswordModel
 {
     [Required]
-    [DataType(DataType.Password)]
+    [StringLength(25, MinimumLength = 8, ErrorMessage = "Password must be between 8 to 25 character")]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$")]
     public string Password { get; set; }
 }
 
@@ -81,22 +82,23 @@ public class UserUpdateModel
     [Required]
     public Guid Id { get; set; }
 
-    //[Required]
+    [Required]
+    [StringLength(25, MinimumLength = 8, ErrorMessage = "Password must be between 8 to 25 character")]
     [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$")]
     public string? Password { get; set; }
 
-    [Required]
-    [EmailAddress]
-    public string Email { get; set; }
+    //[Required]
+    //[EmailAddress]
+    //public string Email { get; set; }
 
-    [Required]
-    public string Fullname { get; set; }
+    //[Required]
+    //public string Fullname { get; set; }
 
-    [Required]
-    public string Address { get; set; }
+    //[Required]
+    //public string Address { get; set; }
 
-    [Required]
-    public string PhoneNumber { get; set; }
+    //[Required]
+    //public string PhoneNumber { get; set; }
 }
 
 public class LoginModel
