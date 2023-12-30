@@ -25,15 +25,17 @@ public class ServerHardwareConfigResultModel
 public class ServerHardwareConfigCreateModel
 {
     [Required]
-    public string? Description { get; set; }
+    public string Cpu { get; set; }
+
+    [Required]
+    public string Ram { get; set; }
+
+    [Required]
+    public string Harddisk { get; set; }
 
     [Required]
     [GreaterThanZero]
     public int ServerAllocationId { get; set; }
-
-    [Required]
-    [GreaterThanZero]
-    public int ComponentId { get; set; }
 }
 
 //public class ConfigDescriptionModel
@@ -57,23 +59,25 @@ public class ServerHardwareConfigCreateBulkModel
     public List<ServerHardwareConfigCreateModel> ServerHardwareConfigCreateModels { set; get; }
 }
 
-public class ServerHardwareConfigUpdateModel
-{
-    [Required]
-    [GreaterThanZero]
-    public int Id { get; set; }
+//public class ServerHardwareConfigUpdateModel
+//{
+//    [Required]
+//    [GreaterThanZero]
+//    public int Id { get; set; }
 
-    [Required]
-    public string? Description { get; set; }
+//    [Required]
+//    public string Cpu { get; set; }
 
-    [Required]
-    [GreaterThanZero]
-    public int ServerAllocationId { get; set; }
+//    [Required]
+//    public string Ram { get; set; }
 
-    [Required]
-    [GreaterThanZero]
-    public int ComponentId { get; set; }
-}
+//    [Required]
+//    public string Harddisk { get; set; }
+
+//    [Required]
+//    [GreaterThanZero]
+//    public int ServerAllocationId { get; set; }
+//}
 
 public class ServerHardwareConfigSearchModel
 {

@@ -50,13 +50,13 @@ public class ServerHardwareConfigController : ControllerBase
     //    return BadRequest(result.ErrorMessage);
     //}
 
-    [HttpPut]
-    public async Task<ActionResult> Update([FromBody] ServerHardwareConfigUpdateModel model)
-    {
-        var result = await _serverHardwareConfigService.Update(model);
-        if (result.Succeed) return Ok(result.Data);
-        return BadRequest(result.ErrorMessage);
-    }
+    //[HttpPut]
+    //public async Task<ActionResult> Update([FromBody] ServerHardwareConfigUpdateModel model)
+    //{
+    //    var result = await _serverHardwareConfigService.Update(model);
+    //    if (result.Succeed) return Ok(result.Data);
+    //    return BadRequest(result.ErrorMessage);
+    //}
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)

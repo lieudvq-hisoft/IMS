@@ -17,7 +17,7 @@ public interface IServerHardwareConfigService
     Task<ResultModel> GetDetail(int id);
     Task<ResultModel> Create(ServerHardwareConfigCreateModel model);
     //Task<ResultModel> CreateBulk(ServerHardwareConfigCreateBulkModel model);
-    Task<ResultModel> Update(ServerHardwareConfigUpdateModel model);
+    //Task<ResultModel> Update(ServerHardwareConfigUpdateModel model);
     Task<ResultModel> Delete(int serverHardwareConfigId);
 }
 
@@ -124,38 +124,56 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
                 result.ErrorMessage = "Cannot change config of allocated server";
             }
 
-            var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
-            if (component == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
-            }
-
-            if (serverAllocation != null)
-            {
-                if (serverAllocation.ServerHardwareConfigs.Any(x => x.ComponentId == component.Id))
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = ServerHardwareConfigErrorMessage.CONFIG_FOR_COMPONENT_EXISTED;
-                }
-            }
+            var cpu = _dbContext.Components.FirstOrDefault(x => x.Name == "CPU");
+            var ram = _dbContext.Components.FirstOrDefault(x => x.Name == "RAM");
+            var harddisk = _dbContext.Components.FirstOrDefault(x => x.Name == "Harddisk");
 
             if (validPrecondition)
             {
-                var serverHardwareConfig = _mapper.Map<ServerHardwareConfig>(model);
-                _dbContext.ServerHardwareConfigs.Add(serverHardwareConfig);
+                _dbContext.ServerHardwareConfigs.RemoveRange(serverAllocation.ServerHardwareConfigs);
                 _dbContext.SaveChanges();
+                _dbContext.ServerHardwareConfigs.Add(new ServerHardwareConfig
+                {
+                    Description = model.Cpu,
+                    ServerAllocationId = model.ServerAllocationId,
+                    ComponentId = cpu.Id,
+                });
                 _dbContext.RequestUpgrades.Add(new RequestUpgrade
                 {
-                    Description = model.Description,
+                    Description = model.Cpu,
                     ServerAllocationId = model.ServerAllocationId,
-                    ComponentId = model.ComponentId,
+                    ComponentId = cpu.Id,
+                    Status = RequestStatus.Success
+                });
+                _dbContext.ServerHardwareConfigs.Add(new ServerHardwareConfig
+                {
+                    Description = model.Ram,
+                    ServerAllocationId = model.ServerAllocationId,
+                    ComponentId = ram.Id,
+                });
+                _dbContext.RequestUpgrades.Add(new RequestUpgrade
+                {
+                    Description = model.Ram,
+                    ServerAllocationId = model.ServerAllocationId,
+                    ComponentId = ram.Id,
+                    Status = RequestStatus.Success
+                });
+                _dbContext.ServerHardwareConfigs.Add(new ServerHardwareConfig
+                {
+                    Description = model.Harddisk,
+                    ServerAllocationId = model.ServerAllocationId,
+                    ComponentId = harddisk.Id,
+                });
+                _dbContext.RequestUpgrades.Add(new RequestUpgrade
+                {
+                    Description = model.Harddisk,
+                    ServerAllocationId = model.ServerAllocationId,
+                    ComponentId = harddisk.Id,
                     Status = RequestStatus.Success
                 });
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
-                result.Data = _mapper.Map<ServerHardwareConfigModel>(serverHardwareConfig);
             }
         }
         catch (Exception e)
@@ -209,58 +227,58 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
     //    return result;
     //}
 
-    public async Task<ResultModel> Update(ServerHardwareConfigUpdateModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
-        bool validPrecondition = true;
+    //public async Task<ResultModel> Update(ServerHardwareConfigUpdateModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
+    //    bool validPrecondition = true;
 
-        try
-        {
-            var serverAllocation = _dbContext.ServerAllocations
-                .Include(x => x.LocationAssignments)
-                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
-                .FirstOrDefault(x => x.Id == model.ServerAllocationId);
-            if (serverAllocation == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
-            }
-            else if (serverAllocation.LocationAssignments.Any())
-            {
-                validPrecondition = false;
-                result.ErrorMessage = "Cannot change config of allocated server";
-            }
+    //    try
+    //    {
+    //        var serverAllocation = _dbContext.ServerAllocations
+    //            .Include(x => x.LocationAssignments)
+    //            .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+    //            .FirstOrDefault(x => x.Id == model.ServerAllocationId);
+    //        if (serverAllocation == null)
+    //        {
+    //            validPrecondition = false;
+    //            result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
+    //        }
+    //        else if (serverAllocation.LocationAssignments.Any())
+    //        {
+    //            validPrecondition = false;
+    //            result.ErrorMessage = "Cannot change config of allocated server";
+    //        }
 
-            var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
-            if (component == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
-            }
+    //        var component = _dbContext.Components.FirstOrDefault(x => x.Id == model.ComponentId);
+    //        if (component == null)
+    //        {
+    //            validPrecondition = false;
+    //            result.ErrorMessage = ComponentErrorMessage.NOT_EXISTED;
+    //        }
 
-            var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault(x => x.Id == model.Id);
-            if (serverHardwareConfig == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
-            }
+    //        var serverHardwareConfig = _dbContext.ServerHardwareConfigs.FirstOrDefault(x => x.Id == model.Id);
+    //        if (serverHardwareConfig == null)
+    //        {
+    //            validPrecondition = false;
+    //            result.ErrorMessage = ServerHardwareConfigErrorMessage.NOT_EXISTED;
+    //        }
 
-            if (validPrecondition)
-            {
-                _mapper.Map<ServerHardwareConfigUpdateModel, ServerHardwareConfig>(model, serverHardwareConfig);
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = _mapper.Map<ServerHardwareConfigModel>(serverHardwareConfig);
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //        if (validPrecondition)
+    //        {
+    //            _mapper.Map<ServerHardwareConfigUpdateModel, ServerHardwareConfig>(model, serverHardwareConfig);
+    //            _dbContext.SaveChanges();
+    //            result.Succeed = true;
+    //            result.Data = _mapper.Map<ServerHardwareConfigModel>(serverHardwareConfig);
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> Delete(int serverHardwareConfigId)
     {
