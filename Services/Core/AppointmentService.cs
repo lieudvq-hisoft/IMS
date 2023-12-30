@@ -1299,6 +1299,10 @@ public class AppointmentService : IAppointmentService
                     {
                         requestExpandResult = await CompleteRequestExpand(requestExpand.Id);
                     }
+                    else
+                    {
+                        requestExpandResult = await CompleteRemoval(requestExpand.Id);
+                    }
                     var createInspectionResult = await CreateExpandInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
                     var createReceiptResult = await CreateExpandReceiptReport(requestExpand.Id, model.DocumentModel);
                     if (!createInspectionResult.Succeed)
@@ -1321,7 +1325,6 @@ public class AppointmentService : IAppointmentService
                         }
                         else
                         {
-                            requestExpandResult = await CompleteRemoval(requestExpand.Id);
                             serverAllocation.RemovalReceiptFilePath = createReceiptResult.Data as string;
                             serverAllocation.RemovalInspectFilePath = createInspectionResult.Data as string;
                         }
@@ -1635,7 +1638,7 @@ public class AppointmentService : IAppointmentService
 
                     document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
 
-                    document.RenderText("__Location__", textInfo.ToTitleCase(model.Location));
+                    document.RenderText("__PartNumber__", textInfo.ToTitleCase(serverAllocation.PartNumber));
 
                     document.TickCheckBoxInDocx("Allocation");
 
@@ -1710,6 +1713,7 @@ public class AppointmentService : IAppointmentService
                .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
                .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                .FirstOrDefault(x => x.Id == serverAllocationId);
+            var serverRemoved = serverAllocation.Status == ServerAllocationStatus.Removed;
             if (serverAllocation == null)
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
@@ -1738,7 +1742,7 @@ public class AppointmentService : IAppointmentService
 
                     document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
 
-                    document.RenderText("__Location__", model.Location);
+                    document.RenderText("__PartNumber__", textInfo.ToTitleCase(serverAllocation.PartNumber ?? ""));
 
                     document.RenderText("__Username__", model.Username);
 
@@ -1771,11 +1775,11 @@ public class AppointmentService : IAppointmentService
 
                     document.RenderText("__SerialNo__", serverAllocation.SerialNumber);
 
-                    document.RenderText("__Size__", serverAllocation.LocationAssignments.Count() + "U");
+                    document.RenderText("__Size__", !serverRemoved ? serverAllocation.LocationAssignments.Count() + "U" : "");
 
-                    document.RenderText("__IPAddress__", serverAllocation.MasterIpAddress);
+                    document.RenderText("__IPAddress__", "");
 
-                    document.RenderText("__Gateway__", serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address);
+                    document.RenderText("__Gateway__", !serverRemoved ? serverAllocation?.IpAssignments?.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.IpAddress?.IpSubnet?.IpAddresses?.FirstOrDefault(x => x.Purpose == IpPurpose.Gateway)?.Address : "");
 
                     document.RenderText("__SubnetMask__", IpAddress.GetDefaultSubnetMask(serverAllocation.MasterIpAddress));
 
@@ -1929,24 +1933,25 @@ public class AppointmentService : IAppointmentService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
-            else if (!requestExpand.ForRemoval && serverAllocation.Status != ServerAllocationStatus.Waiting)
-            {
-                result.ErrorMessage = "Server need to be waiting for allocation";
-            }
-            else if (requestExpand.ForRemoval && serverAllocation.Status != ServerAllocationStatus.Pausing)
-            {
-                result.ErrorMessage = "Server need to be pausing to be remove";
-            }
-            else if (!serverAllocation.LocationAssignments.Any())
-            {
-                result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
-            }
-            else if (!serverAllocation.IpAssignments.Any())
-            {
-                result.ErrorMessage = IpAssignmentErrorMessage.NOT_EXISTED;
-            }
+            //else if (!requestExpand.ForRemoval && serverAllocation.Status != ServerAllocationStatus.Waiting)
+            //{
+            //    result.ErrorMessage = "Server need to be waiting for allocation";
+            //}
+            //else if (requestExpand.ForRemoval && serverAllocation.Status != ServerAllocationStatus.Pausing)
+            //{
+            //    result.ErrorMessage = "Server need to be pausing to be remove";
+            //}
+            //else if (!serverAllocation.LocationAssignments.Any())
+            //{
+            //    result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
+            //}
+            //else if (!serverAllocation.IpAssignments.Any())
+            //{
+            //    result.ErrorMessage = IpAssignmentErrorMessage.NOT_EXISTED;
+            //}
             else
             {
+                var serverRemoved = serverAllocation.Status == ServerAllocationStatus.Removed;
                 File.Copy(inputPath, outputPath, true);
                 var customer = serverAllocation.Customer;
                 using (WordprocessingDocument document = WordprocessingDocument.Open(outputPath, true))
@@ -1955,8 +1960,8 @@ public class AppointmentService : IAppointmentService
 
                     var now = DateTime.UtcNow;
                     document.RenderText("__Time__", $"{now.Hour} Giờ {now.Minute} Phút");
-                    document.RenderText("__Date__", $"ngày {now.Day:dd)} tháng {now.Month:MM} Năm {now.Year}");
-                    document.RenderText("__Location__", model.Location);
+                    document.RenderText("__Date__", $"ngày {now.Day:dd} tháng {now.Month:MM} Năm {now.Year:yyyy}");
+                    document.RenderText("__PartNumber__", textInfo.ToTitleCase(serverAllocation.PartNumber ?? ""));
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());
                     document.RenderText("__CustomerName__", textInfo.ToTitleCase(customer.Representator));
@@ -1978,7 +1983,7 @@ public class AppointmentService : IAppointmentService
                         {
                             PartNo = counter++,
                             Model = hardware.Component.Name + " - " + hardware.Description,
-                            Action = "Thêm",
+                            Action = !serverRemoved ? "Thêm" : "Gỡ",
                             Quantity = 1,
                             Unit = "Cái",
                         };
@@ -2298,6 +2303,7 @@ public class AppointmentService : IAppointmentService
         var result = new ResultModel();
         result.Succeed = false;
         bool validPrecondition = true;
+        using var transaction = _dbContext.Database.BeginTransaction();
 
         try
         {
@@ -2310,9 +2316,9 @@ public class AppointmentService : IAppointmentService
             {
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
-            else if (!appointment.RequestUpgradeAppointment.Any())
+            else if (!appointment.RequestUpgradeAppointment.Any() && !appointment.RequestExpandAppointments.Any())
             {
-                result.ErrorMessage = "Appointment does not have request upgrade!";
+                result.ErrorMessage = "Appointment does not have request!";
             }
             else if (appointment.Status != RequestStatus.Success)
             {
@@ -2374,13 +2380,20 @@ public class AppointmentService : IAppointmentService
                         _dbContext.SaveChanges();
                     }
                 }
-                _dbContext.SaveChanges();
-                result.Succeed = true;
-                result.Data = new DocumentFileResultModel
+                if (!validPrecondition)
                 {
-                    InspectionReport = inspectionRecordFileName,
-                    ReceiptOfRecipient = receiptOfRecipientFileName,
-                };
+                    transaction.Rollback();
+                }
+                else
+                {
+                    transaction.Commit();
+                    result.Succeed = true;
+                    result.Data = new DocumentFileResultModel
+                    {
+                        InspectionReport = inspectionRecordFileName,
+                        ReceiptOfRecipient = receiptOfRecipientFileName,
+                    };
+                }
             }
         }
         catch (Exception e)

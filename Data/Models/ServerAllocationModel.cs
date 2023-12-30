@@ -186,11 +186,6 @@ public class ServerAllocationCreateRequestExpandInspectionReportModel
 
     [Required]
     [MinLength(6)]
-    [MaxLength(2000)]
-    public string Location { get; set; } = "Location";
-
-    [Required]
-    [MinLength(6)]
     [MaxLength(255)]
     public string Username { get; set; } = "Username";
 
