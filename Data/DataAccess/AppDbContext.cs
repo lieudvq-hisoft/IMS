@@ -1,5 +1,6 @@
 ﻿using Data.Entities;
 using Data.Extensions;
+using EntityFramework.Exceptions.PostgreSQL;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -64,6 +65,11 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
         builder.FilterSoftDeleted();
 
         builder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseExceptionProcessor();
     }
 
     public DbSet<Appointment> Appointments { get; set; }

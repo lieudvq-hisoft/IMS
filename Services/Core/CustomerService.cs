@@ -15,6 +15,8 @@ using Services.Utilities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using EntityFramework.Exceptions.PostgreSQL;
+using EntityFramework.Exceptions.Common;
 
 namespace Services.Core;
 
@@ -232,6 +234,10 @@ public class CustomerService : ICustomerService
                 result.Succeed = true;
                 result.Data = _mapper.Map<CustomerModel>(customer);
             }
+        }
+        catch (UniqueConstraintException e)
+        {
+            result.ErrorMessage = "Contact existed";
         }
         catch (Exception e)
         {

@@ -300,6 +300,12 @@ public static class ModelBuilderExtentions
                 .OnDelete(DeleteBehavior.ClientCascade);
         });
 
+        builder.Entity<Contact>(b =>
+        {
+            b.HasIndex(e => e.PhoneNumber).IsUnique().HasFilter("IsDeleted = false");
+            b.HasIndex(e => e.Email).IsUnique().HasFilter("IsDeleted = false");
+        });
+
         builder.Entity<IpAddress>(b =>
         {
             b.HasMany(e => e.IpAssignments)
