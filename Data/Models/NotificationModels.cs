@@ -31,3 +31,8 @@ public class NotificationCreateModel
     public NotificationData Data { get; set; }
 }
 
+public class NotiSearchModel
+{
+    public bool? IsSeen { get; set; }
+}
+

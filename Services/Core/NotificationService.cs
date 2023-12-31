@@ -12,7 +12,7 @@ namespace Services.Core;
 public interface INotificationService
 {
     Task<ResultModel> Add(NotificationCreateModel model);
-    Task<ResultModel> Get(PagingParam<NotificationSortCriteria> paginationModel, NotificationSearchModel searchModel, Guid userId);
+    Task<ResultModel> Get(PagingParam<NotificationSortCriteria> paginationModel, NotiSearchModel searchModel, Guid userId);
     Task<ResultModel> GetById(int Id);
     Task<ResultModel> SeenNotification(int id, Guid userId);
     Task<ResultModel> DeleteNotification(int id, Guid userId);
@@ -60,13 +60,19 @@ public class NotificationService : INotificationService
         return result;
     }
 
-    public async Task<ResultModel> Get(PagingParam<NotificationSortCriteria> paginationModel, NotificationSearchModel searchModel, Guid userId)
+    public async Task<ResultModel> Get(PagingParam<NotificationSortCriteria> paginationModel, NotiSearchModel searchModel, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
         try
         {
-            var notifications = _dbContext.Notifications.Where(_ => _.UserId == userId && !_.IsDeleted);
+            var notifications = _dbContext.Notifications
+                .Where(delegate (Notification x)
+                {
+                    return x.Filter(searchModel);
+                })
+                .Where(_ => _.UserId == userId && !_.IsDeleted)
+                .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, notifications.Count());
 

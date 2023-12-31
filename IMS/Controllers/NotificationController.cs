@@ -29,7 +29,7 @@ public class NotificationController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult> Get([FromQuery] PagingParam<NotificationSortCriteria> pagingParam, [FromQuery] NotificationSearchModel searchModel)
+    public async Task<ActionResult> Get([FromQuery] PagingParam<NotificationSortCriteria> pagingParam, [FromQuery] NotiSearchModel searchModel)
     {
         var rs = await _notificationService.Get(pagingParam, searchModel, Guid.Parse(User.GetId()));
         if (rs.Succeed) return Ok(rs.Data);
