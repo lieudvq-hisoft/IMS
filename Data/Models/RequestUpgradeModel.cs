@@ -98,6 +98,7 @@ public class RequestUpgradeRejectModel
 
 public class RequestUpgradeSearchModel
 {
+    public string? SearchValue { get; set; }
     public int? Id { get; set; }
     public int? ComponentId { get; set; }
     public int? ServerAllocationId { get; set; }

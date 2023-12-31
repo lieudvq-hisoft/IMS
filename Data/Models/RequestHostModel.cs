@@ -160,8 +160,9 @@ public class RequestHostUpdateUpgradeModel
 
 public class RequestHostSearchModel
 {
+    public string? SearchValue { get; set; }
     public IpAssignmentTypes? Type { get; set; }
-    public RequestHostStatus? Status { get; set; }
+    public List<RequestHostStatus?>? Statuses { get; set; }
     public string? MasterIp { get; set; }
     public string? Customer { get; set; }
     public int? ServerAllocationId { get; set; }

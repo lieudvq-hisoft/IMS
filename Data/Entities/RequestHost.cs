@@ -27,17 +27,19 @@ public class RequestHost : BaseEntity
 
     public ICollection<RequestHostUser> RequestHostUsers { get; set; }
 
-    public bool FilterRequestHost(RequestHostSearchModel model)
+    public bool FilterRequestHost(RequestHostSearchModel searchModel)
     {
-        bool matchIpAssignmentTypes = model.Type != null ? Type == model.Type : true;
-        bool matchStatus = model.Status != null ? Status == model.Status : true;
-        bool matchMasterIp = model.MasterIp != null ? ServerAllocation.MasterIpAddress.Contains(model.MasterIp) : true;
-        bool matchCustomer = model.Customer != null ? MyFunction.MatchString(ServerAllocation.Customer.CompanyName, model.Customer) : true;
-        bool matchPurpose = model.IsRemoved != null ? IsRemoval == model.IsRemoved : true;
-        bool matchServer = model.ServerAllocationId != null ? ServerAllocationId == model.ServerAllocationId : true;
-        bool matchCustomerId = model.CustomerId != null ? ServerAllocation.CustomerId == model.CustomerId : true;
-        bool matchUser = model.UserId != null ? RequestHostUsers.Any(x => x.UserId == model.UserId) : true;
+        var matchSearchValue = (MyFunction.ConvertToUnSign(ServerAllocation.Name ?? "").IndexOf(MyFunction.ConvertToUnSign(searchModel.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0);
 
-        return matchIpAssignmentTypes && matchStatus && matchMasterIp && matchCustomer && matchPurpose && matchServer && matchCustomerId && matchUser;
+        bool matchIpAssignmentTypes = searchModel.Type != null ? Type == searchModel.Type : true;
+        bool matchStatus = searchModel.Statuses != null ? searchModel.Statuses.Contains(Status) : true;
+        bool matchMasterIp = searchModel.MasterIp != null ? ServerAllocation.MasterIpAddress.Contains(searchModel.MasterIp) : true;
+        bool matchCustomer = searchModel.Customer != null ? MyFunction.MatchString(ServerAllocation.Customer.CompanyName, searchModel.Customer) : true;
+        bool matchPurpose = searchModel.IsRemoved != null ? IsRemoval == searchModel.IsRemoved : true;
+        bool matchServer = searchModel.ServerAllocationId != null ? ServerAllocationId == searchModel.ServerAllocationId : true;
+        bool matchCustomerId = searchModel.CustomerId != null ? ServerAllocation.CustomerId == searchModel.CustomerId : true;
+        bool matchUser = searchModel.UserId != null ? RequestHostUsers.Any(x => x.UserId == searchModel.UserId) : true;
+
+        return matchSearchValue && matchIpAssignmentTypes && matchStatus && matchMasterIp && matchCustomer && matchPurpose && matchServer && matchCustomerId && matchUser;
     }
 }

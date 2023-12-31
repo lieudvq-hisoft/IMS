@@ -133,6 +133,7 @@ public class ServerAllocationMasterIpAssignmentModel
 
 public class ServerAllocationSearchModel
 {
+    public string? SearchValue { get; set; }
     public Guid? CustomerId { get; set; }
     public int? RackId { get; set; }
     public List<ServerAllocationStatus>? Status { get; set; }

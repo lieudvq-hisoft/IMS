@@ -1,5 +1,6 @@
 ﻿using Data.Enums;
 using Data.Models;
+using Data.Utils.Common;
 
 namespace Data.Entities;
 public class ServerAllocation : BaseEntity
@@ -48,9 +49,13 @@ public class ServerAllocation : BaseEntity
 
     public bool Filter(ServerAllocationSearchModel searchModel)
     {
+        var matchSearchValue = (MyFunction.ConvertToUnSign(Name ?? "").IndexOf(MyFunction.ConvertToUnSign(searchModel.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0)
+            || (MyFunction.ConvertToUnSign(Customer.CompanyName ?? "").IndexOf(MyFunction.ConvertToUnSign(searchModel.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0)
+            || (MyFunction.ConvertToUnSign(MasterIpAddress ?? "").IndexOf(MyFunction.ConvertToUnSign(searchModel.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0);
+
         var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(Status) : true;
         var matchCustomerId = searchModel.CustomerId != null ? CustomerId == searchModel.CustomerId : true;
-        var matchRack = searchModel.RackId != null? LocationAssignments.Select(x => x.Location.RackId).Distinct().Any(x => x == searchModel.RackId) : true; 
-        return matchStatus && matchCustomerId && matchRack;
+        var matchRack = searchModel.RackId != null ? LocationAssignments.Select(x => x.Location.RackId).Distinct().Any(x => x == searchModel.RackId) : true;
+        return matchSearchValue && matchStatus && matchCustomerId && matchRack;
     }
 }

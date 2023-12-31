@@ -116,6 +116,7 @@ public class RequestExpandSuggestLocationModel
 
 public class RequestExpandSearchModel
 {
+    public string? SearchValue { get; set; }
     public int? Id { get; set; }
     public int? ServerAllocationId { get; set; }
     public List<RequestStatus?>? Statuses { get; set; }

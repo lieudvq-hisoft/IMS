@@ -179,10 +179,11 @@ public class AppointmentResolvModel
 
 public class AppointmentSearchModel
 {
+    public string? SearchValue { get; set; }
     public int? Id { get; set; }
-    public RequestStatus? Status { get; set; }
+    public List<RequestStatus?>? Statuses { get; set; }
+    public List<AppointmentReason?>? Reasons { get; set; }
     public int? ServerAllocationId { get; set; }
     public Guid? CustomerId { get; set; }
     public Guid? UserId { get; set; }
 }
-

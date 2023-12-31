@@ -1,5 +1,6 @@
 ﻿using Data.Enums;
 using Data.Models;
+using Data.Utils.Common;
 
 namespace Data.Entities;
 public class RequestExpand : BaseEntity
@@ -25,6 +26,8 @@ public class RequestExpand : BaseEntity
 
     public bool FilterRequestUpgrade(RequestExpandSearchModel model)
     {
+        var matchSearchValue = (MyFunction.ConvertToUnSign(ServerAllocation.Name ?? "").IndexOf(MyFunction.ConvertToUnSign(model.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0);
+
         bool matchId = model.Id != null ? Id == model.Id : true;
         bool matchServerAllocationId = model.ServerAllocationId != null ? ServerAllocationId == model.ServerAllocationId : true;
         bool matchStatus = model.Statuses != null ? model.Statuses.Contains(Status) : true;
@@ -32,6 +35,6 @@ public class RequestExpand : BaseEntity
         bool matchCustomer = model.CustomerId != null ? ServerAllocation.CustomerId == model.CustomerId : true;
         bool matchAppointment = model.AppointmentId != null ? RequestExpandAppointments.Any(x => x.AppointmentId == model.AppointmentId) : true;
 
-        return matchId && matchServerAllocationId && matchStatus && matchUser && matchCustomer && matchAppointment;
+        return matchSearchValue && matchId && matchServerAllocationId && matchStatus && matchUser && matchCustomer && matchAppointment;
     }
 }
