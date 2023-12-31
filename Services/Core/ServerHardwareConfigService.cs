@@ -112,6 +112,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
             var serverAllocation = _dbContext.ServerAllocations
                 .Include(x => x.LocationAssignments).ThenInclude(x => x.Location)
                 .Include(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
+                .Include(x => x.RequestUpgrades)
                 .FirstOrDefault(x => x.Id == model.ServerAllocationId);
             if (serverAllocation == null)
             {
@@ -131,6 +132,7 @@ public class ServerHardwareConfigService : IServerHardwareConfigService
             if (validPrecondition)
             {
                 _dbContext.ServerHardwareConfigs.RemoveRange(serverAllocation.ServerHardwareConfigs);
+                _dbContext.RequestUpgrades.RemoveRange(serverAllocation.RequestUpgrades);
                 _dbContext.SaveChanges();
                 _dbContext.ServerHardwareConfigs.Add(new ServerHardwareConfig
                 {
