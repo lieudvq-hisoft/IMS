@@ -44,6 +44,14 @@ public class NotificationController : ControllerBase
         return BadRequest(rs.ErrorMessage);
     }
 
+    [HttpGet("count")]
+    public async Task<ActionResult> CountUserNoti([FromQuery] Guid userId)
+    {
+        var rs = await _notificationService.CountUserNoti(userId);
+        if (rs.Succeed) return Ok(rs.Data);
+        return BadRequest(rs.ErrorMessage);
+    }
+
     [HttpPut("SeenNotification/{id}")]
     public async Task<IActionResult> SeenNotify(int id)
     {

@@ -4,7 +4,9 @@ using Data.DataAccess;
 using Data.Entities;
 using Data.Enums;
 using Data.Models;
+using Data.Utils.Common;
 using Data.Utils.Paging;
+using NPOI.OpenXmlFormats.Wordprocessing;
 using Services.SignalR;
 
 namespace Services.Core;
@@ -16,6 +18,7 @@ public interface INotificationService
     Task<ResultModel> GetById(int Id);
     Task<ResultModel> SeenNotification(int id, Guid userId);
     Task<ResultModel> DeleteNotification(int id, Guid userId);
+    Task<ResultModel> CountUserNoti(Guid userId);
 }
 
 public class NotificationService : INotificationService
@@ -88,6 +91,24 @@ public class NotificationService : INotificationService
         {
             result.ErrorMessage = e.Message + "\n" + (e.InnerException != null ? e.InnerException.Message : "") + "\n ***Trace*** \n" + e.StackTrace;
         }
+        return result;
+    }
+
+    public async Task<ResultModel> CountUserNoti(Guid userId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            result.Succeed = true;
+            result.Data = _dbContext.Notifications.Count(x => x.UserId == userId);
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
         return result;
     }
 
