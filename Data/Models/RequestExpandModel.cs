@@ -123,6 +123,7 @@ public class RequestExpandSearchModel
     public Guid? CustomerId { get; set; }
     public Guid? UserId { get; set; }
     public int? AppointmentId { get; set; }
+    public bool? IsRemoval { get; set; }
 }
 
 public class RequestExpandAppointmentModel

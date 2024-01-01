@@ -34,7 +34,8 @@ public class RequestExpand : BaseEntity
         bool matchUser = model.UserId != null ? RequestExpandUsers.Any(x => x.UserId == model.UserId) : true;
         bool matchCustomer = model.CustomerId != null ? ServerAllocation.CustomerId == model.CustomerId : true;
         bool matchAppointment = model.AppointmentId != null ? RequestExpandAppointments.Any(x => x.AppointmentId == model.AppointmentId) : true;
+        bool isRemoval = ForRemoval == model.IsRemoval || model.IsRemoval == null;
 
-        return matchSearchValue && matchId && matchServerAllocationId && matchStatus && matchUser && matchCustomer && matchAppointment;
+        return matchSearchValue && matchId && matchServerAllocationId && matchStatus && matchUser && matchCustomer && matchAppointment && isRemoval;
     }
 }
