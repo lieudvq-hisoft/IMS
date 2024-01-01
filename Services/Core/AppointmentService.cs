@@ -7,7 +7,9 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
+using DocumentFormat.OpenXml.Office2010.Excel;
 using DocumentFormat.OpenXml.Packaging;
+using Grpc.Core;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -64,16 +66,19 @@ public class AppointmentService : IAppointmentService
 
         try
         {
+            var searchValue = searchModel.SearchValue?.ToLower() ?? "";
             var appointments = _dbContext.Appointments
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.AppointmentUsers).ThenInclude(x => x.User)
                 .Include(x => x.RequestExpandAppointments)
                 .Include(x => x.RequestUpgradeAppointment)
-                .Where(delegate (Appointment x)
-                {
-                    return x.FilterAppointment(searchModel);
-                })
+                .Where(x => x.ServerAllocationId == searchModel.ServerAllocationId || searchModel.ServerAllocationId == null)
+                .Where(x => searchModel.Statuses.Contains(x.Status) || searchModel.Statuses == null)
+                .Where(x => searchModel.Reasons.Contains(x.Reason) || searchModel.Reasons == null)
+                .Where(x => x.ServerAllocation.CustomerId == searchModel.CustomerId || searchModel.CustomerId == null)
+                .Where(x => x.AppointmentUsers.Any(x => x.UserId == searchModel.UserId) || searchModel.UserId == null)
+                .Where(x => x.AppointedCustomer.ToLower().Contains(searchValue) || x.ServerAllocation.Customer.CompanyName.Contains(searchValue))
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, appointments.Count());
@@ -2473,8 +2478,8 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
-
                 appointment.DocumentConfirm = true;
+                appointment.DateConfirm = DateTime.Now;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = appointment.Id;
