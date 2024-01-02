@@ -187,7 +187,7 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.HAVE_IP_MASTER_ALREADY;
             }
-            else if (model.Type == IpAssignmentTypes.Port && model.Capacities == null)
+            else if (model.Type == IpAssignmentTypes.Port && !model.IsRemoval && model.Capacities == null)
             {
                 result.ErrorMessage = "Please specify capacity of each port";
             }
