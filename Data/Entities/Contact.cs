@@ -17,6 +17,8 @@ public class Contact: BaseEntity
 
     public string? Email { get; set; }
 
+    public string? CCCD { get; set; }
+
     public bool ForAppointment { get; set; }
 
     public Guid CustomerId { get; set; }
