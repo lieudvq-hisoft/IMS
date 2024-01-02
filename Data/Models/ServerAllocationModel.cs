@@ -150,15 +150,15 @@ public class ServerAllocationImportModel
 
 public class HostAndUpgradeCreateInspectionReportModel
 {
-    [Required]
-    [MinLength(6)]
-    [MaxLength(255)]
-    public string QTName { get; set; } = "QTName";
+    //[Required]
+    //[MinLength(6)]
+    //[MaxLength(255)]
+    //public string QTName { get; set; } = "QTName";
 
-    [Required]
-    [MinLength(6)]
-    [MaxLength(255)]
-    public string Position { get; set; } = "Position";
+    //[Required]
+    //[MinLength(6)]
+    //[MaxLength(255)]
+    //public string Position { get; set; } = "Position";
 
     [Required]
     [MinLength(6)]
@@ -175,15 +175,15 @@ public class HostAndUpgradeCreateInspectionReportModel
 
 public class ServerAllocationCreateRequestExpandInspectionReportModel
 {
-    [Required]
-    [MinLength(6)]
-    [MaxLength(255)]
-    public string QTName { get; set; } = "QTName";
+    //[Required]
+    //[MinLength(6)]
+    //[MaxLength(255)]
+    //public string QTName { get; set; } = "QTName";
 
-    [Required]
-    [MinLength(6)]
-    [MaxLength(255)]
-    public string Position { get; set; } = "Position";
+    //[Required]
+    //[MinLength(6)]
+    //[MaxLength(255)]
+    //public string Position { get; set; } = "Position";
 
     [Required]
     [MinLength(6)]

@@ -1174,9 +1174,9 @@ public class RequestHostService : IRequestHostService
 
                     document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
 
-                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+                    document.RenderText("__QTName__", textInfo.ToTitleCase(_config["Appointment:QtName"]));
 
-                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+                    document.RenderText("__Position__", textInfo.ToTitleCase(_config["Appointment:Position"]));
 
                     document.RenderText("__Location__", textInfo.ToTitleCase(model.Location));
 

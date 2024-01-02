@@ -13,6 +13,7 @@ using Grpc.Core;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Services.Utilities;
 using System.Globalization;
 using System.Linq;
@@ -48,8 +49,9 @@ public class AppointmentService : IAppointmentService
     private readonly ICloudinaryHelper _cloudinaryHelper;
     private readonly UserManager<User> _userManager;
     private readonly INotificationService _notiService;
+    private readonly IConfiguration _config;
 
-    public AppointmentService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManage, INotificationService notiService)
+    public AppointmentService(AppDbContext dbContext, IMapper mapper, IHostingEnvironment env, ICloudinaryHelper cloudinaryHelper, UserManager<User> userManage, INotificationService notiService, IConfiguration config)
     {
         _dbContext = dbContext;
         _mapper = mapper;
@@ -57,6 +59,7 @@ public class AppointmentService : IAppointmentService
         _cloudinaryHelper = cloudinaryHelper;
         _userManager = userManage;
         _notiService = notiService;
+        _config = config;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel)
@@ -1639,9 +1642,9 @@ public class AppointmentService : IAppointmentService
 
                     document.RenderText("__CustomerPhoneNumber__", serverAllocation.Customer.PhoneNumber);
 
-                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+                    document.RenderText("__QTName__", textInfo.ToTitleCase(_config["Appointment:QtName"]));
 
-                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+                    document.RenderText("__Position__", textInfo.ToTitleCase(_config["Appointment:Position"]));
 
                     document.RenderText("__PartNumber__", textInfo.ToTitleCase(serverAllocation.PartNumber));
 
@@ -1743,9 +1746,9 @@ public class AppointmentService : IAppointmentService
 
                     document.RenderText("__CustomerPosition__", textInfo.ToTitleCase(customer.RepresentatorPosition));
 
-                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
+                    document.RenderText("__QTName__", textInfo.ToTitleCase(_config["Appointment:QtName"]));
 
-                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+                    document.RenderText("__Position__", textInfo.ToTitleCase(_config["Appointment:Position"]));
 
                     document.RenderText("__PartNumber__", textInfo.ToTitleCase(serverAllocation.PartNumber ?? ""));
 
@@ -1938,22 +1941,6 @@ public class AppointmentService : IAppointmentService
             {
                 result.ErrorMessage = ServerAllocationErrorMessage.NOT_EXISTED;
             }
-            //else if (!requestExpand.ForRemoval && serverAllocation.Status != ServerAllocationStatus.Waiting)
-            //{
-            //    result.ErrorMessage = "Server need to be waiting for allocation";
-            //}
-            //else if (requestExpand.ForRemoval && serverAllocation.Status != ServerAllocationStatus.Pausing)
-            //{
-            //    result.ErrorMessage = "Server need to be pausing to be remove";
-            //}
-            //else if (!serverAllocation.LocationAssignments.Any())
-            //{
-            //    result.ErrorMessage = LocationAssignmentErrorMessage.NOT_EXISTED;
-            //}
-            //else if (!serverAllocation.IpAssignments.Any())
-            //{
-            //    result.ErrorMessage = IpAssignmentErrorMessage.NOT_EXISTED;
-            //}
             else
             {
                 var serverRemoved = serverAllocation.Status == ServerAllocationStatus.Removed;
@@ -1975,8 +1962,9 @@ public class AppointmentService : IAppointmentService
                     document.RenderText("__PhoneNumber__", serverAllocation.Customer.PhoneNumber);
                     document.RenderText("__Email__", serverAllocation.Customer.Email);
 
-                    document.RenderText("__QTName__", textInfo.ToTitleCase(model.QTName));
-                    document.RenderText("__Position__", textInfo.ToTitleCase(model.Position));
+                    document.RenderText("__QTName__", textInfo.ToTitleCase(_config["Appointment:QtName"]));
+
+                    document.RenderText("__Position__", textInfo.ToTitleCase(_config["Appointment:Position"]));
 
                     document.RenderText("__DeviceCondition__", model.DeviceCondition);
 
