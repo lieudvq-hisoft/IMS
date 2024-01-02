@@ -37,7 +37,7 @@ public class NotificationController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    public async Task<ActionResult> Get(int id)
+    public async Task<ActionResult> GetDetail(int id)
     {
         var rs = await _notificationService.GetById(id);
         if (rs.Succeed) return Ok(rs.Data);
@@ -45,9 +45,9 @@ public class NotificationController : ControllerBase
     }
 
     [HttpGet("count")]
-    public async Task<ActionResult> CountUserNoti([FromQuery] Guid userId)
+    public async Task<ActionResult> CountUserNoti([FromQuery] Guid userId, bool isSeen)
     {
-        var rs = await _notificationService.CountUserNoti(userId);
+        var rs = await _notificationService.CountUserNoti(userId, isSeen);
         if (rs.Succeed) return Ok(rs.Data);
         return BadRequest(rs.ErrorMessage);
     }

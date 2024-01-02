@@ -22,6 +22,7 @@ public class Customer
     public string Email { get; set; }
     public string PhoneNumber { get; set; }
     public int CurrenNoticeCount { get; set; } = 0;
+    public Guid? SaleStaff { get; set; }
     public List<string>? FcmTokens { get; set; } = new List<string>();
 
     public ICollection<ServerAllocation> ServerAllocations { get; set; }

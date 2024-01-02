@@ -219,6 +219,7 @@ public class CustomerService : ICustomerService
                 var customer = _mapper.Map<Customer>(model);
                 var password = "Password@123";
                 customer.Password = _passwordHasher.HashPassword(customer, password);
+                customer.SaleStaff = userId;
                 _dbContext.Customers.Add(customer);
                 //_dbContext.Contacts.AddRange(customer.Contacts);
                 _dbContext.SaveChanges();

@@ -16,6 +16,7 @@ public class CustomerModel
     public List<ContactModel>? Contacts { get; set; }
     public int CurrenNoticeCount { get; set; }
     public List<string>? FcmTokens { get; set; }
+    public Guid? SaleStaff { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
 }
@@ -31,6 +32,7 @@ public class CustomerResultModel
     public string? TaxNumber { get; set; }
     public string? Email { get; set; }
     public string? PhoneNumber { get; set; }
+    public Guid? SaleStaff { get; set; }
     public List<ContactModel>? Contacts { get; set; }
     public int CurrenNoticeCount { get; set; }
     public List<string>? FcmTokens { get; set; }

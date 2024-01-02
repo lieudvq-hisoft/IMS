@@ -18,7 +18,7 @@ public interface INotificationService
     Task<ResultModel> GetById(int Id);
     Task<ResultModel> SeenNotification(int id, Guid userId);
     Task<ResultModel> DeleteNotification(int id, Guid userId);
-    Task<ResultModel> CountUserNoti(Guid userId);
+    Task<ResultModel> CountUserNoti(Guid userId, bool IsSeen);
 }
 
 public class NotificationService : INotificationService
@@ -94,7 +94,7 @@ public class NotificationService : INotificationService
         return result;
     }
 
-    public async Task<ResultModel> CountUserNoti(Guid userId)
+    public async Task<ResultModel> CountUserNoti(Guid userId, bool IsSeen)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -102,7 +102,7 @@ public class NotificationService : INotificationService
         try
         {
             result.Succeed = true;
-            result.Data = _dbContext.Notifications.Count(x => x.UserId == userId);
+            result.Data = _dbContext.Notifications.Count(x => x.UserId == userId && x.Seen == IsSeen);
         }
         catch (Exception e)
         {
