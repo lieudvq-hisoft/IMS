@@ -107,6 +107,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         var result = new ResultModel();
         result.Succeed = false;
 
+        var searchValue = searchModel.SearchValue?.ToLower() ?? "";
         var appointments = _dbContext.Appointments
             .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
             .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
@@ -114,12 +115,15 @@ public class RequestUpgradeService : IRequestUpgradeService
             .Include(x => x.AppointmentUsers).ThenInclude(x => x.User)
             .Include(x => x.RequestExpandAppointments)
             .Include(x => x.RequestUpgradeAppointment)
-            .Where(x => x.RequestUpgradeAppointment.Any(x => x.RequestUpgradeId == requestUpgradeId))
             .Include(x => x.AppointmentUsers)
-            .Where(delegate (Appointment x)
-            {
-                return x.FilterAppointment(searchModel);
-            }).AsQueryable();
+            .Where(x => x.RequestUpgradeAppointment.Any(x => x.RequestUpgradeId == requestUpgradeId))
+            .Where(x => x.ServerAllocationId == searchModel.ServerAllocationId || searchModel.ServerAllocationId == null)
+            .Where(x => searchModel.Statuses.Contains(x.Status) || searchModel.Statuses == null)
+            .Where(x => searchModel.Reasons.Contains(x.Reason) || searchModel.Reasons == null)
+            .Where(x => x.ServerAllocation.CustomerId == searchModel.CustomerId || searchModel.CustomerId == null)
+            .Where(x => x.AppointmentUsers.Any(x => x.UserId == searchModel.UserId) || searchModel.UserId == null)
+            .Where(x => x.AppointedCustomer.ToLower().Contains(searchValue) || x.ServerAllocation.Customer.CompanyName.Contains(searchValue))
+            .AsQueryable();
 
         var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, appointments.Count());
 
