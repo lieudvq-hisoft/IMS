@@ -108,6 +108,7 @@ public class AppointmentService : IAppointmentService
 
         try
         {
+            var searchValue = searchModel.SearchValue?.ToLower() ?? "";
             var appointments = _dbContext.Appointments
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
@@ -115,10 +116,12 @@ public class AppointmentService : IAppointmentService
                 .Include(x => x.RequestExpandAppointments)
                 .Include(x => x.RequestUpgradeAppointment)
                 .Where(x => x.DateAppointed.Month == month)
-                .Where(delegate (Appointment x)
-                {
-                    return x.FilterAppointment(searchModel);
-                })
+                .Where(x => x.ServerAllocationId == searchModel.ServerAllocationId || searchModel.ServerAllocationId == null)
+                .Where(x => searchModel.Statuses.Contains(x.Status) || searchModel.Statuses == null)
+                .Where(x => searchModel.Reasons.Contains(x.Reason) || searchModel.Reasons == null)
+                .Where(x => x.ServerAllocation.CustomerId == searchModel.CustomerId || searchModel.CustomerId == null)
+                .Where(x => x.AppointmentUsers.Any(x => x.UserId == searchModel.UserId) || searchModel.UserId == null)
+                .Where(x => x.AppointedCustomer.ToLower().Contains(searchValue) || x.ServerAllocation.Customer.CompanyName.Contains(searchValue))
                 .AsQueryable();
 
             result.Data = _mapper.Map<List<AppointmentModel>>(appointments);

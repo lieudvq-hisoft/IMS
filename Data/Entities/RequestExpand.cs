@@ -24,18 +24,16 @@ public class RequestExpand : BaseEntity
     public ICollection<RequestExpandUser>? RequestExpandUsers { get; set; }
     public ICollection<RequestExpandAppointment>? RequestExpandAppointments { get; set; }
 
-    public bool FilterRequestUpgrade(RequestExpandSearchModel model)
+    public bool FilterRequestUpgrade(RequestExpandSearchModel searchModel)
     {
-        var matchSearchValue = (MyFunction.ConvertToUnSign(ServerAllocation.Name ?? "").IndexOf(MyFunction.ConvertToUnSign(model.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0);
+        bool matchId = searchModel.Id != null ? Id == searchModel.Id : true;
+        bool matchServerAllocationId = searchModel.ServerAllocationId != null ? ServerAllocationId == searchModel.ServerAllocationId : true;
+        bool matchStatus = searchModel.Statuses != null ? searchModel.Statuses.Contains(Status) : true;
+        bool matchUser = searchModel.UserId != null ? RequestExpandUsers.Any(x => x.UserId == searchModel.UserId) : true;
+        bool matchCustomer = searchModel.CustomerId != null ? ServerAllocation.CustomerId == searchModel.CustomerId : true;
+        bool matchAppointment = searchModel.AppointmentId != null ? RequestExpandAppointments.Any(x => x.AppointmentId == searchModel.AppointmentId) : true;
+        bool isRemoval = ForRemoval == searchModel.IsRemoval || searchModel.IsRemoval == null;
 
-        bool matchId = model.Id != null ? Id == model.Id : true;
-        bool matchServerAllocationId = model.ServerAllocationId != null ? ServerAllocationId == model.ServerAllocationId : true;
-        bool matchStatus = model.Statuses != null ? model.Statuses.Contains(Status) : true;
-        bool matchUser = model.UserId != null ? RequestExpandUsers.Any(x => x.UserId == model.UserId) : true;
-        bool matchCustomer = model.CustomerId != null ? ServerAllocation.CustomerId == model.CustomerId : true;
-        bool matchAppointment = model.AppointmentId != null ? RequestExpandAppointments.Any(x => x.AppointmentId == model.AppointmentId) : true;
-        bool isRemoval = ForRemoval == model.IsRemoval || model.IsRemoval == null;
-
-        return matchSearchValue && matchId && matchServerAllocationId && matchStatus && matchUser && matchCustomer && matchAppointment && isRemoval;
+        return matchId && matchServerAllocationId && matchStatus && matchUser && matchCustomer && matchAppointment && isRemoval;
     }
 }

@@ -7,6 +7,8 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
+using DocumentFormat.OpenXml.Office2010.Excel;
+using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
 
@@ -53,10 +55,14 @@ public class RequestExpandService : IRequestExpandService
                 .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
                 .Include(x => x.RequestExpandUsers).ThenInclude(x => x.User)
-                .Where(delegate (RequestExpand x)
-                {
-                    return x.FilterRequestUpgrade(searchModel);
-                })
+                .Where(x => (x.ServerAllocation.Name ?? "").Contains(searchModel.SearchValue) || searchModel.SearchValue == null)
+                .Where(x => searchModel.Id != null ? x.Id == searchModel.Id : true)
+                .Where(x => searchModel.ServerAllocationId != null ? x.ServerAllocationId == searchModel.ServerAllocationId : true)
+                .Where(x => searchModel.Statuses != null ? searchModel.Statuses.Contains(x.Status) : true)
+                .Where(x => searchModel.UserId != null ? x.RequestExpandUsers.Any(x => x.UserId == searchModel.UserId) : true)
+                .Where(x => searchModel.CustomerId != null ? x.ServerAllocation.CustomerId == searchModel.CustomerId : true)
+                .Where(x => searchModel.AppointmentId != null ? x.RequestExpandAppointments.Any(x => x.AppointmentId == searchModel.AppointmentId) : true)
+                .Where(x => x.ForRemoval == searchModel.IsRemoval || searchModel.IsRemoval == null)
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, requestExpands.Count());
