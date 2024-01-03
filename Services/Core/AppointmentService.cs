@@ -1646,7 +1646,7 @@ public class AppointmentService : IAppointmentService
 
                     document.RenderText("__Position__", textInfo.ToTitleCase(_config["Appointment:Position"]));
 
-                    document.RenderText("__PartNumber__", textInfo.ToTitleCase(serverAllocation.PartNumber));
+                    document.RenderText("__PartNumber__", textInfo.ToTitleCase(serverAllocation.PartNumber ?? ""));
 
                     document.TickCheckBoxInDocx("Allocation");
 
