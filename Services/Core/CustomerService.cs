@@ -290,7 +290,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == new Guid(model.Id));
+            var customer = _dbContext.Customers.Include(x => x.Contacts).FirstOrDefault(x => x.Id == model.Id);
             var changeEmail = customer.Email != model.Email;
             if (customer == null)
             {
@@ -298,7 +298,7 @@ public class CustomerService : ICustomerService
                 result.ErrorMessage = CustomerErrorMessage.UPDATE_FAILED;
             }
 
-            var existingCustomer = _dbContext.Customers.FirstOrDefault(x => ((x.CompanyName == model.CompanyName) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber) && x.Id != new Guid(model.Id));
+            var existingCustomer = _dbContext.Customers.FirstOrDefault(x => ((x.CompanyName == model.CompanyName) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber) && x.Id != model.Id);
             if (existingCustomer != null)
             {
                 validPrecondition = false;
@@ -307,7 +307,13 @@ public class CustomerService : ICustomerService
 
             if (validPrecondition)
             {
+                _dbContext.Contacts.RemoveRange(customer.Contacts);
                 _mapper.Map<CustomerUpdateModel, Customer>(model, customer);
+                customer.Contacts = new List<Contact>();
+                _dbContext.SaveChanges();
+                var contacts = _mapper.Map<List<Contact>>(model.Contacts);
+                contacts.ForEach(x => x.CustomerId = customer.Id);
+                _dbContext.Contacts.AddRange(contacts);
                 _dbContext.SaveChanges();
                 if (changeEmail)
                 {

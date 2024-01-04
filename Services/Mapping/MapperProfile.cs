@@ -16,6 +16,7 @@ public class MapperProfile : Profile
         CreateMap<CustomerCreateModel, Customer>();
         CreateMap<CustomerUpdateModel, Customer>();
         CreateMap<Contact, ContactModel>().ReverseMap();
+        CreateMap<ContactModel, Contact>();
         CreateMap<User, UserModel>();
         #endregion
 
