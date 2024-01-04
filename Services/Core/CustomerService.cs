@@ -323,6 +323,10 @@ public class CustomerService : ICustomerService
                 result.Data = _mapper.Map<CustomerModel>(customer);
             }
         }
+        catch (UniqueConstraintException e)
+        {
+            result.ErrorMessage = "Contact existed";
+        }
         catch (Exception e)
         {
             result.ErrorMessage = MyFunction.GetErrorMessage(e);

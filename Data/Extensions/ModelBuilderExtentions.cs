@@ -304,6 +304,7 @@ public static class ModelBuilderExtentions
         {
             b.HasIndex(e => e.PhoneNumber).IsUnique().HasFilter("IsDeleted = false");
             b.HasIndex(e => e.Email).IsUnique().HasFilter("IsDeleted = false");
+            b.HasIndex(e => e.CCCD).IsUnique().HasFilter("IsDeleted = false");
         });
 
         builder.Entity<IpAddress>(b =>
