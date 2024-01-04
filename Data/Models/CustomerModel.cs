@@ -51,7 +51,6 @@ public class ContactModel
     [RegularExpression(@"^\d{10}$|^\d{11}$", ErrorMessage = "Phone number must be a string of 10 or 11 number")]
     public string? PhoneNumber { get; set; }
 
-    [Required]
     [RegularExpression(@"^\d{12}$", ErrorMessage = "CCCD number must be a string of 12 number")]
     public string? CCCD { get; set; }
 
