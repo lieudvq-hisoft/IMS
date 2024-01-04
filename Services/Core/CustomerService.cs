@@ -100,7 +100,7 @@ public class CustomerService : ICustomerService
 
         try
         {
-            var customer = _dbContext.Customers.FirstOrDefault(x => x.Id == id);
+            var customer = _dbContext.Customers.Include(x => x.Contacts).FirstOrDefault(x => x.Id == id);
 
             if (customer != null)
             {
