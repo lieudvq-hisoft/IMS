@@ -2429,10 +2429,6 @@ public class AppointmentService : IAppointmentService
             {
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
             }
-            else if (!appointment.RequestUpgradeAppointment.Any())
-            {
-                result.ErrorMessage = "Appointment does not have request upgrade!";
-            }
             else if (appointment.Status != RequestStatus.Success)
             {
                 result.ErrorMessage = "Appointment's status is not successed!";

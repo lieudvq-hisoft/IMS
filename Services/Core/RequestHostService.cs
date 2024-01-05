@@ -8,6 +8,7 @@ using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
 using DocumentFormat.OpenXml.Packaging;
+using IronPdf.Pages;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -1228,7 +1229,9 @@ public class RequestHostService : IRequestHostService
                     document.RenderText("__Note__", model.Note);
                     document.MainDocumentPart.Document.Save();
                 }
-                string inspectionReportFileName = _cloudinaryHelper.UploadFile(outputPath);
+                string pdfPath = Path.Combine(_env.WebRootPath, "Report", "PDF.pdf");
+                await DocumentHelper.ConvertToPDF(outputPath, pdfPath);
+                string inspectionReportFileName = _cloudinaryHelper.UploadFile(pdfPath);
                 _dbContext.SaveChanges();
 
                 result.Succeed = true;
