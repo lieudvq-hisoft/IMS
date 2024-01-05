@@ -1413,6 +1413,7 @@ public class AppointmentService : IAppointmentService
             .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandLocations)
             .Include(x => x.RequestUpgradeAppointment)
             .Include(x => x.AppointmentUsers)
+            .Include(x => x.ServerAllocation).ThenInclude(x => x.ServerHardwareConfigs).ThenInclude(x => x.Component)
             .FirstOrDefault(x => x.Id == appointmentId);
         if (appointment == null)
         {
@@ -1442,6 +1443,20 @@ public class AppointmentService : IAppointmentService
         {
             validPrecondition = false;
             result.ErrorMessage = "Unassigned tech cannot complete this appointment";
+        }
+
+        var serverAllocation = appointment.ServerAllocation;
+        if (appointment.Reason == AppointmentReason.Install)
+        {
+            var cpu = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description;
+            var ram = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description;
+            var hardDisk = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description;
+
+            if (cpu == null || ram == null || hardDisk == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Server dont have config";
+            }
         }
 
         return validPrecondition;
@@ -1766,10 +1781,10 @@ public class AppointmentService : IAppointmentService
 
                     document.RenderText("__Model__", serverAllocation.Name);
 
-                    var cpu = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description;
+                    var cpu = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU")?.Description ?? "";
                     document.RenderText("__CPU__", cpu);
 
-                    var ram = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description;
+                    var ram = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM")?.Description ?? "";
                     document.RenderText("__Memory__", ram);
 
                     var hardDisk = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description;
