@@ -1179,7 +1179,7 @@ public class RequestHostService : IRequestHostService
 
                     document.RenderText("__Position__", textInfo.ToTitleCase(_config["Appointment:Position"]));
 
-                    document.RenderText("__Location__", textInfo.ToTitleCase(model.Location));
+                    //document.RenderText("__Location__", textInfo.ToTitleCase(model.Location));
 
                     document.TickCheckBoxInDocx("Allocation");
 

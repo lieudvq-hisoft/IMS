@@ -161,11 +161,6 @@ public class HostAndUpgradeCreateInspectionReportModel
     //public string Position { get; set; } = "Position";
 
     [Required]
-    [MinLength(6)]
-    [MaxLength(2000)]
-    public string Location { get; set; } = "Location";
-
-    [Required]
     public bool Good { get; set; } = true;
 
     [MaxLength(2000)]
