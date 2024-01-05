@@ -43,21 +43,18 @@ public class CustomerService : ICustomerService
     private readonly IEmailHelper _emailService;
     private readonly IConfiguration _config;
     private readonly PasswordHasher<Customer> _passwordHasher;
-    private readonly INotificationService _notiService;
 
     public CustomerService(
         AppDbContext dbContext,
         IMapper mapper,
         IEmailHelper emailService,
-        IConfiguration config,
-        INotificationService notiService)
+        IConfiguration config)
     {
         _dbContext = dbContext;
         _mapper = mapper;
         _emailService = emailService;
         _config = config;
         _passwordHasher = new PasswordHasher<Customer>();
-        _notiService = notiService;
     }
 
     public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel)
@@ -214,6 +211,12 @@ public class CustomerService : ICustomerService
                 result.ErrorMessage = CustomerErrorMessage.EXISTED;
             }
 
+            if (_dbContext.Contacts.Any(x => x.Email == model.Email || x.PhoneNumber == model.PhoneNumber))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "There is contact with email contact";
+            }
+
             if (validPrecondition)
             {
                 var customer = _mapper.Map<Customer>(model);
@@ -221,7 +224,6 @@ public class CustomerService : ICustomerService
                 customer.Password = _passwordHasher.HashPassword(customer, password);
                 customer.SaleStaff = userId;
                 _dbContext.Customers.Add(customer);
-                //_dbContext.Contacts.AddRange(customer.Contacts);
                 _dbContext.SaveChanges();
                 await SendActivationEmail(customer);
 
@@ -236,7 +238,7 @@ public class CustomerService : ICustomerService
                 result.Data = _mapper.Map<CustomerModel>(customer);
             }
         }
-        catch (UniqueConstraintException e)
+        catch (UniqueConstraintException)
         {
             result.ErrorMessage = "Contact existed";
         }
@@ -303,6 +305,12 @@ public class CustomerService : ICustomerService
             {
                 validPrecondition = false;
                 result.ErrorMessage = CustomerErrorMessage.EXISTED;
+            }
+
+            if (_dbContext.Contacts.Any(x => x.Email == model.Email || x.PhoneNumber == model.PhoneNumber))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "There is contact with email contact";
             }
 
             if (validPrecondition)
