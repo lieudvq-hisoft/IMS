@@ -881,7 +881,7 @@ public class RequestHostService : IRequestHostService
             {
                 string inspectionReportFileName = _cloudinaryHelper.UploadFile(model.InspectionReport);
 
-                requestHost.InspectionReportFilePath = inspectionReportFileName;
+                requestHost.FinalInspectionReport = inspectionReportFileName;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = new RequestHostDocumentFileResultModel
