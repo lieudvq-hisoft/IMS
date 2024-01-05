@@ -15,13 +15,13 @@ public class DocumentFileUploadModel
     [Required]
     public IFormFile InspectionReport { get; set; }
 
-    [FileExtensions(Extensions = "pdf,jpeg")]
+    [FileExtensions(Extensions = "pdf,jpeg,jpg")]
     public string InspectionReportFileName => InspectionReport?.FileName;
 
     [Required]
     public IFormFile ReceiptOfRecipient { get; set; }
 
-    [FileExtensions(Extensions = "pdf,jpeg")]
+    [FileExtensions(Extensions = "pdf,jpeg,jpg")]
     public string ReceiptOfRecipientFileName => ReceiptOfRecipient?.FileName;
 }
 

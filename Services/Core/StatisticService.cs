@@ -44,8 +44,7 @@ public class StatisticService : IStatisticService
                         var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
                         return matchCustomer && matchServer;
                     })
-                    .Where(x => x.DateCreated.Month == month.Month)
-                    .Count();
+                    .Where(x => x.DateCreated.Month == month.Month && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
                 var requestExpandCount = _dbContext.RequestExpands
                     .Include(x => x.ServerAllocation)
                     .Where(delegate (RequestExpand x)
@@ -54,7 +53,7 @@ public class StatisticService : IStatisticService
                         var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
                         return matchCustomer && matchServer;
                     })
-                    .Where(x => x.DateCreated.Month == month.Month).Count();
+                    .Where(x => x.DateCreated.Month == month.Month && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
                 var requestHostCount = _dbContext.RequestHosts
                     .Include(x => x.ServerAllocation)
                     .Where(delegate (RequestHost x)
@@ -63,7 +62,7 @@ public class StatisticService : IStatisticService
                         var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
                         return matchCustomer && matchServer;
                     })
-                    .Where(x => x.DateCreated.Month == month.Month).Count();
+                    .Where(x => x.DateCreated.Month == month.Month && x.Status.ToString() == model.RequestStatus.ToString() || model.RequestStatus == null).Count();
                 var incidentCount = _dbContext.Incidents
                     .Include(x => x.ServerAllocation)
                     .Where(delegate (Incident x)
@@ -72,7 +71,7 @@ public class StatisticService : IStatisticService
                         var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
                         return matchCustomer && matchServer;
                     })
-                    .Where(x => x.DateCreated.Month == month.Month).Count();
+                    .Where(x => x.DateCreated.Month == month.Month && x.IsResolved == model.Resolved || model.Resolved == null).Count();
                 var appointmentCount = _dbContext.Appointments
                     .Include(x => x.ServerAllocation)
                     .Where(delegate (Appointment x)
@@ -81,7 +80,7 @@ public class StatisticService : IStatisticService
                         var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
                         return matchCustomer && matchServer;
                     })
-                    .Where(x => x.DateCreated.Month == month.Month).Count();
+                    .Where(x => x.DateCreated.Month == month.Month && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
 
                 statistic.Add(new StatisticMonthModel
                 {
@@ -126,7 +125,7 @@ public class StatisticService : IStatisticService
                         var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
                         return matchCustomer && matchServer;
                     })
-                    .Where(x => x.DateCreated.Year == year).Count();
+                    .Where(x => x.DateCreated.Year == year && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
                 var requestExpandCount = _dbContext.RequestExpands
                     .Include(x => x.ServerAllocation)
                     .Where(delegate (RequestExpand x)
@@ -135,7 +134,7 @@ public class StatisticService : IStatisticService
                         var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
                         return matchCustomer && matchServer;
                     })
-                    .Where(x => x.DateCreated.Year == year).Count();
+                    .Where(x => x.DateCreated.Year == year && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
                 var requestHostCount = _dbContext.RequestHosts
                     .Include(x => x.ServerAllocation)
                     .Where(delegate (RequestHost x)
@@ -144,7 +143,7 @@ public class StatisticService : IStatisticService
                         var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
                         return matchCustomer && matchServer;
                     })
-                    .Where(x => x.DateCreated.Year == year).Count();
+                    .Where(x => x.DateCreated.Year == year && x.Status.ToString() == model.RequestStatus.ToString() || model.RequestStatus == null).Count();
                 var incidentCount = _dbContext.Incidents
                     .Include(x => x.ServerAllocation)
                     .Where(delegate (Incident x)
@@ -153,7 +152,7 @@ public class StatisticService : IStatisticService
                         var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
                         return matchCustomer && matchServer;
                     })
-                    .Where(x => x.DateCreated.Year == year).Count();
+                    .Where(x => x.DateCreated.Year == year && x.IsResolved == model.Resolved || model.Resolved == null).Count();
                 var appointmentCount = _dbContext.Appointments
                     .Include(x => x.ServerAllocation)
                     .Where(delegate (Appointment x)
@@ -162,7 +161,7 @@ public class StatisticService : IStatisticService
                         var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
                         return matchCustomer && matchServer;
                     })
-                    .Where(x => x.DateCreated.Year == year).Count();
+                    .Where(x => x.DateCreated.Year == year && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
 
                 statistic.Add(new StatisticYearModel
                 {
