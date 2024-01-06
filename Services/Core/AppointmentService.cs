@@ -942,6 +942,7 @@ public class AppointmentService : IAppointmentService
             if (validPrecondition)
             {
                 appointment.Status = RequestStatus.Accepted;
+                appointment.DateEvaluated = DateTime.Now;
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
                     Action = RequestUserAction.Evaluate,
@@ -959,6 +960,7 @@ public class AppointmentService : IAppointmentService
                 foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
                 {
                     requestUpgrade.Status = RequestStatus.Accepted;
+                    requestUpgrade.DateEvaluated = DateTime.Now;
                     _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
                     {
                         Action = RequestUserAction.Evaluate,
@@ -978,6 +980,7 @@ public class AppointmentService : IAppointmentService
                 {
                     var requestExpand = appointment.RequestExpandAppointments.Select(x => x.RequestExpand).FirstOrDefault();
                     requestExpand.Status = RequestStatus.Accepted;
+                    requestExpand.DateEvaluated = DateTime.Now;
                     if (requestExpand.ForRemoval)
                     {
                         appointment.ServerAllocation.Status = ServerAllocationStatus.Pausing;
@@ -1087,6 +1090,7 @@ public class AppointmentService : IAppointmentService
             {
                 appointment.Status = RequestStatus.Denied;
                 appointment.SaleNote = model.SaleNote;
+                appointment.DateEvaluated = DateTime.Now;
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
                     Action = RequestUserAction.Evaluate,
@@ -1269,6 +1273,7 @@ public class AppointmentService : IAppointmentService
             {
                 _mapper.Map<AppointmentCompleteModel, Appointment>(model, appointment);
                 appointment.Status = RequestStatus.Success;
+                appointment.DateExecuted = DateTime.Now;
                 _dbContext.SaveChanges();
 
                 var requestUpgradeResults = new List<ResultModel>();
@@ -1513,6 +1518,7 @@ public class AppointmentService : IAppointmentService
                     }
                 }
                 requestUpgrade.Status = RequestStatus.Success;
+                requestUpgrade.DateExecuted = DateTime.Now;
                 requestUpgrade.ServerAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
 
@@ -1594,6 +1600,7 @@ public class AppointmentService : IAppointmentService
                 }
                 _dbContext.LocationAssignments.AddRange(locationAssignments);
                 requestExpand.Status = RequestStatus.Success;
+                requestExpand.DateExecuted = DateTime.Now;
                 requestExpand.SuccessExpandAppointmentId = requestExpand.RequestExpandAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success).Id;
                 serverAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
@@ -2057,6 +2064,7 @@ public class AppointmentService : IAppointmentService
             {
                 requestExpand.ServerAllocation.ServerLocation = null;
                 requestExpand.Status = RequestStatus.Success;
+                requestExpand.DateExecuted = DateTime.Now;
                 serverAllocation.Status = ServerAllocationStatus.Removed;
                 foreach (var appointment in serverAllocation.Appointments.Where(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
                 {
@@ -2255,6 +2263,7 @@ public class AppointmentService : IAppointmentService
             {
                 incident.Solution = model.Solution;
                 incident.IsResolved = true;
+                incident.DateResolved = DateTime.Now;
                 _dbContext.IncidentUsers.Add(new IncidentUser
                 {
                     IncidentId = incident.Id,

@@ -626,6 +626,7 @@ public class RequestHostService : IRequestHostService
             if (validPrecondition)
             {
                 requestHost.Status = RequestHostStatus.Accepted;
+                requestHost.DateEvaluated = DateTime.Now;
                 _dbContext.RequestHostUsers.Add(new RequestHostUser
                 {
                     Action = RequestUserAction.Evaluate,
@@ -710,6 +711,7 @@ public class RequestHostService : IRequestHostService
             if (validPrecondition)
             {
                 requestHost.Status = RequestHostStatus.Denied;
+                requestHost.DateEvaluated = DateTime.Now;
                 requestHost.SaleNote = model.SaleNote;
                 _dbContext.RequestHostUsers.Add(new RequestHostUser
                 {
@@ -958,6 +960,7 @@ public class RequestHostService : IRequestHostService
                     _dbContext.IpAssignments.AddRange(ipAssignments);
                 }
                 requestHost.Status = RequestHostStatus.Success;
+                requestHost.DateExecuted = DateTime.Now;
                 requestHost.ServerAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
 
@@ -1089,6 +1092,7 @@ public class RequestHostService : IRequestHostService
                     ipAssignments.Add(ipAssignment);
                 }
                 requestHost.Status = RequestHostStatus.Success;
+                requestHost.DateExecuted = DateTime.Now;
                 requestHost.ServerAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
 

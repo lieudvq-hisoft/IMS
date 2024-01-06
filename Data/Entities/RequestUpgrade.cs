@@ -11,6 +11,8 @@ public class RequestUpgrade : BaseEntity
     public string? Note { get; set; }
     public string? TechNote { get; set; }
     public string? SaleNote { get; set; }
+    public DateTime? DateEvaluated { get; set; }
+    public DateTime? DateExecuted { get; set; }
 
     public int ComponentId { get; set; }
     public Component? Component { get; set; }

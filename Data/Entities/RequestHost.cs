@@ -20,6 +20,8 @@ public class RequestHost : BaseEntity
     public string? InspectionReportFilePath { get; set; }
     public string? FinalInspectionReport { get; set; }
 
+    public DateTime? DateEvaluated { get; set; }
+    public DateTime? DateExecuted { get; set; }
     public int ServerAllocationId { get; set; }
     public ServerAllocation ServerAllocation { get; set; }
 

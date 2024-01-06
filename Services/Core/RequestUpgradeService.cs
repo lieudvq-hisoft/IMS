@@ -471,6 +471,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             if (validPrecondition)
             {
                 requestUpgrade.Status = RequestStatus.Accepted;
+                requestUpgrade.DateEvaluated = DateTime.Now;
                 _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
                 {
                     Action = RequestUserAction.Evaluate,
@@ -538,6 +539,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 requestUpgrade.Status = RequestStatus.Denied;
                 requestUpgrade.SaleNote = model.SaleNote;
+                requestUpgrade.DateEvaluated = DateTime.Now;
                 _dbContext.RequestUpgradeAppointments.RemoveRange(requestUpgrade.RequestUpgradeAppointments);
                 _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
                 {

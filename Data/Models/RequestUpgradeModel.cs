@@ -17,6 +17,8 @@ public class RequestUpgradeModel
     public int ServerAllocationId { get; set; }
     public DateTime DateCreated { get; set; }
     public DateTime DateUpdated { get; set; }
+    public DateTime? DateEvaluated { get; set; }
+    public DateTime? DateExecuted { get; set; }
 
     public ServerAllocationResultModel? ServerAllocation { get; set; }
     public AppointmentResultModel? SucceededAppointment { get; set; }
@@ -38,6 +40,8 @@ public class RequestUpgradeResultModel
     public string? SaleNote { get; set; }
     public int ComponentId { get; set; }
     public int ServerAllocationId { get; set; }
+    public DateTime? DateEvaluated { get; set; }
+    public DateTime? DateExecuted { get; set; }
 }
 
 public class RequestUpgradeCreateModel

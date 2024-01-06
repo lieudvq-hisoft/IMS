@@ -468,6 +468,7 @@ public class RequestExpandService : IRequestExpandService
             if (validPrecondition)
             {
                 requestExpand.Status = RequestStatus.Accepted;
+                requestExpand.DateEvaluated = DateTime.Now;
                 _dbContext.RequestExpandUsers.Add(new RequestExpandUser
                 {
                     Action = RequestUserAction.Evaluate,
@@ -554,6 +555,7 @@ public class RequestExpandService : IRequestExpandService
             if (validPrecondition)
             {
                 requestExpand.Status = RequestStatus.Denied;
+                requestExpand.DateEvaluated = DateTime.Now;
                 requestExpand.SaleNote = model.SaleNote;
                 _dbContext.RequestExpandAppointments.RemoveRange(requestExpand.RequestExpandAppointments);
                 _dbContext.RequestExpandUsers.Add(new RequestExpandUser
@@ -588,39 +590,6 @@ public class RequestExpandService : IRequestExpandService
 
         return result;
     }
-
-    //public async Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId)
-    //{
-    //    var result = new ResultModel();
-    //    result.Succeed = false;
-
-    //    try
-    //    {
-    //        var requestExpand = _dbContext.RequestExpands.Include(x => x.RequestExpandLocations).FirstOrDefault(x => x.Id == requestExpandId);
-    //        if (requestExpand == null)
-    //        {
-    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
-    //        }
-    //        else if (requestExpand.Status != RequestStatus.Accepted)
-    //        {
-    //            result.ErrorMessage = RequestExpandErrorMessage.NOT_ACCEPTED;
-    //        }
-    //        else
-    //        {
-    //            var requestExpandLocations = requestExpand.RequestExpandLocations;
-    //            _dbContext.RequestExpandLocations.RemoveRange(requestExpandLocations);
-    //            _dbContext.SaveChanges();
-    //            result.Succeed = true;
-    //            result.Data = requestExpandLocations.Select(x => x.Id);
-    //        }
-    //    }
-    //    catch (Exception e)
-    //    {
-    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
-    //    }
-
-    //    return result;
-    //}
 
     public async Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model)
     {

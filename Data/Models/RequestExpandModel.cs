@@ -26,6 +26,8 @@ public class RequestExpandModel
     public CustomerResultModel? Customer { get; set; }
     public UserModel? Evaluator { get; set; }
     public UserModel? Executor { get; set; }
+    public DateTime? DateEvaluated { get; set; }
+    public DateTime? DateExecuted { get; set; }
     public RequestExpandAssignLocationModel? RequestedLocation { get; set; }
 }
 
@@ -40,6 +42,8 @@ public class RequestExpandResultModel
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
+    public DateTime? DateEvaluated { get; set; }
+    public DateTime? DateExecuted { get; set; }
     public int? SuccessExpandAppointmentId { get; set; }
     public int ServerAllocationId { get; set; }
 }

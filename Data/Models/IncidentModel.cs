@@ -16,6 +16,7 @@ public class IncidentModel
 
     public UserModel? Evaluator { get; set; }
     public UserModel? Executor { get; set; }
+    public DateTime? DateResolved { get; set; }
 
     public ServerAllocationResultModel? ServerAllocation { get; set; }
 
@@ -33,6 +34,7 @@ public class IncidentResultModel
     public bool IsResolved { get; set; }
     public bool IsResolvByClient { get; set; }
     public string? Document { get; set; }
+    public DateTime? DateResolved { get; set; }
     public int ServerAllocationId { get; set; }
 }
 

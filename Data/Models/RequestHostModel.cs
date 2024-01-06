@@ -29,6 +29,8 @@ public class RequestHostModel
     public List<RequestHostIpModel> IpAddresses { get; set; }
     public UserModel? Evaluator { get; set; }
     public UserModel? Executor { get; set; }
+    public DateTime? DateEvaluated { get; set; }
+    public DateTime? DateExecuted { get; set; }
 }
 
 public class RequestHostIpModel
@@ -52,6 +54,8 @@ public class RequestHostResultModel
     public RequestType RequestType { get; set; } = RequestType.Host;
     public bool DocumentConfirm { get; set; }
     public DateTime? DateConfirm { get; set; }
+    public DateTime? DateEvaluated { get; set; }
+    public DateTime? DateExecuted { get; set; }
     public string? InspectionReportFilePath { get; set; }
     public string? FinalInspectionReport { get; set; }
 

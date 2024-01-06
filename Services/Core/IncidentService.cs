@@ -214,6 +214,7 @@ public class IncidentService : IIncidentService
             {
                 incident.Solution = model.Solution;
                 incident.IsResolved = true;
+                incident.DateResolved = DateTime.Now;
                 _dbContext.IncidentUsers.Add(new IncidentUser
                 {
                     IncidentId = incident.Id,

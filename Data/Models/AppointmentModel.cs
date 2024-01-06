@@ -25,6 +25,8 @@ public class AppointmentModel
     public string? FinalReceiptOfRecipient { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
+    public DateTime? DateEvaluated { get; set; }
+    public DateTime? DateExecuted { get; set; }
 
     public ServerAllocationResultModel? ServerAllocation { get; set; }
     public CustomerResultModel? Customer { get; set; }
@@ -51,6 +53,8 @@ public class AppointmentResultModel
     public string? FinalInspectionReport { get; set; }
     public string? ReceiptOfRecipientFilePath { get; set; }
     public string? FinalReceiptOfRecipient { get; set; }
+    public DateTime? DateEvaluated { get; set; }
+    public DateTime? DateExecuted { get; set; }
 }
 
 public class AppointmentCreateModel
@@ -66,9 +70,6 @@ public class AppointmentCreateModel
     public AppointmentReason Reason { get; set; }
 
     public string? Note { get; set; }
-
-    //[Required]
-    //public Guid UserId { get; set; }
 
     [Required]
     [GreaterThanZero]
