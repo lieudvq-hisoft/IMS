@@ -8,8 +8,8 @@ using System.Globalization;
 namespace Services.Core;
 public interface IStatisticService
 {
-    Task<ResultModel> GetRequestByMonth(StatisticSearchByTimeModel model);
-    Task<ResultModel> GetRequestByYear(StatisticSearchByTimeModel model);
+    //Task<ResultModel> GetRequestByMonth(StatisticSearchByTimeModel model);
+    //Task<ResultModel> GetRequestByYear(StatisticSearchByTimeModel model);
     Task<ResultModel> GetRequest(StatisticSearchModel model);
 }
 
@@ -22,168 +22,168 @@ public class StatisticService : IStatisticService
         _dbContext = dbContext;
     }
 
-    public async Task<ResultModel> GetRequestByMonth(StatisticSearchByTimeModel model)
-    {
+    //public async Task<ResultModel> GetRequestByMonth(StatisticSearchByTimeModel model)
+    //{
 
-        var result = new ResultModel();
-        result.Succeed = false;
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var statistic = new List<StatisticMonthModel>();
-            IEnumerable<(int Month, int Year)>? months =
-           MonthsBetween(model.StartDate, model.EndDate);
+    //    try
+    //    {
+    //        var statistic = new List<StatisticMonthModel>();
+    //        IEnumerable<(int Month, int Year)>? months =
+    //       MonthsBetween(model.StartDate, model.EndDate);
 
-            foreach (var month in months)
-            {
-                var requestUpgradeCount = _dbContext.RequestUpgrades
-                    .Include(x => x.ServerAllocation)
-                    .Where(delegate (RequestUpgrade x)
-                    {
-                        var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
-                        var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
-                        return matchCustomer && matchServer;
-                    })
-                    .Where(x => x.DateCreated.Month == month.Month && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
-                var requestExpandCount = _dbContext.RequestExpands
-                    .Include(x => x.ServerAllocation)
-                    .Where(delegate (RequestExpand x)
-                    {
-                        var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
-                        var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
-                        return matchCustomer && matchServer;
-                    })
-                    .Where(x => x.DateCreated.Month == month.Month && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
-                var requestHostCount = _dbContext.RequestHosts
-                    .Include(x => x.ServerAllocation)
-                    .Where(delegate (RequestHost x)
-                    {
-                        var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
-                        var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
-                        return matchCustomer && matchServer;
-                    })
-                    .Where(x => x.DateCreated.Month == month.Month && x.Status.ToString() == model.RequestStatus.ToString() || model.RequestStatus == null).Count();
-                var incidentCount = _dbContext.Incidents
-                    .Include(x => x.ServerAllocation)
-                    .Where(delegate (Incident x)
-                    {
-                        var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
-                        var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
-                        return matchCustomer && matchServer;
-                    })
-                    .Where(x => x.DateCreated.Month == month.Month && x.IsResolved == model.Resolved || model.Resolved == null).Count();
-                var appointmentCount = _dbContext.Appointments
-                    .Include(x => x.ServerAllocation)
-                    .Where(delegate (Appointment x)
-                    {
-                        var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
-                        var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
-                        return matchCustomer && matchServer;
-                    })
-                    .Where(x => x.DateCreated.Month == month.Month && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
+    //        foreach (var month in months)
+    //        {
+    //            var requestUpgradeCount = _dbContext.RequestUpgrades
+    //                .Include(x => x.ServerAllocation)
+    //                .Where(delegate (RequestUpgrade x)
+    //                {
+    //                    var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
+    //                    var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
+    //                    return matchCustomer && matchServer;
+    //                })
+    //                .Where(x => x.DateCreated.Month == month.Month && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
+    //            var requestExpandCount = _dbContext.RequestExpands
+    //                .Include(x => x.ServerAllocation)
+    //                .Where(delegate (RequestExpand x)
+    //                {
+    //                    var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
+    //                    var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
+    //                    return matchCustomer && matchServer;
+    //                })
+    //                .Where(x => x.DateCreated.Month == month.Month && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
+    //            var requestHostCount = _dbContext.RequestHosts
+    //                .Include(x => x.ServerAllocation)
+    //                .Where(delegate (RequestHost x)
+    //                {
+    //                    var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
+    //                    var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
+    //                    return matchCustomer && matchServer;
+    //                })
+    //                .Where(x => x.DateCreated.Month == month.Month && x.Status.ToString() == model.RequestStatus.ToString() || model.RequestStatus == null).Count();
+    //            var incidentCount = _dbContext.Incidents
+    //                .Include(x => x.ServerAllocation)
+    //                .Where(delegate (Incident x)
+    //                {
+    //                    var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
+    //                    var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
+    //                    return matchCustomer && matchServer;
+    //                })
+    //                .Where(x => x.DateCreated.Month == month.Month && x.IsResolved == model.Resolved || model.Resolved == null).Count();
+    //            var appointmentCount = _dbContext.Appointments
+    //                .Include(x => x.ServerAllocation)
+    //                .Where(delegate (Appointment x)
+    //                {
+    //                    var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
+    //                    var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
+    //                    return matchCustomer && matchServer;
+    //                })
+    //                .Where(x => x.DateCreated.Month == month.Month && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
 
-                statistic.Add(new StatisticMonthModel
-                {
-                    Month = month.Month,
-                    RequestExpands = requestExpandCount,
-                    RequestHosts = requestHostCount,
-                    RequestUpgrades = requestUpgradeCount,
-                    Incidents = incidentCount,
-                    Appointments = appointmentCount,
-                });
-            }
+    //            statistic.Add(new StatisticMonthModel
+    //            {
+    //                Month = month.Month,
+    //                RequestExpands = requestExpandCount,
+    //                RequestHosts = requestHostCount,
+    //                RequestUpgrades = requestUpgradeCount,
+    //                Incidents = incidentCount,
+    //                Appointments = appointmentCount,
+    //            });
+    //        }
 
-            result.Succeed = true;
-            result.Data = statistic;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //        result.Succeed = true;
+    //        result.Data = statistic;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
-    public async Task<ResultModel> GetRequestByYear(StatisticSearchByTimeModel model)
-    {
+    //public async Task<ResultModel> GetRequestByYear(StatisticSearchByTimeModel model)
+    //{
 
-        var result = new ResultModel();
-        result.Succeed = false;
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var statistic = new List<StatisticYearModel>();
-            IEnumerable<int> years = MonthsBetween(model.StartDate, model.EndDate).ToList().Select(x => x.Year);
+    //    try
+    //    {
+    //        var statistic = new List<StatisticYearModel>();
+    //        IEnumerable<int> years = MonthsBetween(model.StartDate, model.EndDate).ToList().Select(x => x.Year);
 
-            foreach (var year in years)
-            {
-                var requestUpgradeCount = _dbContext.RequestUpgrades
-                    .Include(x => x.ServerAllocation)
-                    .Where(delegate (RequestUpgrade x)
-                    {
-                        var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
-                        var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
-                        return matchCustomer && matchServer;
-                    })
-                    .Where(x => x.DateCreated.Year == year && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
-                var requestExpandCount = _dbContext.RequestExpands
-                    .Include(x => x.ServerAllocation)
-                    .Where(delegate (RequestExpand x)
-                    {
-                        var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
-                        var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
-                        return matchCustomer && matchServer;
-                    })
-                    .Where(x => x.DateCreated.Year == year && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
-                var requestHostCount = _dbContext.RequestHosts
-                    .Include(x => x.ServerAllocation)
-                    .Where(delegate (RequestHost x)
-                    {
-                        var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
-                        var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
-                        return matchCustomer && matchServer;
-                    })
-                    .Where(x => x.DateCreated.Year == year && x.Status.ToString() == model.RequestStatus.ToString() || model.RequestStatus == null).Count();
-                var incidentCount = _dbContext.Incidents
-                    .Include(x => x.ServerAllocation)
-                    .Where(delegate (Incident x)
-                    {
-                        var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
-                        var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
-                        return matchCustomer && matchServer;
-                    })
-                    .Where(x => x.DateCreated.Year == year && x.IsResolved == model.Resolved || model.Resolved == null).Count();
-                var appointmentCount = _dbContext.Appointments
-                    .Include(x => x.ServerAllocation)
-                    .Where(delegate (Appointment x)
-                    {
-                        var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
-                        var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
-                        return matchCustomer && matchServer;
-                    })
-                    .Where(x => x.DateCreated.Year == year && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
+    //        foreach (var year in years)
+    //        {
+    //            var requestUpgradeCount = _dbContext.RequestUpgrades
+    //                .Include(x => x.ServerAllocation)
+    //                .Where(delegate (RequestUpgrade x)
+    //                {
+    //                    var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
+    //                    var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
+    //                    return matchCustomer && matchServer;
+    //                })
+    //                .Where(x => x.DateCreated.Year == year && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
+    //            var requestExpandCount = _dbContext.RequestExpands
+    //                .Include(x => x.ServerAllocation)
+    //                .Where(delegate (RequestExpand x)
+    //                {
+    //                    var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
+    //                    var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
+    //                    return matchCustomer && matchServer;
+    //                })
+    //                .Where(x => x.DateCreated.Year == year && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
+    //            var requestHostCount = _dbContext.RequestHosts
+    //                .Include(x => x.ServerAllocation)
+    //                .Where(delegate (RequestHost x)
+    //                {
+    //                    var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
+    //                    var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
+    //                    return matchCustomer && matchServer;
+    //                })
+    //                .Where(x => x.DateCreated.Year == year && x.Status.ToString() == model.RequestStatus.ToString() || model.RequestStatus == null).Count();
+    //            var incidentCount = _dbContext.Incidents
+    //                .Include(x => x.ServerAllocation)
+    //                .Where(delegate (Incident x)
+    //                {
+    //                    var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
+    //                    var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
+    //                    return matchCustomer && matchServer;
+    //                })
+    //                .Where(x => x.DateCreated.Year == year && x.IsResolved == model.Resolved || model.Resolved == null).Count();
+    //            var appointmentCount = _dbContext.Appointments
+    //                .Include(x => x.ServerAllocation)
+    //                .Where(delegate (Appointment x)
+    //                {
+    //                    var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
+    //                    var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
+    //                    return matchCustomer && matchServer;
+    //                })
+    //                .Where(x => x.DateCreated.Year == year && x.Status == model.RequestStatus || model.RequestStatus == null).Count();
 
-                statistic.Add(new StatisticYearModel
-                {
-                    Year = year,
-                    RequestExpands = requestExpandCount,
-                    RequestHosts = requestHostCount,
-                    RequestUpgrades = requestUpgradeCount,
-                    Incidents = incidentCount,
-                    Appointments = appointmentCount,
-                });
-            }
+    //            statistic.Add(new StatisticYearModel
+    //            {
+    //                Year = year,
+    //                RequestExpands = requestExpandCount,
+    //                RequestHosts = requestHostCount,
+    //                RequestUpgrades = requestUpgradeCount,
+    //                Incidents = incidentCount,
+    //                Appointments = appointmentCount,
+    //            });
+    //        }
 
-            result.Succeed = true;
-            result.Data = statistic;
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //        result.Succeed = true;
+    //        result.Data = statistic;
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> GetRequest(StatisticSearchModel model)
     {
@@ -195,6 +195,8 @@ public class StatisticService : IStatisticService
         {
             var requestUpgradeCount = _dbContext.RequestUpgrades
                 .Include(x => x.ServerAllocation)
+                .Where(x => x.DateCreated >= model.StartDate && x.DateCreated <= model.EndDate)
+                .Where(x => x.Status == model.RequestStatus)
                 .Where(delegate (RequestUpgrade x)
                 {
                     var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
@@ -203,6 +205,8 @@ public class StatisticService : IStatisticService
                 }).Count();
             var requestExpandCount = _dbContext.RequestExpands
                 .Include(x => x.ServerAllocation)
+                .Where(x => x.DateCreated >= model.StartDate && x.DateCreated <= model.EndDate)
+                .Where(x => x.Status == model.RequestStatus)
                 .Where(delegate (RequestExpand x)
                 {
                     var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
@@ -211,6 +215,8 @@ public class StatisticService : IStatisticService
                 }).Count();
             var requestHostCount = _dbContext.RequestHosts
                 .Include(x => x.ServerAllocation)
+                .Where(x => x.DateCreated >= model.StartDate && x.DateCreated <= model.EndDate)
+                .Where(x => x.Status.ToString() == model.RequestStatus.ToString())
                 .Where(delegate (RequestHost x)
                 {
                     var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
@@ -219,6 +225,8 @@ public class StatisticService : IStatisticService
                 }).Count();
             var incidentCount = _dbContext.Incidents
                 .Include(x => x.ServerAllocation)
+                .Where(x => x.DateCreated >= model.StartDate && x.DateCreated <= model.EndDate)
+                .Where(x => x.IsResolved == model.Resolved)
                 .Where(delegate (Incident x)
                 {
                     var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
@@ -227,6 +235,8 @@ public class StatisticService : IStatisticService
                 }).Count();
             var appointmentCount = _dbContext.Appointments
                 .Include(x => x.ServerAllocation)
+                .Where(x => x.DateCreated >= model.StartDate && x.DateCreated <= model.EndDate)
+                .Where(x => x.Status == model.RequestStatus)
                 .Where(delegate (Appointment x)
                 {
                     var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;

@@ -49,4 +49,6 @@ public class StatisticSearchModel
     public int? ServerAllocationId { get; set; }
     public RequestStatus? RequestStatus { get; set; }
     public bool? Resolved { get; set; }
+    public DateTime StartDate { get; set; }
+    public DateTime EndDate { get; set; }
 }
