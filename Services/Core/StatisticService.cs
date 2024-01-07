@@ -196,7 +196,7 @@ public class StatisticService : IStatisticService
             var requestUpgradeCount = _dbContext.RequestUpgrades
                 .Include(x => x.ServerAllocation)
                 .Where(x => x.DateCreated >= model.StartDate && x.DateCreated <= model.EndDate)
-                .Where(x => x.Status == model.RequestStatus)
+                .Where(x => x.Status == model.RequestStatus || model.RequestStatus == null)
                 .Where(delegate (RequestUpgrade x)
                 {
                     var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
@@ -206,7 +206,7 @@ public class StatisticService : IStatisticService
             var requestExpandCount = _dbContext.RequestExpands
                 .Include(x => x.ServerAllocation)
                 .Where(x => x.DateCreated >= model.StartDate && x.DateCreated <= model.EndDate)
-                .Where(x => x.Status == model.RequestStatus)
+                .Where(x => x.Status == model.RequestStatus || model.RequestStatus == null)
                 .Where(delegate (RequestExpand x)
                 {
                     var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
@@ -216,9 +216,9 @@ public class StatisticService : IStatisticService
             var requestHostCount = _dbContext.RequestHosts
                 .Include(x => x.ServerAllocation)
                 .Where(x => x.DateCreated >= model.StartDate && x.DateCreated <= model.EndDate)
-                .Where(x => x.Status.ToString() == model.RequestStatus.ToString())
                 .Where(delegate (RequestHost x)
                 {
+                    var matchStatus = x.Status.ToString() == model.RequestStatus.ToString() || model.RequestStatus == null;
                     var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
                     var matchServer = model.ServerAllocationId != null ? x.ServerAllocationId == model.ServerAllocationId : true;
                     return matchCustomer && matchServer;
@@ -236,7 +236,7 @@ public class StatisticService : IStatisticService
             var appointmentCount = _dbContext.Appointments
                 .Include(x => x.ServerAllocation)
                 .Where(x => x.DateCreated >= model.StartDate && x.DateCreated <= model.EndDate)
-                .Where(x => x.Status == model.RequestStatus)
+                .Where(x => x.Status == model.RequestStatus || model.RequestStatus == null)
                 .Where(delegate (Appointment x)
                 {
                     var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;

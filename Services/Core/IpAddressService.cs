@@ -19,7 +19,7 @@ public interface IIpAddressService
     Task<ResultModel> GetIsBlockedCount();
     Task<ResultModel> GetIsReservedCount();
     Task<ResultModel> SuggestMasterIp();
-    Task<ResultModel> ChangeBlockingStatus(IpAddressIdListModel model, bool isBlock);
+    Task<ResultModel> ChangeBlockingStatus(IpAddressIdListModel model, bool isBlock, Guid userId);
     Task<ResultModel> ChangePurpose(IpAddressChangePurposeModel model);
 }
 
@@ -248,7 +248,7 @@ public class IpAddressService : IIpAddressService
         return result;
     }
 
-    public async Task<ResultModel> ChangeBlockingStatus(IpAddressIdListModel model, bool isBlock)
+    public async Task<ResultModel> ChangeBlockingStatus(IpAddressIdListModel model, bool isBlock, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -281,6 +281,14 @@ public class IpAddressService : IIpAddressService
                     }
                     x.Blocked = isBlock;
                     x.Reason = model.Reason;
+                    _dbContext.IpHistories.Add(new IpHistory
+                    {
+                        IpAddressId = x.Id,
+                        UserId = userId,
+                        IsBlock = isBlock,
+                        Reason = model.Reason,
+                        DateExecuted = DateTime.Now
+                    });
                 });
                 _dbContext.SaveChanges();
                 result.Succeed = true;

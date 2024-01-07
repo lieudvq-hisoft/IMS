@@ -18,10 +18,11 @@ public class IpAddress
     public IpPurpose Purpose { get; set; }
 
     public int IpSubnetId { get; set; }
-    public virtual IpSubnet IpSubnet { get; set; }
+    public IpSubnet IpSubnet { get; set; }
 
-    public virtual ICollection<IpAssignment> IpAssignments { get; set; }
-    public virtual ICollection<RequestHostIp> RequestHostIps { get; set; }
+    public ICollection<IpAssignment> IpAssignments { get; set; }
+    public ICollection<RequestHostIp> RequestHostIps { get; set; }
+    public ICollection<IpHistory> IpHistories { get; set; }
 
     public bool IsAvailable()
     {

@@ -3,6 +3,7 @@ using Data.Enums;
 using Data.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Services.ClaimExtensions;
 using Services.Core;
 
 namespace IMS.Controllers;
@@ -78,7 +79,7 @@ public class IpAddressController : ControllerBase
     [HttpPut("Block")]
     public async Task<ActionResult> Block([FromBody] IpAddressIdListModel model)
     {
-        var result = await _ipAddressService.ChangeBlockingStatus(model, true);
+        var result = await _ipAddressService.ChangeBlockingStatus(model, true, Guid.Parse(User.GetId()));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -86,7 +87,7 @@ public class IpAddressController : ControllerBase
     [HttpPut("Unblock")]
     public async Task<ActionResult> Unblock([FromBody] IpAddressIdListModel model)
     {
-        var result = await _ipAddressService.ChangeBlockingStatus(model, false);
+        var result = await _ipAddressService.ChangeBlockingStatus(model, false, Guid.Parse(User.GetId()));
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

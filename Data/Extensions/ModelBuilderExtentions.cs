@@ -236,6 +236,7 @@ public static class ModelBuilderExtentions
         builder.Entity<IncidentUser>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<IpAddress>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<IpAssignment>().HasQueryFilter(x => !x.IsDeleted);
+        builder.Entity<IpHistory>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<IpSubnet>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<Location>().HasQueryFilter(x => !x.IsDeleted);
         builder.Entity<LocationAssignment>().HasQueryFilter(x => !x.IsDeleted);
@@ -310,6 +311,9 @@ public static class ModelBuilderExtentions
         builder.Entity<IpAddress>(b =>
         {
             b.HasMany(e => e.IpAssignments)
+                .WithOne(e => e.IpAddress)
+                .OnDelete(DeleteBehavior.ClientCascade);
+            b.HasMany(e => e.IpHistories)
                 .WithOne(e => e.IpAddress)
                 .OnDelete(DeleteBehavior.ClientCascade);
             b.HasMany(e => e.RequestHostIps)

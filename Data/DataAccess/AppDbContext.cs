@@ -84,6 +84,7 @@ public class AppDbContext : IdentityDbContext<User, Role, Guid, IdentityUserClai
     public DbSet<IncidentUser> IncidentUsers { get; set; }
     public DbSet<IpAddress> IpAddresses { get; set; }
     public DbSet<IpAssignment> IpAssignments { get; set; }
+    public DbSet<IpHistory> IpHistories { get; set; }
     public DbSet<IpSubnet> IpSubnets { get; set; }
     public DbSet<Location> Locations { get; set; }
     public DbSet<LocationAssignment> LocationAssignments { get; set; }
