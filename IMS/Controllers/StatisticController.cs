@@ -24,13 +24,13 @@ public class StatisticController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpGet("ByMonth")]
-    //public async Task<ActionResult> Get([FromQuery] StatisticSearchByTimeModel model)
-    //{
-    //    var result = await _statisticService.GetRequestByMonth(model);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
+    [HttpGet("ByMonth")]
+    public async Task<ActionResult> Get([FromQuery] StatisticSearchByTimeModel model)
+    {
+        var result = await _statisticService.GetRequestByMonth(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 
     //[HttpGet("ByYear")]
     //public async Task<ActionResult> GetByYear([FromQuery] StatisticSearchByTimeModel model)

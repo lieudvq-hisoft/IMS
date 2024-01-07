@@ -38,7 +38,8 @@ public class LocationRackMapModel
 
 public class LocationSearchModel
 {
-    public int? LocationId { get; set; } = null;
+    public int? LocationId { get; set; }
+    public bool? Available { get; set; }
 }
 
 public class LocationChoiceModel

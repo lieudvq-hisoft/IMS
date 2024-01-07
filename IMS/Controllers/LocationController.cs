@@ -20,14 +20,14 @@ public class LocationController : ControllerBase
         _LocationService = LocationService;
     }
 
-    //[HttpGet]
-    //[SwaggerOperation(Summary = "Get all Location")]
-    //public async Task<ActionResult> Get([FromQuery] PagingParam<SimpleSortCriteria> pagingParam, [FromQuery] LocationSearchModel searchModel)
-    //{
-    //    var result = await _LocationService.Get(pagingParam, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
+    [HttpGet]
+    [SwaggerOperation(Summary = "Get all Location")]
+    public async Task<ActionResult> Get([FromQuery] PagingParam<SimpleSortCriteria> pagingParam, [FromQuery] LocationSearchModel searchModel)
+    {
+        var result = await _LocationService.Get(pagingParam, searchModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 
     //[HttpGet("{id}")]
     //public async Task<ActionResult> GetDetail(int id)
