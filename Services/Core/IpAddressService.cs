@@ -14,6 +14,7 @@ public interface IIpAddressService
 {
     Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, IpAddressSearchModel searchModel);
     Task<ResultModel> GetDetail(int id);
+    Task<ResultModel> GetHistory(int id, PagingParam<BaseSortCriteria> paginationModel);
     Task<ResultModel> GetServerAllocation(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, ServerAllocationSearchModel searchModel);
     Task<ResultModel> GetCustomer(int ipAddressId, PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> GetIsBlockedCount();
@@ -91,6 +92,47 @@ public class IpAddressService : IIpAddressService
         {
             result.ErrorMessage = MyFunction.GetErrorMessage(e);
         }
+        return result;
+    }
+
+    public async Task<ResultModel> GetHistory(int id, PagingParam<BaseSortCriteria> paginationModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var ipHistories = _dbContext.IpHistories
+                .Include(x => x.User)
+                .Include(x => x.IpAddress)
+                .Where(x => x.IpAddressId == id)
+                .AsQueryable();
+
+            var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, ipHistories.Count());
+
+            ipHistories = ipHistories.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+            ipHistories = ipHistories.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+            var mappedData = _mapper.Map<List<IpHistoryModel>>(ipHistories.ToList());
+            mappedData.ForEach(ipHistoryModel =>
+            {
+                var serverAllocation = _dbContext.ServerAllocations
+                    .Include(x => x.IpAssignments)
+                    .ThenInclude(x => x.IpAddress)
+                    .Include(x => x.Customer)
+                    .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
+                    .FirstOrDefault(x => x.Id == ipHistoryModel.CurrentServerId);
+                ipHistoryModel.CurrentServer = _mapper.Map<ServerAllocationModel>(serverAllocation);
+            });
+            paging.Data = mappedData;
+            result.Data = paging;
+            result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
         return result;
     }
 
@@ -287,6 +329,7 @@ public class IpAddressService : IIpAddressService
                         UserId = userId,
                         IsBlock = isBlock,
                         Reason = model.Reason,
+                        CurrentServerId = x.IpAssignments.FirstOrDefault().ServerAllocationId,
                         DateExecuted = DateTime.Now
                     });
                 });

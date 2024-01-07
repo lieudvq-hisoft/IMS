@@ -10,6 +10,7 @@ public class IpHistory : BaseEntity
     public DateTime DateExecuted { get; set; }
     public bool IsBlock { get; set; }
     public string Reason { get; set; }
+    public int CurrentServerId { get; set; }
 
     public int IpAddressId { get; set; }
     public IpAddress IpAddress { get; set; }

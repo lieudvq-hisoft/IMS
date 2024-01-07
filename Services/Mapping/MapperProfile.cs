@@ -362,6 +362,15 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.SubnetIds, opt => opt.MapFrom(src => src.SubNets.Select(x => x.Id)));
 
         CreateMap<IpAssignment, IpAssignmentModel>();
+        CreateMap<IpHistory, IpHistoryModel>()
+            .AfterMap((src, dest, context) =>
+            {
+                dest.IpAddress = context.Mapper.Map<IpAddress, IpAddressResultModel>(src.IpAddress);
+            })
+            .AfterMap((src, dest, context) =>
+            {
+                dest.Executor = context.Mapper.Map<User, UserModel>(src.User);
+            });
         #endregion
 
         #region RequestHost

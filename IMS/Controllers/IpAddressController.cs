@@ -36,6 +36,14 @@ public class IpAddressController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/History")]
+    public async Task<ActionResult> GetHistory(int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel)
+    {
+        var result = await _ipAddressService.GetHistory(id, paginationModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpGet("{id}/ServerAllocation")]
     public async Task<ActionResult> GetServerAllocation(int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] ServerAllocationSearchModel searchModel)
     {
