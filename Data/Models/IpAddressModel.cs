@@ -51,7 +51,8 @@ public class IpAddressChangePurposeModel
 public class IpAddressSearchModel
 {
     public string? Address { get; set; }
-    public List<IpAssignmentTypes?>? AssignmentTypes { get; set; }  
+    public List<IpAssignmentTypes?>? AssignmentTypes { get; set; }
+    public List<IpPurpose?>? Purposes { get; set; }
     public bool? IsAvailable { get; set; }
     public bool? IsAssigned { get; set; }
     public bool? IsBlocked { get; set; }

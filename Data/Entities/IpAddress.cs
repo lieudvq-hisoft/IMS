@@ -44,8 +44,9 @@ public class IpAddress
         var matchRequestHost = model.RequestHostId != null ? RequestHostIps.Any(x => x.RequestHostId == model.RequestHostId) : true;
         var matchServer = model.ServerAllocationId != null ? IpAssignments.Any(x => x.ServerAllocationId == model.ServerAllocationId) : true;
         var matchSubnet = model.SubnetId != null ? IpSubnetId == model.SubnetId : true;
+        var matchPurpose = model.Purposes != null ? model.Purposes.Contains(this.Purpose) : true;
 
-        return matchAddress && matchAssignmentType && available && assigned && isReserved && blocked && matchRequestHost && matchServer && matchSubnet;
+        return matchAddress && matchAssignmentType && available && assigned && isReserved && blocked && matchRequestHost && matchServer && matchSubnet && matchPurpose;
     }
 
     public static string GetDefaultSubnetMask(string ipAddressString)
