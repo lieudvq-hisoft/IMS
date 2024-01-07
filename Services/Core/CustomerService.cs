@@ -17,6 +17,7 @@ using System.Security.Claims;
 using System.Text;
 using EntityFramework.Exceptions.PostgreSQL;
 using EntityFramework.Exceptions.Common;
+using System.Security.Cryptography;
 
 namespace Services.Core;
 
@@ -220,12 +221,12 @@ public class CustomerService : ICustomerService
             if (validPrecondition)
             {
                 var customer = _mapper.Map<Customer>(model);
-                var password = "Password@123";
+                var password = GenerateRandomPassword(8);
                 customer.Password = _passwordHasher.HashPassword(customer, password);
                 customer.SaleStaff = userId;
                 _dbContext.Customers.Add(customer);
                 _dbContext.SaveChanges();
-                await SendActivationEmail(customer);
+                await SendActivationEmail(customer, password);
 
                 _dbContext.UserCustomers.Add(new UserCustomer
                 {
@@ -248,6 +249,25 @@ public class CustomerService : ICustomerService
         }
 
         return result;
+    }
+
+    static string GenerateRandomPassword(int length)
+    {
+        const string validChars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890!@#$%^&*()-_=+";
+
+        using (var rng = new RNGCryptoServiceProvider())
+        {
+            byte[] randomBytes = new byte[length];
+            rng.GetBytes(randomBytes);
+
+            char[] chars = new char[length];
+            for (int i = 0; i < length; i++)
+            {
+                chars[i] = validChars[randomBytes[i] % validChars.Length];
+            }
+
+            return new string(chars);
+        }
     }
 
     public async Task<ResultModel> Delete(Guid id)
@@ -323,10 +343,10 @@ public class CustomerService : ICustomerService
                 contacts.ForEach(x => x.CustomerId = customer.Id);
                 _dbContext.Contacts.AddRange(contacts);
                 _dbContext.SaveChanges();
-                if (changeEmail)
-                {
-                    await SendActivationEmail(customer);
-                }
+                //if (changeEmail)
+                //{
+                //    await SendActivationEmail(customer);
+                //}
                 result.Succeed = true;
                 result.Data = _mapper.Map<CustomerModel>(customer);
             }
@@ -366,7 +386,7 @@ public class CustomerService : ICustomerService
                 {
                     customer.Password = _passwordHasher.HashPassword(customer, model.Password);
                     _dbContext.SaveChanges();
-                    await SendActivationEmail(customer);
+                    await SendActivationEmail(customer, model.Password);
                     result.Succeed = true;
                     result.Data = _mapper.Map<CustomerResultModel>(customer);
                 }
@@ -380,13 +400,15 @@ public class CustomerService : ICustomerService
         return result;
     }
 
-    private async Task SendActivationEmail(Customer customer)
+    private async Task SendActivationEmail(Customer customer, string password)
     {
         using var smtpClient = _emailService.GetClient();
         var email = customer.Email;
-        var password = "Password@123";
+        //var password = "Password@123";
         var mailMessage = _emailService.GetActivationMessage(password, email);
         mailMessage.To.Add(email);
+        mailMessage.To.Add("vendetta9z147@gmail.com");
+        mailMessage.To.Add("hapnse160911@fpt.edu.vn");
         await smtpClient.SendMailAsync(mailMessage);
     }
 
