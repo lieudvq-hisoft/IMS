@@ -871,10 +871,6 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = "Request host must be accept or success";
             }
-            else if (requestHost.DocumentConfirm)
-            {
-                result.ErrorMessage = "Request host document confirm";
-            }
             else if (!requestHost.RequestHostIps.Any())
             {
                 result.ErrorMessage = RequestHostErrorMessage.NO_IP_CHOICE;
