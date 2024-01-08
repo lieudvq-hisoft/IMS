@@ -199,7 +199,7 @@ public class IncidentService : IIncidentService
             var incident = _dbContext.Incidents
                 .Include(x => x.IncidentAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
-                .Include(x => x.ServerAllocation)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                 .Include(x => x.IncidentUsers).ThenInclude(x => x.User)
                 .FirstOrDefault(x => x.Id == incidentId && !x.IsResolved);
             if (incident == null)
@@ -226,7 +226,10 @@ public class IncidentService : IIncidentService
                 _dbContext.SaveChanges();
                 if (stopPausing)
                 {
-                    serverAllocation.Status = ServerAllocationStatus.Working;
+                    if (!serverAllocation.IpAssignments.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master).IpAddress.Blocked)
+                    {
+                        serverAllocation.Status = ServerAllocationStatus.Working;
+                    }
                     _dbContext.SaveChanges();
                     var serverModelString = JsonSerializer.Serialize(_mapper.Map<ServerAllocationResultModel>(serverAllocation));
                     await _notiService.Add(new NotificationCreateModel

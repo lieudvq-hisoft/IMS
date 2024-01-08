@@ -298,7 +298,8 @@ public class IpAddressService : IIpAddressService
         try
         {
             var ipAddresses = _dbContext.IpAddresses
-                .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation)
+                .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
+                .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation).ThenInclude(x => x.Incidents)
                 .Where(x => model.IpAddressIds.Contains(x.Id) && x.Blocked == !isBlock)
                 .ToList();
             if (ipAddresses.Count() != model.IpAddressIds.Count())
@@ -318,7 +319,11 @@ public class IpAddressService : IIpAddressService
                         }
                         else
                         {
-                            masterIpServer.Status = ServerAllocationStatus.Working;
+                            if (masterIpServer.Incidents.All(x => x.IsResolved && x.PausingRequired))
+                            {
+                                masterIpServer.Status = ServerAllocationStatus.Working;
+                            }
+                            masterIpServer.IpAssignments.Select(x => x.IpAddress).ToList().ForEach(x => x.Blocked = false);
                         }
                     }
                     x.Blocked = isBlock;
