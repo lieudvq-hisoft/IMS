@@ -2134,8 +2134,10 @@ public class AppointmentService : IAppointmentService
                     _dbContext.RequestUpgradeUsers.Remove(requestUpgrade.RequestUpgradeUsers.FirstOrDefault(x => x.UserId == executor.UserId && x.Action == RequestUserAction.Execute));
                 }
 
-                foreach (var requestExpand in appointment.RequestExpandAppointments.Select(x => x.RequestExpand))
+                var requestExpand = appointment.RequestExpandAppointments.FirstOrDefault().RequestExpand;
+                if (requestExpand != null)
                 {
+                    appointment.ReceiptOfRecipientFilePath = (await CreateExpandReceiptReport(requestExpand.Id, model.DocumentModel)).Data as string;
                     _dbContext.RequestExpandUsers.Remove(requestExpand.RequestExpandUsers.FirstOrDefault(x => x.UserId == executor.UserId && x.Action == RequestUserAction.Execute));
                 }
                 appointment.TechNote = model.TechNote;

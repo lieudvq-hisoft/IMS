@@ -149,6 +149,9 @@ public class AppointmentFailModel
     [Required]
     [StringLength(2000)]
     public string? TechNote { get; set; }
+
+    [Required]
+    public ServerAllocationCreateRequestExpandInspectionReportModel DocumentModel { get; set; }
 }
 
 public class AppointmentCompleteModel
