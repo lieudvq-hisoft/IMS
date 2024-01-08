@@ -83,6 +83,7 @@ public class StatisticService : IStatisticService
                 statistic.Add(new StatisticMonthModel
                 {
                     Month = month.Month,
+                    Year = month.Year,
                     RequestExpands = new StatisticRequestModel
                     {
                         Waiting = requestExpands.Where(x => x.Status == RequestStatus.Waiting).Count(),

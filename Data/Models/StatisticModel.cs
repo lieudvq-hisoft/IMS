@@ -14,6 +14,7 @@ public class StatisticModel
 public class StatisticMonthModel
 {
     public int Month { get; set; }
+    public int Year { get; set; }
     public StatisticRequestModel RequestHosts { get; set; }
     public StatisticRequestModel RequestUpgrades { get; set; }
     public StatisticRequestModel RequestExpands { get; set; }
