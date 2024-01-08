@@ -311,11 +311,13 @@ public class IpAddressService : IIpAddressService
                 ipAddresses.ForEach(x =>
                 {
                     var masterIpServer = x.IpAssignments.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.ServerAllocation;
+                    var masterIpServerIps = masterIpServer.IpAssignments.Select(x => x.IpAddress);
                     if (masterIpServer != null)
                     {
                         if (isBlock)
                         {
                             masterIpServer.Status = ServerAllocationStatus.Pausing;
+                            masterIpServerIps.ToList().ForEach(x => x.Blocked = true);
                         }
                         else
                         {
@@ -323,7 +325,7 @@ public class IpAddressService : IIpAddressService
                             {
                                 masterIpServer.Status = ServerAllocationStatus.Working;
                             }
-                            masterIpServer.IpAssignments.Select(x => x.IpAddress).ToList().ForEach(x => x.Blocked = false);
+                            masterIpServerIps.ToList().ForEach(x => x.Blocked = false);
                         }
                     }
                     x.Blocked = isBlock;
