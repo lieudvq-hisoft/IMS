@@ -12,6 +12,7 @@ public interface IStatisticService
     Task<ResultModel> GetRequestByMonth(StatisticSearchByTimeModel model);
     //Task<ResultModel> GetRequestByYear(StatisticSearchByTimeModel model);
     Task<ResultModel> GetRequest(StatisticSearchModel model);
+    Task<ResultModel> GetCustomerStatistic(Guid customerId);
 }
 
 public class StatisticService : IStatisticService
@@ -349,5 +350,43 @@ public class StatisticService : IStatisticService
 
             iterator = iterator.AddMonths(1);
         }
+    }
+
+    public async Task<ResultModel> GetCustomerStatistic(Guid customerId)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var servers = _dbContext.ServerAllocations.Where(x => x.CustomerId == customerId);
+            var ips = _dbContext.IpAddresses
+                .Include(x => x.IpAssignments).ThenInclude(x => x.ServerAllocation)
+                .Where(x => x.IpAssignments.Select(x => x.ServerAllocation).Any(x => x.CustomerId == customerId));
+
+            result.Succeed = true;
+            result.Data = new CustomerStatisticModel
+            {
+                Servers = new CustomerServerStatisticModel
+                {
+                    Waiting = servers.Where(x => x.Status == ServerAllocationStatus.Waiting).Count(),
+                    Working = servers.Where(x => x.Status == ServerAllocationStatus.Working).Count(),
+                    Pausing = servers.Where(x => x.Status == ServerAllocationStatus.Pausing).Count(),
+                    Removed = servers.Where(x => x.Status == ServerAllocationStatus.Removed).Count(),
+                },
+                Ips = new CustomerIpStatisticMode
+                {
+                    Master = ips.Where(x => x.IpAssignments.FirstOrDefault().Type == IpAssignmentTypes.Master).Count(),
+                    Additional = ips.Where(x => x.IpAssignments.FirstOrDefault().Type == IpAssignmentTypes.Additional).Count(),
+                    Port = ips.Where(x => x.IpAssignments.FirstOrDefault().Type == IpAssignmentTypes.Port).Count(),
+                }
+            };
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
     }
 }

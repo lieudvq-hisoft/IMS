@@ -32,6 +32,14 @@ public class StatisticController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("ByCustomer")]
+    public async Task<ActionResult> Get([FromQuery] Guid customerId)
+    {
+        var result = await _statisticService.GetCustomerStatistic(customerId);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     //[HttpGet("ByYear")]
     //public async Task<ActionResult> GetByYear([FromQuery] StatisticSearchByTimeModel model)
     //{

@@ -68,3 +68,24 @@ public class StatisticSearchModel
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
 }
+
+public class CustomerStatisticModel
+{
+    public CustomerServerStatisticModel Servers { get; set; }
+    public CustomerIpStatisticMode Ips { get; set; }
+}
+
+public class CustomerServerStatisticModel
+{
+    public int Waiting { get; set; }
+    public int Working { get; set; }
+    public int Pausing { get; set; }
+    public int Removed { get; set; }
+}
+
+public class CustomerIpStatisticMode
+{
+    public int Master { get; set; }
+    public int Port { get; set; }
+    public int Additional { get; set; }
+}
