@@ -9,6 +9,7 @@ using Data.Utils.Common;
 using Data.Utils.Paging;
 using Data.Utils.Tree;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Text.RegularExpressions;
 using static Data.Utils.Tree.TreeExtensions;
 
@@ -33,13 +34,15 @@ public class IpSubnetService : IIpSubnetService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly IConfiguration _config;
     private const int SUBNET_MAX_SIZE = 256;
     private const int PREFIX_LENGTH_MAX = 32;
 
-    public IpSubnetService(AppDbContext dbContext, IMapper mapper)
+    public IpSubnetService(AppDbContext dbContext, IMapper mapper, IConfiguration config)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _config = config;
     }
 
     //public async Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, IpSubnetSearchModel searchModel)
@@ -541,62 +544,62 @@ public class IpSubnetService : IIpSubnetService
     //    return result;
     //}
 
-    private bool IpSubnetBelongToParent(List<int> subnetOctet, IpSubnet parentSubnet)
-    {
-        double parentSubnetIncremental = Math.Pow(2, PREFIX_LENGTH_MAX - parentSubnet.PrefixLength) / SUBNET_MAX_SIZE;
-        return subnetOctet[0] == parentSubnet.FirstOctet && subnetOctet[1] == parentSubnet.SecondOctet && subnetOctet[2] >= parentSubnet.ThirdOctet && subnetOctet[2] < parentSubnet.ThirdOctet + parentSubnetIncremental;
-    }
+    //private bool IpSubnetBelongToParent(List<int> subnetOctet, IpSubnet parentSubnet)
+    //{
+    //    double parentSubnetIncremental = Math.Pow(2, PREFIX_LENGTH_MAX - parentSubnet.PrefixLength) / SUBNET_MAX_SIZE;
+    //    return subnetOctet[0] == parentSubnet.FirstOctet && subnetOctet[1] == parentSubnet.SecondOctet && subnetOctet[2] >= parentSubnet.ThirdOctet && subnetOctet[2] < parentSubnet.ThirdOctet + parentSubnetIncremental;
+    //}
 
-    private bool ValidPrefixLengthAndOctets(List<int> subnetOctet, int prefixLength)
-    {
-        bool validPrefixLengthAndOctets = true;
-        if (prefixLength <= 24 && subnetOctet[3] != 0)
-        {
-            validPrefixLengthAndOctets = false;
-        }
+    //private bool ValidPrefixLengthAndOctets(List<int> subnetOctet, int prefixLength)
+    //{
+    //    bool validPrefixLengthAndOctets = true;
+    //    if (prefixLength <= 24 && subnetOctet[3] != 0)
+    //    {
+    //        validPrefixLengthAndOctets = false;
+    //    }
 
-        return validPrefixLengthAndOctets;
-    }
+    //    return validPrefixLengthAndOctets;
+    //}
 
-    private List<IpAddress> ExtractSubnetIpAddresses(double numberOfIps, List<int> octets, List<IpAddress> parentIps)
-    {
-        int subnetIncremental = (int)numberOfIps / SUBNET_MAX_SIZE;
-        double ipTaken = 0;
-        var ips = new List<IpAddress>();
+    //private List<IpAddress> ExtractSubnetIpAddresses(double numberOfIps, List<int> octets, List<IpAddress> parentIps)
+    //{
+    //    int subnetIncremental = (int)numberOfIps / SUBNET_MAX_SIZE;
+    //    double ipTaken = 0;
+    //    var ips = new List<IpAddress>();
 
-        if (subnetIncremental == 0)
-        {
-            for (int t = octets[3]; t < octets[3] + numberOfIps; t++)
-            {
-                var address = $"{octets[0]}.{octets[1]}.{octets[2]}.{t}";
-                var ip = parentIps.FirstOrDefault(x => x.Address.Trim() == address.Trim());
-                if (ip != null)
-                {
-                    ips.Add(ip);
-                    parentIps.Remove(ip);
-                }
-            }
-        }
-        else
-        {
-            for (int i = 0; i < subnetIncremental; i++)
-            {
-                for (int t = 0; t < SUBNET_MAX_SIZE && ipTaken < numberOfIps; t++)
-                {
-                    ipTaken++;
-                    var address = $"{octets[0]}.{octets[1]}.{octets[2] + i}.{t}";
-                    var ip = parentIps.FirstOrDefault(x => x.Address.Trim() == address.Trim());
-                    if (ip != null)
-                    {
-                        ips.Add(ip);
-                        parentIps.Remove(ip);
-                    }
-                }
-            }
-        }
+    //    if (subnetIncremental == 0)
+    //    {
+    //        for (int t = octets[3]; t < octets[3] + numberOfIps; t++)
+    //        {
+    //            var address = $"{octets[0]}.{octets[1]}.{octets[2]}.{t}";
+    //            var ip = parentIps.FirstOrDefault(x => x.Address.Trim() == address.Trim());
+    //            if (ip != null)
+    //            {
+    //                ips.Add(ip);
+    //                parentIps.Remove(ip);
+    //            }
+    //        }
+    //    }
+    //    else
+    //    {
+    //        for (int i = 0; i < subnetIncremental; i++)
+    //        {
+    //            for (int t = 0; t < SUBNET_MAX_SIZE && ipTaken < numberOfIps; t++)
+    //            {
+    //                ipTaken++;
+    //                var address = $"{octets[0]}.{octets[1]}.{octets[2] + i}.{t}";
+    //                var ip = parentIps.FirstOrDefault(x => x.Address.Trim() == address.Trim());
+    //                if (ip != null)
+    //                {
+    //                    ips.Add(ip);
+    //                    parentIps.Remove(ip);
+    //                }
+    //            }
+    //        }
+    //    }
 
-        return ips;
-    }
+    //    return ips;
+    //}
 
     public async Task<ResultModel> SuggestAdditionalIps(SuggestAdditionalIpModel model)
     {

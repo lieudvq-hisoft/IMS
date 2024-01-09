@@ -321,7 +321,7 @@ public class IpAddressService : IIpAddressService
                         }
                         else
                         {
-                            if (masterIpServer.Incidents.All(x => x.IsResolved && x.PausingRequired))
+                            if (!masterIpServer.Incidents.Any(x => !x.IsResolved && x.PausingRequired))
                             {
                                 masterIpServer.Status = ServerAllocationStatus.Working;
                             }
