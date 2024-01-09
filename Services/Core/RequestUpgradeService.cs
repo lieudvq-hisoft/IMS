@@ -461,23 +461,16 @@ public class RequestUpgradeService : IRequestUpgradeService
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_WAITING;
             }
 
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
-            if (user == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-
             if (validPrecondition)
             {
                 requestUpgrade.Status = RequestStatus.Accepted;
-                requestUpgrade.DateEvaluated = DateTime.Now;
                 _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
                 {
-                    Action = RequestUserAction.Evaluate,
                     RequestUpgradeId = requestUpgrade.Id,
-                    UserId = userId
+                    UserId = userId,
+                    Action = RequestUserAction.Execute
                 });
+                requestUpgrade.DateEvaluated = DateTime.Now;
                 _dbContext.SaveChanges();
 
                 var requestModelString = JsonSerializer.Serialize(_mapper.Map<RequestUpgradeResultModel>(requestUpgrade));

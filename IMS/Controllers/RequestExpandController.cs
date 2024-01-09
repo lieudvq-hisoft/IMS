@@ -84,7 +84,7 @@ public class RequestExpandController : ControllerBase
     public async Task<ActionResult> Accept(int id)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestExpandService.Accept(id, new Guid(userId));
+        var result = await _requestExpandService.Accept(id);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }

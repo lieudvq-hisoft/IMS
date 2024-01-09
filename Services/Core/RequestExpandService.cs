@@ -22,7 +22,7 @@ public interface IRequestExpandService
     Task<ResultModel> Update(RequestExpandUpdateModel model);
     Task<ResultModel> Delete(int requestExpandId);
     Task<ResultModel> Reject(int requestExpandId, RequestExpandRejectModel modell);
-    Task<ResultModel> Accept(int requestExpandId, Guid userId);
+    Task<ResultModel> Accept(int requestExpandId);
     Task<ResultModel> Deny(int requestExpandId, Guid userId, DenyModel model);
     //Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
     Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model);
@@ -438,7 +438,7 @@ public class RequestExpandService : IRequestExpandService
     //    return result;
     //}
 
-    public async Task<ResultModel> Accept(int requestExpandId, Guid userId)
+    public async Task<ResultModel> Accept(int requestExpandId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -458,23 +458,10 @@ public class RequestExpandService : IRequestExpandService
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_WAITING;
             }
 
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
-            if (user == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-
             if (validPrecondition)
             {
                 requestExpand.Status = RequestStatus.Accepted;
                 requestExpand.DateEvaluated = DateTime.Now;
-                _dbContext.RequestExpandUsers.Add(new RequestExpandUser
-                {
-                    Action = RequestUserAction.Evaluate,
-                    RequestExpandId = requestExpand.Id,
-                    UserId = userId
-                });
                 if (requestExpand.ForRemoval)
                 {
                     requestExpand.ServerAllocation.Status = ServerAllocationStatus.Pausing;

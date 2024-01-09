@@ -28,7 +28,7 @@ public interface IRequestHostService
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Update(RequestHostUpdateModel model);
     Task<ResultModel> UpdatePortUpgrade(RequestHostUpdateUpgradeModel model);
-    Task<ResultModel> Accept(int requestHostId, Guid userId, UserAssignModel model);
+    Task<ResultModel> Accept(int requestHostId, Guid userId);
     Task<ResultModel> Deny(int requestHostId, Guid userId, DenyModel model);
     Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model);
     Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model);
@@ -577,7 +577,7 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    public async Task<ResultModel> Accept(int requestHostId, Guid userId, UserAssignModel model)
+    public async Task<ResultModel> Accept(int requestHostId, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -601,26 +601,10 @@ public class RequestHostService : IRequestHostService
             }
 
             var user = _dbContext.User.FirstOrDefault(x => x.Id == userId);
-            User executor = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
             if (user == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-
-            if (executor == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var roles = await _userManager.GetRolesAsync(executor);
-                if (!roles.Contains(RoleType.Tech.ToString()))
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "User assigned is not a tech";
-                }
             }
 
             if (validPrecondition)
@@ -633,12 +617,6 @@ public class RequestHostService : IRequestHostService
                     RequestHostId = requestHost.Id,
                     UserId = userId
                 });
-                _dbContext.RequestHostUsers.Add(new RequestHostUser
-                {
-                    Action = RequestUserAction.Execute,
-                    RequestHostId = requestHostId,
-                    UserId = executor.Id,
-                });
                 _dbContext.SaveChanges();
 
                 var reuqestHostModelString = JsonSerializer.Serialize(_mapper.Map<RequestHostResultModel>(requestHost));
@@ -648,18 +626,6 @@ public class RequestHostService : IRequestHostService
                     Action = "Accepted",
                     Title = $"{(requestHost.IsUpgrade ? "Port upgrade" : "Ip")} request accepted",
                     Body = $"There's an {(requestHost.IsUpgrade ? "port upgrade" : "ip")} request just accepted",
-                    Data = new NotificationData
-                    {
-                        Key = "RequestHost",
-                        Value = reuqestHostModelString
-                    }
-                });
-                await _notiService.Add(new NotificationCreateModel
-                {
-                    UserId = executor.Id,
-                    Action = "Assigned",
-                    Title = "Assigned to ip request",
-                    Body = "There's an ip request just assigned to you",
                     Data = new NotificationData
                     {
                         Key = "RequestHost",
@@ -922,7 +888,7 @@ public class RequestHostService : IRequestHostService
             }
             else
             {
-                validPrecondition = IsCompletable(requestHostId, result, model, userId);
+                validPrecondition = IsCompletable(requestHostId, result, model);
             }
 
             if (!validPrecondition)
@@ -958,6 +924,12 @@ public class RequestHostService : IRequestHostService
                 requestHost.Status = RequestHostStatus.Success;
                 requestHost.DateExecuted = DateTime.Now;
                 requestHost.ServerAllocation.DateUpdated = DateTime.UtcNow;
+                _dbContext.RequestHostUsers.Add(new RequestHostUser
+                {
+                    RequestHostId = requestHost.Id,
+                    UserId = userId,
+                    Action = RequestUserAction.Execute
+                });
                 _dbContext.SaveChanges();
 
                 var createDocResult = await CreateUpgradeAndHostInspectionReport(requestHost.Id, model);
@@ -999,7 +971,7 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    private bool IsCompletable(int requestHostId, ResultModel result, HostAndUpgradeCreateInspectionReportModel model, Guid userId)
+    private bool IsCompletable(int requestHostId, ResultModel result, HostAndUpgradeCreateInspectionReportModel model)
     {
         bool validPrecondition = true;
         var requestHost = _dbContext.RequestHosts
@@ -1027,20 +999,6 @@ public class RequestHostService : IRequestHostService
         else if (requestHost.InspectionReportFilePath == null && model == null)
         {
             result.ErrorMessage = "Need inspection report to complete";
-        }
-        else
-        {
-            var executor = _dbContext.RequestHostUsers.FirstOrDefault(x => x.RequestHostId == requestHost.Id && x.Action == RequestUserAction.Execute);
-            if (executor == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = $"{(requestHost.IsUpgrade ? "Port upgrade" : "Ip")} request must have an assigned tech";
-            }
-            else if (executor.UserId != userId)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = "Unassigned tech cannot complete this request";
-            }
         }
 
         return validPrecondition;
@@ -1070,7 +1028,7 @@ public class RequestHostService : IRequestHostService
             }
             else
             {
-                validPrecondition = IsCompletable(requestHostId, result, model, userId);
+                validPrecondition = IsCompletable(requestHostId, result, model);
             }
 
             if (!validPrecondition)
@@ -1088,6 +1046,12 @@ public class RequestHostService : IRequestHostService
                     ipAssignments.Add(ipAssignment);
                 }
                 requestHost.Status = RequestHostStatus.Success;
+                _dbContext.RequestHostUsers.Add(new RequestHostUser
+                {
+                    RequestHostId = requestHost.Id,
+                    UserId = userId,
+                    Action = RequestUserAction.Execute
+                });
                 requestHost.DateExecuted = DateTime.Now;
                 requestHost.ServerAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();

@@ -30,9 +30,9 @@ public interface IAppointmentService
     Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model);
     Task<ResultModel> Update(AppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
-    Task<ResultModel> Accept(int appointmentId, Guid userId, UserAssignModel model);
+    Task<ResultModel> Accept(int appointmentId, Guid userId);
     Task<ResultModel> Deny(int appointmentId, Guid userId, DenyModel model);
-    Task<ResultModel> AssignTech(int appointmentId, UserAssignModel model);
+    //Task<ResultModel> AssignTech(int appointmentId, UserAssignModel model);
     Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model, Guid userId);
     Task<ResultModel> Resolv(int appointmentId, AppointmentResolvModel model, Guid userId);
     Task<ResultModel> Fail(int appointmentId, AppointmentFailModel model);
@@ -893,7 +893,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> Accept(int appointmentId, Guid userId, UserAssignModel model)
+    public async Task<ResultModel> Accept(int appointmentId, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -918,26 +918,10 @@ public class AppointmentService : IAppointmentService
             }
 
             var evaluator = _dbContext.User.FirstOrDefault(x => x.Id == userId);
-            User executor = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
             if (evaluator == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-
-            if (executor == null)
-            {
-                validPrecondition = false;
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var roles = await _userManager.GetRolesAsync(executor);
-                if (!roles.Contains(RoleType.Tech.ToString()))
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = "User assigned is not a tech";
-                }
             }
 
             if (validPrecondition)
@@ -951,13 +935,6 @@ public class AppointmentService : IAppointmentService
                     UserId = evaluator.Id
                 });
 
-                _dbContext.AppointmentUsers.Add(new AppointmentUser
-                {
-                    Action = RequestUserAction.Execute,
-                    AppointmentId = appointmentId,
-                    UserId = executor.Id,
-                });
-
                 foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
                 {
                     requestUpgrade.Status = RequestStatus.Accepted;
@@ -967,13 +944,6 @@ public class AppointmentService : IAppointmentService
                         Action = RequestUserAction.Evaluate,
                         RequestUpgradeId = requestUpgrade.Id,
                         UserId = evaluator.Id
-                    });
-
-                    _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
-                    {
-                        Action = RequestUserAction.Execute,
-                        RequestUpgradeId = requestUpgrade.Id,
-                        UserId = executor.Id
                     });
                 }
 
@@ -992,13 +962,6 @@ public class AppointmentService : IAppointmentService
                         RequestExpandId = requestExpand.Id,
                         UserId = userId
                     });
-
-                    _dbContext.RequestExpandUsers.Add(new RequestExpandUser
-                    {
-                        Action = RequestUserAction.Execute,
-                        RequestExpandId = requestExpand.Id,
-                        UserId = executor.Id
-                    });
                 }
 
                 _dbContext.SaveChanges();
@@ -1009,18 +972,6 @@ public class AppointmentService : IAppointmentService
                     Action = "Accepted",
                     Title = "Appointment accepted",
                     Body = "There's an appointment just accepted",
-                    Data = new NotificationData
-                    {
-                        Key = "Appointment",
-                        Value = appointmentModelString
-                    }
-                });
-                await _notiService.Add(new NotificationCreateModel
-                {
-                    UserId = executor.Id,
-                    Action = "Assigned",
-                    Title = "Assigned to appointment",
-                    Body = "There's an appointment just assigned to you",
                     Data = new NotificationData
                     {
                         Key = "Appointment",
@@ -1125,115 +1076,115 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> AssignTech(int appointmentId, UserAssignModel model)
-    {
-        var result = new ResultModel();
-        result.Succeed = false;
+    //public async Task<ResultModel> AssignTech(int appointmentId, UserAssignModel model)
+    //{
+    //    var result = new ResultModel();
+    //    result.Succeed = false;
 
-        try
-        {
-            var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
-            var appointment = _dbContext.Appointments
-                .Include(x => x.AppointmentUsers)
-                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandUsers)
-                .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.RequestUpgradeUsers)
-                .Include(x => x.IncidentAppointments).ThenInclude(x => x.Incident).ThenInclude(x => x.IncidentUsers)
-                .FirstOrDefault(x => x.Id == appointmentId);
-            if (appointment == null)
-            {
-                result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
-            }
-            else if (appointment.Status != RequestStatus.Accepted)
-            {
-                result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
-            }
-            else if (user == null)
-            {
-                result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                var roles = await _userManager.GetRolesAsync(user);
-                if (!roles.Contains(RoleType.Tech.ToString()))
-                {
-                    result.ErrorMessage = "User assigned is not a tech";
-                }
-                else
-                {
-                    var existedExecutor = appointment.AppointmentUsers?.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
-                    if (existedExecutor != null)
-                    {
-                        _dbContext.AppointmentUsers.Remove(existedExecutor);
-                    }
-                    switch (appointment.Reason)
-                    {
-                        case AppointmentReason.Support:
-                            break;
-                        case AppointmentReason.Install:
-                        case AppointmentReason.Uninstall:
-                            {
-                                var requestExpand = appointment.RequestExpandAppointments.FirstOrDefault().RequestExpand;
-                                var executor = requestExpand.RequestExpandUsers.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
-                                _dbContext.RequestExpandUsers.Remove(executor);
-                                _dbContext.RequestExpandUsers.Add(new RequestExpandUser
-                                {
-                                    Action = RequestUserAction.Execute,
-                                    RequestExpandId = requestExpand.Id,
-                                    UserId = user.Id,
-                                });
-                                break;
-                            }
-                        case AppointmentReason.Upgrade:
-                            {
-                                var requestUpgrades = appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade);
-                                foreach (var requestUpgrade in requestUpgrades)
-                                {
-                                    var executor = requestUpgrade.RequestUpgradeUsers.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
-                                    _dbContext.RequestUpgradeUsers.Remove(executor);
-                                    _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
-                                    {
-                                        Action = RequestUserAction.Execute,
-                                        RequestUpgradeId = requestUpgrade.Id,
-                                        UserId = user.Id,
-                                    });
-                                }
-                            }
-                            break;
-                        case AppointmentReason.Incident:
-                            {
-                                var incident = appointment.IncidentAppointments.FirstOrDefault().Incident;
-                                var executor = incident.IncidentUsers.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
-                                if (executor != null)
-                                {
-                                    _dbContext.IncidentUsers.Remove(executor);
-                                }
-                                _dbContext.IncidentUsers.Add(new IncidentUser
-                                {
-                                    Action = RequestUserAction.Execute,
-                                    IncidentId = incident.Id,
-                                    UserId = user.Id,
-                                });
-                                break;
-                            }
-                    }
-                    _dbContext.AppointmentUsers.Add(new AppointmentUser
-                    {
-                        Action = RequestUserAction.Execute,
-                        AppointmentId = appointmentId,
-                        UserId = user.Id,
-                    });
-                    _dbContext.SaveChanges();
-                    result.Succeed = true;
-                }
-            }
-        }
-        catch (Exception e)
-        {
-            result.ErrorMessage = MyFunction.GetErrorMessage(e);
-        }
+    //    try
+    //    {
+    //        var user = _dbContext.User.FirstOrDefault(x => x.Id == new Guid(model.UserId));
+    //        var appointment = _dbContext.Appointments
+    //            .Include(x => x.AppointmentUsers)
+    //            .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandUsers)
+    //            .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.RequestUpgradeUsers)
+    //            .Include(x => x.IncidentAppointments).ThenInclude(x => x.Incident).ThenInclude(x => x.IncidentUsers)
+    //            .FirstOrDefault(x => x.Id == appointmentId);
+    //        if (appointment == null)
+    //        {
+    //            result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+    //        }
+    //        else if (appointment.Status != RequestStatus.Accepted)
+    //        {
+    //            result.ErrorMessage = AppointmentErrorMessage.NOT_ACCEPTED;
+    //        }
+    //        else if (user == null)
+    //        {
+    //            result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
+    //        }
+    //        else
+    //        {
+    //            var roles = await _userManager.GetRolesAsync(user);
+    //            if (!roles.Contains(RoleType.Tech.ToString()))
+    //            {
+    //                result.ErrorMessage = "User assigned is not a tech";
+    //            }
+    //            else
+    //            {
+    //                var existedExecutor = appointment.AppointmentUsers?.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
+    //                if (existedExecutor != null)
+    //                {
+    //                    _dbContext.AppointmentUsers.Remove(existedExecutor);
+    //                }
+    //                switch (appointment.Reason)
+    //                {
+    //                    case AppointmentReason.Support:
+    //                        break;
+    //                    case AppointmentReason.Install:
+    //                    case AppointmentReason.Uninstall:
+    //                        {
+    //                            var requestExpand = appointment.RequestExpandAppointments.FirstOrDefault().RequestExpand;
+    //                            var executor = requestExpand.RequestExpandUsers.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
+    //                            _dbContext.RequestExpandUsers.Remove(executor);
+    //                            _dbContext.RequestExpandUsers.Add(new RequestExpandUser
+    //                            {
+    //                                Action = RequestUserAction.Execute,
+    //                                RequestExpandId = requestExpand.Id,
+    //                                UserId = user.Id,
+    //                            });
+    //                            break;
+    //                        }
+    //                    case AppointmentReason.Upgrade:
+    //                        {
+    //                            var requestUpgrades = appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade);
+    //                            foreach (var requestUpgrade in requestUpgrades)
+    //                            {
+    //                                var executor = requestUpgrade.RequestUpgradeUsers.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
+    //                                _dbContext.RequestUpgradeUsers.Remove(executor);
+    //                                _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
+    //                                {
+    //                                    Action = RequestUserAction.Execute,
+    //                                    RequestUpgradeId = requestUpgrade.Id,
+    //                                    UserId = user.Id,
+    //                                });
+    //                            }
+    //                        }
+    //                        break;
+    //                    case AppointmentReason.Incident:
+    //                        {
+    //                            var incident = appointment.IncidentAppointments.FirstOrDefault().Incident;
+    //                            var executor = incident.IncidentUsers.FirstOrDefault(x => x.Action == RequestUserAction.Execute);
+    //                            if (executor != null)
+    //                            {
+    //                                _dbContext.IncidentUsers.Remove(executor);
+    //                            }
+    //                            _dbContext.IncidentUsers.Add(new IncidentUser
+    //                            {
+    //                                Action = RequestUserAction.Execute,
+    //                                IncidentId = incident.Id,
+    //                                UserId = user.Id,
+    //                            });
+    //                            break;
+    //                        }
+    //                }
+    //                _dbContext.AppointmentUsers.Add(new AppointmentUser
+    //                {
+    //                    Action = RequestUserAction.Execute,
+    //                    AppointmentId = appointmentId,
+    //                    UserId = user.Id,
+    //                });
+    //                _dbContext.SaveChanges();
+    //                result.Succeed = true;
+    //            }
+    //        }
+    //    }
+    //    catch (Exception e)
+    //    {
+    //        result.ErrorMessage = MyFunction.GetErrorMessage(e);
+    //    }
 
-        return result;
-    }
+    //    return result;
+    //}
 
     public async Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model, Guid userId)
     {
@@ -1267,13 +1218,19 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
-                validPrecondition = IsCompletable(appointmentId, result, userId);
+                validPrecondition = IsCompletable(appointmentId, result);
             }
 
             if (validPrecondition)
             {
                 _mapper.Map<AppointmentCompleteModel, Appointment>(model, appointment);
                 appointment.Status = RequestStatus.Success;
+                _dbContext.AppointmentUsers.Add(new AppointmentUser
+                {
+                    AppointmentId = appointmentId,
+                    UserId = userId,
+                    Action = RequestUserAction.Execute
+                });
                 appointment.DateExecuted = DateTime.Now;
                 _dbContext.SaveChanges();
 
@@ -1291,7 +1248,7 @@ public class AppointmentService : IAppointmentService
                     //appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
                     foreach (var requestUpgradeId in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgradeId))
                     {
-                        requestUpgradeResults.Add(await CompleteRequestUpgrade(requestUpgradeId));
+                        requestUpgradeResults.Add(await CompleteRequestUpgrade(requestUpgradeId, userId));
                     }
                     var createInspectionResult = await CreateUpgradeInspectionReport(appointment.ServerAllocationId, model.DocumentModel);
                     if (!createInspectionResult.Succeed)
@@ -1314,7 +1271,7 @@ public class AppointmentService : IAppointmentService
 
                     if (!requestExpand.ForRemoval)
                     {
-                        requestExpandResult = await CompleteRequestExpand(requestExpand.Id);
+                        requestExpandResult = await CompleteRequestExpand(requestExpand.Id, userId);
                     }
                     else
                     {
@@ -1412,7 +1369,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    private bool IsCompletable(int appointmentId, ResultModel result, Guid userId)
+    private bool IsCompletable(int appointmentId, ResultModel result)
     {
         bool validPrecondition = true;
         var appointment = _dbContext.Appointments
@@ -1439,18 +1396,6 @@ public class AppointmentService : IAppointmentService
             result.ErrorMessage = "Please assign location to all request expand to complete the appointment";
         }
 
-        var executor = _dbContext.AppointmentUsers.FirstOrDefault(x => x.AppointmentId == appointment.Id && x.Action == RequestUserAction.Execute);
-        if (executor == null)
-        {
-            validPrecondition = false;
-            result.ErrorMessage = "Appointment must have an assigned tech";
-        }
-        else if (executor.UserId != userId)
-        {
-            validPrecondition = false;
-            result.ErrorMessage = "Unassigned tech cannot complete this appointment";
-        }
-
         var serverAllocation = appointment.ServerAllocation;
         if (appointment.Reason == AppointmentReason.Install)
         {
@@ -1468,7 +1413,7 @@ public class AppointmentService : IAppointmentService
         return validPrecondition;
     }
 
-    private async Task<ResultModel> CompleteRequestUpgrade(int requestUpgradeId)
+    private async Task<ResultModel> CompleteRequestUpgrade(int requestUpgradeId, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -1519,6 +1464,12 @@ public class AppointmentService : IAppointmentService
                     }
                 }
                 requestUpgrade.Status = RequestStatus.Success;
+                _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
+                {
+                    RequestUpgradeId = requestUpgradeId,
+                    UserId = userId,
+                    Action = RequestUserAction.Execute
+                });
                 requestUpgrade.DateExecuted = DateTime.Now;
                 requestUpgrade.ServerAllocation.DateUpdated = DateTime.UtcNow;
                 _dbContext.SaveChanges();
@@ -1536,7 +1487,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    private async Task<ResultModel> CompleteRequestExpand(int requestExpandId)
+    private async Task<ResultModel> CompleteRequestExpand(int requestExpandId, Guid userId)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -1601,6 +1552,12 @@ public class AppointmentService : IAppointmentService
                 }
                 _dbContext.LocationAssignments.AddRange(locationAssignments);
                 requestExpand.Status = RequestStatus.Success;
+                _dbContext.RequestExpandUsers.Add(new RequestExpandUser
+                {
+                    RequestExpandId = requestExpandId,
+                    UserId = userId,
+                    Action = RequestUserAction.Execute
+                });
                 requestExpand.DateExecuted = DateTime.Now;
                 requestExpand.SuccessExpandAppointmentId = requestExpand.RequestExpandAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Success).Id;
                 serverAllocation.DateUpdated = DateTime.UtcNow;
@@ -2110,36 +2067,20 @@ public class AppointmentService : IAppointmentService
                 .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.RequestExpand).ThenInclude(x => x.RequestExpandUsers)
                 .Include(x => x.RequestUpgradeAppointment).ThenInclude(x => x.RequestUpgrade).ThenInclude(x => x.RequestUpgradeUsers)
                 .FirstOrDefault(x => x.Id == appointmentId);
-            AppointmentUser executor = null;
             if (appointment == null)
             {
                 validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
-            }
-            else
-            {
-                executor = _dbContext.AppointmentUsers.FirstOrDefault(x => x.AppointmentId == appointment.Id && x.Action == RequestUserAction.Execute);
-                if (executor == null)
-                {
-                    validPrecondition = false;
-                    result.ErrorMessage = AppointmentUserErrorMessage.NOT_EXISTED;
-                }
             }
 
             if (validPrecondition)
             {
 
                 appointment.Status = RequestStatus.Failed;
-                foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
-                {
-                    _dbContext.RequestUpgradeUsers.Remove(requestUpgrade.RequestUpgradeUsers.FirstOrDefault(x => x.UserId == executor.UserId && x.Action == RequestUserAction.Execute));
-                }
-
                 var requestExpand = appointment.RequestExpandAppointments.FirstOrDefault().RequestExpand;
                 if (requestExpand != null)
                 {
                     appointment.ReceiptOfRecipientFilePath = (await CreateExpandReceiptReport(requestExpand.Id, model.DocumentModel)).Data as string;
-                    _dbContext.RequestExpandUsers.Remove(requestExpand.RequestExpandUsers.FirstOrDefault(x => x.UserId == executor.UserId && x.Action == RequestUserAction.Execute));
                 }
                 appointment.TechNote = model.TechNote;
                 _dbContext.SaveChanges();
@@ -2194,13 +2135,19 @@ public class AppointmentService : IAppointmentService
             }
             else
             {
-                validPrecondition = IsCompletable(appointmentId, result, userId);
+                validPrecondition = IsCompletable(appointmentId, result);
             }
 
             if (validPrecondition)
             {
                 _mapper.Map<AppointmentResolvModel, Appointment>(model, appointment);
                 appointment.Status = RequestStatus.Success;
+                _dbContext.AppointmentUsers.Add(new AppointmentUser
+                {
+                    AppointmentId = appointment.Id,
+                    UserId = userId,
+                    Action = RequestUserAction.Execute
+                });
                 _dbContext.SaveChanges();
                 var incident = appointment.IncidentAppointments.FirstOrDefault().Incident;
                 var incidentResult = await ResolvIncident(incident.Id, model.IncidentResolvModel, userId);
