@@ -81,6 +81,7 @@ public class AppointmentService : IAppointmentService
                 .Where(x => searchModel.Reasons.Contains(x.Reason) || searchModel.Reasons == null)
                 .Where(x => x.ServerAllocation.CustomerId == searchModel.CustomerId || searchModel.CustomerId == null)
                 .Where(x => x.AppointmentUsers.Any(x => x.UserId == searchModel.UserId) || searchModel.UserId == null)
+                .Where(x => x.IncidentAppointments.Any(x => x.IncidentId == searchModel.IncidentId) || searchModel.IncidentId == null)
                 .Where(x => x.AppointedCustomer.ToLower().Contains(searchValue) || x.ServerAllocation.Customer.CompanyName.Contains(searchValue))
                 .AsQueryable();
 
