@@ -10,6 +10,7 @@ using Data.Utils.Paging;
 using Data.Utils.Tree;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using static Data.Utils.Tree.TreeExtensions;
 
@@ -308,6 +309,7 @@ public class IpSubnetService : IIpSubnetService
 
         try
         {
+            var dnss = JsonSerializer.Deserialize<List<string>>(_config["DNSs"]);
             var octets = GetIPv4Octets(model.IpAddresss);
             var existedSubnet = _dbContext.IpSubnets.FirstOrDefault(x => x.FirstOctet == octets[0] && x.SecondOctet == octets[1] && x.ThirdOctet == octets[2]);
             List<IpAddress> ips = new List<IpAddress>();
@@ -378,7 +380,6 @@ public class IpSubnetService : IIpSubnetService
                     {
                         ipCount = 0;
                     }
-                    //}
                 }
             }
 
@@ -395,6 +396,7 @@ public class IpSubnetService : IIpSubnetService
             }
             else
             {
+                ips.Where(x => dnss.Contains(x.Address)).ToList().ForEach(x => x.Purpose = IpPurpose.Dns);
                 _dbContext.IpAddresses.AddRange(ips);
                 _dbContext.SaveChanges();
 
