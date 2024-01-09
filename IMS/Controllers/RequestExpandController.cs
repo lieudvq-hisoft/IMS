@@ -81,17 +81,17 @@ public class RequestExpandController : ControllerBase
 
     [HttpPut("{id}/Accept")]
     [SwaggerOperation(Summary = "Accept a waiting request expand")]
-    public async Task<ActionResult> Accept(int id)
+    public async Task<ActionResult> Accept(int id, [FromBody] EvaluateModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestExpandService.Accept(id);
+        var result = await _requestExpandService.Accept(id, Guid.Parse(userId), model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpPut("{id}/Deny")]
     [SwaggerOperation(Summary = "Deny a waiting request expand")]
-    public async Task<ActionResult> Deny(int id, [FromBody] DenyModel model)
+    public async Task<ActionResult> Deny(int id, [FromBody] EvaluateModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
         var result = await _requestExpandService.Deny(id, new Guid(userId), model);

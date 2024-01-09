@@ -37,7 +37,7 @@ public class UserAssignModel
     public string UserId { get; set; }
 }
 
-public class DenyModel
+public class EvaluateModel
 {
     [Required]
     public string SaleNote { get; set; }

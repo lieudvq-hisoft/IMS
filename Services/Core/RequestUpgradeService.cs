@@ -20,8 +20,8 @@ public interface IRequestUpgradeService
     Task<ResultModel> Delete(int requestUpgradeId);
     Task<ResultModel> Reject(int requestUpgradeId, RequestUpgradeRejectModel model);
     Task<ResultModel> Update(RequestUpgradeUpdateModel model);
-    Task<ResultModel> Accept(int requestUpgradeId, Guid userId);
-    Task<ResultModel> Deny(int requestUpgradeId, Guid userId, DenyModel model);
+    Task<ResultModel> Accept(int requestUpgradeId, Guid userId, EvaluateModel model);
+    Task<ResultModel> Deny(int requestUpgradeId, Guid userId, EvaluateModel model);
 }
 
 public class RequestUpgradeService : IRequestUpgradeService
@@ -441,7 +441,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> Accept(int requestUpgradeId, Guid userId)
+    public async Task<ResultModel> Accept(int requestUpgradeId, Guid userId, EvaluateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -464,6 +464,7 @@ public class RequestUpgradeService : IRequestUpgradeService
             if (validPrecondition)
             {
                 requestUpgrade.Status = RequestStatus.Accepted;
+                requestUpgrade.SaleNote = model.SaleNote;
                 _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
                 {
                     RequestUpgradeId = requestUpgrade.Id,
@@ -498,7 +499,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         return result;
     }
 
-    public async Task<ResultModel> Deny(int requestUpgradeId, Guid userId, DenyModel model)
+    public async Task<ResultModel> Deny(int requestUpgradeId, Guid userId, EvaluateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;

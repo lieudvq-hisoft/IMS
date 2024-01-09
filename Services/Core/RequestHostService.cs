@@ -28,8 +28,8 @@ public interface IRequestHostService
     Task<ResultModel> Delete(int id);
     Task<ResultModel> Update(RequestHostUpdateModel model);
     Task<ResultModel> UpdatePortUpgrade(RequestHostUpdateUpgradeModel model);
-    Task<ResultModel> Accept(int requestHostId, Guid userId);
-    Task<ResultModel> Deny(int requestHostId, Guid userId, DenyModel model);
+    Task<ResultModel> Accept(int requestHostId, Guid userId, EvaluateModel model);
+    Task<ResultModel> Deny(int requestHostId, Guid userId, EvaluateModel model);
     Task<ResultModel> AssignAdditionalIp(int requestHostId, RequestHostIpAssignmentModel model);
     Task<ResultModel> AssignInspectionReport(int requestHostId, RequestHostDocumentFileUploadModel model);
     Task<ResultModel> Complete(int requestHostId, Guid userId, HostAndUpgradeCreateInspectionReportModel? model);
@@ -577,7 +577,7 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    public async Task<ResultModel> Accept(int requestHostId, Guid userId)
+    public async Task<ResultModel> Accept(int requestHostId, Guid userId, EvaluateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -610,6 +610,7 @@ public class RequestHostService : IRequestHostService
             if (validPrecondition)
             {
                 requestHost.Status = RequestHostStatus.Accepted;
+                requestHost.SaleNote = model.SaleNote;
                 requestHost.DateEvaluated = DateTime.Now;
                 _dbContext.RequestHostUsers.Add(new RequestHostUser
                 {
@@ -645,7 +646,7 @@ public class RequestHostService : IRequestHostService
         return result;
     }
 
-    public async Task<ResultModel> Deny(int requestHostId, Guid userId, DenyModel model)
+    public async Task<ResultModel> Deny(int requestHostId, Guid userId, EvaluateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;

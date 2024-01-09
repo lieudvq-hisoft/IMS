@@ -113,17 +113,17 @@ public class AppointmentController : ControllerBase
 
     [HttpPut("{id}/Accept")]
     [SwaggerOperation(Summary = "Accept a waiting appointment")]
-    public async Task<ActionResult> Accept(int id)
+    public async Task<ActionResult> Accept(int id, [FromBody] EvaluateModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _appointmentService.Accept(id, new Guid(userId));
+        var result = await _appointmentService.Accept(id, new Guid(userId), model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
 
     [HttpPut("{id}/Deny")]
     [SwaggerOperation(Summary = "Deny a waiting appointment")]
-    public async Task<ActionResult> Deny(int id, [FromBody] DenyModel model)
+    public async Task<ActionResult> Deny(int id, [FromBody] EvaluateModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
         var result = await _appointmentService.Deny(id, new Guid(userId), model);

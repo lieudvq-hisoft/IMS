@@ -87,10 +87,10 @@ public class RequestUpgradeController : ControllerBase
 
     [HttpPut("{id}/Accept")]
     [SwaggerOperation(Summary = "Accept a waiting request upgrade")]
-    public async Task<ActionResult> Accept(int id)
+    public async Task<ActionResult> Accept(int id, [FromBody] EvaluateModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-        var result = await _requestUpgradeService.Accept(id, new Guid(userId));
+        var result = await _requestUpgradeService.Accept(id, new Guid(userId), model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
@@ -107,7 +107,7 @@ public class RequestUpgradeController : ControllerBase
 
     [HttpPut("{id}/Deny")]
     [SwaggerOperation(Summary = "Deny a waiting request upgrade")]
-    public async Task<ActionResult> Deny(int id, [FromBody] DenyModel model)
+    public async Task<ActionResult> Deny(int id, [FromBody] EvaluateModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
         var result = await _requestUpgradeService.Deny(id, new Guid(userId), model);

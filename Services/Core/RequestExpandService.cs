@@ -22,8 +22,8 @@ public interface IRequestExpandService
     Task<ResultModel> Update(RequestExpandUpdateModel model);
     Task<ResultModel> Delete(int requestExpandId);
     Task<ResultModel> Reject(int requestExpandId, RequestExpandRejectModel modell);
-    Task<ResultModel> Accept(int requestExpandId);
-    Task<ResultModel> Deny(int requestExpandId, Guid userId, DenyModel model);
+    Task<ResultModel> Accept(int requestExpandId, Guid userId, EvaluateModel model);
+    Task<ResultModel> Deny(int requestExpandId, Guid userId, EvaluateModel model);
     //Task<ResultModel> DeleteRequestExpandLocation(int requestExpandId);
     Task<ResultModel> AssignLocation(int requestExpandId, RequestExpandAssignLocationModel model);
     //Task<ResultModel> GetChosenLocation(int requestExpandId);
@@ -438,7 +438,7 @@ public class RequestExpandService : IRequestExpandService
     //    return result;
     //}
 
-    public async Task<ResultModel> Accept(int requestExpandId)
+    public async Task<ResultModel> Accept(int requestExpandId, Guid userId, EvaluateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -461,6 +461,13 @@ public class RequestExpandService : IRequestExpandService
             if (validPrecondition)
             {
                 requestExpand.Status = RequestStatus.Accepted;
+                _dbContext.RequestExpandUsers.Add(new RequestExpandUser
+                {
+                    RequestExpandId = requestExpandId,
+                    UserId = userId,
+                    Action = RequestUserAction.Evaluate
+                });
+                requestExpand.SaleNote = model.SaleNote;
                 requestExpand.DateEvaluated = DateTime.Now;
                 if (requestExpand.ForRemoval)
                 {
@@ -509,7 +516,7 @@ public class RequestExpandService : IRequestExpandService
         return result;
     }
 
-    public async Task<ResultModel> Deny(int requestExpandId, Guid userId, DenyModel model)
+    public async Task<ResultModel> Deny(int requestExpandId, Guid userId, EvaluateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;

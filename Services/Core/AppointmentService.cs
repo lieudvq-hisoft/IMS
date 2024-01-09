@@ -30,8 +30,8 @@ public interface IAppointmentService
     Task<ResultModel> CreateRequestAppointment(int appointmentId, RequestAppointmentCreateModel model);
     Task<ResultModel> Update(AppointmentUpdateModel model);
     Task<ResultModel> Delete(int id);
-    Task<ResultModel> Accept(int appointmentId, Guid userId);
-    Task<ResultModel> Deny(int appointmentId, Guid userId, DenyModel model);
+    Task<ResultModel> Accept(int appointmentId, Guid userId, EvaluateModel model);
+    Task<ResultModel> Deny(int appointmentId, Guid userId, EvaluateModel model);
     //Task<ResultModel> AssignTech(int appointmentId, UserAssignModel model);
     Task<ResultModel> Complete(int appointmentId, AppointmentCompleteModel model, Guid userId);
     Task<ResultModel> Resolv(int appointmentId, AppointmentResolvModel model, Guid userId);
@@ -893,7 +893,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> Accept(int appointmentId, Guid userId)
+    public async Task<ResultModel> Accept(int appointmentId, Guid userId, EvaluateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -927,6 +927,7 @@ public class AppointmentService : IAppointmentService
             if (validPrecondition)
             {
                 appointment.Status = RequestStatus.Accepted;
+                appointment.SaleNote = model.SaleNote;
                 appointment.DateEvaluated = DateTime.Now;
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {
@@ -938,6 +939,7 @@ public class AppointmentService : IAppointmentService
                 foreach (var requestUpgrade in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgrade))
                 {
                     requestUpgrade.Status = RequestStatus.Accepted;
+                    requestUpgrade.SaleNote = model.SaleNote;
                     requestUpgrade.DateEvaluated = DateTime.Now;
                     _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
                     {
@@ -951,6 +953,7 @@ public class AppointmentService : IAppointmentService
                 {
                     var requestExpand = appointment.RequestExpandAppointments.Select(x => x.RequestExpand).FirstOrDefault();
                     requestExpand.Status = RequestStatus.Accepted;
+                    requestExpand.SaleNote = model.SaleNote;
                     requestExpand.DateEvaluated = DateTime.Now;
                     if (requestExpand.ForRemoval)
                     {
@@ -1006,7 +1009,7 @@ public class AppointmentService : IAppointmentService
         return result;
     }
 
-    public async Task<ResultModel> Deny(int appointmentId, Guid userId, DenyModel model)
+    public async Task<ResultModel> Deny(int appointmentId, Guid userId, EvaluateModel model)
     {
         var result = new ResultModel();
         result.Succeed = false;
