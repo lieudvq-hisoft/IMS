@@ -74,6 +74,11 @@ public class UserChangePasswordModel
     [Required]
     [StringLength(25, MinimumLength = 8, ErrorMessage = "Password must be between 8 to 25 character")]
     [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$")]
+    public string CurrentPassword { get; set; }
+
+    [Required]
+    [StringLength(25, MinimumLength = 8, ErrorMessage = "Password must be between 8 to 25 character")]
+    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\W).{8,}$")]
     public string Password { get; set; }
 }
 

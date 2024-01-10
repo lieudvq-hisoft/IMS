@@ -38,9 +38,11 @@ public class EmailHelper : IEmailHelper
             From = new MailAddress(_config[$"Email:{_env}:Account"]),
             Subject = subject,
             Body =
-            //$"<h1>Click the following link to confirm your email address " +
-            //$"<a href='{_config[$"Email:{_env}:Link"] + email}'>Activation Link</a></h1>" +
-            $"<h1>Your password: [{password}]</h1>",
+            "<div>Dear Customer,</div><br><br>" +
+            $"<div>Your account with the email <b>{email}</b> " +
+            $"and the Password <b>[{password}]</b> was created successfully.<br>" +
+            "Please consider changing the password after the first login.</div><br><br>" +
+            "<div>Sincerely,<br>The QSTC team.</div>",
             IsBodyHtml = true,
         };
     }

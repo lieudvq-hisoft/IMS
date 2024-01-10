@@ -178,9 +178,17 @@ public class UserService : IUserService
             }
             else
             {
-                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-                await _userManager.ResetPasswordAsync(user, token, model.Password);
-                result.Succeed = true;
+                var check = await _signInManager.CheckPasswordSignInAsync(user, model.CurrentPassword, false);
+                if (!check.Succeeded)
+                {
+                    result.ErrorMessage = "Current password no match";
+                }
+                else
+                {
+                    var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+                    await _userManager.ResetPasswordAsync(user, token, model.Password);
+                    result.Succeed = true;
+                }
             }
         }
         catch (Exception e)
