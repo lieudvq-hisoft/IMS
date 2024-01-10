@@ -1402,9 +1402,9 @@ public class AppointmentService : IAppointmentService
         var serverAllocation = appointment.ServerAllocation;
         if (appointment.Reason == AppointmentReason.Install)
         {
-            var cpu = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "CPU").Description;
-            var ram = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "RAM").Description;
-            var hardDisk = serverAllocation.ServerHardwareConfigs.FirstOrDefault(x => x.Component.Name == "Harddisk").Description;
+            var cpu = serverAllocation?.ServerHardwareConfigs?.FirstOrDefault(x => x.Component.Name == "CPU")?.Description;
+            var ram = serverAllocation?.ServerHardwareConfigs?.FirstOrDefault(x => x.Component.Name == "RAM")?.Description;
+            var hardDisk = serverAllocation?.ServerHardwareConfigs?.FirstOrDefault(x => x.Component.Name == "Harddisk")?.Description;
 
             if (cpu == null || ram == null || hardDisk == null)
             {
