@@ -18,6 +18,7 @@ using System.Text;
 using EntityFramework.Exceptions.PostgreSQL;
 using EntityFramework.Exceptions.Common;
 using System.Security.Cryptography;
+using Microsoft.AspNetCore.Authorization;
 
 namespace Services.Core;
 
@@ -555,6 +556,7 @@ public class CustomerService : ICustomerService
         return result;
     }
 
+    [AllowAnonymous]
     public async Task<ResultModel> DeleteFcmToken(string fcmToken, Guid customerId)
     {
         var result = new ResultModel();

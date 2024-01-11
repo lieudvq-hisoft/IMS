@@ -7,6 +7,7 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -833,6 +834,7 @@ public class UserService : IUserService
         return result;
     }
 
+    [AllowAnonymous]
     public async Task<ResultModel> DeleteFcmToken(string fcmToken, Guid userId)
     {
         var result = new ResultModel();
