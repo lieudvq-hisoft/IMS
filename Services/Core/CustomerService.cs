@@ -26,7 +26,6 @@ public interface ICustomerService
     Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, CustomerSearchModel searchModel);
     Task<ResultModel> GetDetail(Guid id);
     Task<ResultModel> GetServerAllocation(PagingParam<BaseSortCriteria> paginationModel, Guid id);
-    //Task<ResultModel> GetAppointment(Guid id, PagingParam<BaseSortCriteria> paginationModel, AppointmentSearchModel searchModel);
     Task<ResultModel> Create(CustomerCreateModel model, Guid userId);
     Task<ResultModel> Delete(Guid id);
     Task<ResultModel> Update(CustomerUpdateModel model);
@@ -206,7 +205,7 @@ public class CustomerService : ICustomerService
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
 
-            if (_dbContext.Customers.Any(x => (x.CompanyName == model.CompanyName) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber))
+            if (_dbContext.Customers.Any(x => (x.CompanyName == model.CompanyName) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber || x.ContractNumber == model.ContractNumber))
             {
                 validPrecondition = false;
                 result.ErrorMessage = CustomerErrorMessage.EXISTED;
@@ -320,7 +319,7 @@ public class CustomerService : ICustomerService
                 result.ErrorMessage = CustomerErrorMessage.UPDATE_FAILED;
             }
 
-            var existingCustomer = _dbContext.Customers.FirstOrDefault(x => ((x.CompanyName == model.CompanyName) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber) && x.Id != model.Id);
+            var existingCustomer = _dbContext.Customers.FirstOrDefault(x => ((x.CompanyName == model.CompanyName) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber || x.ContractNumber == model.ContractNumber) && x.Id != model.Id);
             if (existingCustomer != null)
             {
                 validPrecondition = false;

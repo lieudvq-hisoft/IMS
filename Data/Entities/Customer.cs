@@ -11,6 +11,7 @@ public class Customer
     public Guid Id { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
+    public DateTime? DateContract { get; set; }
     public bool IsDeleted { get; set; }
     public string Representator { get; set; }
     public string RepresentatorPosition { get; set; }
@@ -33,6 +34,7 @@ public class Customer
     {
         var matchCompanyName = searchModel.CompanyName != null ? MyFunction.MatchString(searchModel.CompanyName, CompanyName) : true;
         var isDeleted = searchModel.IsDeleted != null ? IsDeleted == searchModel.IsDeleted : !IsDeleted;
-        return matchCompanyName && isDeleted;
+        var matchSale = UserCustomers.FirstOrDefault(x => x.UserId == searchModel.SaleId) != null || searchModel.SaleId == null;
+        return matchCompanyName && isDeleted && matchSale;
     }
 }

@@ -19,6 +19,7 @@ public class CustomerModel
     public Guid? SaleStaff { get; set; }
     public DateTime DateCreated { get; set; } = DateTime.Now;
     public DateTime DateUpdated { get; set; } = DateTime.Now;
+    public DateTime? DateContract { get; set; }
 }
 
 public class CustomerResultModel
@@ -36,6 +37,7 @@ public class CustomerResultModel
     public List<ContactModel>? Contacts { get; set; }
     public int CurrenNoticeCount { get; set; }
     public List<string>? FcmTokens { get; set; }
+    public DateTime? DateContract { get; set; }
 }
 
 public class ContactModel
@@ -89,6 +91,8 @@ public class CustomerCreateModel
     public string PhoneNumber { get; set; }
 
     public List<ContactModel>? Contacts { get; set; }
+
+    public DateTime? DateContract { get; set; }
 }
 
 public class CustomerUpdateModel
@@ -125,6 +129,8 @@ public class CustomerUpdateModel
     public string PhoneNumber { get; set; }
 
     public List<ContactModel>? Contacts { get; set; }
+
+    public DateTime? DateContract { get; set; }
 }
 
 public class CustomerChangePasswordModel
@@ -142,6 +148,7 @@ public class CustomerSearchModel
 {
     public string? CompanyName { get; set; }
     public bool? IsDeleted { get; set; }
+    public Guid? SaleId { get; set; }
 }
 
 public class CustomerLoginModel
