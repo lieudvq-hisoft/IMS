@@ -205,10 +205,34 @@ public class CustomerService : ICustomerService
                 result.ErrorMessage = UserErrorMessage.NOT_EXISTED;
             }
 
-            if (_dbContext.Customers.Any(x => (x.CompanyName == model.CompanyName) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber || x.ContractNumber == model.ContractNumber))
+            if (_dbContext.Customers.Any(x => x.CompanyName == model.CompanyName))
             {
                 validPrecondition = false;
-                result.ErrorMessage = CustomerErrorMessage.EXISTED;
+                result.ErrorMessage = "Company name existed";
+            }
+
+            if (_dbContext.Customers.Any(x => x.Email == model.Email))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Email existed";
+            }
+
+            if (_dbContext.Customers.Any(x => x.TaxNumber == model.TaxNumber))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Tax number existed";
+            }
+
+            if (_dbContext.Customers.Any(x => x.PhoneNumber == model.PhoneNumber))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Phone number existed";
+            }
+
+            if (_dbContext.Customers.Any(x => x.ContractNumber == model.ContractNumber))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Contract number existed";
             }
 
             if (_dbContext.Contacts.Any(x => x.Email == model.Email || x.PhoneNumber == model.PhoneNumber))
@@ -319,11 +343,34 @@ public class CustomerService : ICustomerService
                 result.ErrorMessage = CustomerErrorMessage.UPDATE_FAILED;
             }
 
-            var existingCustomer = _dbContext.Customers.FirstOrDefault(x => ((x.CompanyName == model.CompanyName) || x.Email == model.Email || x.TaxNumber == model.TaxNumber || x.PhoneNumber == model.PhoneNumber || x.ContractNumber == model.ContractNumber) && x.Id != model.Id);
-            if (existingCustomer != null)
+            if (_dbContext.Customers.Any(x => x.CompanyName == model.CompanyName && x.Id != model.Id))
             {
                 validPrecondition = false;
-                result.ErrorMessage = CustomerErrorMessage.EXISTED;
+                result.ErrorMessage = "Company name existed";
+            }
+
+            if (_dbContext.Customers.Any(x => x.Email == model.Email && x.Id != model.Id))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Email existed";
+            }
+
+            if (_dbContext.Customers.Any(x => x.TaxNumber == model.TaxNumber && x.Id != model.Id))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Tax number existed";
+            }
+
+            if (_dbContext.Customers.Any(x => x.PhoneNumber == model.PhoneNumber && x.Id != model.Id))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Phone number existed";
+            }
+
+            if (_dbContext.Customers.Any(x => x.ContractNumber == model.ContractNumber && x.Id != model.Id))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Contract number existed";
             }
 
             if (_dbContext.Contacts.Any(x => x.Email == model.Email || x.PhoneNumber == model.PhoneNumber))

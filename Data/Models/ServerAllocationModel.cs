@@ -136,6 +136,7 @@ public class ServerAllocationSearchModel
     public string? SearchValue { get; set; }
     public Guid? CustomerId { get; set; }
     public int? RackId { get; set; }
+    public Guid? UserId { get; set; }
     public List<ServerAllocationStatus>? Status { get; set; }
 }
 

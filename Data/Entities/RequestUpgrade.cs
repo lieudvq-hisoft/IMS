@@ -32,7 +32,7 @@ public class RequestUpgrade : BaseEntity
         bool matchServerAllocationId = searchModel.ServerAllocationId != null ? ServerAllocationId == searchModel.ServerAllocationId : true;
         bool matchStatus = searchModel.Statuses != null ? searchModel.Statuses.Contains(Status) : true;
         bool matchCustomer = searchModel.CustomerId != null ? ServerAllocation.CustomerId == searchModel.CustomerId : true;
-        bool matchUser = searchModel.UserId != null ? RequestUpgradeUsers.Any(x => x.UserId == searchModel.UserId) : true;
+        bool matchUser = searchModel.UserId != null ? ServerAllocation.Customer.UserCustomers.Any(x => x.UserId == searchModel.UserId) : true;
         bool matchAppointment = searchModel.AppointmentId != null ? RequestUpgradeAppointments.Any(x => x.AppointmentId == searchModel.AppointmentId) : true;
 
         return matchSearchValue && matchId && matchComponentId && matchServerAllocationId && matchStatus && matchCustomer && matchUser && matchAppointment;

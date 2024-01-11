@@ -48,7 +48,7 @@ public class RequestUpgradeService : IRequestUpgradeService
                 .Include(x => x.Component)
                 .Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.RequestUpgradeUsers).ThenInclude(x => x.User)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer).ThenInclude(x => x.UserCustomers)
                 .Where(delegate (RequestUpgrade x)
                 {
                     return x.FilterRequestUpgrade(searchModel);

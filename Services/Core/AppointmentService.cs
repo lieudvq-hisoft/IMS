@@ -72,7 +72,7 @@ public class AppointmentService : IAppointmentService
             var searchValue = searchModel.SearchValue?.ToLower() ?? "";
             var appointments = _dbContext.Appointments
                 .Include(x => x.ServerAllocation).ThenInclude(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer).ThenInclude(x => x.UserCustomers)
                 .Include(x => x.AppointmentUsers).ThenInclude(x => x.User)
                 .Include(x => x.RequestExpandAppointments)
                 .Include(x => x.RequestUpgradeAppointment)
@@ -80,7 +80,7 @@ public class AppointmentService : IAppointmentService
                 .Where(x => searchModel.Statuses.Contains(x.Status) || searchModel.Statuses == null)
                 .Where(x => searchModel.Reasons.Contains(x.Reason) || searchModel.Reasons == null)
                 .Where(x => x.ServerAllocation.CustomerId == searchModel.CustomerId || searchModel.CustomerId == null)
-                .Where(x => x.AppointmentUsers.Any(x => x.UserId == searchModel.UserId) || searchModel.UserId == null)
+                .Where(x => x.ServerAllocation.Customer.UserCustomers.Any(x => x.UserId == searchModel.UserId) || searchModel.UserId == null)
                 .Where(x => x.IncidentAppointments.Any(x => x.IncidentId == searchModel.IncidentId) || searchModel.IncidentId == null)
                 .Where(x => x.AppointedCustomer.ToLower().Contains(searchValue) || x.ServerAllocation.Customer.CompanyName.Contains(searchValue))
                 .AsQueryable();

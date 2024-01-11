@@ -56,6 +56,7 @@ public class ServerAllocation : BaseEntity
         var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(Status) : true;
         var matchCustomerId = searchModel.CustomerId != null ? CustomerId == searchModel.CustomerId : true;
         var matchRack = searchModel.RackId != null ? LocationAssignments.Select(x => x.Location.RackId).Distinct().Any(x => x == searchModel.RackId) : true;
-        return matchSearchValue && matchStatus && matchCustomerId && matchRack;
+        var matchUser = Customer.UserCustomers.Any(x => x.UserId == searchModel.UserId) || searchModel.UserId == null;
+        return matchSearchValue && matchStatus && matchCustomerId && matchRack && matchUser;
     }
 }

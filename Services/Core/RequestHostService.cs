@@ -68,7 +68,7 @@ public class RequestHostService : IRequestHostService
         {
             var requestHosts = _dbContext.RequestHosts
                 .Include(x => x.RequestHostIps).ThenInclude(x => x.IpAddress)
-                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer)
+                .Include(x => x.ServerAllocation).ThenInclude(x => x.Customer).ThenInclude(x => x.UserCustomers)
                 .Include(x => x.RequestHostUsers).ThenInclude(x => x.User)
                 .Where(delegate (RequestHost x)
                  {
