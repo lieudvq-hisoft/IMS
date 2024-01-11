@@ -66,6 +66,7 @@ public class CustomerService : ICustomerService
         {
             var customers = _dbContext.Customers
                 .Include(x => x.Contacts)
+                .Include(x => x.UserCustomers)
                 .IgnoreQueryFilters()
                 .Where(delegate (Customer x)
                 {
