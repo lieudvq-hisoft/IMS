@@ -33,7 +33,7 @@ public class Customer
     public bool Filter(CustomerSearchModel searchModel)
     {
         var matchCompanyName = searchModel.CompanyName != null ? MyFunction.MatchString(searchModel.CompanyName, CompanyName) : true;
-        var isDeleted = searchModel.IsDeleted != null ? IsDeleted == searchModel.IsDeleted : !IsDeleted;
+        var isDeleted = searchModel.IncludeDeleted != null && searchModel.IncludeDeleted == false ? IsDeleted == true : true;
         var matchSale = UserCustomers.FirstOrDefault(x => x.UserId == searchModel.SaleId) != null || searchModel.SaleId == null;
         return matchCompanyName && isDeleted && matchSale;
     }

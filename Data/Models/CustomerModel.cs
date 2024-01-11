@@ -147,7 +147,7 @@ public class CustomerChangePasswordModel
 public class CustomerSearchModel
 {
     public string? CompanyName { get; set; }
-    public bool? IsDeleted { get; set; }
+    public bool? IncludeDeleted { get; set; }
     public Guid? SaleId { get; set; }
 }
 
