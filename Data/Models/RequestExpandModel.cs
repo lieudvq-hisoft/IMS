@@ -1,5 +1,6 @@
 ﻿using Data.Enums;
 using Data.Utils.ValidationAttributes;
+using Microsoft.AspNetCore.Http;
 using System.ComponentModel.DataAnnotations;
 
 namespace Data.Models;
@@ -8,7 +9,7 @@ public class RequestExpandModel
     public int Id { get; set; }
     public RequestStatus Status { get; set; }
     public bool ForRemoval { get; set; }
-    public string RequestType { get; set; }
+    public string? RequestType { get; set; }
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
     public string? TechNote { get; set; }
@@ -29,6 +30,7 @@ public class RequestExpandModel
     public DateTime? DateEvaluated { get; set; }
     public DateTime? DateExecuted { get; set; }
     public RequestExpandAssignLocationModel? RequestedLocation { get; set; }
+    public string? RemovalRequestDocument { get; set; }
 }
 
 public class RequestExpandResultModel
@@ -37,7 +39,7 @@ public class RequestExpandResultModel
     public RequestStatus Status { get; set; }
     public int? Size { get; set; }
     public bool ForRemoval { get; set; }
-    public string RequestType { get; set; }
+    public string? RequestType { get; set; }
     public string? ChosenLocation { get; set; }
     public string? Note { get; set; }
     public string? SaleNote { get; set; }
@@ -46,6 +48,7 @@ public class RequestExpandResultModel
     public DateTime? DateExecuted { get; set; }
     public int? SuccessExpandAppointmentId { get; set; }
     public int ServerAllocationId { get; set; }
+    public string? RemovalRequestDocument { get; set; }
 }
 
 public class RequestExpandCompleteBulkModel
@@ -58,7 +61,6 @@ public class RequestExpandCreateModel
 {
     public bool ForRemoval { get; set; }
 
-    //[Required]
     [GreaterThanZero]
     public int? Size { get; set; }
 
@@ -72,6 +74,11 @@ public class RequestExpandCreateModel
     [Required]
     [GreaterThanZero]
     public int ServerAllocationId { get; set; }
+
+    public IFormFile? RemovalRequestDocument { get; set; }
+
+    [FileExtensions(Extensions = "pdf,jpeg,jpg")]
+    public string? RemovalRequestDocumentFileName => RemovalRequestDocument?.FileName;
 }
 
 public class RequestExpandAssignLocationModel

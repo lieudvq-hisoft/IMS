@@ -200,6 +200,10 @@ public class RequestHostService : IRequestHostService
             {
                 result.ErrorMessage = "Removal request cannot have capacity";
             }
+            else if (model.IsRemoval && model.RemovalRequestDocument == null)
+            {
+                result.ErrorMessage = "Request for removal require removal document";
+            }
             else if (model.Capacities != null && model.Capacities.Count != model.Quantity)
             {
                 result.ErrorMessage = "Capacities count must match quantity";
@@ -212,6 +216,11 @@ public class RequestHostService : IRequestHostService
             {
                 var requestHost = _mapper.Map<RequestHost>(model);
                 requestHost.Status = RequestHostStatus.Waiting;
+                if (requestHost.IsRemoval)
+                {
+                    string removalDocument = _cloudinaryHelper.UploadFile(model.RemovalRequestDocument);
+                    requestHost.RemovalRequestDocument = removalDocument;
+                }
                 _dbContext.RequestHosts.Add(requestHost);
                 _dbContext.SaveChanges();
 

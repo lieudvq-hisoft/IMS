@@ -48,7 +48,7 @@ public class RequestExpandController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult> Create([FromBody] RequestExpandCreateModel model)
+    public async Task<ActionResult> Create([FromForm] RequestExpandCreateModel model)
     {
         var result = await _requestExpandService.Create(model);
         if (result.Succeed) return Ok(result.Data);

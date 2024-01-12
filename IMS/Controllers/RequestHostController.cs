@@ -44,7 +44,7 @@ public class RequestHostController : ControllerBase
     //}
 
     [HttpPost]
-    public async Task<ActionResult> Create([FromBody] RequestHostCreateModel model)
+    public async Task<ActionResult> Create([FromForm] RequestHostCreateModel model)
     {
         var result = await _requestHostService.Create(model);
         if (result.Succeed) return Ok(result.Data);

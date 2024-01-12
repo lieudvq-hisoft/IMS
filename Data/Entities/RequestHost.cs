@@ -19,6 +19,7 @@ public class RequestHost : BaseEntity
     public DateTime? DateConfirm { get; set; }
     public string? InspectionReportFilePath { get; set; }
     public string? FinalInspectionReport { get; set; }
+    public string? RemovalRequestDocument { get; set; }
 
     public DateTime? DateEvaluated { get; set; }
     public DateTime? DateExecuted { get; set; }

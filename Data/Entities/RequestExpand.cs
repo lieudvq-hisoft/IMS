@@ -18,6 +18,7 @@ public class RequestExpand : BaseEntity
     public string? ChosenLocation { get; set; }
     public DateTime? DateEvaluated { get; set; }
     public DateTime? DateExecuted { get; set; }
+    public string? RemovalRequestDocument { get; set; }
 
     public int ServerAllocationId { get; set; }
     public ServerAllocation? ServerAllocation { get; set; }

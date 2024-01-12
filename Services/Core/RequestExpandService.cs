@@ -7,9 +7,9 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
-using DocumentFormat.OpenXml.Office2010.Excel;
 using Grpc.Core;
 using Microsoft.EntityFrameworkCore;
+using Services.Utilities;
 using System.Text.Json;
 
 namespace Services.Core;
@@ -34,12 +34,14 @@ public class RequestExpandService : IRequestExpandService
 {
     private readonly AppDbContext _dbContext;
     private readonly IMapper _mapper;
+    private readonly ICloudinaryHelper _cloudinaryHelper;
     private readonly INotificationService _notiService;
 
-    public RequestExpandService(AppDbContext dbContext, IMapper mapper, INotificationService notiService)
+    public RequestExpandService(AppDbContext dbContext, IMapper mapper, INotificationService notiService, ICloudinaryHelper cloudinaryHelper)
     {
         _dbContext = dbContext;
         _mapper = mapper;
+        _cloudinaryHelper = cloudinaryHelper;
         _notiService = notiService;
     }
 
@@ -188,6 +190,11 @@ public class RequestExpandService : IRequestExpandService
                 validPrecondition = false;
                 result.ErrorMessage = "Can not specify size for removal request";
             }
+            else if (model.ForRemoval && model.RemovalRequestDocument == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Request for removal require removal document";
+            }
             else
             {
                 foreach (var component in requiredComponents)
@@ -208,6 +215,8 @@ public class RequestExpandService : IRequestExpandService
                 {
                     requestExpand.RequestType = RequestType.RemoveLocation;
                     requestExpand.Size = serverAllocation.LocationAssignments.Count();
+                    string removalDocument = _cloudinaryHelper.UploadFile(model.RemovalRequestDocument);
+                    requestExpand.RemovalRequestDocument = removalDocument;
                 }
                 _dbContext.RequestExpands.Add(requestExpand);
                 _dbContext.SaveChanges();

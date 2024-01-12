@@ -317,7 +317,6 @@ public class StatisticService : IStatisticService
                 },
             };
 
-
             result.Succeed = true;
             result.Data = statistic;
         }
