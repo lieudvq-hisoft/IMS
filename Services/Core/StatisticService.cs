@@ -227,7 +227,8 @@ public class StatisticService : IStatisticService
         {
             var requestUpgrades = _dbContext.RequestUpgrades
                 .Include(x => x.ServerAllocation)
-                .Where(x => x.DateCreated >= model.StartDate || model.StartDate == null && x.DateCreated <= model.EndDate || model.EndDate == null)
+                .Where(x => x.DateCreated >= model.StartDate || model.StartDate == null)
+                .Where(x => x.DateCreated <= model.EndDate || model.EndDate == null)
                 .Where(delegate (RequestUpgrade x)
                 {
                     var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
@@ -236,7 +237,8 @@ public class StatisticService : IStatisticService
                 });
             var requestExpands = _dbContext.RequestExpands
                 .Include(x => x.ServerAllocation)
-                .Where(x => x.DateCreated >= model.StartDate || model.StartDate == null && x.DateCreated <= model.EndDate || model.EndDate == null)
+                .Where(x => x.DateCreated >= model.StartDate || model.StartDate == null)
+                .Where(x => x.DateCreated <= model.EndDate || model.EndDate == null)
                 .Where(delegate (RequestExpand x)
                 {
                     var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
@@ -245,7 +247,8 @@ public class StatisticService : IStatisticService
                 });
             var requestHosts = _dbContext.RequestHosts
                 .Include(x => x.ServerAllocation)
-                .Where(x => x.DateCreated >= model.StartDate || model.StartDate == null && x.DateCreated <= model.EndDate || model.EndDate == null)
+                .Where(x => x.DateCreated >= model.StartDate || model.StartDate == null)
+                .Where(x => x.DateCreated <= model.EndDate || model.EndDate == null)
                 .Where(delegate (RequestHost x)
                 {
                     var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
@@ -254,7 +257,8 @@ public class StatisticService : IStatisticService
                 });
             var incidents = _dbContext.Incidents
                 .Include(x => x.ServerAllocation)
-                .Where(x => x.DateCreated >= model.StartDate || model.StartDate == null && x.DateCreated <= model.EndDate || model.EndDate == null)
+                .Where(x => x.DateCreated >= model.StartDate || model.StartDate == null)
+                .Where(x => x.DateCreated <= model.EndDate || model.EndDate == null)
                 .Where(delegate (Incident x)
                 {
                     var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
@@ -263,7 +267,8 @@ public class StatisticService : IStatisticService
                 });
             var appointments = _dbContext.Appointments
                 .Include(x => x.ServerAllocation)
-                .Where(x => x.DateCreated >= model.StartDate || model.StartDate == null && x.DateCreated <= model.EndDate || model.EndDate == null)
+                .Where(x => x.DateCreated >= model.StartDate || model.StartDate == null)
+                .Where(x => x.DateCreated <= model.EndDate || model.EndDate == null)
                 .Where(delegate (Appointment x)
                 {
                     var matchCustomer = model.CustomerId != null ? x.ServerAllocation.CustomerId == model.CustomerId : true;
