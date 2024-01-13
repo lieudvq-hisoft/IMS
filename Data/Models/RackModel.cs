@@ -10,6 +10,7 @@ public class RackModel
     public int Row { get; set; }
     public int Size { get; set; }
     public int AreaId { get; set; }
+    public AreaModel Area { get; set; }
 }
 
 public class RackResultModel

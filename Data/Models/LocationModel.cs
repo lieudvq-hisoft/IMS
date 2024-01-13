@@ -8,6 +8,7 @@ public class LocationModel
     public bool? IsServer { get; set; }
     public int Position { get; set; }
     public int RackId { get; set; }
+    public RackModel Rack { get; set; }
 }
 
 public class LocationResultModel
