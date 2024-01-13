@@ -13,6 +13,7 @@ namespace Services.Core;
 public interface ILocationService
 {
     Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, LocationSearchModel searchModel);
+    Task<ResultModel> GetAvailable(AvailableLocationSearchModel model);
     //Task<ResultModel> GetDetail(int id);
     //Task<ResultModel> GetRequestExpandLocation(int id);
     //Task<ResultModel> GetLocationAssignment(int id);
@@ -52,6 +53,44 @@ public class LocationService : ILocationService
 
             result.Data = paging;
             result.Succeed = true;
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetAvailable(AvailableLocationSearchModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var rack = _dbContext.Racks
+                .Include(x => x.Locations).ThenInclude(x => x.LocationAssignments)
+                .Include(x => x.Locations).ThenInclude(x => x.RequestExpandLocations)
+                .FirstOrDefault(x => x.Id == model.RackId);
+            if (rack != null)
+            {
+                var availableLocations = rack.Locations
+                   .Where(location => !location.LocationAssignments.Any() && !location.RequestExpandLocations.Select(x => x.RequestExpand).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                   .ToList();
+                var resultLocations = new List<Location>();
+                foreach (var location in availableLocations)
+                {
+                    var start = location.Position;
+                    var end = start + model.Size - 1;
+                    if (availableLocations.Where(x => x.Position >= start && x.Position <= end).Count() == model.Size)
+                    {
+                        resultLocations.Add(location);
+                    }
+                }
+
+                result.Data = _mapper.Map<List<LocationModel>>(resultLocations);
+                result.Succeed = true;
+            }
         }
         catch (Exception e)
         {

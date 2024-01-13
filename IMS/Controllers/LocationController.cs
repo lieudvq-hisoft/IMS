@@ -29,6 +29,14 @@ public class LocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("Available")]
+    public async Task<ActionResult> GetAvailable([FromQuery] AvailableLocationSearchModel model)
+    {
+        var result = await _LocationService.GetAvailable(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpPut("Reserve")]
     [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> ReserveLocation(LocationReserveModel model)

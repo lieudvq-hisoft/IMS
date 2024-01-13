@@ -42,6 +42,12 @@ public class LocationSearchModel
     public bool? Available { get; set; }
 }
 
+public class AvailableLocationSearchModel
+{
+    public int RackId { get; set; }
+    public int? Size { get; set; }
+}
+
 public class LocationChoiceModel
 {
     public int AreaId { get; set; }
