@@ -476,7 +476,10 @@ public class RequestExpandService : IRequestExpandService
                     UserId = userId,
                     Action = RequestUserAction.Evaluate
                 });
-                requestExpand.SaleNote = model.SaleNote;
+                if (!string.IsNullOrEmpty(model.SaleNote))
+                {
+                    requestExpand.SaleNote = model.SaleNote;
+                }
                 requestExpand.DateEvaluated = DateTime.Now;
                 if (requestExpand.ForRemoval)
                 {

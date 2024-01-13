@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.Tokens;
 using Services.Utilities;
 using System.Globalization;
 using System.Linq;
@@ -927,7 +928,10 @@ public class AppointmentService : IAppointmentService
             if (validPrecondition)
             {
                 appointment.Status = RequestStatus.Accepted;
-                appointment.SaleNote = model.SaleNote;
+                if (!string.IsNullOrEmpty(model.SaleNote))
+                {
+                    appointment.SaleNote = model.SaleNote;
+                }
                 appointment.DateEvaluated = DateTime.Now;
                 _dbContext.AppointmentUsers.Add(new AppointmentUser
                 {

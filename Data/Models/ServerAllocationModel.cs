@@ -110,9 +110,8 @@ public class ServerAllocationUpdateModel
     [StringLength(255, MinimumLength = 6)]
     public string SerialNumber { get; set; }
 
-    [Required]
     [StringLength(255, MinimumLength = 6)]
-    public string PartNumber { get; set; }
+    public string? PartNumber { get; set; }
 
     [Required]
     public string Name { get; set; }

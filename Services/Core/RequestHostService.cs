@@ -619,7 +619,10 @@ public class RequestHostService : IRequestHostService
             if (validPrecondition)
             {
                 requestHost.Status = RequestHostStatus.Accepted;
-                requestHost.SaleNote = model.SaleNote;
+                if (!string.IsNullOrEmpty(model.SaleNote))
+                {
+                    requestHost.SaleNote = model.SaleNote;
+                }
                 requestHost.DateEvaluated = DateTime.Now;
                 _dbContext.RequestHostUsers.Add(new RequestHostUser
                 {

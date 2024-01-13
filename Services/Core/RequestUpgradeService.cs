@@ -464,7 +464,10 @@ public class RequestUpgradeService : IRequestUpgradeService
             if (validPrecondition)
             {
                 requestUpgrade.Status = RequestStatus.Accepted;
-                requestUpgrade.SaleNote = model.SaleNote;
+                if (!string.IsNullOrEmpty(model.SaleNote))
+                {
+                    requestUpgrade.SaleNote = model.SaleNote;
+                }
                 _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
                 {
                     RequestUpgradeId = requestUpgrade.Id,

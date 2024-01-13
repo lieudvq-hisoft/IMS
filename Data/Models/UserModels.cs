@@ -39,8 +39,7 @@ public class UserAssignModel
 
 public class EvaluateModel
 {
-    [Required]
-    public string SaleNote { get; set; }
+    public string? SaleNote { get; set; }
 }
 
 public class UserCreateModel
