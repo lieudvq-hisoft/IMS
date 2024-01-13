@@ -20,24 +20,6 @@ public class RackController : ControllerBase
         _RackService = RackService;
     }
 
-    //[HttpGet]
-    //[SwaggerOperation(Summary = "Get all Rack")]
-    //public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RackSearchModel searchModel)
-    //{
-    //    var result = await _RackService.Get(pagingParam, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("All")]
-    //[SwaggerOperation(Summary = "Get all Rack no paging")]
-    //public async Task<ActionResult> GetAll()
-    //{
-    //    var result = await _RackService.GetAll();
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpGet("{id}")]
     [SwaggerOperation(Summary = "Get detail information of an Rack")]
     public async Task<ActionResult> GetDetail(int id)
@@ -46,24 +28,6 @@ public class RackController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
-
-    //[HttpGet("{id}/Location")]
-    //[SwaggerOperation(Summary = "Get all rack location by rack id")]
-    //public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
-    //{
-    //    var result = await _RackService.GetLocation(pagingParam, id);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("{id}/ServerAllocation")]
-    //[SwaggerOperation(Summary = "Get all rack server allocation by rack id")]
-    //public async Task<ActionResult> GetServerAllocation([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
-    //{
-    //    var result = await _RackService.GetServerAllocation(pagingParam, id);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
 
     [HttpGet("{id}/Map")]
     [SwaggerOperation(Summary = "Get all rack location with server allocation id by rack id")]
@@ -74,16 +38,8 @@ public class RackController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpGet("{id}/Power")]
-    //[SwaggerOperation(Summary = "Get rack power")]
-    //public async Task<ActionResult> GetPower(int id)
-    //{
-    //    var result = await _RackService.GetPower(id);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPost]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     [SwaggerOperation(Summary = "Create an arae")]
     public async Task<ActionResult> Create([FromBody] RackCreateModel model)
     {
@@ -93,6 +49,7 @@ public class RackController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     [SwaggerOperation(Summary = "Delete an Rack")]
     public async Task<ActionResult> Delete(int id)
     {

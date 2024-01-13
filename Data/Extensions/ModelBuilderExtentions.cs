@@ -66,7 +66,7 @@ public static class ModelBuilderExtentions
                 racks.Add(new Rack
                 {
                     Id = (j - 1) * 8 + i,
-                    MaxPower = 3000,
+                    MaxPower = 6000,
                     Column = i,
                     Row = j,
                     Size = 42,
@@ -82,7 +82,7 @@ public static class ModelBuilderExtentions
                 racks.Add(new Rack
                 {
                     Id = 8 * 8 + (j - 1) * 8 + i,
-                    MaxPower = 3500,
+                    MaxPower = 6000,
                     Column = i,
                     Row = j,
                     Size = 42,
@@ -139,6 +139,13 @@ public static class ModelBuilderExtentions
             Id = seedGuids[2],
             Name = "Admin",
             Description = "Admin",
+            isDeactive = false,
+        });
+        builder.Entity<Role>().HasData(new Role
+        {
+            Id = seedGuids[3],
+            Name = "Manager",
+            Description = "Manager",
             isDeactive = false,
         });
         #endregion
@@ -199,25 +206,12 @@ public static class ModelBuilderExtentions
             });
 
             #region UserRole
-            if (i == 1)
+
+            builder.Entity<UserRole>().HasData(new UserRole
             {
-                for (int j = 1; j <= 3; j++)
-                {
-                    builder.Entity<UserRole>().HasData(new UserRole
-                    {
-                        RoleId = seedGuids[j - 1],
-                        UserId = seedGuids[i - 1],
-                    });
-                }
-            }
-            else
-            {
-                builder.Entity<UserRole>().HasData(new UserRole
-                {
-                    RoleId = seedGuids[i - 2],
-                    UserId = seedGuids[i - 1],
-                });
-            }
+                RoleId = seedGuids[i - 1],
+                UserId = seedGuids[i - 1],
+            });
             #endregion
         }
         #endregion

@@ -5,7 +5,8 @@ public enum RoleType
     Tech = 1,
     Sale = 2,
     Manager = 3,
-    Admin = 4
+    Admin = 4,
+    Customer = 5
 }
 
 public enum ComponentType

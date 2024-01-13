@@ -85,6 +85,7 @@ public class IpAddressController : ControllerBase
     }
 
     [HttpPut("Block")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Block([FromBody] IpAddressIdListModel model)
     {
         var result = await _ipAddressService.ChangeBlockingStatus(model, true, Guid.Parse(User.GetId()));
@@ -93,6 +94,7 @@ public class IpAddressController : ControllerBase
     }
 
     [HttpPut("Unblock")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Unblock([FromBody] IpAddressIdListModel model)
     {
         var result = await _ipAddressService.ChangeBlockingStatus(model, false, Guid.Parse(User.GetId()));
@@ -101,6 +103,7 @@ public class IpAddressController : ControllerBase
     }
 
     [HttpPut("Purpose")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Purpose([FromBody] IpAddressChangePurposeModel model)
     {
         var result = await _ipAddressService.ChangePurpose(model);

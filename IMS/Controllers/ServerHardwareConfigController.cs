@@ -35,28 +35,13 @@ public class ServerHardwareConfigController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = nameof(RoleType.Customer) + "," + nameof(RoleType.Tech))]
     public async Task<ActionResult> Create([FromBody] ServerHardwareConfigCreateModel model)
     {
         var result = await _serverHardwareConfigService.Create(model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
-
-    //[HttpPost("Bulk")]
-    //public async Task<ActionResult> CreateBulk([FromBody] ServerHardwareConfigCreateBulkModel model)
-    //{
-    //    var result = await _serverHardwareConfigService.CreateBulk(model);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpPut]
-    //public async Task<ActionResult> Update([FromBody] ServerHardwareConfigUpdateModel model)
-    //{
-    //    var result = await _serverHardwareConfigService.Update(model);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
 
     [HttpDelete("{id}")]
     public async Task<ActionResult> Delete(int id)

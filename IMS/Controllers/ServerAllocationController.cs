@@ -37,73 +37,8 @@ public class ServerAllocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpGet("{id}/HardwareConfig")]
-    //public async Task<ActionResult> GetHardwareConfig([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromRoute] int id)
-    //{
-    //    var result = await _serverAllocationService.GetHardwareConfig(pagingParam, id);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("{id}/RequestUpgrade")]
-    //public async Task<ActionResult> GetRequestUpgrade([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestUpgradeSearchModel searchModel, int id)
-    //{
-    //    var result = await _serverAllocationService.GetRequestUpgrade(pagingParam, searchModel, id);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("{id}/RequestExpand")]
-    //public async Task<ActionResult> GetRequestExpand([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestExpandSearchModel searchModel, int id)
-    //{
-    //    var result = await _serverAllocationService.GetRequestExpand(pagingParam, searchModel, id);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("{id}/RequestHost")]
-    //public async Task<ActionResult> GetRequestHost(int id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestHostSearchModel searchModel)
-    //{
-    //    var result = await _serverAllocationService.GetRequestHost(id, pagingParam, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-
-    //[HttpGet("{id}/Incident")]
-    //public async Task<ActionResult> GetIncident(int id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] IncidentSearchModel searchModel)
-    //{
-    //    var result = await _serverAllocationService.GetIncident(id, pagingParam, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("{id}/IpAddress")]
-    //public async Task<ActionResult> GetIpAddress([FromRoute] int id, [FromQuery] PagingParam<SimpleSortCriteria> paginationModel, [FromQuery] IpAddressSearchModel searchModel)
-    //{
-    //    var result = await _serverAllocationService.GetIpAddress(id, paginationModel, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("{id}/Location")]
-    //public async Task<ActionResult> GetLocation([FromQuery] PagingParam<SimpleSortCriteria> pagingParam, [FromRoute] int id)
-    //{
-    //    var result = await _serverAllocationService.GetLocation(pagingParam, id);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("{id}/Appointment")]
-    //public async Task<ActionResult> GetAppointment([FromRoute] int id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] AppointmentSearchModel searchModel)
-    //{
-    //    var result = await _serverAllocationService.GetAppointment(id, pagingParam, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPost]
-    [Authorize(Roles = "Customer")]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> Create([FromBody] ServerAllocationCreateModel model)
     {
         var result = await _serverAllocationService.Create(model, new Guid
@@ -113,6 +48,7 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = nameof(RoleType.Customer) + "," + nameof(RoleType.Tech))]
     public async Task<ActionResult> Update([FromBody] ServerAllocationUpdateModel model)
     {
         var result = await _serverAllocationService.Update(model);
@@ -121,6 +57,7 @@ public class ServerAllocationController : ControllerBase
     }
 
     [HttpPut("{id}/Confirm")]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> Confirm(int id)
     {
         var result = await _serverAllocationService.Confirm(id);
@@ -128,53 +65,14 @@ public class ServerAllocationController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpDelete("{id}")]
-    //public async Task<ActionResult> Delete(int id)
-    //{
-    //    var result = await _serverAllocationService.Delete(id);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPost("{id}/MasterIp")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> AssignMasterIp(int id, [FromBody] ServerAllocationMasterIpAssignmentModel model)
     {
         var result = await _serverAllocationService.AssignMasterIp(id, model);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
-
-    //[HttpPost("{id}/ServerLocation")]
-    //public async Task<ActionResult> AssignServerLocation(int id, [FromBody] ServerAllocationAssignLocationModel model)
-    //{
-    //    var result = await _serverAllocationService.AssignLocation(id, model);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpPost("{id}/InspectionReport")]
-    //public async Task<ActionResult> CreateInspectionReport(int id, [FromBody] HostAndUpgradeCreateInspectionReportModel model)
-    //{
-    //    var result = await _serverAllocationService.CreateUpgradeAndHostInspectionReport(id, model);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpPost("{id}/ReceiptOfRecipient")]
-    //public async Task<ActionResult> CreateReceiptOfRecipient(int id, [FromBody] ServerAllocationCreateRequestExpandInspectionReportModel model)
-    //{
-    //    var result = await _serverAllocationService.CreateReceiptReport(id, model);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpPost("{id}/RequestExpandInspection")]
-    //public async Task<ActionResult> CreateRequestExpandInspection(int id, [FromBody] ServerAllocationCreateRequestExpandInspectionReportModel model)
-    //{
-    //    var result = await _serverAllocationService.CreateRequestExpandInspectionReport(id, model);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
 
     [HttpPost("{id}/Document")]
     public async Task<ActionResult> UploadInspectionRecordAndReceiptOfRecipientReport(int id, [FromForm] DocumentFileUploadModel model)

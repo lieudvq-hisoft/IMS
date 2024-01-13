@@ -35,15 +35,8 @@ public class RequestHostController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpGet("{id}/IpAddress")]
-    //public async Task<ActionResult> GetAssignedIp(int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] IpAddressSearchModel searchModel)
-    //{
-    //    var result = await _requestHostService.GetIpAddress(id, paginationModel, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPost]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> Create([FromForm] RequestHostCreateModel model)
     {
         var result = await _requestHostService.Create(model);
@@ -52,6 +45,7 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpPost("PortUpgrade")]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> CreatePortUpgrade([FromBody] RequestHostCreateUpgradeModel model)
     {
         var result = await _requestHostService.CreatePortUpgrade(model);
@@ -60,6 +54,7 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> Update([FromBody] RequestHostUpdateModel model)
     {
         var result = await _requestHostService.Update(model);
@@ -68,6 +63,7 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpPut("PortUpgrade")]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> UpdatePortUpgrade([FromBody] RequestHostUpdateUpgradeModel model)
     {
         var result = await _requestHostService.UpdatePortUpgrade(model);
@@ -76,6 +72,7 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _requestHostService.Delete(id);
@@ -84,6 +81,7 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpPut("{id}/IpAddress")]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> AssignIp(int id, [FromBody] RequestHostIpAssignmentModel model)
     {
         var result = await _requestHostService.AssignAdditionalIp(id, model);
@@ -92,6 +90,7 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpPut("{id}/Accept")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Accept a waiting request host")]
     public async Task<ActionResult> Accept(int id, [FromBody] EvaluateModel model)
     {
@@ -101,17 +100,8 @@ public class RequestHostController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpPut("Accept/Bulk")]
-    //[SwaggerOperation(Summary = "Accept many waiting request host")]
-    //public async Task<ActionResult> AcceptBulk(RequestHostEvaluateBulkModel model)
-    //{
-    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-    //    var result = await _requestHostService.EvaluateBulk(model, RequestHostStatus.Accepted, new Guid(userId));
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPut("{id}/Deny")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Deny a waiting request host")]
     public async Task<ActionResult> Deny(int id, [FromBody] EvaluateModel model)
     {
@@ -121,17 +111,8 @@ public class RequestHostController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpPut("Deny/Bulk")]
-    //[SwaggerOperation(Summary = "Deny many waiting request host")]
-    //public async Task<ActionResult> DenyBulk(RequestHostEvaluateBulkModel model)
-    //{
-    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-    //    var result = await _requestHostService.EvaluateBulk(model, RequestHostStatus.Denied, new Guid(userId));
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPost("{id}/Document")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> UploadDocument(int id, [FromForm] RequestHostDocumentFileUploadModel model)
     {
         var result = await _requestHostService.AssignInspectionReport(id, model);
@@ -139,16 +120,8 @@ public class RequestHostController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpPut("{id}/Process")]
-    //public async Task<ActionResult> Process(int id)
-    //{
-    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-    //    var result = await _requestHostService.Process(id, new Guid(userId));
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPut("{id}/Complete")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Complete(int id, [FromBody] HostAndUpgradeCreateInspectionReportModel? model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -158,6 +131,7 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpPut("{id}/CompletePortUpgrade")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> CompletePortUpgrade(int id, [FromBody] HostAndUpgradeCreateInspectionReportModel? model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -167,6 +141,7 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpPut("{id}/Reject")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Reject(int id, RequestHostRejectModel model)
     {
         var result = await _requestHostService.Reject(id, model);
@@ -175,6 +150,7 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpPut("{id}/DocumentConfirmation/True")]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> DocumentConfirmationTrue(int id)
     {
         var result = await _requestHostService.DocumentConfirmTrue(id);

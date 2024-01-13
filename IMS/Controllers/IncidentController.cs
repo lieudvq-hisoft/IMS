@@ -37,6 +37,7 @@ public class IncidentController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Create([FromBody] IncidentCreateModel model)
     {
         var result = await _incidentService.Create(model, Guid.Parse(User.GetId()));
@@ -45,6 +46,7 @@ public class IncidentController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Update([FromBody] IncidentUpdateModel model)
     {
         var result = await _incidentService.Update(model);
@@ -53,6 +55,7 @@ public class IncidentController : ControllerBase
     }
 
     [HttpPut("{id}/Resolve")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Resolve(int id, [FromBody] IncidentResolvModel model)
     {
         var result = await _incidentService.Resolv(id, model, Guid.Parse(User.GetId()));

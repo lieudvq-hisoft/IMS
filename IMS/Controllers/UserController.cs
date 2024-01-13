@@ -41,7 +41,6 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("MyAccount")]
-    [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Get your information")]
     public async Task<ActionResult> GetAccountInfo()
     {
@@ -51,19 +50,8 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpPatch("MyAccount")]
-    //[Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
-    //[SwaggerOperation(Summary = "Update your information")]
-    //public async Task<ActionResult> UpdateAccountInfo([FromBody] UserUpdateModel model)
-    //{
-    //    var result = await _userService.ChangePassword(model);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPut("Password")]
-    //[Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
-    [AllowAnonymous]
+    [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale) + "," + nameof(RoleType.Manager))]
     public async Task<ActionResult> ChangePassword([FromBody] UserChangePasswordModel model)
     {
         var result = await _userService.ChangePassword(model, Guid.Parse(User.GetId()));
@@ -71,25 +59,9 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpPost("Position")]
-    //public async Task<ActionResult> AssignRole([FromBody] UserAssignRoleModel model)
-    //{
-    //    var result = await _userService.AssignRole(model, new Guid(User.GetId()));
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpDelete("Position")]
-    //public async Task<ActionResult> UnassignRole([FromBody] UserAssignRoleModel model)
-    //{
-    //    var result = await _userService.UnassignRole(model, new Guid(User.GetId()));
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpGet]
     [SwaggerOperation(Summary = "Get list of users")]
-    [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale) + "," + nameof(RoleType.Manager))]
     public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] UserSearchModel searchModel)
     {
         var result = await _userService.Get(paginationModel, searchModel);
@@ -99,7 +71,7 @@ public class UserController : ControllerBase
 
     [HttpGet("Tech")]
     [SwaggerOperation(Summary = "Get list of users")]
-    [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale) + "," + nameof(RoleType.Manager))]
     public async Task<ActionResult> GetTech([FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] UserSearchModel searchModel)
     {
         var result = await _userService.GetTech(paginationModel, searchModel);
@@ -108,7 +80,7 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("{id}")]
-    [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale))]
+    [Authorize(Roles = nameof(RoleType.Admin) + "," + nameof(RoleType.Tech) + "," + nameof(RoleType.Sale) + "," + nameof(RoleType.Manager))]
     public async Task<ActionResult> GetDetail(string id)
     {
         var result = await _userService.GetDetail(id);
@@ -116,40 +88,7 @@ public class UserController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpGet("{id}/AssignedRequestExpand")]
-    //public async Task<ActionResult> GetAssignedRequestExpand(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestExpandSearchModel searchModel)
-    //{
-    //    var result = await _userService.GetAssignedRequestExpand(id, pagingParam, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("{id}/AssignedRequestUpgrade")]
-    //public async Task<ActionResult> GetAssignedRequestUpgrade(string id, [FromQuery] PagingParam<RequestUpgradeSortCriteria> paginationModel, [FromQuery] RequestUpgradeSearchModel searchModel)
-    //{
-    //    var result = await _userService.GetAssignedRequestUpgrade(id, paginationModel, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("{id}/AssignedRequestHost")]
-    //public async Task<ActionResult> GetAssignedRequestHost(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] RequestHostSearchModel searchModel)
-    //{
-    //    var result = await _userService.GetAssignedRequestHost(id, pagingParam, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("{id}/AssignedIncident")]
-    //public async Task<ActionResult> GetAssignedIncident(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] IncidentSearchModel searchModel)
-    //{
-    //    var result = await _userService.GetIncident(Guid.Parse(id), pagingParam, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPost("FcmToken")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<IActionResult> BindFcmToken([FromBody] BindFcmtokenModel model)
     {
         var rs = await _userService.BindFcmtoken(model, Guid.Parse(User.GetId()));
@@ -158,6 +97,7 @@ public class UserController : ControllerBase
     }
 
     [HttpDelete("FcmToken")]
+    [AllowAnonymous]
     public async Task<IActionResult> DeleteFcmToken([FromBody] DeleteFcmtokenModel model)
     {
         var rs = await _userService.DeleteFcmToken(model.FcmToken, Guid.Parse(User.GetId()));

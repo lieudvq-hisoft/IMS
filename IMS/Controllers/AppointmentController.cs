@@ -47,14 +47,6 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpGet("{id}/RequestExpand")]
-    //public async Task<ActionResult> GetRequestExpand([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
-    //{
-    //    var result = await _appointmentService.GetRequestExpand(pagingParam, id);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPut("{id}/Request")]
     public async Task<ActionResult> CreateRequestUpgradeAppointment(int id, RequestAppointmentCreateModel model)
     {
@@ -63,23 +55,8 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpGet("{id}/RequestUpgrade")]
-    //public async Task<ActionResult> GetRequestUpgrade(int id, [FromQuery] PagingParam<RequestUpgradeSortCriteria> paginationModel, [FromQuery] RequestUpgradeSearchModel searchModel)
-    //{
-    //    var result = await _appointmentService.GetRequestUpgrade(id, paginationModel, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("{id}/Incident")]
-    //public async Task<ActionResult> GetIncident(int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel, [FromQuery] IncidentSearchModel searchModel)
-    //{
-    //    var result = await _appointmentService.GetIncident(id, paginationModel, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPost]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> Create([FromBody] AppointmentCreateModel model)
     {
         var result = await _appointmentService.Create(model);
@@ -88,6 +65,7 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPost("Incident")]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> CreateIncident([FromBody] AppointmentIncidentCreateModel model)
     {
         var result = await _appointmentService.CreateIncident(model);
@@ -96,6 +74,7 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> Update([FromBody] AppointmentUpdateModel model)
     {
         var result = await _appointmentService.Update(model);
@@ -104,6 +83,7 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _appointmentService.Delete(id);
@@ -113,6 +93,7 @@ public class AppointmentController : ControllerBase
 
     [HttpPut("{id}/Accept")]
     [SwaggerOperation(Summary = "Accept a waiting appointment")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     public async Task<ActionResult> Accept(int id, [FromBody] EvaluateModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -122,6 +103,7 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPut("{id}/Deny")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Deny a waiting appointment")]
     public async Task<ActionResult> Deny(int id, [FromBody] EvaluateModel model)
     {
@@ -131,15 +113,8 @@ public class AppointmentController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpPut("{id}/Executor")]
-    //public async Task<ActionResult> AssignExecutor(int id, [FromBody] UserAssignModel model)
-    //{
-    //    var result = await _appointmentService.AssignTech(id, model);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPut("{id}/Complete")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Complete(int id, [FromBody] AppointmentCompleteModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -149,6 +124,7 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPut("{id}/Resolv")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Resolv(int id, [FromBody] AppointmentResolvModel model)
     {
         var result = await _appointmentService.Resolv(id, model, new Guid(User.GetId()));
@@ -157,6 +133,7 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPut("{id}/Fail")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Fail(int id, AppointmentFailModel model)
     {
         var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
@@ -166,6 +143,7 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPut("{id}/Document")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> UpdateDocument(int id, [FromBody] ServerAllocationCreateRequestExpandInspectionReportModel model)
     {
         var result = await _appointmentService.UpdateDocument(id, model);
@@ -174,6 +152,7 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPost("{id}/FinalDocument")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> UploadFinalDocument(int id, [FromForm] DocumentFileUploadModel model)
     {
         var result = await _appointmentService.AssignFinalDocument(id, model);
@@ -182,6 +161,7 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPut("{id}/DocumentConfirmation/True")]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> DocumentConfirmationTrue(int id)
     {
         var result = await _appointmentService.ConfirmDocument(id);

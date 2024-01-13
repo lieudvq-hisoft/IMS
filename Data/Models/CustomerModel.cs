@@ -155,6 +155,6 @@ public class CustomerLoginModel
 {
     public string Email { get; set; }
 
-    [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$")]
+    //[RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^\da-zA-Z]).{8,}$")]
     public string Password { get; set; }
 }

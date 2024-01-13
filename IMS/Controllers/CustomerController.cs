@@ -39,23 +39,8 @@ public class CustomerController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpGet("{id}/ServerAllocation")]
-    //public async Task<ActionResult> GetServerAllocation([FromQuery] PagingParam<BaseSortCriteria> pagingParam, string id)
-    //{
-    //    var result = await _customerService.GetServerAllocation(pagingParam, new Guid(id));
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("{id}/Appointment")]
-    //public async Task<ActionResult> GetAppointment(string id, [FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] AppointmentSearchModel searchModel)
-    //{
-    //    var result = await _customerService.GetAppointment(new Guid(id), pagingParam, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPost]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Create a customer and associate user")]
     public async Task<ActionResult> Create([FromBody] CustomerCreateModel model)
     {
@@ -66,6 +51,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "[Sale]: Update a customer")]
     public async Task<ActionResult> Update([FromBody] CustomerUpdateModel model)
     {
@@ -85,6 +71,7 @@ public class CustomerController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RoleType.Sale) + "," + nameof(RoleType.Manager))]
     [SwaggerOperation(Summary = "[Sale]: Delete a customer")]
     public async Task<ActionResult> Delete(string id)
     {
@@ -104,7 +91,6 @@ public class CustomerController : ControllerBase
     }
 
     [HttpPost("FcmToken")]
-    [Authorize(AuthenticationSchemes = "Bearer")]
     public async Task<IActionResult> BindFcmToken([FromBody] BindFcmtokenModel model)
     {
         var rs = await _customerService.BindFcmtoken(model, Guid.Parse(User.GetId()));
@@ -112,6 +98,7 @@ public class CustomerController : ControllerBase
         return BadRequest(rs.ErrorMessage);
     }
 
+    [AllowAnonymous]
     [HttpDelete("FcmToken")]
     public async Task<IActionResult> DeleteFcmToken([FromBody] DeleteFcmtokenModel model)
     {
@@ -120,6 +107,7 @@ public class CustomerController : ControllerBase
         return BadRequest(rs.ErrorMessage);
     }
 
+    [AllowAnonymous]
     [HttpPost("SeenCurrenNoticeCount")]
     public async Task<ActionResult> SeenCurrenNoticeCount()
     {

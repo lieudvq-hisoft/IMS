@@ -19,15 +19,6 @@ public class AreaController : ControllerBase
         _areaService = areaService;
     }
 
-    //[HttpGet]
-    //public async Task<ActionResult> Get([FromQuery] PagingParam<BaseSortCriteria> pagingParam, [FromQuery] AreaSearchModel searchModel)
-    //{
-    //    var result = await _areaService.Get(pagingParam, searchModel);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-
     [HttpGet("All")]
     public async Task<ActionResult> GetALL()
     {
@@ -35,22 +26,6 @@ public class AreaController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
-
-    //[HttpGet("{id}")]
-    //public async Task<ActionResult> GetDetail(int id)
-    //{
-    //    var result = await _areaService.GetDetail(id);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("{id}/Rack")]
-    //public async Task<ActionResult> GetRack([FromQuery] PagingParam<BaseSortCriteria> pagingParam, int id)
-    //{
-    //    var result = await _areaService.GetRack(pagingParam, id);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
 
     [HttpGet("{id}/RackAll")]
     public async Task<ActionResult> GetRackAll(int id)
@@ -62,6 +37,7 @@ public class AreaController : ControllerBase
 
 
     [HttpPost]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Create([FromBody] AreaCreateModel model)
     {
         var result = await _areaService.Create(model);
@@ -70,6 +46,7 @@ public class AreaController : ControllerBase
     }
 
     [HttpPut]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Update([FromBody] AreaUpdateModel model)
     {
         var result = await _areaService.Update(model);
@@ -78,6 +55,7 @@ public class AreaController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _areaService.Delete(id);

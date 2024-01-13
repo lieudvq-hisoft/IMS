@@ -44,6 +44,7 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPost]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     [SwaggerOperation(Summary = "Create new request upgrade, state is waiting")]
     public async Task<ActionResult> Create([FromBody] RequestUpgradeCreateModel model)
     {
@@ -52,16 +53,8 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpPost("Bulk")]
-    //[SwaggerOperation(Summary = "Create many request upgrade for server, state is accepted")]
-    //public async Task<ActionResult> CreateBulk([FromBody] RequestUpgradeCreateBulkModel model)
-    //{
-    //    var result = await _requestUpgradeService.CreateBulk(model);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPut]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> Update([FromBody] RequestUpgradeUpdateModel model)
     {
         var result = await _requestUpgradeService.Update(model);
@@ -70,6 +63,7 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpDelete("{id}")]
+    [Authorize(Roles = nameof(RoleType.Customer))]
     public async Task<ActionResult> Delete(int id)
     {
         var result = await _requestUpgradeService.Delete(id);
@@ -78,6 +72,7 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPut("{id}/Reject")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Reject(int id, RequestUpgradeRejectModel model)
     {
         var result = await _requestUpgradeService.Reject(id, model);
@@ -86,6 +81,7 @@ public class RequestUpgradeController : ControllerBase
     }
 
     [HttpPut("{id}/Accept")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Accept a waiting request upgrade")]
     public async Task<ActionResult> Accept(int id, [FromBody] EvaluateModel model)
     {
@@ -95,17 +91,8 @@ public class RequestUpgradeController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
-    //[HttpPut("Accept/Bulk")]
-    //[SwaggerOperation(Summary = "Accept many waiting request upgrade")]
-    //public async Task<ActionResult> AcceptBulk(RequestUpgradeEvaluateBulkModel model)
-    //{
-    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-    //    var result = await _requestUpgradeService.EvaluateBulk(model, RequestStatus.Accepted, new Guid(userId));
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
     [HttpPut("{id}/Deny")]
+    [Authorize(Roles = nameof(RoleType.Sale))]
     [SwaggerOperation(Summary = "Deny a waiting request upgrade")]
     public async Task<ActionResult> Deny(int id, [FromBody] EvaluateModel model)
     {
@@ -114,43 +101,4 @@ public class RequestUpgradeController : ControllerBase
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
-
-    //[HttpPut("Deny/Bulk")]
-    //[SwaggerOperation(Summary = "Deny many waiting request upgrade")]
-    //public async Task<ActionResult> DenyBulk(RequestUpgradeEvaluateBulkModel model)
-    //{
-    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-    //    var result = await _requestUpgradeService.EvaluateBulk(model, RequestStatus.Denied, new Guid(userId));
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpGet("{id}/Completability")]
-    //[SwaggerOperation(Summary = "True if any appointment success and have inspection record")]
-    //public async Task<ActionResult> GetCompletability(int id)
-    //{
-    //    var result = await _requestUpgradeService.CheckCompletability(id);
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpPut("{id}/Complete")]
-    //[SwaggerOperation(Summary = "Complete a completable accepted request upgrade. Change serverHardwareconfig")]
-    //public async Task<ActionResult> Complete(int id)
-    //{
-    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-    //    var result = await _requestUpgradeService.Complete(id, new Guid(userId));
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
-
-    //[HttpPut("Complete/Bulk")]
-    //[SwaggerOperation(Summary = "Complete many completable accepted request upgrade. Change serverHardwareconfig")]
-    //public async Task<ActionResult> CompleteBulk(RequestUpgradeCompleteBulkModel model)
-    //{
-    //    var userId = User.Claims.FirstOrDefault(x => x.Type == "UserId").Value;
-    //    var result = await _requestUpgradeService.CompleteBulk(model, new Guid(userId));
-    //    if (result.Succeed) return Ok(result.Data);
-    //    return BadRequest(result.ErrorMessage);
-    //}
 }
