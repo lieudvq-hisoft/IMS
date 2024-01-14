@@ -191,6 +191,21 @@ public class AreaService : IAreaService
                 var area = _mapper.Map<Area>(model);
                 _dbContext.Areas.Add(area);
                 _dbContext.SaveChanges();
+                for (var row = 0; row < area.RowCount; row++)
+                {
+                    for (var col = 0; col < area.ColumnCount; col++)
+                    {
+                        _dbContext.Racks.Add(new Rack
+                        {
+                            Size = 42,
+                            MaxPower = 6000,
+                            AreaId = area.Id,
+                            Column = col,
+                            Row = row
+                        });
+                    }
+                }
+                _dbContext.SaveChanges();
 
                 result.Succeed = true;
                 result.Data = _mapper.Map<AreaModel>(area);
