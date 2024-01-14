@@ -18,6 +18,7 @@ public interface IRackService
     Task<ResultModel> GetServerAllocation(PagingParam<BaseSortCriteria> paginationModel, int rackId);
     Task<ResultModel> GetRackMap(int rackId);
     Task<ResultModel> GetPower(int rackId);
+    Task<ResultModel> AddPower(RackAddPowerModel model);
     Task<ResultModel> Create(RackCreateModel model);
     Task<ResultModel> Delete(int rackId);
     Task<ResultModel> GetRackChoiceSuggestionBySize(SuggestLocationModel model);
@@ -299,6 +300,34 @@ public class RackService : IRackService
             else
             {
                 _dbContext.Racks.Remove(rack);
+                _dbContext.SaveChanges();
+                result.Succeed = true;
+                result.Data = rack.Id;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+
+        return result;
+    }
+
+    public async Task<ResultModel> AddPower(RackAddPowerModel model)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var rack = _dbContext.Racks.FirstOrDefault(x => x.Id == model.Id);
+            if (rack == null)
+            {
+                result.ErrorMessage = RackErrorMessage.NOT_EXISTED;
+            }
+            else
+            {
+                rack.MaxPower += model.Power;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = rack.Id;

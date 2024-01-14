@@ -46,6 +46,16 @@ public class RackCreateModel
     public int AreaId { get; set; }
 }
 
+public class RackAddPowerModel
+{
+    [Required]
+    public int Id { get; set; }
+
+    [Required]
+    [GreaterThanZero]
+    public int Power { get; set; }
+}
+
 public class RackUpdateModel
 {
     [Required]

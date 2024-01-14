@@ -98,7 +98,6 @@ public class CustomerController : ControllerBase
         return BadRequest(rs.ErrorMessage);
     }
 
-    [AllowAnonymous]
     [HttpDelete("FcmToken")]
     public async Task<IActionResult> DeleteFcmToken([FromBody] DeleteFcmtokenModel model)
     {

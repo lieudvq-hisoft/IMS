@@ -97,7 +97,6 @@ public class UserController : ControllerBase
     }
 
     [HttpDelete("FcmToken")]
-    [AllowAnonymous]
     public async Task<IActionResult> DeleteFcmToken([FromBody] DeleteFcmtokenModel model)
     {
         var rs = await _userService.DeleteFcmToken(model.FcmToken, Guid.Parse(User.GetId()));

@@ -48,6 +48,15 @@ public class RackController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpPatch("AddPower")]
+    [Authorize(Roles = nameof(RoleType.Tech))]
+    public async Task<ActionResult> AddPower([FromBody] RackAddPowerModel model)
+    {
+        var result = await _RackService.AddPower(model);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
+
     [HttpDelete("{id}")]
     [Authorize(Roles = nameof(RoleType.Tech))]
     [SwaggerOperation(Summary = "Delete an Rack")]

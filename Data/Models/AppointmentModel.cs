@@ -150,12 +150,13 @@ public class AppointmentFailModel
     [StringLength(2000)]
     public string? TechNote { get; set; }
 
-    [Required]
-    public ServerAllocationCreateRequestExpandInspectionReportModel DocumentModel { get; set; }
+    public ServerAllocationCreateRequestExpandInspectionReportModel? DocumentModel { get; set; }
 }
 
 public class AppointmentCompleteModel
 {
+    public string? TechNote { get; set; }
+
     [Required]
     public DateTime DateCheckedIn { get; set; }
 

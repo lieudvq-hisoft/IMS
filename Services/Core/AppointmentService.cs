@@ -1244,15 +1244,6 @@ public class AppointmentService : IAppointmentService
                 var requestUpgradeResults = new List<ResultModel>();
                 if (appointment.RequestUpgradeAppointment.Any())
                 {
-                    //var createReceiptResult = await CreateUpgradeReceiptReport(appointment.Id, model.DocumentModel);
-                    //if (!createReceiptResult.Succeed)
-                    //{
-                    //    validPrecondition = false;
-                    //    result.ErrorMessage = createReceiptResult.ErrorMessage;
-                    //}
-                    //else
-                    //{
-                    //appointment.ReceiptOfRecipientFilePath = createReceiptResult.Data as string;
                     foreach (var requestUpgradeId in appointment.RequestUpgradeAppointment.Select(x => x.RequestUpgradeId))
                     {
                         requestUpgradeResults.Add(await CompleteRequestUpgrade(requestUpgradeId, userId));
@@ -2078,6 +2069,11 @@ public class AppointmentService : IAppointmentService
             {
                 validPrecondition = false;
                 result.ErrorMessage = AppointmentErrorMessage.NOT_EXISTED;
+            }
+            else if (appointment.Reason == AppointmentReason.Install && model.DocumentModel == null)
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "Failing install appointment require document";
             }
 
             if (validPrecondition)
