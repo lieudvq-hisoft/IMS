@@ -81,7 +81,7 @@ public class RequestHostController : ControllerBase
     }
 
     [HttpPut("{id}/IpAddress")]
-    [Authorize(Roles = nameof(RoleType.Customer))]
+    [Authorize(Roles = nameof(RoleType.Customer) + "," + nameof(RoleType.Tech))]
     public async Task<ActionResult> AssignIp(int id, [FromBody] RequestHostIpAssignmentModel model)
     {
         var result = await _requestHostService.AssignAdditionalIp(id, model);
