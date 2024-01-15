@@ -35,6 +35,13 @@ public class AreaController : ControllerBase
         return BadRequest(result.ErrorMessage);
     }
 
+    [HttpGet("{id}/Rack")]
+    public async Task<ActionResult> GetRack(int id, [FromQuery] PagingParam<BaseSortCriteria> paginationModel)
+    {
+        var result = await _areaService.GetRack(id, paginationModel);
+        if (result.Succeed) return Ok(result.Data);
+        return BadRequest(result.ErrorMessage);
+    }
 
     [HttpPost]
     [Authorize(Roles = nameof(RoleType.Tech))]

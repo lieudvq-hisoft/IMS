@@ -14,6 +14,7 @@ public interface IAreaService
 {
     //Task<ResultModel> Get(PagingParam<BaseSortCriteria> paginationModel, AreaSearchModel searchModel);
     Task<ResultModel> GetAll();
+    Task<ResultModel> GetRack(int id, PagingParam<BaseSortCriteria> paginationModel);
     //Task<ResultModel> GetDetail(int id);
     //Task<ResultModel> GetRack(PagingParam<BaseSortCriteria> paginationModel, int id);
     Task<ResultModel> GetRackAll(int id);
@@ -165,6 +166,38 @@ public class AreaService : IAreaService
             {
                 result.ErrorMessage = AreaErrorMessage.NOT_EXISTED;
                 result.Succeed = false;
+            }
+        }
+        catch (Exception e)
+        {
+            result.ErrorMessage = MyFunction.GetErrorMessage(e);
+        }
+        return result;
+    }
+
+    public async Task<ResultModel> GetRack(int id, PagingParam<BaseSortCriteria> paginationModel)
+    {
+        var result = new ResultModel();
+        result.Succeed = false;
+
+        try
+        {
+            var area = _dbContext.Areas
+                .Include(x => x.Racks)
+                .FirstOrDefault(x => x.Id == id);
+
+            if (area != null)
+            {
+                var racks = area.Racks.AsQueryable();
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, racks.Count());
+
+                racks = racks.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                racks = racks.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+                paging.Data = _mapper.Map<List<RackModel>>(racks.ToList());
+
+                result.Data = paging;
+                result.Succeed = true;
             }
         }
         catch (Exception e)
