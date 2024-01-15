@@ -54,7 +54,7 @@ public class RequestExpandController : ControllerBase
     }
 
     [HttpPut]
-    [Authorize(Roles = nameof(RoleType.Customer))]
+    [Authorize(Roles = nameof(RoleType.Tech))]
     public async Task<ActionResult> Update([FromBody] RequestExpandUpdateModel model)
     {
         var result = await _requestExpandService.Update(model);
