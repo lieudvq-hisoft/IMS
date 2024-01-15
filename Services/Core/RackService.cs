@@ -43,6 +43,7 @@ public class RackService : IRackService
         try
         {
             var racks = _dbContext.Racks
+                .Include(x => x.Area)
                 .Where(x => searchModel.RackId != null ? x.Id == searchModel.RackId : true)
                 .AsQueryable();
 
@@ -70,7 +71,8 @@ public class RackService : IRackService
 
         try
         {
-            var racks = _dbContext.Racks.AsQueryable();
+            var racks = _dbContext.Racks
+                .Include(x => x.Area).AsQueryable();
 
             result.Data = _mapper.Map<List<RackModel>>(racks.ToList());
             result.Succeed = true;
@@ -90,6 +92,7 @@ public class RackService : IRackService
         try
         {
             var rack = _dbContext.Racks
+                .Include(x => x.Area)
                 .FirstOrDefault(x => x.Id == rackId);
 
             if (rack != null)

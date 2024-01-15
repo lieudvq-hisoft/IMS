@@ -13,7 +13,7 @@ namespace Services.Core;
 public interface ILocationService
 {
     Task<ResultModel> Get(PagingParam<SimpleSortCriteria> paginationModel, LocationSearchModel searchModel);
-    Task<ResultModel> GetAvailable(AvailableLocationSearchModel model);
+    Task<ResultModel> GetAvailable(AvailableLocationSearchModel model, PagingParam<SimpleSortCriteria> paginationModel);
     //Task<ResultModel> GetDetail(int id);
     //Task<ResultModel> GetRequestExpandLocation(int id);
     //Task<ResultModel> GetLocationAssignment(int id);
@@ -64,7 +64,7 @@ public class LocationService : ILocationService
         return result;
     }
 
-    public async Task<ResultModel> GetAvailable(AvailableLocationSearchModel model)
+    public async Task<ResultModel> GetAvailable(AvailableLocationSearchModel model, PagingParam<SimpleSortCriteria> paginationModel)
     {
         var result = new ResultModel();
         result.Succeed = false;
@@ -92,7 +92,15 @@ public class LocationService : ILocationService
                     }
                 }
 
-                result.Data = _mapper.Map<List<LocationModel>>(resultLocations);
+                var locations = resultLocations.AsQueryable();
+                var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, locations.Count());
+
+                locations = locations.GetWithSorting(paginationModel.SortKey.ToString(), paginationModel.SortOrder);
+                locations = locations.GetWithPaging(paginationModel.PageIndex, paginationModel.PageSize);
+
+                paging.Data = _mapper.Map<List<LocationModel>>(locations.ToList());
+
+                result.Data = paging;
                 result.Succeed = true;
             }
         }
