@@ -228,17 +228,27 @@ public class AreaService : IAreaService
                 {
                     for (var col = 0; col < area.ColumnCount; col++)
                     {
-                        _dbContext.Racks.Add(new Rack
+                        var rack = new Rack
                         {
                             Size = 42,
                             MaxPower = 6000,
                             AreaId = area.Id,
                             Column = col,
                             Row = row
-                        });
+                        };
+                        _dbContext.Racks.Add(rack);
+                        _dbContext.SaveChanges();
+                        for (var position = 0; position < 42; position++)
+                        {
+                            _dbContext.Locations.Add(new Location
+                            {
+                                RackId = rack.Id,
+                                Position = position
+                            });
+                        }
+                        _dbContext.SaveChanges();
                     }
                 }
-                _dbContext.SaveChanges();
 
                 result.Succeed = true;
                 result.Data = _mapper.Map<AreaModel>(area);
