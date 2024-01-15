@@ -30,9 +30,9 @@ public class LocationController : ControllerBase
     }
 
     [HttpGet("Available")]
-    public async Task<ActionResult> GetAvailable([FromQuery] AvailableLocationSearchModel model)
+    public async Task<ActionResult> GetAvailable([FromQuery] AvailableLocationSearchModel model, [FromQuery] PagingParam<SimpleSortCriteria> pagingParam)
     {
-        var result = await _LocationService.GetAvailable(model);
+        var result = await _LocationService.GetAvailable(model, pagingParam);
         if (result.Succeed) return Ok(result.Data);
         return BadRequest(result.ErrorMessage);
     }
