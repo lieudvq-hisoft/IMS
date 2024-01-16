@@ -41,6 +41,7 @@ public class LocationSearchModel
 {
     public int? LocationId { get; set; }
     public bool? Available { get; set; }
+    public bool? IsReserved { get; set; }
 }
 
 public class AvailableLocationSearchModel

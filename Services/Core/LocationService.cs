@@ -44,6 +44,7 @@ public class LocationService : ILocationService
                 .Include(x => x.RequestExpandLocations)
                 .Include(x => x.Rack).ThenInclude(x => x.Area)
                 .Where(x => searchModel.LocationId != null ? x.Id == searchModel.LocationId : true)
+                .Where(x => x.IsReserved == searchModel.IsReserved || searchModel.IsReserved == null)
                 .Where(location => searchModel.Available != null ? !location.LocationAssignments.Any() && !location.RequestExpandLocations.Select(x => x.RequestExpand).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted) : true)
                 .AsQueryable();
 
@@ -73,7 +74,7 @@ public class LocationService : ILocationService
         {
             var rack = _dbContext.Racks
                 .Include(x => x.Locations).ThenInclude(x => x.LocationAssignments)
-                .Include(x => x.Locations).ThenInclude(x => x.RequestExpandLocations)
+                .Include(x => x.Locations).ThenInclude(x => x.RequestExpandLocations).ThenInclude(x => x.RequestExpand)
                 .Include(x => x.Area)
                 .FirstOrDefault(x => x.Id == model.RackId);
             if (rack != null)
