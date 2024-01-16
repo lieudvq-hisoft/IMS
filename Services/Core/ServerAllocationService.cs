@@ -66,9 +66,7 @@ public class ServerAllocationService : IServerAllocationService
                 .Where(x => searchModel.RackId != null ? x.LocationAssignments.Select(x => x.Location.RackId).Distinct().Any(x => x == searchModel.RackId) : true)
                 .Where(x => searchModel.CustomerId != null ? x.CustomerId == searchModel.CustomerId : true)
                 .Where(x => searchModel.Status != null ? searchModel.Status.Contains(x.Status) : true)
-                .Where(x => x.Name.ToLower().Contains(searchModel.SearchValue)
-            || x.Customer.CompanyName.ToLower().Contains(searchModel.SearchValue)
-            || x.MasterIpAddress.Contains(searchModel.SearchValue))
+                .Where(x => x.Name.ToLower().Contains(searchModel.SearchValue) || x.Customer.CompanyName.ToLower().Contains(searchModel.SearchValue) || x.MasterIpAddress.Contains(searchModel.SearchValue) || searchModel.SearchValue == null)
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, serverAllocations.Count());
