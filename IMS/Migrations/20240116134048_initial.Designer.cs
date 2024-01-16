@@ -14,8 +14,8 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace IMS.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240110170131_server_contract_date")]
-    partial class server_contract_date
+    [Migration("20240116134048_initial")]
+    partial class initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -176,8 +176,8 @@ namespace IMS.Migrations
                         {
                             Id = 1,
                             ColumnCount = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4820),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4821),
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4058),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4059),
                             IsDeleted = false,
                             Name = "A",
                             RowCount = 8
@@ -186,8 +186,8 @@ namespace IMS.Migrations
                         {
                             Id = 2,
                             ColumnCount = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4836),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4836),
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4078),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4079),
                             IsDeleted = false,
                             Name = "B",
                             RowCount = 5
@@ -229,8 +229,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 1,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4679),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4692),
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(3760),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(3781),
                             IsDeleted = false,
                             IsRequired = false,
                             Name = "CPU"
@@ -238,8 +238,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 2,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4784),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4785),
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4012),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4013),
                             IsDeleted = false,
                             IsRequired = false,
                             Name = "RAM"
@@ -247,8 +247,8 @@ namespace IMS.Migrations
                         new
                         {
                             Id = 3,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4796),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4797),
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4028),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4029),
                             IsDeleted = false,
                             IsRequired = false,
                             Name = "Harddisk"
@@ -297,17 +297,17 @@ namespace IMS.Migrations
 
                     b.HasIndex("CCCD")
                         .IsUnique()
-                        .HasFilter("IsDeleted = false");
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.HasIndex("CustomerId");
 
                     b.HasIndex("Email")
                         .IsUnique()
-                        .HasFilter("IsDeleted = false");
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.HasIndex("PhoneNumber")
                         .IsUnique()
-                        .HasFilter("IsDeleted = false");
+                        .HasFilter("\"IsDeleted\" = false");
 
                     b.ToTable("Contacts");
                 });
@@ -332,6 +332,9 @@ namespace IMS.Migrations
 
                     b.Property<int>("CurrenNoticeCount")
                         .HasColumnType("integer");
+
+                    b.Property<DateTime?>("DateContract")
+                        .HasColumnType("timestamp without time zone");
 
                     b.Property<DateTime>("DateCreated")
                         .HasColumnType("timestamp without time zone");
@@ -35753,1248 +35756,1248 @@ namespace IMS.Migrations
                         {
                             Id = 1,
                             AreaId = 1,
-                            Column = 1,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4843),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4843),
+                            Column = 0,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4087),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4087),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 2,
                             AreaId = 1,
-                            Column = 2,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4867),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4874),
+                            Column = 1,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4217),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4218),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 3,
                             AreaId = 1,
-                            Column = 3,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4896),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4896),
+                            Column = 2,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4235),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4236),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 4,
                             AreaId = 1,
-                            Column = 4,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4905),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4905),
+                            Column = 3,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4252),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4253),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 5,
                             AreaId = 1,
-                            Column = 5,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4913),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4913),
+                            Column = 4,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4265),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4266),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 6,
                             AreaId = 1,
-                            Column = 6,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4921),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4922),
+                            Column = 5,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4281),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4281),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 7,
                             AreaId = 1,
-                            Column = 7,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4977),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4978),
+                            Column = 6,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4295),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4296),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 8,
                             AreaId = 1,
-                            Column = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4985),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4986),
+                            Column = 7,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4310),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4311),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 9,
                             AreaId = 1,
-                            Column = 1,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4847),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4847),
+                            Column = 0,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4094),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4095),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 10,
                             AreaId = 1,
-                            Column = 2,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4889),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4889),
+                            Column = 1,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4222),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4223),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 11,
                             AreaId = 1,
-                            Column = 3,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4898),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4898),
+                            Column = 2,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4239),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4240),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 12,
                             AreaId = 1,
-                            Column = 4,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4906),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4906),
+                            Column = 3,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4253),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4254),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 13,
                             AreaId = 1,
-                            Column = 5,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4914),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4915),
+                            Column = 4,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4268),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4268),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 14,
                             AreaId = 1,
-                            Column = 6,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4922),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4923),
+                            Column = 5,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4282),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4283),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 15,
                             AreaId = 1,
-                            Column = 7,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4978),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4979),
+                            Column = 6,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4297),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4297),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 16,
                             AreaId = 1,
-                            Column = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4986),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4987),
+                            Column = 7,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4312),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4313),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 17,
                             AreaId = 1,
-                            Column = 1,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4848),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4849),
+                            Column = 0,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4097),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4097),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 18,
                             AreaId = 1,
-                            Column = 2,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4890),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4890),
+                            Column = 1,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4224),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4225),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 19,
                             AreaId = 1,
-                            Column = 3,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4899),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4899),
+                            Column = 2,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4241),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4242),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 20,
                             AreaId = 1,
-                            Column = 4,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4907),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4907),
+                            Column = 3,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4255),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4255),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 21,
                             AreaId = 1,
-                            Column = 5,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4915),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4916),
+                            Column = 4,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4270),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4271),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 22,
                             AreaId = 1,
-                            Column = 6,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4923),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4923),
+                            Column = 5,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4284),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4284),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 23,
                             AreaId = 1,
-                            Column = 7,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4979),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4980),
+                            Column = 6,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4299),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4299),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 24,
                             AreaId = 1,
-                            Column = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4987),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4988),
+                            Column = 7,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4314),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4314),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 25,
                             AreaId = 1,
-                            Column = 1,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4849),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4850),
+                            Column = 0,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4099),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4099),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 26,
                             AreaId = 1,
-                            Column = 2,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4891),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4891),
+                            Column = 1,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4226),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4227),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 27,
                             AreaId = 1,
-                            Column = 3,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4900),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4900),
+                            Column = 2,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4243),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4244),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 28,
                             AreaId = 1,
-                            Column = 4,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4908),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4908),
+                            Column = 3,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4256),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4257),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 29,
                             AreaId = 1,
-                            Column = 5,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4916),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4917),
+                            Column = 4,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4272),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4273),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 30,
                             AreaId = 1,
-                            Column = 6,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4924),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4924),
+                            Column = 5,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4286),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4286),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 31,
                             AreaId = 1,
-                            Column = 7,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4980),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4981),
+                            Column = 6,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4301),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4301),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 32,
                             AreaId = 1,
-                            Column = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4988),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4989),
+                            Column = 7,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4315),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4316),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 33,
                             AreaId = 1,
-                            Column = 1,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4850),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4851),
+                            Column = 0,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4101),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4101),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 34,
                             AreaId = 1,
-                            Column = 2,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4892),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4892),
+                            Column = 1,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4228),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4229),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 35,
                             AreaId = 1,
-                            Column = 3,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4901),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4901),
+                            Column = 2,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4245),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4245),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 36,
                             AreaId = 1,
-                            Column = 4,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4909),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4909),
+                            Column = 3,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4258),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4259),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 37,
                             AreaId = 1,
-                            Column = 5,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4917),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4918),
+                            Column = 4,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4274),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4274),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 38,
                             AreaId = 1,
-                            Column = 6,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4925),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4925),
+                            Column = 5,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4288),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4288),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 39,
                             AreaId = 1,
-                            Column = 7,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4981),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4982),
+                            Column = 6,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4302),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4303),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 40,
                             AreaId = 1,
-                            Column = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4989),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4990),
+                            Column = 7,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4317),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4318),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 41,
                             AreaId = 1,
-                            Column = 1,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4853),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4853),
+                            Column = 0,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4195),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4197),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 6,
+                            MaxPower = 6000,
+                            Row = 5,
                             Size = 42
                         },
                         new
                         {
                             Id = 42,
                             AreaId = 1,
-                            Column = 2,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4893),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4893),
+                            Column = 1,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4230),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4230),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 6,
+                            MaxPower = 6000,
+                            Row = 5,
                             Size = 42
                         },
                         new
                         {
                             Id = 43,
                             AreaId = 1,
-                            Column = 3,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4902),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4902),
+                            Column = 2,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4247),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4247),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 6,
+                            MaxPower = 6000,
+                            Row = 5,
                             Size = 42
                         },
                         new
                         {
                             Id = 44,
                             AreaId = 1,
-                            Column = 4,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4910),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4910),
+                            Column = 3,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4260),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4260),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 6,
+                            MaxPower = 6000,
+                            Row = 5,
                             Size = 42
                         },
                         new
                         {
                             Id = 45,
                             AreaId = 1,
-                            Column = 5,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4918),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4919),
+                            Column = 4,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4275),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4276),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 6,
+                            MaxPower = 6000,
+                            Row = 5,
                             Size = 42
                         },
                         new
                         {
                             Id = 46,
                             AreaId = 1,
-                            Column = 6,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4926),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4926),
+                            Column = 5,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4289),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4290),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 6,
+                            MaxPower = 6000,
+                            Row = 5,
                             Size = 42
                         },
                         new
                         {
                             Id = 47,
                             AreaId = 1,
-                            Column = 7,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4982),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4983),
+                            Column = 6,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4304),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4305),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 6,
+                            MaxPower = 6000,
+                            Row = 5,
                             Size = 42
                         },
                         new
                         {
                             Id = 48,
                             AreaId = 1,
-                            Column = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4990),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4991),
+                            Column = 7,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4319),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4319),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 6,
+                            MaxPower = 6000,
+                            Row = 5,
                             Size = 42
                         },
                         new
                         {
                             Id = 49,
                             AreaId = 1,
-                            Column = 1,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4854),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4854),
+                            Column = 0,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4199),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4204),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 7,
+                            MaxPower = 6000,
+                            Row = 6,
                             Size = 42
                         },
                         new
                         {
                             Id = 50,
                             AreaId = 1,
-                            Column = 2,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4894),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4894),
+                            Column = 1,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4232),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4232),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 7,
+                            MaxPower = 6000,
+                            Row = 6,
                             Size = 42
                         },
                         new
                         {
                             Id = 51,
                             AreaId = 1,
-                            Column = 3,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4903),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4903),
+                            Column = 2,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4249),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4249),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 7,
+                            MaxPower = 6000,
+                            Row = 6,
                             Size = 42
                         },
                         new
                         {
                             Id = 52,
                             AreaId = 1,
-                            Column = 4,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4911),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4911),
+                            Column = 3,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4261),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4262),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 7,
+                            MaxPower = 6000,
+                            Row = 6,
                             Size = 42
                         },
                         new
                         {
                             Id = 53,
                             AreaId = 1,
-                            Column = 5,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4919),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4920),
+                            Column = 4,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4277),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4278),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 7,
+                            MaxPower = 6000,
+                            Row = 6,
                             Size = 42
                         },
                         new
                         {
                             Id = 54,
                             AreaId = 1,
-                            Column = 6,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4927),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4927),
+                            Column = 5,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4291),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4292),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 7,
+                            MaxPower = 6000,
+                            Row = 6,
                             Size = 42
                         },
                         new
                         {
                             Id = 55,
                             AreaId = 1,
-                            Column = 7,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4983),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4984),
+                            Column = 6,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4306),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4307),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 7,
+                            MaxPower = 6000,
+                            Row = 6,
                             Size = 42
                         },
                         new
                         {
                             Id = 56,
                             AreaId = 1,
-                            Column = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4991),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4992),
+                            Column = 7,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4321),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4321),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 7,
+                            MaxPower = 6000,
+                            Row = 6,
                             Size = 42
                         },
                         new
                         {
                             Id = 57,
                             AreaId = 1,
-                            Column = 1,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4866),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4866),
+                            Column = 0,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4215),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4216),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 8,
+                            MaxPower = 6000,
+                            Row = 7,
                             Size = 42
                         },
                         new
                         {
                             Id = 58,
                             AreaId = 1,
-                            Column = 2,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4895),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4895),
+                            Column = 1,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4233),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4234),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 8,
+                            MaxPower = 6000,
+                            Row = 7,
                             Size = 42
                         },
                         new
                         {
                             Id = 59,
                             AreaId = 1,
-                            Column = 3,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4904),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4904),
+                            Column = 2,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4250),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4251),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 8,
+                            MaxPower = 6000,
+                            Row = 7,
                             Size = 42
                         },
                         new
                         {
                             Id = 60,
                             AreaId = 1,
-                            Column = 4,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4912),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4912),
+                            Column = 3,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4263),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4264),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 8,
+                            MaxPower = 6000,
+                            Row = 7,
                             Size = 42
                         },
                         new
                         {
                             Id = 61,
                             AreaId = 1,
-                            Column = 5,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4920),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4921),
+                            Column = 4,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4279),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4279),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 8,
+                            MaxPower = 6000,
+                            Row = 7,
                             Size = 42
                         },
                         new
                         {
                             Id = 62,
                             AreaId = 1,
-                            Column = 6,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4976),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4976),
+                            Column = 5,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4293),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4294),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 8,
+                            MaxPower = 6000,
+                            Row = 7,
                             Size = 42
                         },
                         new
                         {
                             Id = 63,
                             AreaId = 1,
-                            Column = 7,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4984),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4985),
+                            Column = 6,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4308),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4309),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 8,
+                            MaxPower = 6000,
+                            Row = 7,
                             Size = 42
                         },
                         new
                         {
                             Id = 64,
                             AreaId = 1,
-                            Column = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4992),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4993),
+                            Column = 7,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4322),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4323),
                             IsDeleted = false,
-                            MaxPower = 3000,
-                            Row = 8,
+                            MaxPower = 6000,
+                            Row = 7,
                             Size = 42
                         },
                         new
                         {
                             Id = 65,
                             AreaId = 2,
-                            Column = 1,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4994),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4994),
+                            Column = 0,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4325),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4325),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 66,
                             AreaId = 2,
-                            Column = 2,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5000),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5000),
+                            Column = 1,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4338),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4339),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 67,
                             AreaId = 2,
-                            Column = 3,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5005),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5006),
+                            Column = 2,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4348),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4349),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 68,
                             AreaId = 2,
-                            Column = 4,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5010),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5011),
+                            Column = 3,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4359),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4359),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 69,
                             AreaId = 2,
-                            Column = 5,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5015),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5015),
+                            Column = 4,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4425),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4426),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 70,
                             AreaId = 2,
-                            Column = 6,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5020),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5020),
+                            Column = 5,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4434),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4435),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 71,
                             AreaId = 2,
-                            Column = 7,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5025),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5025),
+                            Column = 6,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4444),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4444),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 72,
                             AreaId = 2,
-                            Column = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5030),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5030),
+                            Column = 7,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4453),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4454),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 1,
+                            MaxPower = 6000,
+                            Row = 0,
                             Size = 42
                         },
                         new
                         {
                             Id = 73,
                             AreaId = 2,
-                            Column = 1,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4996),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4996),
+                            Column = 0,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4330),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4330),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 74,
                             AreaId = 2,
-                            Column = 2,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5001),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5002),
+                            Column = 1,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4340),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4341),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 75,
                             AreaId = 2,
-                            Column = 3,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5006),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5007),
+                            Column = 2,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4351),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4351),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 76,
                             AreaId = 2,
-                            Column = 4,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5011),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5012),
+                            Column = 3,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4360),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4361),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 77,
                             AreaId = 2,
-                            Column = 5,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5016),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5017),
+                            Column = 4,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4427),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4428),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 78,
                             AreaId = 2,
-                            Column = 6,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5021),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5021),
+                            Column = 5,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4436),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4437),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 79,
                             AreaId = 2,
-                            Column = 7,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5026),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5026),
+                            Column = 6,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4446),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4446),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 80,
                             AreaId = 2,
-                            Column = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5031),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5031),
+                            Column = 7,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4455),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4456),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 2,
+                            MaxPower = 6000,
+                            Row = 1,
                             Size = 42
                         },
                         new
                         {
                             Id = 81,
                             AreaId = 2,
-                            Column = 1,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4997),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4997),
+                            Column = 0,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4332),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4332),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 82,
                             AreaId = 2,
-                            Column = 2,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5002),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5003),
+                            Column = 1,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4342),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4343),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 83,
                             AreaId = 2,
-                            Column = 3,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5007),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5008),
+                            Column = 2,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4353),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4353),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 84,
                             AreaId = 2,
-                            Column = 4,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5012),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5012),
+                            Column = 3,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4362),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4362),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 85,
                             AreaId = 2,
-                            Column = 5,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5017),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5017),
+                            Column = 4,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4429),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4429),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 86,
                             AreaId = 2,
-                            Column = 6,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5022),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5022),
+                            Column = 5,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4438),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4438),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 87,
                             AreaId = 2,
-                            Column = 7,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5027),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5027),
+                            Column = 6,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4447),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4448),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 88,
                             AreaId = 2,
-                            Column = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5032),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5032),
+                            Column = 7,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4457),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4457),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 3,
+                            MaxPower = 6000,
+                            Row = 2,
                             Size = 42
                         },
                         new
                         {
                             Id = 89,
                             AreaId = 2,
-                            Column = 1,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4998),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4998),
+                            Column = 0,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4333),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4334),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 90,
                             AreaId = 2,
-                            Column = 2,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5003),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5004),
+                            Column = 1,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4344),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4345),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 91,
                             AreaId = 2,
-                            Column = 3,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5008),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5009),
+                            Column = 2,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4355),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4355),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 92,
                             AreaId = 2,
-                            Column = 4,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5013),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5013),
+                            Column = 3,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4420),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4421),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 93,
                             AreaId = 2,
-                            Column = 5,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5018),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5018),
+                            Column = 4,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4430),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4431),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 94,
                             AreaId = 2,
-                            Column = 6,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5023),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5023),
+                            Column = 5,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4440),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4440),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 95,
                             AreaId = 2,
-                            Column = 7,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5028),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5028),
+                            Column = 6,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4449),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4450),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 96,
                             AreaId = 2,
-                            Column = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5033),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5033),
+                            Column = 7,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4459),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4459),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 4,
+                            MaxPower = 6000,
+                            Row = 3,
                             Size = 42
                         },
                         new
                         {
                             Id = 97,
                             AreaId = 2,
-                            Column = 1,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4999),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(4999),
+                            Column = 0,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4335),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4336),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 98,
                             AreaId = 2,
-                            Column = 2,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5004),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5004),
+                            Column = 1,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4346),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4347),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 99,
                             AreaId = 2,
-                            Column = 3,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5009),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5010),
+                            Column = 2,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4357),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4357),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 100,
                             AreaId = 2,
-                            Column = 4,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5014),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5014),
+                            Column = 3,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4423),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4424),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 101,
                             AreaId = 2,
-                            Column = 5,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5019),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5019),
+                            Column = 4,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4432),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4433),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 102,
                             AreaId = 2,
-                            Column = 6,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5024),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5024),
+                            Column = 5,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4441),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4442),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 103,
                             AreaId = 2,
-                            Column = 7,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5029),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5029),
+                            Column = 6,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4451),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4451),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         },
                         new
                         {
                             Id = 104,
                             AreaId = 2,
-                            Column = 8,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5034),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 859, DateTimeKind.Local).AddTicks(5034),
+                            Column = 7,
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4460),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 150, DateTimeKind.Local).AddTicks(4461),
                             IsDeleted = false,
-                            MaxPower = 3500,
-                            Row = 5,
+                            MaxPower = 6000,
+                            Row = 4,
                             Size = 42
                         });
                 });
@@ -37036,6 +37039,9 @@ namespace IMS.Migrations
 
                     b.Property<DateTime?>("RemovalDateUpdated")
                         .HasColumnType("timestamp without time zone");
+
+                    b.Property<string>("RemovalRequestDocument")
+                        .HasColumnType("text");
 
                     b.Property<int>("RequestType")
                         .HasColumnType("integer");
@@ -37219,6 +37225,9 @@ namespace IMS.Migrations
 
                     b.Property<int>("Quantity")
                         .HasColumnType("integer");
+
+                    b.Property<string>("RemovalRequestDocument")
+                        .HasColumnType("text");
 
                     b.Property<int>("RequestType")
                         .HasColumnType("integer");
@@ -37492,6 +37501,13 @@ namespace IMS.Migrations
                             Description = "Admin",
                             Name = "Admin",
                             isDeactive = false
+                        },
+                        new
+                        {
+                            Id = new Guid("2e3566a9-02b1-4ec4-a2d4-b3bb3c4f2b45"),
+                            Description = "Manager",
+                            Name = "Manager",
+                            isDeactive = false
                         });
                 });
 
@@ -37502,9 +37518,6 @@ namespace IMS.Migrations
                         .HasColumnType("integer");
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("ContractDate")
-                        .HasColumnType("timestamp without time zone");
 
                     b.Property<Guid>("CustomerId")
                         .HasColumnType("uuid");
@@ -37718,10 +37731,10 @@ namespace IMS.Migrations
                             Id = new Guid("57ffb575-7c79-4133-8433-aebbcd71f824"),
                             AccessFailedCount = 0,
                             Address = "Đ. Mạc Đĩnh Chi, Khu phố Tân Hòa, Dĩ An, Bình Dương",
-                            ConcurrencyStamp = "808adc29-1286-4dec-834d-9a37e10591ff",
+                            ConcurrencyStamp = "2ff972d6-6863-4f8f-95dd-696738a64bf0",
                             CurrenNoticeCount = 0,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 864, DateTimeKind.Local).AddTicks(1623),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 864, DateTimeKind.Local).AddTicks(1638),
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 189, DateTimeKind.Local).AddTicks(5184),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 189, DateTimeKind.Local).AddTicks(5248),
                             Email = "khacnhien.dao@gmail.com",
                             EmailConfirmed = true,
                             FcmTokens = new List<string>(),
@@ -37730,7 +37743,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "khacnhien.dao@gmail.com",
                             NormalizedUserName = "khacnhien.dao",
-                            PasswordHash = "AQAAAAIAAYagAAAAEF3UfdaU4S4lkn2J9DTv1BZzUe9XAbFYgqVE4TgPP4WY0ZxE/x47s1V4AAZ8pzDpzA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEEf7uatqjWatw46fu8Cbx9dFs0EnCzab7fJ9T2cSUUQr0qe1fxKCoZNXcHQvWqH1sw==",
                             PhoneNumber = "0866445139",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -37742,10 +37755,10 @@ namespace IMS.Migrations
                             Id = new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab"),
                             AccessFailedCount = 0,
                             Address = "24/5 Lê Trọng Tấn, P.Tây Thạnh, Q.Tân Phú, TPHCM",
-                            ConcurrencyStamp = "9b6b2316-10d1-4b78-9ad1-76735b0c1fbe",
+                            ConcurrencyStamp = "db07eec5-220f-4c91-884a-1eb5d90f6532",
                             CurrenNoticeCount = 0,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 29, 938, DateTimeKind.Local).AddTicks(368),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 29, 938, DateTimeKind.Local).AddTicks(381),
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 314, DateTimeKind.Local).AddTicks(5502),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 314, DateTimeKind.Local).AddTicks(5523),
                             Email = "caovy.tran@gmail.com",
                             EmailConfirmed = true,
                             FcmTokens = new List<string>(),
@@ -37754,7 +37767,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "caovy.tran@gmail.com",
                             NormalizedUserName = "caovy.tran",
-                            PasswordHash = "AQAAAAIAAYagAAAAEBFCHL+++4iatXalMNW+xyCQJ66CKiwSbkoaW2qSbjCukvQ1KFym65bKLgpGGB04QQ==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEOkX35lIL9l/bsPRmBVV/gyPDEmP5c7L+qJpoja//Cswiur8HUe+Wa3HwWFINXEt1w==",
                             PhoneNumber = "0985097145",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -37766,10 +37779,10 @@ namespace IMS.Migrations
                             Id = new Guid("1abb6e28-793d-460f-8a24-745998356da8"),
                             AccessFailedCount = 0,
                             Address = "Origami Tòa S10.03, Vinhomes Grand Park, Long Bình, Quận 9, TP.HCM",
-                            ConcurrencyStamp = "c6679df7-66d1-476a-8abb-58bb3362e18d",
+                            ConcurrencyStamp = "04ee838d-02bf-4be1-abc1-622a14a91f2a",
                             CurrenNoticeCount = 0,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 30, 21, DateTimeKind.Local).AddTicks(8344),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 30, 21, DateTimeKind.Local).AddTicks(8361),
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 410, DateTimeKind.Local).AddTicks(3333),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 410, DateTimeKind.Local).AddTicks(3346),
                             Email = "nhatha.pham@gmail.com",
                             EmailConfirmed = true,
                             FcmTokens = new List<string>(),
@@ -37778,7 +37791,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "nhatha.pham@gmail.com",
                             NormalizedUserName = "nhatha.pham",
-                            PasswordHash = "AQAAAAIAAYagAAAAELWI3XDTM+oOhE0kw4vD5yhGea1JgEhDGHi/AJKiXtN1o1IvuoF1ibC6BilVSm00zA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEDm91O1NKKOsukBi9iupDRLQdF0vjYoqJHoHfoFBpGbRiCe5utHGwzkuQjVOrBu3ug==",
                             PhoneNumber = "0834666630",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -37790,10 +37803,10 @@ namespace IMS.Migrations
                             Id = new Guid("2e3566a9-02b1-4ec4-a2d4-b3bb3c4f2b45"),
                             AccessFailedCount = 0,
                             Address = "Tòa S106 Vinhomes Grand Park, TP. Thủ Đức, TP. Hồ Chí Minh",
-                            ConcurrencyStamp = "da786a58-8c75-46c6-b35f-d52c8e674167",
+                            ConcurrencyStamp = "610b7cd7-7aeb-4554-b916-7425b9cd2b03",
                             CurrenNoticeCount = 0,
-                            DateCreated = new DateTime(2024, 1, 11, 0, 1, 30, 121, DateTimeKind.Local).AddTicks(436),
-                            DateUpdated = new DateTime(2024, 1, 11, 0, 1, 30, 121, DateTimeKind.Local).AddTicks(451),
+                            DateCreated = new DateTime(2024, 1, 16, 20, 40, 46, 559, DateTimeKind.Local).AddTicks(7717),
+                            DateUpdated = new DateTime(2024, 1, 16, 20, 40, 46, 559, DateTimeKind.Local).AddTicks(7779),
                             Email = "anhtuan.tran@gmail.com",
                             EmailConfirmed = true,
                             FcmTokens = new List<string>(),
@@ -37802,7 +37815,7 @@ namespace IMS.Migrations
                             LockoutEnabled = false,
                             NormalizedEmail = "anhtuan.tran@gmail.com",
                             NormalizedUserName = "anhtuan.tran",
-                            PasswordHash = "AQAAAAIAAYagAAAAELuypU0xSNas9Fv0ngtYm9CiLcYgUqRXDlObtlB5O0zWjQdWNYbb6uTFaUmxskRhZA==",
+                            PasswordHash = "AQAAAAIAAYagAAAAEGn7YMEAk3s5/0oPVR1+GMNKXcLyt5gadu8VuBR6jvg94IpBXBooUC/K9XBgbHJClg==",
                             PhoneNumber = "0682716278",
                             PhoneNumberConfirmed = false,
                             SecurityStamp = "",
@@ -37865,28 +37878,18 @@ namespace IMS.Migrations
                         },
                         new
                         {
-                            UserId = new Guid("57ffb575-7c79-4133-8433-aebbcd71f824"),
-                            RoleId = new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab")
-                        },
-                        new
-                        {
-                            UserId = new Guid("57ffb575-7c79-4133-8433-aebbcd71f824"),
-                            RoleId = new Guid("1abb6e28-793d-460f-8a24-745998356da8")
-                        },
-                        new
-                        {
                             UserId = new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab"),
-                            RoleId = new Guid("57ffb575-7c79-4133-8433-aebbcd71f824")
+                            RoleId = new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab")
                         },
                         new
                         {
                             UserId = new Guid("1abb6e28-793d-460f-8a24-745998356da8"),
-                            RoleId = new Guid("4716f673-cef5-4edd-b67d-9c71599b9fab")
+                            RoleId = new Guid("1abb6e28-793d-460f-8a24-745998356da8")
                         },
                         new
                         {
                             UserId = new Guid("2e3566a9-02b1-4ec4-a2d4-b3bb3c4f2b45"),
-                            RoleId = new Guid("1abb6e28-793d-460f-8a24-745998356da8")
+                            RoleId = new Guid("2e3566a9-02b1-4ec4-a2d4-b3bb3c4f2b45")
                         });
                 });
 

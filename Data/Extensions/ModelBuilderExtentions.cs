@@ -59,32 +59,32 @@ public static class ModelBuilderExtentions
         });
 
         List<Rack> racks = new List<Rack>();
-        for (int i = 0; i < 8; i++)
+        for (int i = 1; i <= 8; i++)
         {
-            for (int j = 0; j < 8; j++)
+            for (int j = 1; j <= 8; j++)
             {
                 racks.Add(new Rack
                 {
                     Id = (j - 1) * 8 + i,
                     MaxPower = 6000,
-                    Column = i,
-                    Row = j,
+                    Column = i - 1,
+                    Row = j - 1,
                     Size = 42,
                     AreaId = 1
                 });
             }
         }
 
-        for (int i = 0; i < 8; i++)
+        for (int i = 1; i <= 8; i++)
         {
-            for (int j = 0; j < 5; j++)
+            for (int j = 1; j <= 5; j++)
             {
                 racks.Add(new Rack
                 {
                     Id = 8 * 8 + (j - 1) * 8 + i,
                     MaxPower = 6000,
-                    Column = i,
-                    Row = j,
+                    Column = i - 1,
+                    Row = j - 1,
                     Size = 42,
                     AreaId = 2
                 });
@@ -297,9 +297,9 @@ public static class ModelBuilderExtentions
 
         builder.Entity<Contact>(b =>
         {
-            b.HasIndex(e => e.PhoneNumber).IsUnique().HasFilter("IsDeleted = false");
-            b.HasIndex(e => e.Email).IsUnique().HasFilter("IsDeleted = false");
-            b.HasIndex(e => e.CCCD).IsUnique().HasFilter("IsDeleted = false");
+            b.HasIndex(e => e.PhoneNumber).IsUnique().HasFilter("\"IsDeleted\" = false");
+            b.HasIndex(e => e.Email).IsUnique().HasFilter("\"IsDeleted\" = false");
+            b.HasIndex(e => e.CCCD).IsUnique().HasFilter("\"IsDeleted\" = false");
         });
 
         builder.Entity<IpAddress>(b =>
