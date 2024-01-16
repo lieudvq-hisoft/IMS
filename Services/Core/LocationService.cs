@@ -80,7 +80,7 @@ public class LocationService : ILocationService
             if (rack != null)
             {
                 var availableLocations = rack.Locations
-                   .Where(location => !location.LocationAssignments.Any() && !location.RequestExpandLocations.Select(x => x.RequestExpand).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted))
+                   .Where(location => !location.LocationAssignments.Any() && !location.RequestExpandLocations.Select(x => x.RequestExpand).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted) && !location.IsReserved)
                    .ToList();
                 var resultLocations = new List<Location>();
                 foreach (var location in availableLocations)
