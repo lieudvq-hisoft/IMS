@@ -41,7 +41,7 @@ public class RequestHost : BaseEntity
         bool matchPurpose = searchModel.IsRemoved != null ? IsRemoval == searchModel.IsRemoved : true;
         bool matchServer = searchModel.ServerAllocationId != null ? ServerAllocationId == searchModel.ServerAllocationId : true;
         bool matchCustomerId = searchModel.CustomerId != null ? ServerAllocation.CustomerId == searchModel.CustomerId : true;
-        bool matchUser = searchModel.UserId != null ? RequestHostUsers.Any(x => x.UserId == searchModel.UserId) : true;
+        bool matchUser = searchModel.UserId != null ? ServerAllocation.Customer.SaleStaff == searchModel.UserId : true;
 
         return matchSearchValue && matchIpAssignmentTypes && matchStatus && matchMasterIp && matchCustomer && matchPurpose && matchServer && matchCustomerId && matchUser;
     }

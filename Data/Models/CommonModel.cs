@@ -30,7 +30,7 @@ public class RequestHostDocumentFileUploadModel
     [Required]
     public IFormFile InspectionReport { get; set; }
 
-    [FileExtensions(Extensions = "pdf,docx,doc,jpeg")]
+    [FileExtensions(Extensions = "pdf,jpg,jpeg")]
     public string InspectionReportFileName => InspectionReport?.FileName;
 }
 
@@ -39,7 +39,7 @@ public class ServerAllocationRemovalReportFileUploadModel
     [Required]
     public IFormFile RemovalReport { get; set; }
 
-    [FileExtensions(Extensions = "pdf,docx,doc,jpeg")]
+    [FileExtensions(Extensions = "pdf,jpg,jpeg")]
     public string RemovalReporttFileName => RemovalReport?.FileName;
 }
 

@@ -237,10 +237,16 @@ public class CustomerService : ICustomerService
                 result.ErrorMessage = "Contract number existed";
             }
 
-            if (_dbContext.Contacts.Any(x => x.Email == model.Email || x.PhoneNumber == model.PhoneNumber))
+            if (_dbContext.Contacts.Any(x => x.Email == model.Email))
             {
                 validPrecondition = false;
-                result.ErrorMessage = "There is contact with email contact";
+                result.ErrorMessage = "There is contact with email exist";
+            }
+
+            if (_dbContext.Contacts.Any(x => x.PhoneNumber == model.PhoneNumber))
+            {
+                validPrecondition = false;
+                result.ErrorMessage = "There is contact with phonenumber exist";
             }
 
             if (validPrecondition)

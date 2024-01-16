@@ -59,9 +59,9 @@ public static class ModelBuilderExtentions
         });
 
         List<Rack> racks = new List<Rack>();
-        for (int i = 1; i <= 8; i++)
+        for (int i = 0; i < 8; i++)
         {
-            for (int j = 1; j <= 8; j++)
+            for (int j = 0; j < 8; j++)
             {
                 racks.Add(new Rack
                 {
@@ -75,9 +75,9 @@ public static class ModelBuilderExtentions
             }
         }
 
-        for (int i = 1; i <= 8; i++)
+        for (int i = 0; i < 8; i++)
         {
-            for (int j = 1; j <= 5; j++)
+            for (int j = 0; j < 5; j++)
             {
                 racks.Add(new Rack
                 {
