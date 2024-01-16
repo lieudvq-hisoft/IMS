@@ -47,16 +47,16 @@ public class ServerAllocation : BaseEntity
         return $"{rack.Area.Name}{rack.Column}-{rack.Row} U{startPosition + 1}-U{endPosition + 1}";
     }
 
-    public bool Filter(ServerAllocationSearchModel searchModel)
-    {
-        var matchSearchValue = (MyFunction.ConvertToUnSign(Name ?? "").IndexOf(MyFunction.ConvertToUnSign(searchModel.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0)
-            || (MyFunction.ConvertToUnSign(Customer.CompanyName ?? "").IndexOf(MyFunction.ConvertToUnSign(searchModel.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0)
-            || (MyFunction.ConvertToUnSign(MasterIpAddress ?? "").IndexOf(MyFunction.ConvertToUnSign(searchModel.SearchValue ?? ""), StringComparison.CurrentCultureIgnoreCase) >= 0);
+    //public bool Filter(ServerAllocationSearchModel searchModel)
+    //{
+    //    var matchSearchValue = Name.ToLower().Contains(searchModel.SearchValue) 
+    //        || Customer.CompanyName.ToLower().Contains(searchModel.SearchValue)
+    //        || MasterIpAddress.Contains(searchModel.SearchValue);
 
-        var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(Status) : true;
-        var matchCustomerId = searchModel.CustomerId != null ? CustomerId == searchModel.CustomerId : true;
-        var matchRack = searchModel.RackId != null ? LocationAssignments.Select(x => x.Location.RackId).Distinct().Any(x => x == searchModel.RackId) : true;
-        var matchUser = Customer.UserCustomers.Any(x => x.UserId == searchModel.UserId) || searchModel.UserId == null;
-        return matchSearchValue && matchStatus && matchCustomerId && matchRack && matchUser;
-    }
+    //    var matchStatus = searchModel.Status != null ? searchModel.Status.Contains(Status) : true;
+    //    var matchCustomerId = searchModel.CustomerId != null ? CustomerId == searchModel.CustomerId : true;
+    //    var matchRack = searchModel.RackId != null ? LocationAssignments.Select(x => x.Location.RackId).Distinct().Any(x => x == searchModel.RackId) : true;
+    //    var matchUser = Customer.UserCustomers.Any(x => x.UserId == searchModel.UserId) || searchModel.UserId == null;
+    //    return matchSearchValue && matchStatus && matchCustomerId && matchRack && matchUser;
+    //}
 }

@@ -7,6 +7,8 @@ using Data.Enums;
 using Data.Models;
 using Data.Utils.Common;
 using Data.Utils.Paging;
+using DocumentFormat.OpenXml.Wordprocessing;
+using Grpc.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Services.Utilities;
@@ -54,15 +56,19 @@ public class ServerAllocationService : IServerAllocationService
 
         try
         {
+            var searchValue = searchModel.SearchValue?.ToLower() ?? "";
             var serverAllocations = _dbContext.ServerAllocations
                 .Include(x => x.IpAssignments).ThenInclude(x => x.IpAddress)
                 .Include(x => x.Customer).ThenInclude(x => x.UserCustomers)
                 .Include(x => x.LocationAssignments).ThenInclude(x => x.Location).ThenInclude(x => x.Rack).ThenInclude(x => x.Area)
                 .Include(x => x.Incidents)
-                .Where(delegate (ServerAllocation x)
-                {
-                    return x.Filter(searchModel);
-                })
+                .Where(x => x.Customer.UserCustomers.Any(x => x.UserId == searchModel.UserId) || searchModel.UserId == null)
+                .Where(x => searchModel.RackId != null ? x.LocationAssignments.Select(x => x.Location.RackId).Distinct().Any(x => x == searchModel.RackId) : true)
+                .Where(x => searchModel.CustomerId != null ? x.CustomerId == searchModel.CustomerId : true)
+                .Where(x => searchModel.Status != null ? searchModel.Status.Contains(x.Status) : true)
+                .Where(x => x.Name.ToLower().Contains(searchModel.SearchValue)
+            || x.Customer.CompanyName.ToLower().Contains(searchModel.SearchValue)
+            || x.MasterIpAddress.Contains(searchModel.SearchValue))
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, serverAllocations.Count());
