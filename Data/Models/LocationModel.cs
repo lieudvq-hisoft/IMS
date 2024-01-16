@@ -40,6 +40,7 @@ public class LocationRackMapModel
 public class LocationSearchModel
 {
     public int? LocationId { get; set; }
+    public int? RackId { get; set; }
     public bool? Available { get; set; }
     public bool? IsReserved { get; set; }
 }

@@ -46,6 +46,7 @@ public class LocationService : ILocationService
                 .Where(x => searchModel.LocationId != null ? x.Id == searchModel.LocationId : true)
                 .Where(x => x.IsReserved == searchModel.IsReserved || searchModel.IsReserved == null)
                 .Where(location => searchModel.Available != null ? !location.LocationAssignments.Any() && !location.RequestExpandLocations.Select(x => x.RequestExpand).Any(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted) : true)
+                .Where(x => x.RackId == searchModel.RackId || searchModel.RackId == null)
                 .AsQueryable();
 
             var paging = new PagingModel(paginationModel.PageIndex, paginationModel.PageSize, Locations.Count());
