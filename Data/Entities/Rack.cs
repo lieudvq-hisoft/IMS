@@ -13,6 +13,6 @@ public class Rack : BaseEntity
 
     public string DisplayRack()
     {
-        return $"{Area.Name}{Column}-{Row}";
+        return $"{Area.Name}{Column + 1}-{Row + 1}";
     }
 }

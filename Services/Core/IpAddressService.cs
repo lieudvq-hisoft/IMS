@@ -314,9 +314,9 @@ public class IpAddressService : IIpAddressService
                 ipAddresses.ForEach(x =>
                 {
                     var masterIpServer = x.IpAssignments.FirstOrDefault(x => x.Type == IpAssignmentTypes.Master)?.ServerAllocation;
-                    var masterIpServerIps = masterIpServer.IpAssignments.Select(x => x.IpAddress);
                     if (masterIpServer != null)
                     {
+                        var masterIpServerIps = masterIpServer.IpAssignments.Select(x => x.IpAddress);
                         if (isBlock)
                         {
                             masterIpServer.Status = ServerAllocationStatus.Pausing;

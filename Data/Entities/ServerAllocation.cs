@@ -44,7 +44,7 @@ public class ServerAllocation : BaseEntity
         var rack = locations.Select(x => x.Rack).Distinct().FirstOrDefault();
         var startPosition = locations.Select(x => x.Position).Min();
         var endPosition = locations.Select(x => x.Position).Max();
-        return $"{rack.Area.Name}{rack.Column}-{rack.Row} U{startPosition + 1}-U{endPosition + 1}";
+        return $"{rack.Area.Name}{rack.Column + 1}-{rack.Row + 1} U{startPosition + 1}-U{endPosition + 1}";
     }
 
     //public bool Filter(ServerAllocationSearchModel searchModel)
