@@ -717,8 +717,7 @@ public class IpSubnetService : IIpSubnetService
             var parentIpSubnets = _dbContext.IpSubnets
                 .Include(_ => _.SubNets)
                 .Where(_ => _.ParentNetworkId == null && !_.IsDeleted)
-                .ToList()
-                .OrderBy(x => $"{x.FirstOctet}.{x.SecondOctet}.{x.ThirdOctet}.{x.FourthOctet}");
+                .ToList();
 
             var treeView = new List<IpSubnetTreeModel>();
             foreach (var node in parentIpSubnets)
@@ -739,7 +738,7 @@ public class IpSubnetService : IIpSubnetService
             }
 
             result.Succeed = true;
-            result.Data = treeView;
+            result.Data = treeView.OrderBy(x => $"{x.FirstOctet}.{x.SecondOctet}.{x.ThirdOctet}.{x.FourthOctet}");
         }
         catch (Exception e)
         {
