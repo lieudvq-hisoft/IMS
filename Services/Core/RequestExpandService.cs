@@ -349,7 +349,10 @@ public class RequestExpandService : IRequestExpandService
 
         try
         {
-            var requestExpand = _dbContext.RequestExpands.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == requestExpandId);
+            var requestExpand = _dbContext.RequestExpands
+                .Include(x => x.ServerAllocation)
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
+                .FirstOrDefault(x => x.Id == requestExpandId);
             if (requestExpand == null)
             {
                 result.ErrorMessage = RequestExpandErrorMessage.NOT_EXISTED;
@@ -361,6 +364,8 @@ public class RequestExpandService : IRequestExpandService
             else
             {
                 requestExpand.Status = RequestStatus.Failed;
+                var appointment = requestExpand.RequestExpandAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted);
+                appointment.Status = RequestStatus.Failed;
                 if (model.SaleNote != null)
                 {
                     requestExpand.SaleNote = model.SaleNote;

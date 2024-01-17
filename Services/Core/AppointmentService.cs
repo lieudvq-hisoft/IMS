@@ -1933,7 +1933,7 @@ public class AppointmentService : IAppointmentService
 
                     var now = DateTime.UtcNow;
                     document.RenderText("__Time__", $"{now.Hour} Giờ {now.Minute} Phút");
-                    document.RenderText("__Date__", $"ngày {now.Day:dd} tháng {now.Month:MM} Năm {now.Year:yyyy}");
+                    document.RenderText("__Date__", $"ngày {now.Day} tháng {now.Month} Năm {now.Year}");
                     document.RenderText("__PartNumber__", textInfo.ToTitleCase(serverAllocation.PartNumber ?? ""));
 
                     document.RenderText("__CompanyName__", serverAllocation.Customer.CompanyName.ToUpper());

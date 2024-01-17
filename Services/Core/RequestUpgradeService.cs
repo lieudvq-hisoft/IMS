@@ -394,7 +394,10 @@ public class RequestUpgradeService : IRequestUpgradeService
 
         try
         {
-            var requestUpgrade = _dbContext.RequestUpgrades.Include(x => x.ServerAllocation).FirstOrDefault(x => x.Id == requestUpgradeId);
+            var requestUpgrade = _dbContext.RequestUpgrades
+                .Include(x => x.ServerAllocation)
+                .Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
+                .FirstOrDefault(x => x.Id == requestUpgradeId);
             if (requestUpgrade == null)
             {
                 result.ErrorMessage = RequestUpgradeErrorMessage.NOT_EXISTED;
@@ -406,6 +409,8 @@ public class RequestUpgradeService : IRequestUpgradeService
             else
             {
                 requestUpgrade.Status = RequestStatus.Failed;
+                var appointment = requestUpgrade.RequestUpgradeAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted);
+                appointment.Status = RequestStatus.Failed;
                 if (requestUpgrade.TechNote != null)
                 {
                     requestUpgrade.TechNote = model.TechNote;
