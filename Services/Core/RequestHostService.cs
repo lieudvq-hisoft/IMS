@@ -1156,9 +1156,11 @@ public class RequestHostService : IRequestHostService
 
                     document.RenderText("__Position__", textInfo.ToTitleCase(_config["Appointment:Position"]));
 
+                    document.RenderText("__PartNumber__", textInfo.ToTitleCase(serverAllocation.PartNumber ?? ""));
+
                     //document.RenderText("__Location__", textInfo.ToTitleCase(model.Location));
 
-                    document.TickCheckBoxInDocx("Allocation");
+                    document.TickCheckBoxInDocx("Service");
 
                     document.RenderText("__ServerName__", serverAllocation.Name);
 
