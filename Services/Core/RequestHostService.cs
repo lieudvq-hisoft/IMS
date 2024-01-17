@@ -1309,6 +1309,7 @@ public class RequestHostService : IRequestHostService
             {
 
                 requestHost.DocumentConfirm = true;
+                requestHost.DateConfirm = DateTime.Now;
                 _dbContext.SaveChanges();
                 result.Succeed = true;
                 result.Data = requestHost.Id;
