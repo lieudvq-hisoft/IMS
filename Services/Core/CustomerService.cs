@@ -470,7 +470,7 @@ public class CustomerService : ICustomerService
         var result = new ResultModel();
         result.Succeed = false;
 
-        var customer = _dbContext.Customers.FirstOrDefault(x => x.Email == model.Email);
+        var customer = _dbContext.Customers.FirstOrDefault(x => x.Email.ToLower() == model.Email.ToLower());
 
         if (customer != null)
         {
