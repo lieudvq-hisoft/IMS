@@ -201,7 +201,7 @@ public class NotificationService : INotificationService
                         Title = title,
                         Body = body,
                         Data = data,
-                        RegistrationIds = userReceive.FcmTokens.ToList(),
+                        RegistrationIds = userReceive.FcmTokens,
                         UserId = userReceive.Id,
                     };
                     var response = await _fireBaseNotificationService.SendNotification(result);
