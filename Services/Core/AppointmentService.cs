@@ -1949,7 +1949,17 @@ public class AppointmentService : IAppointmentService
                     document.RenderText("__DeviceCondition__", model.DeviceCondition);
 
                     int counter = 1;
-                    var receiptReportModels = new List<ReceiptReportModel>();
+                    var receiptReportModels = new List<ReceiptReportModel>
+                    {
+                        new ReceiptReportModel
+                        {
+                            PartNo = counter++,
+                            Model = serverAllocation.Name,
+                            Action = !serverRemoved ? "Thêm" : "Gỡ",
+                            Quantity = 1,
+                            Unit = "Cái"
+                        }
+                    };
                     foreach (var hardware in serverAllocation.ServerHardwareConfigs)
                     {
                         var receiptReportModel = new ReceiptReportModel
