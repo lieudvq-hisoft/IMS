@@ -410,7 +410,10 @@ public class RequestUpgradeService : IRequestUpgradeService
             {
                 requestUpgrade.Status = RequestStatus.Failed;
                 var appointment = requestUpgrade.RequestUpgradeAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted);
-                appointment.Status = RequestStatus.Failed;
+                if (appointment != null)
+                {
+                    appointment.Status = RequestStatus.Failed;
+                }
                 if (requestUpgrade.TechNote != null)
                 {
                     requestUpgrade.TechNote = model.TechNote;
@@ -517,7 +520,7 @@ public class RequestUpgradeService : IRequestUpgradeService
         {
             var requestUpgrade = _dbContext.RequestUpgrades
                 .Include(x => x.ServerAllocation)
-                .Include(x => x.RequestUpgradeAppointments)
+                .Include(x => x.RequestUpgradeAppointments).ThenInclude(x => x.Appointment)
                 .FirstOrDefault(x => x.Id == requestUpgradeId);
             if (requestUpgrade == null)
             {
@@ -542,7 +545,11 @@ public class RequestUpgradeService : IRequestUpgradeService
                 requestUpgrade.Status = RequestStatus.Denied;
                 requestUpgrade.SaleNote = model.SaleNote;
                 requestUpgrade.DateEvaluated = DateTime.Now;
-                _dbContext.RequestUpgradeAppointments.RemoveRange(requestUpgrade.RequestUpgradeAppointments);
+                var appointment = requestUpgrade.RequestUpgradeAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted);
+                if (appointment != null)
+                {
+                    appointment.Status = RequestStatus.Failed;
+                }
                 _dbContext.RequestUpgradeUsers.Add(new RequestUpgradeUser
                 {
                     Action = RequestUserAction.Evaluate,

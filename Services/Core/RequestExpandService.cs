@@ -365,7 +365,10 @@ public class RequestExpandService : IRequestExpandService
             {
                 requestExpand.Status = RequestStatus.Failed;
                 var appointment = requestExpand.RequestExpandAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted);
-                appointment.Status = RequestStatus.Failed;
+                if (appointment != null)
+                {
+                    appointment.Status = RequestStatus.Failed;
+                }
                 if (model.SaleNote != null)
                 {
                     requestExpand.SaleNote = model.SaleNote;
@@ -542,7 +545,7 @@ public class RequestExpandService : IRequestExpandService
         try
         {
             var requestExpand = _dbContext.RequestExpands
-                .Include(x => x.RequestExpandAppointments)
+                .Include(x => x.RequestExpandAppointments).ThenInclude(x => x.Appointment)
                 .Include(x => x.ServerAllocation)
                 .FirstOrDefault(x => x.Id == requestExpandId);
             if (requestExpand == null)
@@ -568,7 +571,11 @@ public class RequestExpandService : IRequestExpandService
                 requestExpand.Status = RequestStatus.Denied;
                 requestExpand.DateEvaluated = DateTime.Now;
                 requestExpand.SaleNote = model.SaleNote;
-                _dbContext.RequestExpandAppointments.RemoveRange(requestExpand.RequestExpandAppointments);
+                var appointment = requestExpand.RequestExpandAppointments.Select(x => x.Appointment).FirstOrDefault(x => x.Status == RequestStatus.Waiting || x.Status == RequestStatus.Accepted);
+                if (appointment != null)
+                {
+                    appointment.Status = RequestStatus.Failed;
+                }
                 _dbContext.RequestExpandUsers.Add(new RequestExpandUser
                 {
                     Action = RequestUserAction.Evaluate,
