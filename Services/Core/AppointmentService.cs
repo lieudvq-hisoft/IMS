@@ -1570,7 +1570,6 @@ public class AppointmentService : IAppointmentService
                 serverAllocation.ServerLocation = serverAllocation.GetServerLocation();
                 _dbContext.SaveChanges();
                 result.Succeed = true;
-                //result.Data = _mapper.Map<List<LocationAssignmentModel>>(locationAssignments);
             }
         }
         catch (Exception e)
