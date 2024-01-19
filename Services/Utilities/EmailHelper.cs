@@ -41,7 +41,7 @@ public class EmailHelper : IEmailHelper
             "<div>Dear Customer,</div><br><br>" +
             $"<div>Your account with the email <b>{email}</b> " +
             $"and the Password <b>[{password}]</b> was created successfully.<br>" +
-            "Please consider changing the password after the first login.</div><br><br>" +
+            $"Please consider changing the password after the first login into {_config[$"Email:{_env}:Link"]}.</div><br><br>" +
             "<div>Sincerely,<br>The QSTC team.</div>",
             IsBodyHtml = true,
         };
