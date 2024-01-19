@@ -110,7 +110,7 @@ public class UserService : IUserService
         {
             Access_token = serializedToken,
             Token_type = "Bearer",
-            Expires_in = int.Parse(_config["Jwt:ExpireTimes"]) * 60 * 24,
+            Expires_in = int.Parse(_config["Jwt:ExpireTimes"]) * 60 * 60 * 24,
             UserID = user.Id.ToString(),
             UserName = user.UserName,
             PhoneNumber = user.PhoneNumber,

@@ -511,7 +511,7 @@ public class CustomerService : ICustomerService
         {
             Access_token = serializedToken,
             Token_type = "Bearer",
-            Expires_in = int.Parse(_config["Jwt:ExpireTimes"]) * 60,
+            Expires_in = int.Parse(_config["Jwt:ExpireTimes"]) * 60 * 60 * 24,
             UserID = customer.Id.ToString(),
             PhoneNumber = customer.PhoneNumber,
             Roles = new List<string>() { "Customer" }
