@@ -524,6 +524,25 @@ public class RequestExpandService : IRequestExpandService
                         }
                     });
                 }
+                var techs = _dbContext.Users
+                   .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                   .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Tech")).ToList();
+                foreach (var tech in techs)
+                {
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = tech.Id,
+                        Action = "Accepted",
+                        Title = "Allocation request accepted",
+                        Body = "There's an allocation request just accepted",
+                        Data = new NotificationData
+                        {
+                            Key = "RequestExpand",
+                            Value = requestExpandModelString
+                        }
+                    });
+                }
+
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestHostModel>(requestExpand);
             }

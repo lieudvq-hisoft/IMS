@@ -498,6 +498,25 @@ public class RequestUpgradeService : IRequestUpgradeService
                         Value = requestModelString
                     }
                 });
+                var techs = _dbContext.Users
+                   .Include(x => x.UserRoles).ThenInclude(x => x.Role)
+                   .Where(x => x.UserRoles.Select(x => x.Role).Any(x => x.Name == "Tech")).ToList();
+                foreach (var tech in techs)
+                {
+                    await _notiService.Add(new NotificationCreateModel
+                    {
+                        UserId = tech.Id,
+                        Action = "Accepted",
+                        Title = "Upgrade request accepted",
+                        Body = "There's an upgrade request just accepted",
+                        Data = new NotificationData
+                        {
+                            Key = "RequestUpgrade",
+                            Value = requestModelString
+                        }
+                    });
+                }
+
                 result.Succeed = true;
                 result.Data = _mapper.Map<RequestUpgradeModel>(requestUpgrade);
             }
